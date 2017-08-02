@@ -1,0 +1,9 @@
+{
+  "meta": {
+    "local": true
+  },
+  "checked": true,
+  "name": "online",
+  "description": "空的host文件，选择此文件，proxy不进行host解析",
+  "content": {}
+}

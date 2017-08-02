@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "local": true
+  },
+  "checked": false,
+  "name": "qahost",
+  "description": "qa环境",
+  "content": {
+    "*.koudaitong.com": "192.168.66.239",
+    "*.youzan.com": "192.168.66.239",
+    "static.youzan.com": "127.0.0.1",
+    "static.koudaitong.com": "127.0.0.1"
+  }
+}

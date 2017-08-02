@@ -1,0 +1,13 @@
+{
+  "responderParams": {
+    "project name": "path to your project"
+  },
+  "mockServer": "10.9.43.182",
+  "exceptionLogLevel": "info",
+  "connectLogLevel": "info",
+  "requestLogLevel": "info",
+  "proxyPort": 8001,
+  "requestTimeoutTime": 10000,
+  "gitlabToken": "",
+  "enableRule": true
+}

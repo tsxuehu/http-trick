@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "local": true
+  },
+  "checked": false,
+  "name": "pre",
+  "description": "预发",
+  "content": {
+    "*.youzan.com": "192.168.66.240",
+    "*.koudaitong.com": "192.168.66.240",
+    "static.youzan.com": "127.0.0.1",
+    "static.koudaitong.com": "127.0.0.1"
+  }
+}
