@@ -7,6 +7,7 @@ import parseDomain from "parse-domain";
 export default class CertificationManager {
     static getCertificationManager(certTempDir: string,
                                    root: Certification): CertificationManager {
+        // 每一个目录只对应一个manager
         return new CertificationManager(certTempDir, root);
     }
 
