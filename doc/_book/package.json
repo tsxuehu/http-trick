@@ -1,10 +1,10 @@
 {
   "name": "admin",
   "version": "1.0.0",
-  "description": "zan proxy admin page",
+  "description": "zan proxy doc",
   "author": "taiyong <taiyong@youzan.com>",
   "scripts": {
     "dev": "gitbook serve",
-    "build": "gitbook build . ../front-end-proxy/webui/help"
+    "build": "gitbook build . ../static/help"
   }
 }

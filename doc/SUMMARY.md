@@ -12,3 +12,8 @@
 * [WebSocket Mock](websocket_mock/README.md)
 * [chrome代理配置](chrome/README.md)
 * [手机代理配置](phone/README.md)
+* [内部机制](internal/README.md)
+   * [代理流程](internal/proxy.md)
+   * [请求处理流程](internal/request-flow.md)
+   * [ws调试](internal/ws-debug.md)
+

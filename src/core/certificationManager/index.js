@@ -3,30 +3,30 @@ import parseDomain from "parse-domain";
 import * as fileUtils from "../utils/file";
 import pem from "pem";
 
-
+let manager;
 /**
  * 证书管理
  */
 export default class CertificationManager {
-    private static managerMap = {};
-
-    static getCertificationManager(certTempDir: string,
-                                   root: Certification): CertificationManager {
-        // 每一个目录只对应一个manager
-        let manager = CertificationManager.managerMap[certTempDir];
+    /**
+     *
+     * @returns {*}
+     */
+    static getCertificationManager() {
         if (!manager) {
+            // 获取临时目录 和 根证书
+
             manager = new CertificationManager(certTempDir, root);
-            CertificationManager.managerMap[certTempDir] = manager;
         }
         return manager;
     }
 
     /**
-     * 为指定域名创建证书
+     * 为指定域名创建证书 (使用自定义的根证书)
      * @param host
      * @returns {Promise<Certification>}
      */
-    static createCertificate(host: string, root: Certification): Promise<Certification> {
+    static createCertificate(host, root) {
         return new Promise((resolve, reject) => {
             pem.createCertificate({
                 serviceKey: root.key,
@@ -37,20 +37,22 @@ export default class CertificationManager {
                 days: 365 * 10
             }, function (err, result) {
                 if (err) reject(err);
-                resolve({key: result.clientKey, cert: result.certificate} as Certification);
+                resolve({key: result.clientKey, cert: result.certificate});
             })
-        }) as Promise<Certification>;
+        });
 
     }
 
-    cache: any;
-    // 存放证书的目录
-    certTempDir: string;
-    // 根证书
-    root: Certification;// 根证书
-    private constructor(certTempDir: string,
-                        root: Certification) {
+    /**
+     *
+     * @param certTempDir 存放证书的目录
+     * @param root 根证书的key 和 cert
+     */
+    constructor(certTempDir,
+                        root) {
+        // 存放证书的目录
         this.certTempDir = certTempDir;
+        // 根证书
         this.root = root;
         this.cache = LRU({
             max: 500,
@@ -69,7 +71,7 @@ export default class CertificationManager {
      * @param host
      * @returns {Promise<Certification>}
      */
-    async getCertificationForHost(host: string): Promise<Certification> {
+    async getCertificationForHost(host) {
         let domain = host;
         let parsed = parseDomain(host);
         // 寻找一级域名
@@ -86,8 +88,8 @@ export default class CertificationManager {
         let cacheHit = true; // 是否命中缓存标识
 
         // 从缓存里取数据
-        let cert: string = this.cache.get(certKey);
-        let key: string = this.cache.get(keykey);
+        let cert = this.cache.get(certKey);
+        let key = this.cache.get(keykey);
 
         // 从存放证书的临时文件夹里取数据
         if (!cert || !key) {
@@ -112,7 +114,7 @@ export default class CertificationManager {
         return {
             cert,
             key
-        } as Certification;
+        };
     }
 
     /**
@@ -120,17 +122,11 @@ export default class CertificationManager {
      * @param root
      * @returns {Promise<void>}
      */
-    async resetRootCertificate(root: Certification) {
+    async resetRootCertificate(root) {
         // 清证书缓存
 
         // 设置值
     }
-
-
-}
-export type Certification = {
-    cert: string,
-    key: string
 }
 
 const clientKey = `-----BEGIN RSA PRIVATE KEY-----

@@ -8,6 +8,7 @@
     "commander": "^2.9.0",
     "cookie": "^0.3.1",
     "copy-dir": "^0.3.0",
+    "get-port": "^3.2.0",
     "http-proxy": "^1.16.2",
     "ip": "^0.3.2",
     "jsonfile": "^2.4.0",
@@ -27,17 +28,27 @@
     "pem": "^1.9.4",
     "psaux": "^0.3.0",
     "query-string": "^4.3.4",
+    "regenerator-runtime": "^0.10.5",
     "rimraf": "^2.6.1",
     "socket.io": "^1.7.3",
     "vue": "^2.1.10",
     "ws": "2.2.1"
   },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.6.0",
+    "babel-register": "^6.24.1"
+  },
   "repository": {
     "type": "git",
     "url": ""
   },
+  "scripts": {
+    "clean": "",
+    "build": "babel src -d dist"
+  },
   "bin": {
-    "zan-proxy": "./bin.js"
+    "zan-proxy": "./dist/bin.js"
   },
   "author": ""
 }
