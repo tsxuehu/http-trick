@@ -5,6 +5,13 @@
  */
 export default class ConfigureRepository {
     /**
+     * 是否运行在服务器端
+     * @returns {boolean}
+     */
+    isServer(){
+        return false;
+    }
+    /**
      * 保存用户的配置
      * @param userId
      * @param config

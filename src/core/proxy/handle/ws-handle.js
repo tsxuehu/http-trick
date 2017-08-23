@@ -1,11 +1,10 @@
-var dc = require('../../datacenter');
-var url = require('url');
-var httpProxy = require('http-proxy');
-var proxy = httpProxy.createProxyServer({
-    secure: false
-});
-var log = require('../../utils/log');
-var wsMock = require('../ws-mock');
+
+import url from 'url';
+import httpProxy from 'http-proxy';
+import Log from '../../utils/log';
+import WsMock from '../wsmock'
+
+
 
 var proxyEvent = require('../../utils/proxyEvent');
 
@@ -22,7 +21,12 @@ export default class WsHandle {
     }
 
     constructor() {
-
+        this.log = Log.getLog();
+        // 创建httpProxy
+        this.proxy = httpProxy.createProxyServer({
+            secure: false
+        });
+        // 为httpProxy注册事件处理函数
     }
 
     // websocket请求转发 ws测试服务器ws://echo.websocket.org/

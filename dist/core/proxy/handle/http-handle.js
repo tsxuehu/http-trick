@@ -1,3 +1,8 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 var actionMap = require('../action');
 var getMatchedRule = require('./getMatchedRule');
 var notify = require('../../notify');
@@ -9,22 +14,20 @@ var runActions = require('./../action/run-actions');
 // request session id seed
 var idx = 0;
 let httpHandle;
-export default class HttpHandle {
+class HttpHandle {
 
-    static getHttpHandle(){
-        if (!httpHandle){
+    static getHttpHandle() {
+        if (!httpHandle) {
             httpHandle = new HttpHandle();
         }
         return httpHandle;
     }
-    constructor(){
-
-    }
+    constructor() {}
     /**
      * 正常的http请求处理流程，
      * 处理流程 更具转发规则、mock规则
      */
-    handle(req, res){
+    handle(req, res) {
         // 解析请求参数
         var urlObj = parseUrl(req);
         req.urlObj = urlObj; // 绑定url请求信息，方便异常处理函数中做日志
@@ -32,7 +35,7 @@ export default class HttpHandle {
         // 如果是 ui server请求，则直接转发不做记录
 
         if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == dc.getPcIp()) && urlObj.port == dc.getRealUiPort()) {
-            actionMap['bypass'].run({req, res, urlObj});
+            actionMap['bypass'].run({ req, res, urlObj });
             return;
         }
 
@@ -92,17 +95,8 @@ export default class HttpHandle {
             res.setHeader('fe-proxy-rule-match', encodeURI(matchedRule.info));
             runActions(req, res, urlObj, matchedRule.rule);
         } else {
-            actionMap['bypass'].run({req, res, urlObj, actionIndex: 0});
+            actionMap['bypass'].run({ req, res, urlObj, actionIndex: 0 });
         }
     }
-
-    async runAtions(){
-        // 查找过滤器
-
-        // 执行前置动作
-
-        // 执行请求指定动作
-
-        // 执行请求后置动作
-    }
 }
+exports.default = HttpHandle;
