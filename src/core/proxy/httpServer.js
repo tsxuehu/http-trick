@@ -3,9 +3,9 @@
  */
 
 import http from "http";
-import HttpHandle from "./handle/http-handle";
-import ConnectHandle from "./handle/connect-handle";
-import WsHandle from "./handle/ws-handle";
+import HttpHandle from "./handle/httpHandle";
+import ConnectHandle from "./handle/connectHandle";
+import WsHandle from "./handle/wsHandle";
 
 
 /**

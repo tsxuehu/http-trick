@@ -15,6 +15,5 @@ module.exports = function ({res, statusCode, headers, content, logKey}) {
         res.setHeader(key, value);
     });
 
-
     res.end(buffer);
 };

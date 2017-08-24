@@ -4,13 +4,8 @@
  * Created by tsxuehu on 8/3/17.
  */
 export default class ConfigureRepository {
-    /**
-     * 是否运行在服务器端
-     * @returns {boolean}
-     */
-    isServer(){
-        return false;
-    }
+
+
     /**
      * 保存用户的配置
      * @param userId
@@ -65,5 +60,14 @@ export default class ConfigureRepository {
      */
     getProjectPathByClientIp(clientIp) {
 
+    }
+
+    /**
+     * 代理超时时间
+     * @param clientIp
+     * @returns {number}
+     */
+    getRequestTimeoutTime(clientIp) {
+        return 10000;
     }
 }

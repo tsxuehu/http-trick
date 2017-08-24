@@ -8,3 +8,10 @@ export async function readFile(path) {
 export async function writeFile(path, content) {
 
 }
+
+/**
+ * 获取配置目录
+ */
+export function getConfDir(){
+
+}

@@ -3,8 +3,8 @@ import tls from "tls";
 import crypto from "crypto";
 
 import CertificationManager from "../certificationManager";
-import HttpHandle from "./handle/http-handle";
-import WsHandle from "./handle/ws-handle";
+import HttpHandle from "./handle/httpHandle";
+import WsHandle from "./handle/wsHandle";
 
 let createSecureContext = tls.createSecureContext || crypto.createSecureContext;
 
