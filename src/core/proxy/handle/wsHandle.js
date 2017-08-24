@@ -1,15 +1,7 @@
-
-import url from 'url';
-import httpProxy from 'http-proxy';
-import Log from '../../utils/log';
-import WsMock from '../wsmock'
-
-
-
-var proxyEvent = require('../../utils/proxyEvent');
-
-proxyEvent.registHandleForWSProxy(proxy);
-
+import url from "url";
+import HttpProxy from "../../utils/httpProxy";
+import Log from "../../utils/log";
+import WsMock from "../wsmock";
 
 let wsHandle;
 export default class WsHandle {
@@ -23,10 +15,8 @@ export default class WsHandle {
     constructor() {
         this.log = Log.getLog();
         // 创建httpProxy
-        this.proxy = httpProxy.createProxyServer({
-            secure: false
-        });
-        // 为httpProxy注册事件处理函数
+        this.proxy = HttpProxy.getHttpProxy();
+        this.wsMock = WsMock.getWsMock();
     }
 
     // websocket请求转发 ws测试服务器ws://echo.websocket.org/
@@ -36,13 +26,13 @@ export default class WsHandle {
         var port = req.headers.host.split(':')[1];
         var path = url.parse(req.url).path;
         var protocal = (!!req.connection.encrypted && !/^http:/.test(req.url)) ? "https" : "http";
-        var sessionId = wsMock.getFreeSession(req.headers.host + path);
+        var sessionId = this.wsMock.getFreeSession(req.headers.host + path);
 
         if (sessionId) {
             // 有监控的客户端
-            wsMock.handleUpgrade(req, socket, head, sessionId, req.headers.host + path)
+            this.wsMock.handleUpgrade(req, socket, head, sessionId, req.headers.host + path)
         } else { // 不需要监听ws
-            proxy.ws(req, socket, head, {
+            this.proxy.ws(req, socket, head, {
                 target: {
                     protocol: protocal,
                     hostname: dc.resolveHost(host),

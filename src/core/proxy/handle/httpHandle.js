@@ -96,7 +96,7 @@ export default class HttpHandle {
         }
     }
 
-    async runAtions(){
+    async _runAtions(){
         // 查找过滤器
 
         // 执行前置动作

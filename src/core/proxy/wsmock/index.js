@@ -5,7 +5,6 @@ var _ = require('lodash');
 
 
 var EventEmitter = require('events');
-var event = new EventEmitter();
 
 /**
  * hack， 创建一个不监听端口的server，让wss暴露handleUpgrade函数
@@ -31,16 +30,21 @@ var currentSessionId = 1024;
  */
 var sessionIdInfo = {};
 let wsMock;
+/**
+ * websocket mock
+ */
 export default class WsMock {
 
     static getWsMock() {
-        if (!wsMock){
+        if (!wsMock) {
             wsMock = new WsMock();
         }
         return wsMock;
     }
 
     constructor() {
+        this.event = new EventEmitter();
+
     }
 
     getFreeSession(url) {
@@ -55,8 +59,8 @@ export default class WsMock {
 
     handleUpgrade(req, socket, head, sessionId, url) {
 
-        event.emit('page-connected', sessionId);
-        event.emit('page-msg', sessionId, '[url]: ' + url);
+        this.event.emit('page-connected', sessionId);
+        this.event.emit('page-msg', sessionId, '[url]: ' + url);
         wss.handleUpgrade(req, socket, head, function (page) {
             sessionIdInfo[sessionId].page = page;
             // 浏览器页面发出的消息，转发给监控终端
@@ -65,7 +69,7 @@ export default class WsMock {
             });
 
             page.on('close', function () {
-                event.emit('page-closed', sessionId);
+                this.event.emit('page-closed', sessionId);
                 // 调试结束 释放会话
                 if (!sessionIdInfo[sessionId]) return;
                 sessionIdInfo[sessionId].assigned = false;
@@ -79,7 +83,7 @@ export default class WsMock {
     }
 
     on(eventanme, callback) {
-        event.on(eventanme, callback);
+        this.event.on(eventanme, callback);
     }
 
     // 分配调试会话id
