@@ -3,7 +3,7 @@
  */
 // 向客户端返回错误
 
-module.exports = function (req, res, statusCode, reason) {
+export default function (req, res, statusCode, reason) {
     res.statusCode = statusCode || 500;
     res.setHeader('Content-Length', 0);
     res.setHeader('fe-proxy-reason', encodeURI(reason));

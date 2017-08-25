@@ -88,6 +88,7 @@
           {value: 'addRequestCookie', label: '修改请求cookie'},
           {value: 'redirect', label: '转发请求'},
           {value: 'data', label: '返回自定义数据'},
+          {value: 'addRequestHeader', label: '增加请求头'},
           {value: 'modifyResponseBody', label: '修改返回body'},
           {value: 'modifyResponseHeader', label: '修改返回header'}
         ],
