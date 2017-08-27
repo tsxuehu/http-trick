@@ -25,8 +25,9 @@ export default class Redirect extends Action{
             urlObj,
             rule, // 规则
             action, // 规则里的一个动作
-            requestHeaders, // 请求头
-            toSendResponse //响应内容
+            extraRequestHeaders, // 请求头
+            toClientResponse, //响应内容
+            last = true
         }) {
 
     }

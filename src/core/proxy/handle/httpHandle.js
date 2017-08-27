@@ -96,12 +96,25 @@ export default class HttpHandle {
         }
     }
 
+    /**
+     * 运行动作
+     * @returns {Promise.<void>}
+     * @private
+     */
     async _runAtions(){
+        // 额外发送的头部
+        let extraRequestHeaders = {};
+        // 要发送给浏览器的内容
+        let toClientResponse = {
+            hasContent: false,
+            headers: {},
+            body: ''
+        }
         // 查找过滤器
 
         // 执行前置动作
 
-        // 执行请求指定动作
+        // 执行请求指定动作 (获取内容时，追加header日志)
 
         // 执行请求后置动作
     }
