@@ -1,15 +1,16 @@
-/**
- * Created by tsxuehu on 8/23/17.
- */
-
 // 读取本地文件返回给客户端
 
-var mime = require('mime');
-var fs = require('fs');
-var notify = require('../../notify');
+import mime from "mime";
+import fs from "fs";
+import sendErrorToClient from "../sendToClient/error";
+
+let local;
 export default class Local {
     static getLocal() {
-
+        if (!local) {
+            local = new Local();
+        }
+        return local;
     }
 
     /**
@@ -21,7 +22,7 @@ export default class Local {
         // 本地文件
         fs.stat(path, function (err, stat) {
             if (err || !stat.isFile()) {
-                errorRes(req, res, 404, 'can not read file' + path);
+                sendErrorToClient(req, res, 404, 'can not read file ' + path);
                 return;
             }
             res.statusCode = 200;
@@ -29,7 +30,6 @@ export default class Local {
             res.setHeader('Access-Control-Allow-Origin', '*');
             res.setHeader('Content-Length', stat.size);
             res.setHeader('Content-Type', contentType + ';charset=utf-8');
-            res.setHeader(logKey || 'fe-proxy-action', encodeURI(path));
             fs.createReadStream(path).pipe(res);
         });
         return Promise.resolve(true);
@@ -46,7 +46,7 @@ export default class Local {
             // 本地文件
             fs.stat(path, function (err, stat) {
                 if (err || !stat.isFile()) {
-                    errorRes(req, res, 404, 'can not read file' + path);
+                    sendErrorToClient(req, res, 404, 'can not read file' + path);
                     resolve(true);
                     return;
                 }

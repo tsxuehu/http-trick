@@ -41,6 +41,9 @@ export default class Bypass extends Action {
         let headers = _.assign({}, req.headers, extraRequestHeaders);
 
         let ipOrHost = this.hostRepository.resolveHost(clientIp, hostname);
+        let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
+
+        res.setHeader('fe-proxy-content', encodeURI(targetUrl));
 
         if (last) {
             toClientResponse.sendedToClient = true;
@@ -49,7 +52,6 @@ export default class Bypass extends Action {
                 protocol, hostname, path, port, headers
             });
         } else {
-            let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
             this.remote.cache({
                 req, res,
                 targetUrl, headers, toClientResponse
