@@ -4,9 +4,14 @@ import HttpProxy from "../../utils/httpProxy";
 /**
  * 请求连接获取返回结果
  */
+
+let remote;
 export default class Remote {
     static getRemote() {
-
+        if (!remote) {
+            remote = new Remote();
+        }
+        return remote;
     }
 
     constructor() {
@@ -33,7 +38,7 @@ export default class Remote {
     /**
      * 将请求远程的响应内容
      */
-    cache({req, res, targetUrl, headers, toSendResponse}) {
+    cache({req, res, targetUrl, headers, toClientResponse}) {
         // 设置超时时间，节约socket资源
         return Promise.resolve().then(() => {
             return axios({
@@ -45,9 +50,9 @@ export default class Remote {
                 data: req
             });
         }).then(response => {
-            toSendResponse.hasContent = true;
-            toSendResponse.headers = Object.assign(toSendResponse.headers, response.headers);
-            toSendResponse.body = response.data;
+            toClientResponse.hasContent = true;
+            toClientResponse.headers = Object.assign(toSendResponse.headers, response.headers);
+            toClientResponse.body = response.data;
         });
     }
 }

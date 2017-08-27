@@ -1,99 +1,149 @@
-import Action from './action'
-import calcPath  from '../../utils/calcPath'
-import specContentRes  from '../response/specific-content'
-import sendToClientError  from '../sendToClient/error'
-import sendToClientSpecific  from '../sendToClient/specific'
-import localResCache from '../response/local-cache'
-import localResPipe  from '../response/local-pipe'
-import remoteResCache  from '../response/remote-cache'
-import remoteResPipe  from '../response/remote-pipe'
-import _ from 'lodash'
+import Action from "./action";
+import _ from "lodash";
+import Repository from "../../repository";
+import sendErrorToClient from "../sendToClient/error";
+import Local from "../content/local";
+import url from "url";
+import Remote from "../content/remote";
+
 /**
  * 重定向 本地 或者 远程
  */
-export default class Redirect extends Action{
-    static getRedirect(){
+export default class Redirect extends Action {
+    static getRedirect() {
 
+    }
+
+    constructor() {
+        super();
+        this.hostRepository = Repository.getHostRepository();
+        this.configureRepository = Repository.getConfigureRepository();
+        this.remote = Remote.getRemote();
+        this.local = Local.getLocal();
+    }
+
+    willGetContent() {
+        return true;
     }
 
     /**
      * 运行处理动作
      */
-    run({
-            req,
-            res,
-            urlObj,
-            rule, // 规则
-            action, // 规则里的一个动作
-            extraRequestHeaders, // 请求头
-            toClientResponse, //响应内容
-            last = true
-        }) {
+    async run({
+                  req,
+                  res,
+                  urlObj,
+                  clientIp,
+                  rule, // 规则
+                  action, // 规则里的一个动作
+                  requestContent, // 请求内容
+                  extraRequestHeaders, // 请求头
+                  toClientResponse, //响应内容
+                  last = true
+              }) {
+        //================== 转发到本地 或远程
+        let {href} = urlObj;
+        // 解析目标
+        let target = this.configureRepository.calcPath(clientIp, href, rule.match, action.data.target);
+        if (!target) {
+            toClientResponse.sendedToClient = true;
+            sendErrorToClient(req, res, 500, 'target parse error' + action.data.target);
+            return;
+        }
+        // 远程
+        if (target.startsWith('http')) {
+            await this._toRemote({
+                req,
+                res,
+                clientIp,
+                target,
+                extraRequestHeaders,
+                toClientResponse,
+                last
+            });
+        } else {// 本地文件
+            await this._toLocal({
+                req,
+                res,
+                clientIp,
+                target,
+                rule,
+                action,
+                requestContent,
+                extraRequestHeaders,
+                toClientResponse,
+                last
+            });
+        }
 
+
+    }
+
+
+    async _toRemote({
+                        req,
+                        res,
+                        clientIp,
+                        target,
+                        extraRequestHeaders, // 请求头
+                        toClientResponse, //响应内容
+                        last
+                    }) {
+        let redirectUrlObj = url.parse(target);
+        let {protocol, hostname, path, port} = redirectUrlObj;
+
+        let ipOrHost = this.hostRepository.resolveHost(clientIp, hostname);
+
+        port = port || ('https:' == protocol ? 443 : 80);
+
+        let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
+        res.setHeader('fe-proxy-content', encodeURI(targetUrl));
+
+        let headers = _.assign({}, req.headers, extraRequestHeaders);
+        if (last) {
+            toClientResponse.sendedToClient = true;
+            this.remote.pipe({
+                req, res,
+                protocol, hostname, path, port, headers
+            });
+        } else {
+            this.remote.cache({
+                req, res,
+                targetUrl, headers, toClientResponse
+            });
+        }
+    }
+
+    async _toLocal({
+                       req,
+                       res,
+                       urlObj,
+                       clientIp,
+                       target,
+                       rule, // 规则
+                       action, // 规则里的一个动作
+                       requestContent, // 请求内容
+                       extraRequestHeaders, // 请求头
+                       toClientResponse, //响应内容
+                       last
+                   }) {
+
+        res.setHeader('fe-proxy-content', encodeURI(target));
+
+        if (last) {
+            toClientResponse.sendedToClient = true;
+            this.local.pipe({
+                req,
+                res,
+                path: target
+            });
+        } else {
+            await this.local.pipe({
+                req,
+                res,
+                path: target,
+                toClientResponse
+            });
+        }
     }
 }
-
-/**
- * 重定向到另一个远程地址
- */
-
-/**
- *
- * @param req
- * @param res
- * @param urlObj
- * @param data
- * @param match
- */
-exports.run = function ({
-                            req, res, urlObj, rule, action,
-                            actionIndex, hasNextAction, requestHeaders, toSendResponse
-                        }) {
-
-    //================== 转发到本地 或远程
-    // 解析目标
-    var target = calcPath(urlObj.href, rule.match, action.data.target);
-    if (!target) {
-        errorRes(req, res, 500, 'target parse error' + action.data.target);
-        return Promise.resolve(true);
-    }
-
-    if (!hasNextAction) {
-        _.forEach(toSendResponse.headers, function (value, key) {
-            res.setHeader(key, value);
-        });
-    }
-
-    if (target.startsWith('http')) {
-        if (!hasNextAction) {
-            return remoteResPipe.redirect({
-                req, res, urlObj, target,
-                logKey: `fe-proxy-action-${actionIndex}`,
-                requestHeaders
-            });
-        } else {
-            return remoteResCache.redirect({
-                req, res, urlObj, target,
-                logKey: `fe-proxy-action-${actionIndex}`,
-                requestHeaders,
-                toSendResponse
-            })
-        }
-    } else {
-        // 本地文件
-        if (!hasNextAction) {
-            return localResPipe({
-                req, res,
-                path: target,
-                logKey: `fe-proxy-action-${actionIndex}`
-            });
-        } else {
-            return localResCache({
-                req, res,
-                path: target,
-                logKey: `fe-proxy-action-${actionIndex}`,
-                toSendResponse
-            });
-        }
-    }
-};

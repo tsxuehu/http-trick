@@ -182,12 +182,12 @@
           actionList: [{
             type: "redirect",// 转发redirect  接口转发api 使用数据文件替换data
             data: {
-              target: "",// 转发目标路径
-              dataId: '', //返回数据文件的id
-              modifyResponseBody: '',// 修改body的操作类型
-              modifyResponseHeader: '',// 修改body的操作类型
-              cookie: "", // 设置到请求里的cookie
-              callbackName: "" // jsonp请求参数名
+                target: "",// 转发目标路径
+                dataId: '', //返回数据文件的id
+                modifyResponseType: '',// 修改响应内容类型
+                cookie: "", // 设置到请求里的cookie
+                callbackName: "", // jsonp请求参数名
+                headers: {},
             }
           }]
         })

@@ -1,21 +1,17 @@
 import Action from "./action";
-import _ from "lodash";
-
-let addRequestHeader;
 /**
- * 增加请求头
+ * 自定义js脚本修改请求内容
  */
-export default class AddRequestHeader extends Action {
-    static getAddRequestHeader() {
-        if (!addRequestHeader) {
-            addRequestHeader = new AddRequestHeader();
-        }
-        return addRequestHeader;
+export default class ScriptModifyRequest extends Action {
+
+    needRequestContent() {
+        return true;
     }
 
-    /**
-     * 运行处理动作
-     */
+    willGetContent() {
+        return true;
+    }
+
     async run({
                   req,
                   res,
@@ -28,6 +24,10 @@ export default class AddRequestHeader extends Action {
                   toClientResponse, //响应内容
                   last = true
               }) {
-        _.assign(extraRequestHeaders, action.data.headers);
+
+
+        // 运行用户脚本, 修改请求内容
+
+        // 发送请求，获取内容
     }
 }

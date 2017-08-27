@@ -26,12 +26,13 @@ var currentSessionId = 1024;
  * urlPattern
  * assigned
  * page
- * @type {{}}
  */
 var sessionIdInfo = {};
 let wsMock;
+
 /**
  * websocket mock
+ * 和ws mock responsitory通信 实现mock功能
  */
 export default class WsMock {
 

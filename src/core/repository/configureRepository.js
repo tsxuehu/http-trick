@@ -5,6 +5,9 @@
  */
 export default class ConfigureRepository {
 
+    calcPath(clientIp, href, match, target) {
+
+    }
 
     /**
      * 保存用户的配置

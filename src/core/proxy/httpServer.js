@@ -25,7 +25,7 @@ export default class HttpServer {
         // handle CONNECT request for https over http
         this.httpProxyServer.on('connect', ConnectHandle.getHandle(this.httpPort, this.httpsPort).handle);
         // websocket 请求处理
-        this. httpProxyServer.on('upgrade', WsHandle.getWsHandle().handle);
+        this.httpProxyServer.on('upgrade', WsHandle.getWsHandle().handle);
         //start proxy server 捕获端口冲突
 
         this.httpProxyServer.on('error', function (err) {
@@ -33,6 +33,6 @@ export default class HttpServer {
             process.exit(0);
         });
 
-        this.httpProxyServer.listen(httpProxyPort);
+        this.httpProxyServer.listen(httpProxyPort, "0.0.0.0");
     }
 }

@@ -15,7 +15,7 @@ export default class Local {
     /**
      * 将请求远程的响应内容直接返回给浏览器
      */
-    pipe({req, res, path, logKey, contentType}) {
+    pipe({req, res, path, contentType}) {
 
         contentType = contentType || mime.lookup(path);
         // 本地文件
@@ -38,7 +38,7 @@ export default class Local {
     /**
      * 将请求远程的响应内容
      */
-    cache({req, res, path, logKey, contentType, toSendResponse}) {
+    cache({req, res, path, contentType, toClientResponse}) {
         return new Promise((resolve, reject) => {
 
             contentType = contentType || mime.lookup(path);
@@ -50,12 +50,12 @@ export default class Local {
                     resolve(true);
                     return;
                 }
-                toSendResponse.hasContent = true;
-                toSendResponse.headers['Access-Control-Allow-Origin'] = '*';
-                toSendResponse.headers['Content-Length'] = stat.size;
-                toSendResponse.headers['Content-Type'] = contentType + ';charset=utf-8';
-                toSendResponse.headers[logKey || 'fe-proxy-action'] = encodeURI(path);
-                toSendResponse.body = fs.readFileSync(path);
+                toClientResponse.hasContent = true;
+                toClientResponse.headers['Access-Control-Allow-Origin'] = '*';
+                toClientResponse.headers['Content-Length'] = stat.size;
+                toClientResponse.headers['Content-Type'] = contentType + ';charset=utf-8';
+                toClientResponse.headers[logKey || 'fe-proxy-action'] = encodeURI(path);
+                toClientResponse.body = fs.readFileSync(path);
                 resolve(false);
             });
         });
