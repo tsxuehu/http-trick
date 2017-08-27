@@ -53,7 +53,7 @@ export default class ConfigureRepository {
      * 获取转发规则启用开关
      * @param clientIp
      */
-    getEnableRuleByClientIp(clientIp) {
+    getEnableRule(clientIp) {
 
     }
 
@@ -61,7 +61,7 @@ export default class ConfigureRepository {
      * 获取工程路径配置
      * @param clientIp
      */
-    getProjectPathByClientIp(clientIp) {
+    getProjectPath(clientIp) {
 
     }
 

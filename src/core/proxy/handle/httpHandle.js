@@ -5,6 +5,7 @@ var zlib = require('zlib');
 var parseUrl = require('../../utils/parseUrl');
 var dc = require('../../datacenter');
 var runActions = require('./../action/run-actions');
+import Repository from "../../repository";
 
 
 import getClientIp from "../../utils/getClientIp";
@@ -21,7 +22,8 @@ export default class HttpHandle {
     }
 
     constructor() {
-
+        this.ruleRepository = Repository.getRuleRepository();
+        this.configureRepository = Repository.getConfigureRepository();
     }
 
     /**
@@ -33,7 +35,6 @@ export default class HttpHandle {
         var urlObj = parseUrl(req);
         req.urlObj = urlObj; // 绑定url请求信息，方便异常处理函数中做日志
 
-        req.clientIp = getClientIp(req);
 
         // 如果是 ui server请求，则直接转发不做记录
 
@@ -59,19 +60,27 @@ export default class HttpHandle {
             });
         }
 
+        let clientIp = getClientIp(req);
+
         // 限流 https://github.com/tjgq/node-stream-throttle
 
         // 断点
 
-        // 规则处理
+
+        // 转发规则处理
+        if (!this.configureRepository.getEnableRule(clientIp)) {// 判断转发规则有没有开启
+
+            res.setHeader('fe-proxy-rule', "disabled");
+
+        }
+
+        let matchedRule = this.ruleRepository.getProcessRule(clientIp, req.method, urlObj);
 
         // 透传
 
-        // 判断转发规则有没有开启
-
 
         // 路由请求
-        var matchedRule = getMatchedRule(req, urlObj);
+
         if (matchedRule.type == 'userRule') {
             // 日志记录匹配的规则
             res.setHeader('fe-proxy-rule-match', encodeURI(matchedRule.info));

@@ -55,4 +55,8 @@ export default class Respository {
     static getRuntimeInfoRepository() {
 
     }
+
+    static getFilterRepository(){
+
+    }
 }

@@ -10,7 +10,7 @@ export default class ruleRepository {
 
     }
 
-    getInuseRules(ip) {
+    getInuseRules(clientIp) {
 
     }
 
@@ -19,7 +19,7 @@ export default class ruleRepository {
      * @param method
      * @param urlObj
      */
-    getMatchedRule(method, urlObj){
+    getProcessRule(clientIp, method, urlObj) {
 
     }
 }
