@@ -14,7 +14,7 @@ export default class Log {
 
     constructor() {
 
-        log4js.configure(path.join(__dirname, '../../conf/log4js.json'), {cwd: appInfo.userConfigDir});
+        log4js.configure(path.join(__dirname, '../../conf/log4js.json'), {cwd: appInfo.proxyDir});
     }
 
     getExceptionLog() {

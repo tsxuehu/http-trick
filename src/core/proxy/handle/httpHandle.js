@@ -37,8 +37,10 @@ export default class HttpHandle {
         // 解析请求参数
         let urlObj = parseUrl(req);
 
-        // 如果是 ui server请求，则直接转发不做记录
 
+        let clientIp = getClientIp(req);
+
+        // 如果是 ui server请求，则直接转发不做记录
         if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == this.configureRepository.getPcIp())
             && urlObj.port == this.configureRepository.getRealUiPort()) {
             this.actionMap['bypass'].run({req, res, urlObj});
@@ -48,21 +50,19 @@ export default class HttpHandle {
         // 如果有客户端监听请求内容，则做记录
         if (this.runtimeRepository.hasHttpTraficMonitor()) {
             // 记录请求
-            let sid = ++idx;
+            let id = ++idx;
             if (idx > 2000) idx = 0;
-            this.logRepository.request(sid, req, res);
+            this.logRepository.request({clientIp, id, req, res, urlObj});
 
             // 日记记录body
             this._getRequestBody().then(body => {
-                this.logRepository.reqBody(sid, req, res, body);
+                this.logRepository.reqBody({clientIp, id, req, res, body});
             });
 
-            this._getResponseToClient(res).then(response => {
-                this.logRepository.response(sid, req, res, response);
+            this._getResponseToClient(res).then(responseContent => {
+                this.logRepository.response({clientIp, id, req, res, responseContent});
             });
         }
-
-        let clientIp = getClientIp(req);
 
 
         // =========================================
