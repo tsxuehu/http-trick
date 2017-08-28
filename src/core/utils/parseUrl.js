@@ -21,6 +21,7 @@ module.exports = function parseUrl(req) {
     var host = req.headers.host;
     var protocol = (!!req.connection.encrypted && !/^http:/.test(req.url)) ? "https" : "http";
     // http代理协议里 path部分会包含全路径 （如 GET http://www.baidu.com/ HTTP/1.0）
+    // https协议必定是443端口，http协议的端口在req.url中（GET http://www.baidu.com/status?name=ryan HTTP/1.1\r\n）
     var fullUrl = protocol === "http" ? req.url : (protocol + '://' + host + req.url);
     var urlObj = url.parse(fullUrl);
     urlObj.port = urlObj.port || (protocol == 'https'? 443 : 80);
