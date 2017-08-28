@@ -34,8 +34,8 @@ export default class ModifyResponse extends Action {
         } else if (action.data.modifyResponseType == "returnDataInJsonpStyle") {
 
             // jsonp请求 替换callback
-            var parsed = queryString.parse(urlObj.search);
-            var cbName = parsed[action.data.callbackName];
+            let parsed = queryString.parse(urlObj.search);
+            let cbName = parsed[action.data.callbackName];
             toClientResponse.body = `${cbName}(${body})`;
             toClientResponse.headers['Content-Type'] = 'application/javascript;charset=utf-8';
 

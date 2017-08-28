@@ -2,7 +2,9 @@ import zlib from "zlib";
 import parseUrl from "../../utils/parseUrl";
 import Repository from "../../repository";
 import Action from "../action/action";
+import queryString from "query-string";
 import getClientIp from "../../utils/getClientIp";
+import Breakpoint from "../breakpoint";
 // request session id seed
 let idx = 0;
 let httpHandle;
@@ -17,12 +19,14 @@ export default class HttpHandle {
 
     constructor() {
         this.actionMap = Action.getActionMap();
+        this.breakpoint = Breakpoint.getBreakpoint();
 
         this.ruleRepository = Repository.getRuleRepository();
         this.configureRepository = Repository.getConfigureRepository();
         this.runtimeRepository = Repository.getRuntimeInfoRepository();
         this.breakpointRepository = Repository.getBreakpointRepository();
         this.filterRepository = Repository.getFilterRepository();
+        this.logRepository = Repository.getLogRepository();
     }
 
     /**
@@ -37,24 +41,24 @@ export default class HttpHandle {
 
         if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == this.configureRepository.getPcIp())
             && urlObj.port == this.configureRepository.getRealUiPort()) {
-            actionMap['bypass'].run({req, res, urlObj});
+            this.actionMap['bypass'].run({req, res, urlObj});
             return;
         }
 
         // 如果有客户端监听请求内容，则做记录
         if (this.runtimeRepository.hasHttpTraficMonitor()) {
             // 记录请求
-            var sid = ++idx;
+            let sid = ++idx;
             if (idx > 2000) idx = 0;
-            notify.request(sid, req, res);
+            this.logRepository.request(sid, req, res);
 
             // 日记记录body
             this._getRequestBody().then(body => {
-                notify.reqBody(sid, req, res, body);
+                this.logRepository.reqBody(sid, req, res, body);
             });
 
             this._getResponseToClient(res).then(response => {
-                notify.response(sid, req, res, response);
+                this.logRepository.response(sid, req, res, response);
             });
         }
 
@@ -64,19 +68,18 @@ export default class HttpHandle {
         // =========================================
         // 断点
         if (this.breakpointRepository.hasBreakpoint(clientIp, req.method, urlObj)) {
-
-
+            this.breakpoint.run({
+                req, res, urlObj, clientIp
+            });
             return;
         }
 
         // =====================================================
         // 限流 https://github.com/tjgq/node-stream-throttle
 
-
         let matchedRule = this.ruleRepository.getProcessRule(clientIp, req.method, urlObj);
 
-
-        this._runAtions(req, res, urlObj, clientIp, matchedRule);
+        this._runAtions({req, res, urlObj, clientIp, rule: matchedRule});
     }
 
     /**
@@ -84,7 +87,7 @@ export default class HttpHandle {
      * @returns {Promise.<void>}
      * @private
      */
-    async _runAtions(req, res, urlObj, clientIp, rule) {
+    async _runAtions({req, res, urlObj, clientIp, rule}) {
         // 原始的请求头部
         let requestContent = {
             hasContent: false,
@@ -113,52 +116,70 @@ export default class HttpHandle {
         // 查找过滤器
         let filterRuleList = this.filterRepository.getFilterRuleList(clientIp, urlObj);
 
-        // 生成要执行的action列表
-        let beforeFilterActionsInfo = [];
-        let afterFilterActionsInfo = [];
-
-        _.forEach(filterRuleList, rule => {
-            _.forEach(rule.actionList, action => {
-                let actionHandler = this.actionMap[action.type];
-                if (actionHandler.needResponse()) {
-                    afterFilterActionsInfo.push({
-                        action: action,
-                        rule: rule
-                    })
-                } else {
-                    beforeFilterActionsInfo.push({
-                        action: action,
-                        rule: rule
-                    })
-                }
-            });
-        });
-
-
-
-
-        let ruleActionsInfo = [];
-        _.forEach(rule.actionList, action => {
-            ruleActionsInfo.push({
-                action: action,
-                rule: rule
-            })
-        });
-
-        let willRunActionList = beforeFilterActionsInfo.concat(ruleActionsInfo).concat(afterFilterActionsInfo);
+        // 获得要执行的action列表
+        let willRunActionList = this._mergeToRunAction(filterRuleList, rule);
 
         let willRunActionListLength = willRunActionList.length;
         // 执行前置动作
         for (let i = 0; i < willRunActionListLength; i++) {
+
+            // 已经向浏览器发送响应，则停止规则处理
+            if (toClientResponse.sendedToClient) {
+                break;
+            }
+
             // 对每一个规则 执行action
             let actionInfo = willRunActionList[i];
             let action = actionInfo.action;
             let rule = actionInfo.rule;
             let actionHandler = this.actionMap[action.type];
-            toClientResponse.headers[`fe-proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-${!!actionHandler}`);
-            if (actionHandler) {
 
+
+            if (!actionHandler) {
+                toClientResponse.headers[`fe-proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-notfound`);
+                continue;
             }
+            // 已经有response, 则不运行获取response的action
+            if (actionHandler.willGetContent() && toClientResponse.hasContent) {
+                toClientResponse.headers[`fe-proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-notrun`);
+                continue;
+            }
+            toClientResponse.headers[`fe-proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-run`);
+
+            // 动作需要返回内容，但是当前却没有返回内容
+            if (actionHandler.needResponse() && !toClientResponse.hasContent) {
+                await this.actionMap['bypass'].run({
+                    req,
+                    res,
+                    urlObj,
+                    clientIp,
+                    rule, // 规则
+                    action, // 规则里的一个动作
+                    requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
+                    extraRequestHeaders, // 请求头
+                    toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
+                    last: false
+                });
+            }
+            // 动作需要请求内容，但是当前却没有请求内容
+            if (actionHandler.needRequestContent() && !requestContent.hasContent) {
+                requestContent = await this._getRequestContent(
+                    req,
+                    urlObj);
+            }
+            // 运行action
+            await actionHandler.run({
+                req,
+                res,
+                urlObj,
+                clientIp,
+                rule, // 规则
+                action, // 规则里的一个动作
+                requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
+                extraRequestHeaders, // 请求头
+                toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
+                last: i == (willRunActionListLength - 1)
+            });
         }
 
     }
@@ -194,17 +215,19 @@ export default class HttpHandle {
     }
 
     async _getRequestContent(req, urlObj) {
-        let body = await this.getRequestBody(req);
-        let {protocol, hostname, path, port} = urlObj;
+        let body = await this._getRequestBody(req);
+        let {protocol, hostname, pathname, port} = urlObj;
+        let query = queryString.parse(urlObj.search);
         return {
             hasContent: true,
-            protocol,
-            hostname,
-            method: req.method,
-            path,
-            port,
-            headers: _.assign({}, req.headers),
-            body
+            protocol, // 请求协议
+            hostname, // 请求域名
+            method: req.method, // 请求方法
+            pathname, // 路径
+            query, // query对象
+            port, // 端口号
+            headers: _.assign({}, req.headers), // 请求头
+            body // 请求body
         };
     }
 
@@ -246,5 +269,44 @@ export default class HttpHandle {
 
         res.responseToClientPromise = promise;
         return res.responseToClientPromise;
+    }
+
+    /**
+     * 合并过滤规则，和请求处理规则
+     *  生成要执行的action列表
+     * @param filterRules
+     * @param processRule
+     * @private
+     */
+    _mergeToRunAction(filterRules, processRule) {
+        let beforeFilterActionsInfo = [];
+        let afterFilterActionsInfo = [];
+
+        _.forEach(filterRules, rule => {
+            _.forEach(rule.actionList, action => {
+                let actionHandler = this.actionMap[action.type];
+                if (actionHandler.needResponse()) {
+                    afterFilterActionsInfo.push({
+                        action: action,
+                        rule: rule
+                    })
+                } else {
+                    beforeFilterActionsInfo.push({
+                        action: action,
+                        rule: rule
+                    })
+                }
+            });
+        });
+
+
+        let ruleActionsInfo = [];
+        _.forEach(processRule.actionList, action => {
+            ruleActionsInfo.push({
+                action: action,
+                rule: rule
+            })
+        });
+        return beforeFilterActionsInfo.concat(ruleActionsInfo).concat(afterFilterActionsInfo);
     }
 }

@@ -8,8 +8,17 @@
  * 将request、response发送给breakpoint repository
  * 监听breakpoint repository事件，
  */
+let breakpoint;
 export default class Breakpoint {
-    run() {
+    static getBreakpoint(){
+        if(!breakpoint){
+            breakpoint = new Breakpoint();
+        }
+        return breakpoint;
+    }
+    run({
+            req, res, urlObj, clientIp
+        }) {
 
     }
 }

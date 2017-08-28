@@ -28,6 +28,6 @@ export default class ScriptModifyRequest extends Action {
 
         // 运行用户脚本, 修改请求内容
 
-        // 发送请求，获取内容
+        // 发送请求，获取内容  或者将远端内容直接返回给浏览器
     }
 }
