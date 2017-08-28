@@ -1,3 +1,5 @@
-/**
- * Created by tsxuehu on 8/28/17.
- */
+export default class FilterRepository {
+    getFilterRuleList(clientIp, urlObj) {
+
+    }
+}

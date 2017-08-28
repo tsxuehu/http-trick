@@ -5,6 +5,7 @@ import sendErrorToClient from "../sendToClient/error";
 import Local from "../content/local";
 import url from "url";
 import Remote from "../content/remote";
+import addHeaderToResponse from "../../utils/addHeaderToResponse";
 
 /**
  * 重定向 本地 或者 远程
@@ -97,11 +98,11 @@ export default class Redirect extends Action {
         port = port || ('https:' == protocol ? 443 : 80);
 
         let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
-        res.setHeader('fe-proxy-content', encodeURI(targetUrl));
-
+        toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
         let headers = _.assign({}, req.headers, extraRequestHeaders);
         if (last) {
             toClientResponse.sendedToClient = true;
+            addHeaderToResponse(res, toClientResponse.headers);
             this.remote.pipe({
                 req, res,
                 protocol, hostname, path, port, headers
@@ -128,10 +129,10 @@ export default class Redirect extends Action {
                        last
                    }) {
 
-        res.setHeader('fe-proxy-content', encodeURI(target));
-
+        toClientResponse.headers['fe-proxy-content'] = encodeURI(target);
         if (last) {
             toClientResponse.sendedToClient = true;
+            addHeaderToResponse(res, toClientResponse.headers);
             this.local.pipe({
                 req,
                 res,

@@ -54,7 +54,6 @@ export default class Local {
                 toClientResponse.headers['Access-Control-Allow-Origin'] = '*';
                 toClientResponse.headers['Content-Length'] = stat.size;
                 toClientResponse.headers['Content-Type'] = contentType + ';charset=utf-8';
-                toClientResponse.headers[logKey || 'fe-proxy-action'] = encodeURI(path);
                 toClientResponse.body = fs.readFileSync(path);
                 resolve(false);
             });

@@ -51,7 +51,7 @@ export default class Remote {
             });
         }).then(response => {
             toClientResponse.hasContent = true;
-            toClientResponse.headers = Object.assign(toSendResponse.headers, response.headers);
+            toClientResponse.headers = _.assign({}, response.headers, toClientResponse.headers);
             toClientResponse.body = response.data;
         });
     }

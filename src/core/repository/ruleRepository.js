@@ -1,7 +1,9 @@
-import _ from 'lodash'
+import _ from "lodash";
 
 
 let passRule = {
+    "method": "",
+    "match": "",
     "actionList": [{
         "type": "bypass",
     }]
@@ -44,7 +46,7 @@ export default class ruleRepository {
             }
         }
         // 查找规则，如果找不到则返回透传规则
-        if (!candidateRule ){
+        if (!candidateRule) {
             candidateRule = passRule
         }
         return candidateRule;
@@ -56,6 +58,7 @@ export default class ruleRepository {
         var loweredRuleMethod = _.lowerCase(ruleMethod);
         return loweredReqMethod == loweredRuleMethod || !ruleMethod || loweredReqMethod == 'option';
     }
+
     // 请求的url是否匹配规则
     _isUrlMatch(reqUrl, ruleMatchStr) {
         return ruleMatchStr && (reqUrl.indexOf(ruleMatchStr) >= 0 || (new RegExp(ruleMatchStr)).test(reqUrl));

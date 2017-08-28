@@ -4,6 +4,7 @@
 import Action from "./action";
 import Repository from "../../repository";
 import Local from "../content/local";
+import addHeaderToResponse from "../../utils/addHeaderToResponse";
 
 export default class MockData extends Action {
     static getMockData() {
@@ -39,10 +40,10 @@ export default class MockData extends Action {
         let dataId = action.data.dataId;
         let filepath = this.mockDataRepository.getDataFilePath(clientIp, dataId);
         let contentType = this.mockDataRepository.getDataFileContentType(clientIp, dataId);
-
-        res.setHeader('fe-proxy-content', encodeURI(filepath));
+        toClientResponse.headers['fe-proxy-content'] = encodeURI(filepath);
         if (last) {
             toClientResponse.sendedToClient = true;
+            addHeaderToResponse(res, toClientResponse.headers);
             this.local.pipe({
                 req,
                 res,

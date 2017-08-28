@@ -2,6 +2,8 @@ import Action from "./action";
 import Remote from "../content/remote";
 import _ from "lodash";
 import Repository from "../../repository";
+import addHeaderToResponse from "../../utils/addHeaderToResponse";
+
 let bypass;
 export default class Bypass extends Action {
     static getBypass() {
@@ -38,15 +40,17 @@ export default class Bypass extends Action {
               }) {
         // 构造url
         let {protocol, hostname, path, port} = urlObj;
-        let headers = _.assign({}, req.headers, extraRequestHeaders);
 
         let ipOrHost = this.hostRepository.resolveHost(clientIp, hostname);
         let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
 
-        res.setHeader('fe-proxy-content', encodeURI(targetUrl));
+        toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
+
+        let headers = _.assign({}, req.headers, extraRequestHeaders);
 
         if (last) {
             toClientResponse.sendedToClient = true;
+            addHeaderToResponse(res, toClientResponse.headers);
             this.remote.pipe({
                 req, res,
                 protocol, hostname, path, port, headers

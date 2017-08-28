@@ -1,16 +1,10 @@
-var actionMap = require('../action');
-var getMatchedRule = require('./getMatchedRule');
-var notify = require('../../notify');
-var zlib = require('zlib');
-var parseUrl = require('../../utils/parseUrl');
-var dc = require('../../datacenter');
-var runActions = require('./../action/run-actions');
+import zlib from "zlib";
+import parseUrl from "../../utils/parseUrl";
 import Repository from "../../repository";
-
-
+import Action from "../action/action";
 import getClientIp from "../../utils/getClientIp";
 // request session id seed
-var idx = 0;
+let idx = 0;
 let httpHandle;
 export default class HttpHandle {
 
@@ -22,8 +16,13 @@ export default class HttpHandle {
     }
 
     constructor() {
+        this.actionMap = Action.getActionMap();
+
         this.ruleRepository = Repository.getRuleRepository();
         this.configureRepository = Repository.getConfigureRepository();
+        this.runtimeRepository = Repository.getRuntimeInfoRepository();
+        this.breakpointRepository = Repository.getBreakpointRepository();
+        this.filterRepository = Repository.getFilterRepository();
     }
 
     /**
@@ -32,19 +31,18 @@ export default class HttpHandle {
      */
     handle(req, res) {
         // 解析请求参数
-        var urlObj = parseUrl(req);
-        req.urlObj = urlObj; // 绑定url请求信息，方便异常处理函数中做日志
-
+        let urlObj = parseUrl(req);
 
         // 如果是 ui server请求，则直接转发不做记录
 
-        if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == dc.getPcIp()) && urlObj.port == dc.getRealUiPort()) {
+        if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == this.configureRepository.getPcIp())
+            && urlObj.port == this.configureRepository.getRealUiPort()) {
             actionMap['bypass'].run({req, res, urlObj});
             return;
         }
 
         // 如果有客户端监听请求内容，则做记录
-        if (dc.hasHttpTraficMonitor()) {
+        if (this.runtimeRepository.hasHttpTraficMonitor()) {
             // 记录请求
             var sid = ++idx;
             if (idx > 2000) idx = 0;
@@ -62,32 +60,23 @@ export default class HttpHandle {
 
         let clientIp = getClientIp(req);
 
+
+        // =========================================
+        // 断点
+        if (this.breakpointRepository.hasBreakpoint(clientIp, req.method, urlObj)) {
+
+
+            return;
+        }
+
+        // =====================================================
         // 限流 https://github.com/tjgq/node-stream-throttle
 
-        // 断点
-
-
-        // 转发规则处理
-        if (!this.configureRepository.getEnableRule(clientIp)) {// 判断转发规则有没有开启
-
-            res.setHeader('fe-proxy-rule', "disabled");
-
-        }
 
         let matchedRule = this.ruleRepository.getProcessRule(clientIp, req.method, urlObj);
 
-        // 透传
 
-
-        // 路由请求
-
-        if (matchedRule.type == 'userRule') {
-            // 日志记录匹配的规则
-            res.setHeader('fe-proxy-rule-match', encodeURI(matchedRule.info));
-            runActions(req, res, urlObj, matchedRule.rule);
-        } else {
-            actionMap['bypass'].run({req, res, urlObj, actionIndex: 0});
-        }
+        this._runAtions(req, res, urlObj, clientIp, matchedRule);
     }
 
     /**
@@ -95,7 +84,7 @@ export default class HttpHandle {
      * @returns {Promise.<void>}
      * @private
      */
-    async _runAtions() {
+    async _runAtions(req, res, urlObj, clientIp, rule) {
         // 原始的请求头部
         let requestContent = {
             hasContent: false,
@@ -114,14 +103,64 @@ export default class HttpHandle {
             sendedToClient: false, // 已经向浏览器发送响应内容
             headers: {},// 要发送给浏览器的header
             body: ''// 要发送给浏览器的body
+        };
+
+        // 转发规则处理
+        if (!this.configureRepository.getEnableRule(clientIp)) {// 判断转发规则有没有开启
+            toClientResponse.headers['fe-proxy-rule-disabled'] = "true";
         }
+
         // 查找过滤器
+        let filterRuleList = this.filterRepository.getFilterRuleList(clientIp, urlObj);
 
+        // 生成要执行的action列表
+        let beforeFilterActionsInfo = [];
+        let afterFilterActionsInfo = [];
+
+        _.forEach(filterRuleList, rule => {
+            _.forEach(rule.actionList, action => {
+                let actionHandler = this.actionMap[action.type];
+                if (actionHandler.needResponse()) {
+                    afterFilterActionsInfo.push({
+                        action: action,
+                        rule: rule
+                    })
+                } else {
+                    beforeFilterActionsInfo.push({
+                        action: action,
+                        rule: rule
+                    })
+                }
+            });
+        });
+
+
+
+
+        let ruleActionsInfo = [];
+        _.forEach(rule.actionList, action => {
+            ruleActionsInfo.push({
+                action: action,
+                rule: rule
+            })
+        });
+
+        let willRunActionList = beforeFilterActionsInfo.concat(ruleActionsInfo).concat(afterFilterActionsInfo);
+
+        let willRunActionListLength = willRunActionList.length;
         // 执行前置动作
+        for (let i = 0; i < willRunActionListLength; i++) {
+            // 对每一个规则 执行action
+            let actionInfo = willRunActionList[i];
+            let action = actionInfo.action;
+            let rule = actionInfo.rule;
+            let actionHandler = this.actionMap[action.type];
+            toClientResponse.headers[`fe-proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-${!!actionHandler}`);
+            if (actionHandler) {
 
-        // 执行请求指定动作 (获取内容时，追加header日志)
+            }
+        }
 
-        // 执行请求后置动作
     }
 
     // 同一个请求，返回同一个Promise
@@ -154,9 +193,9 @@ export default class HttpHandle {
         return req.fetchDataPromise;
     }
 
-    async _getRequestContent(req) {
+    async _getRequestContent(req, urlObj) {
         let body = await this.getRequestBody(req);
-        let {protocol, hostname, path, port} = req.urlObj;
+        let {protocol, hostname, path, port} = urlObj;
         return {
             hasContent: true,
             protocol,
