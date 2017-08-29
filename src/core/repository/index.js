@@ -59,4 +59,8 @@ export default class Respository {
     static getFilterRepository(){
 
     }
+
+    static getUserRepository(){
+
+    }
 }

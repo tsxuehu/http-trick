@@ -27,6 +27,7 @@ export default class HttpHandle {
         this.breakpointRepository = Repository.getBreakpointRepository();
         this.filterRepository = Repository.getFilterRepository();
         this.logRepository = Repository.getLogRepository();
+        this.userRepository = Repository.getUserRepository();
     }
 
     /**
@@ -112,6 +113,8 @@ export default class HttpHandle {
         if (!this.configureRepository.getEnableRule(clientIp)) {// 判断转发规则有没有开启
             toClientResponse.headers['fe-proxy-rule-disabled'] = "true";
         }
+
+        toClientResponse.headers['fe-proxy-uid'] = this.userRepository.getClientIpMappedUserId(clientIp);
 
         // 查找过滤器
         let filterRuleList = this.filterRepository.getFilterRuleList(clientIp, urlObj);
