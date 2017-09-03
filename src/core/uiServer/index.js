@@ -178,5 +178,3 @@ export default class UiServer {
         return cookies['userId'] || '0';
     }
 }
-
-new UiServer(8020).start();
