@@ -2,6 +2,16 @@ import httpProxy from "http-proxy";
 import Repository from "../repository";
 import Log from "../utils/log";
 
+
+var defaultHttpAgent = new http.Agent({
+    keepAlive: true,
+    maxSockets: 5
+});
+
+var defaultHttpsAgent = new https.Agent({
+    keepAlive: true,
+    maxSockets: 5
+});
 let proxy;
 export default class HttpProxy {
     static getHttpProxy() {
@@ -29,7 +39,8 @@ export default class HttpProxy {
      * @param options
      */
     web(req, res, options) {
-        this.proxy.web(req, res, options);
+        let isHttps = urlObj.protocol.indexOf('https') > -1;
+        this.proxy.web(req, res, Object.assign({agent: isHttps ? defaultHttpsAgent : defaultHttpAgent}, options));
     }
 
     /**

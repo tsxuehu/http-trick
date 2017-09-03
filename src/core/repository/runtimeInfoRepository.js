@@ -2,53 +2,74 @@
  * Created by tsxuehu on 8/3/17.
  */
 export default class RuntimeInfoRepository {
+
+    /**
+     * 用户新开一个HttpTrafficMonitor窗口
+     */
+    incHttpTrafficMonitor(userId) {
+
+    }
+
+    /**
+     * 用户关闭一个HttpTrafficMonitor窗口
+     * @param userId
+     */
+    decHttpTrafficMonitor(userId) {
+
+    }
+
+    /**
+     * 用户是否有HttpTrafficMonitor窗口
+     * @param userId
+     */
+    hasHttpTrafficMonitor(userId) {
+
+    }
+
+    /**
+     * 获取 http 请求id
+     * @param clientIp
+     */
+    getHttpTrafficId(clientIp){
+
+    }
+
     /**
      * 获取保存请求记录的目录
      * @param clientIp
      */
     getSaveResponseDirPath(clientIp) {
+
     }
 
     getRealUiPort() {
-        return store.runtimeInfo.realUiPort;
+        return this.realUiPort;
     }
 
     setRealUiPort(uiport) {
-        store.runtimeInfo.realUiPort = uiport;
+        this.realUiPort = uiport;
     }
 
     getRealProxyPort() {
-        return store.runtimeInfo.realProxyPort;
+        return this.realProxyPort;
     }
 
     setRealProxyPort(proxyport) {
-        store.runtimeInfo.realProxyPort = proxyport;
+        this.realProxyPort = proxyport;
     }
 
     setPcIp(pcIp) {
-        store.runtimeInfo.pcIp = pcIp;
+        this.pcIp = pcIp;
     }
 
     getPcIp() {
-        return store.runtimeInfo.pcIp;
+        return this.pcIp;
     }
 
     getRuntimeInfo() {
         return store.runtimeInfo;
     }
 
-    // 是否有监控http请求的窗口
-    hasHttpTraficMonitor() {
-        return store.runtimeInfo.httpTraficMonitorCnt > 0;
-    }
-
-    inHttpTraficMonitor() {
-        return store.runtimeInfo.httpTraficMonitorCnt++;
-    }
-
-    outHttpTraficMonitor() {
-        return store.runtimeInfo.httpTraficMonitorCnt--;
-    }
 
     // 数据中心监控
     hasStoreMonitor() {
