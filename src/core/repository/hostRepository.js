@@ -5,4 +5,8 @@ export default class hostRepository {
     resolveHost(clientIp, hostname) {
 
     }
+
+    getHostFileList(){
+
+    }
 }

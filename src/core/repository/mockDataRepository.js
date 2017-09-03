@@ -8,4 +8,7 @@ export default class mockDataRepository {
     getDataFileContentType(clientIp, dataId){
 
     }
+    getDataFileList(){
+
+    }
 }

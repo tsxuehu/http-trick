@@ -5,6 +5,10 @@
  */
 export default class ConfigureRepository {
 
+    getConf(){
+
+    }
+
     calcPath(clientIp, href, match, target) {
 
     }

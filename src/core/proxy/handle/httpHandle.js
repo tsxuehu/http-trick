@@ -26,7 +26,7 @@ export default class HttpHandle {
         this.runtimeRepository = Repository.getRuntimeInfoRepository();
         this.breakpointRepository = Repository.getBreakpointRepository();
         this.filterRepository = Repository.getFilterRepository();
-        this.logRepository = Repository.getLogRepository();
+        this.httpTrafficRepository = Repository.getHttpTrafficRepository();
         this.userRepository = Repository.getUserRepository();
     }
 
@@ -53,15 +53,15 @@ export default class HttpHandle {
             // 记录请求
             let id = ++idx;
             if (idx > 2000) idx = 0;
-            this.logRepository.request({clientIp, id, req, res, urlObj});
+            this.httpTrafficRepository.request({clientIp, id, req, res, urlObj});
 
             // 日记记录body
             this._getRequestBody().then(body => {
-                this.logRepository.reqBody({clientIp, id, req, res, body});
+                this.httpTrafficRepository.reqBody({clientIp, id, req, res, body});
             });
 
             this._getResponseToClient(res).then(responseContent => {
-                this.logRepository.response({clientIp, id, req, res, responseContent});
+                this.httpTrafficRepository.response({clientIp, id, req, res, responseContent});
             });
         }
 

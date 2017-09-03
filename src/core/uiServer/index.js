@@ -13,9 +13,14 @@ export default class UiServer {
     constructor(webUiPort) {
         this.webUiPort = webUiPort;
 
-        //
+        // 数据存储服务
         this.runTimeInfoRepository = Responsitory.getRuntimeInfoRepository();
-        this.runTimeInfoRepository = Responsitory.get;
+        this.httpTrafficRepository = Responsitory.getHttpTrafficRepository();
+        this.confRepository = Responsitory.getConfigureRepository();
+        this.hostRepository = Responsitory.getHostRepository();
+        this.mockDataRepository = Responsitory.getMockDataRepository();
+        this.ruleRepository = Responsitory.getRuleRepository();
+        this.wsMockRepository = Responsitory.getWsMockRepository();
 
         // 初始化koa
         this.app = koa();
@@ -24,14 +29,13 @@ export default class UiServer {
         this.app.use(router());
 
         // 创建server
-        this.server = http.createServer(app.callback());
+        this.server = http.createServer(this.app.callback());
         this.io = new SocketIO(this.server);
 
         // 初始化socket io
-        this._initStore();
         this._initTraffic();
+        this._initManger();
         this._initWsMock();
-
     }
 
     async start() {
@@ -39,6 +43,7 @@ export default class UiServer {
         this.server.listen(this.webUiPort);
     }
 
+    // http流量监控界面
     _initTraffic() {
         this.httpTraficMonitorNS = this.io.of('/httptrafic');
         this.httpTraficMonitorNS.on('connection', function (client) {
@@ -51,11 +56,19 @@ export default class UiServer {
                 this.runTimeInfoRepository.decHttpTrafficMonitor(userId);
             });
         });
-        // 监听logRespository事件,
 
+        // 监听logRespository事件
+        this.httpTrafficRepository.on('traffic', (userId, rows) => {
+            this.sendTrafficToUser(userId, rows)
+        });
     }
 
-    _initStore() {
+    sendTrafficToUser(userId, rows) {
+        this.httpTraficMonitorNS.to(userId).emit('rows', rows);
+    }
+
+    // 管理界面 使用的功能
+    _initManger() {
         this.storeMonitorNS = this.io.of('/store');
 
         // 注册通知
@@ -64,72 +77,105 @@ export default class UiServer {
             let userId = this._getUserId(client);
             client.join(userId, err => {
             });
-            client.on('internal state', function () {
+            client.on('internal state', _ => {
                 // 基础配置
-                api.sentToClientConfState(dc.getConf());
+                this.sendConfToUser(userId, this.confRepository.getConf(userId));
                 // host文件列表
-                api.sentToClientHostFileList(dc.getHostFileList());
+                this.sendHostFileListToUser(userId, this.hostRepository.getHostFileList(userId));
                 // 规则文件列表
-                api.sentToClientRuleFileList(dc.getRuleFileList());
+                this.sendRuleFileListToUser(userId, this.ruleRepository.getRuleFileList(userId));
                 // 数据文件列表
-                api.sentToClientDataListChange(dc.getDataList());
+                this.sendDataFileListToUser(userId, this.mockDataRepository.getDataFileList(userId));
             })
         });
+        this.confRepository.on("dataChange", (userId, conf) => {
+            this.sendConfToUser(userId, conf);
+        });
+        this.hostRepository.on("dataChange", (userId, hostFilelist) => {
+            this.sendHostFileListToUser(userId, hostFilelist);
+        });
+        this.ruleRepository.on("dataChange", (userId, ruleFilelist) => {
+            this.sendRuleFileListToUser(userId, ruleFilelist);
+        });
+        this.mockDataRepository.on("dataChange", (userId, dataFilelist) => {
+            this.sendDataFileListToUser(userId, dataFilelist);
+        });
     }
-    sendConfToUser(userId){
 
-    }
-    sendHostFileListToUser(userId){
-
-    }
-    sendRuleFileListToUser(userId){
-
-    }
-    sendDataFileListToUser(userId){
-
+    sendConfToUser(userId, conf) {
+        this.storeMonitorNS.to(userId).emit('conf', conf);
     }
 
+    sendHostFileListToUser(userId, hostFilelist) {
+        this.storeMonitorNS.to(userId).emit('hostfilelist', hostFilelist);
+    }
+
+    sendRuleFileListToUser(userId, ruleFilelist) {
+        this.storeMonitorNS.to(userId).emit('rulefilelist', ruleFilelist);
+    }
+
+    sendDataFileListToUser(userId, dataFilelist) {
+        this.storeMonitorNS.to(userId).emit('datalist', dataFilelist);
+    }
+
+    // ws mock 相关函数
     _initWsMock() {
         this.wsmockNS = this.io.of('/wsmock');
 
-        wsmockNS.on('connection', function (debugClient) {
-            dc.inWsMockClient();
-            // 开启调试会话,返回会话id
-            debugClient.on('opensession', function (urlPattern) {
-                var sessionId = wsMock.openSession(debugClient.id, urlPattern);
-                wsmockNS.emit('assignedsessionid', urlPattern, sessionId);
+        this.wsmockNS.on('connection', debugClient => {
+
+            let userId = this._getUserId(debugClient);
+            debugClient.join(userId, err => {
             });
+            // 用户开启调试会话,返回会话id
+            debugClient.on('opensession', urlPattern => {
+                let sessionId = this.wsMockRepository.openSession(userId, debugClient.id, urlPattern);
+                this._sendAssignedSessionIdToUser(userId, urlPattern, sessionId);
+            });
+            // 用户关闭会话
             debugClient.on('closesession', function (sessionId) {
-                wsMock.closeSession(sessionId);
+                this.wsMockRepository.closeSession(sessionId);
             });
             // mock 界面发回的数据 ， 需要返回给正在mock的页面
             debugClient.on('debuggermsg', function (sessionId, data) {
-                wsMock.sendToPageMsg(sessionId, data)
+                this.wsMockRepository.sendToPageMsg(sessionId, data);
             });
-            // 关闭该客户端的所有会话
+            // 用户关闭ws界面  关闭该链接相关的所有会话
             debugClient.on('disconnect', function () {
-                dc.outWsMockClient();
-                wsMock.closeAllSessionInSocket(debugClient.id);
+                this.wsMockRepository.closeAllSessionInSocket(debugClient.id);
             });
         });
-        /* // 页面和proxy建立连接, id为页面对应的调试会话
-         wsMock.on('page-connected',function (sessionId) {
-         wsmockNS.emit('page-connected',sessionId);
-         });
-         // 页面发出消息 id为页面对应的调试会话, data为消息内容
-         wsMock.on('page-msg',function (sessionId ,data) {
-         wsmockNS.emit('page-msg', sessionId, data);
-         });
-         // 页面关闭 id为页面对应的调试会话
-         wsMock.on('page-closed',function (sessionId) {
-         wsmockNS.emit('page-closed',sessionId);
-         });*/
-
+        this.wsMockRepository.on("page-connected", (userId, sessionId) => {
+            this._sendPageConnectedToUser(userId, sessionId);
+        });
+        this.wsMockRepository.on("page-msg", (userId, sessionId, data) => {
+            this._sendPageMsgToUser(userId, sessionId, data);
+        });
+        this.wsMockRepository.on("page-closed", (userId, sessionId) => {
+            this._sendPageClosedToUser(userId, sessionId);
+        });
     }
 
+    _sendAssignedSessionIdToUser(userId, urlPattern, sessionId) {
+        this.wsMockRepository.to(userId).emit('assignedsessionid', urlPattern, sessionId);
+    }
+
+    _sendPageConnectedToUser(userId, sessionId) {
+        this.wsMockRepository.to(userId).emit('page-connected', sessionId);
+    }
+
+    _sendPageMsgToUser(userId, sessionId, data) {
+        this.wsMockRepository.to(userId).emit('page-msg', sessionId, data);
+    }
+
+    _sendPageClosedToUser(userId, sessionId) {
+        this.wsMockRepository.to(userId).emit('page-closed', sessionId);
+    }
+
+    // 通用函数，获取socket连接中的用户id
     _getUserId(socketIOConn) {
         let cookies = cookie.parse(socketIOConn.request.headers.cookie);
-        return cookies['userId']
+        return cookies['userId'] || '0';
     }
 }
 

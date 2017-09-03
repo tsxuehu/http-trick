@@ -40,7 +40,7 @@ export default class Respository {
 
     }
 
-    static getLogRepository() {
+    static getHttpTrafficRepository() {
 
     }
 
@@ -61,6 +61,10 @@ export default class Respository {
     }
 
     static getUserRepository(){
+
+    }
+
+    static getWsMockRepository(){
 
     }
 }

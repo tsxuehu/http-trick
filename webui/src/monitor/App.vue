@@ -124,7 +124,7 @@
 
       if (!window.io) return;
       var socket = io('/httptrafic');
-      socket.on('proxy', this.receiveTraffic);
+      socket.on('rows', this.receiveTraffic);
     },
   }
 </script>
