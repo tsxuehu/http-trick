@@ -53,3 +53,9 @@ exports.regist = function (router) {
         };
     });
 };
+
+export default class HostController {
+    regist(router){
+
+    }
+}

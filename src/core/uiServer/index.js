@@ -21,6 +21,7 @@ export default class UiServer {
         this.mockDataRepository = Responsitory.getMockDataRepository();
         this.ruleRepository = Responsitory.getRuleRepository();
         this.wsMockRepository = Responsitory.getWsMockRepository();
+        this.userRepository = Responsitory.getUserRepository();
 
         // 初始化koa
         this.app = koa();
@@ -58,7 +59,8 @@ export default class UiServer {
         });
 
         // 监听logRespository事件
-        this.httpTrafficRepository.on('traffic', (userId, rows) => {
+        this.httpTrafficRepository.on('traffic', (clientIp, rows) => {
+            let userId = this.userRepository.getClientIpMappedUserId(clientIp);
             this.sendTrafficToUser(userId, rows)
         });
     }
@@ -130,7 +132,7 @@ export default class UiServer {
             // 用户开启调试会话,返回会话id
             debugClient.on('opensession', urlPattern => {
                 let sessionId = this.wsMockRepository.openSession(userId, debugClient.id, urlPattern);
-                this._sendAssignedSessionIdToUser(userId, urlPattern, sessionId);
+                this.sendAssignedSessionIdToUser(userId, urlPattern, sessionId);
             });
             // 用户关闭会话
             debugClient.on('closesession', function (sessionId) {
@@ -146,29 +148,29 @@ export default class UiServer {
             });
         });
         this.wsMockRepository.on("page-connected", (userId, sessionId) => {
-            this._sendPageConnectedToUser(userId, sessionId);
+            this.sendPageConnectedToUser(userId, sessionId);
         });
         this.wsMockRepository.on("page-msg", (userId, sessionId, data) => {
-            this._sendPageMsgToUser(userId, sessionId, data);
+            this.sendPageMsgToUser(userId, sessionId, data);
         });
         this.wsMockRepository.on("page-closed", (userId, sessionId) => {
-            this._sendPageClosedToUser(userId, sessionId);
+            this.sendPageClosedToUser(userId, sessionId);
         });
     }
 
-    _sendAssignedSessionIdToUser(userId, urlPattern, sessionId) {
+    sendAssignedSessionIdToUser(userId, urlPattern, sessionId) {
         this.wsMockRepository.to(userId).emit('assignedsessionid', urlPattern, sessionId);
     }
 
-    _sendPageConnectedToUser(userId, sessionId) {
+    sendPageConnectedToUser(userId, sessionId) {
         this.wsMockRepository.to(userId).emit('page-connected', sessionId);
     }
 
-    _sendPageMsgToUser(userId, sessionId, data) {
+    sendPageMsgToUser(userId, sessionId, data) {
         this.wsMockRepository.to(userId).emit('page-msg', sessionId, data);
     }
 
-    _sendPageClosedToUser(userId, sessionId) {
+    sendPageClosedToUser(userId, sessionId) {
         this.wsMockRepository.to(userId).emit('page-closed', sessionId);
     }
 

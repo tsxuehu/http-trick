@@ -121,3 +121,9 @@ exports.regist = function (router) {
         };
     });
 }
+
+export default class RuleController {
+    regist(router){
+
+    }
+}
