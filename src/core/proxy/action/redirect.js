@@ -45,7 +45,7 @@ export default class Redirect extends Action {
         //================== 转发到本地 或远程
         let {href} = urlObj;
         // 解析目标
-        let target = this.configureRepository.calcPath(clientIp, href, rule.match, action.data.target);
+        let target = this.configureRepository.calcPathbyClientIp(clientIp, href, rule.match, action.data.target);
         if (!target) {
             toClientResponse.sendedToClient = true;
             sendErrorToClient(req, res, 500, 'target parse error' + action.data.target);

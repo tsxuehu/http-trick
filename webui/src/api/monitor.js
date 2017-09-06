@@ -2,7 +2,7 @@ import axios from "axios";
 import queryString from "query-string";
 export async function getRequestBody(id) {
   try{
-    let result = await axios.get(`/res/get?idx=${id}`);
+    let result = await axios.get(`/traffic/getResponseBody?id=${id}`);
     return result.data;
   }catch (e){
     return '';

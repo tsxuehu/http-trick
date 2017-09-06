@@ -4,7 +4,7 @@
 import fs from "fs";
 import path from "path";
 import rimraf from "rimraf";
-import * as appInfo from "../../appInfo"
+import * as appInfo from "../../appInfo";
 
 // 启动的时候先清空请求记录目录
 rimraf.sync(appInfo.tempDir);
@@ -40,6 +40,16 @@ export default class logRepository {
                 queue = [];
             }
         }, 2500);
+    }
+
+    /**
+     * 获取请求的请求内容
+     * @param userId
+     * @param requestId
+     */
+    getResponseBody(userId, requestId) {
+        var saveResponseDirPath = dc.getSaveResponseDirPath();
+        var filepath = path.join(saveResponseDirPath, id + '_res_body');
     }
 
     request({clientIp, id, req, res, urlObj}) {

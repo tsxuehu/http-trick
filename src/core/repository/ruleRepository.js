@@ -38,6 +38,9 @@ export default class ruleRepository {
 
     }
 
+    getRemoteRuleFile(userId,url){
+
+    }
     /**
      * 根据请求,获取处理请求的规则
      * @param method

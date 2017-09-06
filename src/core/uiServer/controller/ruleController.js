@@ -1,13 +1,12 @@
 /**
  * Created by tsxuehu on 4/11/17.
  */
-import _ from "lodash";
 import Repository from "../../repository";
-var gitlab = require('../../utils/gitlab');
 
 export default class RuleController {
     constructor() {
         this.ruleRepository = Repository.getRuleRepository();
+        this.configRepository = Repository.getConfigureRepository();
     }
 
     regist(router) {
@@ -86,52 +85,26 @@ export default class RuleController {
              targetTpl: '',// 路径模板， 会用urlReg的匹配结果来替换targetTpl $1 $2
              matchRlt: '',// url匹配结果
              targetRlt: ''// 路径匹配结果
-             msg: '' // 处理消息
              */
             let userId = ctx.userId;
-            var match = this.request.body.match;
-            var url = this.request.body.url;
-            var matchRlt = '不匹配';
+            let match = ctx.request.body.match;
+            let url = ctx.request.body.url;
+            let matchRlt = '不匹配';
+
             if (match && (url.indexOf(match) >= 0 || (new RegExp(match)).test(url))) {
                 matchRlt = 'url匹配通过'
             }
 
-            var targetTpl = this.request.body.targetTpl;
-            var targetRlt = '----';
-            var msg = '----';
-            if (match && targetTpl) {
-
-                var matchList = url.match(new RegExp(match));
-                _.forEach(matchList, function (value, index) {
-                    var reg = new RegExp('\\$' + index, 'g');
-                    targetTpl = targetTpl.replace(reg, value);
-                });
-                targetRlt = targetTpl;
-                try {
-                    targetRlt = dc.resolvePath(targetRlt);
-                } catch (e) {
-                    msg = e.toString();
-                }
-            }
+            let targetTpl = ctx.request.body.targetTpl;
+            let targetRlt = this.configRepository.calcPathbyUser(userId, url, match, targetTpl);
 
             // 测试规则
             this.body = {
                 code: 0,
                 data: {
                     matchRlt: matchRlt,
-                    targetRlt: targetRlt,
-                    msg: msg
+                    targetRlt: targetRlt
                 }
-            };
-        });
-
-        router.get('/rule/getremoteFile', (ctx, next) => {
-            let userId = ctx.userId;
-            var url = ctx.query.url;
-            var response = yield gitlab.getContent(url, dc.getGitlabToken());
-            this.body = {
-                headers: response.headers,
-                data: response.data
             };
         });
     }

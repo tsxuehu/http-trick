@@ -38,7 +38,7 @@ var api = {
   },
 
   getRemoteRuleFile(url){
-    return axios.get(`/rule/getremoteFile?url=${encodeURIComponent(url)}`);
+    return axios.get(`/utils/getGitlabFile?url=${encodeURIComponent(url)}`);
   },
 
   getReferenceVar(content) {

@@ -16,7 +16,32 @@ export default class ConfigureRepository {
 
     }
 
-    calcPath(clientIp, href, match, target) {
+    /**
+     * 替换redirect中的变量引用,
+     * 如果引用的变量不存在，则不做替换
+     * @param clientIp
+     * @param href
+     * @param match
+     * @param target
+     */
+    calcPathbyUser(userId, href, match, target) {
+
+        if (match) {
+            try {
+                var matchList = href.match(new RegExp(match));
+                _.forEach(matchList, function (value, index) {
+                    if (index == 0) return;
+                    var reg = new RegExp('\\$' + index, 'g');
+                    target = target.replace(reg, value);
+                });
+                // 解析应用的变量
+                return dc.resolvePath(target);
+            } catch (e) {
+            }
+        }
+    }
+
+    calcPathbyClientIp(clientIp, href, match, target) {
 
     }
 

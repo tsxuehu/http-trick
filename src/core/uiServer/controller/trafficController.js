@@ -1,15 +1,16 @@
-import fs from 'fs';
-import  path from 'path';
+import Repository from "../../repository";
 
 export default class TrafficController {
-    regist(router){
-        router.get('/res/get', (ctx, next)=> {
-            let userId = ctx.userId;
-            var saveResponseDirPath = dc.getSaveResponseDirPath();
+    constructor() {
+        this.httpTrafficRepository = Repository.getHttpTrafficRepository();
+    }
 
-            var id = this.query.idx;
-            var filepath = path.join(saveResponseDirPath, id + '_res_body');
-            fs.existsSync(filepath) && (this.body = fs.createReadStream(filepath));
+    regist(router) {
+        router.get('/traffic/getResponseBody', async (ctx, next) => {
+            let userId = ctx.userId;
+            let id = ctx.query.id;
+            let content = await this.httpTrafficRepository.getResponseBody(userId, id);
+            this.body = content;
         });
     }
 }
