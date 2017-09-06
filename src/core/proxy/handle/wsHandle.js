@@ -1,7 +1,7 @@
 import url from "url";
-import HttpProxy from "../../utils/httpProxy";
 import Log from "../../utils/log";
 import WsMock from "../wsmock";
+import HttpProxy from "http-proxy";
 
 let wsHandle;
 export default class WsHandle {
@@ -15,7 +15,11 @@ export default class WsHandle {
     constructor() {
         this.log = Log.getLog();
         // 创建httpProxy
-        this.proxy = HttpProxy.getHttpProxy();
+        this.proxy = HttpProxy.createProxyServer({
+            secure: false // http-proxy api  在request的option里设置 rejectUnauthorized = false
+        });
+        this._registHandleForWSProxy(this.proxy);
+
         this.wsMock = WsMock.getWsMock();
     }
 
@@ -40,5 +44,20 @@ export default class WsHandle {
                 }
             });
         }
+    }
+
+    _registHandleForWSProxy(proxy) {
+        proxy.on('proxyReqWs', function (proxyReq, req, socket, options, head) {
+
+        });
+        proxy.on('open', function (proxySocket) {
+
+        });
+        proxy.on('close', function (proxyRes, proxySocket, proxyHead) {
+
+        });
+        proxy.on('error', function (err, req, socket) {
+            this.log.getRequestLog().error(err);
+        });
     }
 }

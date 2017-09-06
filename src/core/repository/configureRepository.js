@@ -114,7 +114,7 @@ export default class ConfigureRepository {
      * @param clientIp
      * @returns {number}
      */
-    getRequestTimeoutTime(clientIp) {
+    getRequestTimeoutTime() {
         return 10000;
     }
 }
