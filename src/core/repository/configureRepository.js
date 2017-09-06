@@ -4,8 +4,15 @@
  * Created by tsxuehu on 8/3/17.
  */
 export default class ConfigureRepository {
+    constructor() {
+        this.defaultConf = {};
+    }
 
-    getConf(){
+    getConf() {
+
+    }
+
+    setConf(userId, conf) {
 
     }
 
@@ -58,6 +65,14 @@ export default class ConfigureRepository {
      * @param clientIp
      */
     getEnableRule(clientIp) {
+
+    }
+
+    enableRule(userId) {
+
+    }
+
+    disableRule(userId) {
 
     }
 

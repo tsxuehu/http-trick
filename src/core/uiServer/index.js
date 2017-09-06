@@ -2,11 +2,12 @@ import http from "http";
 import koa from "koa";
 import path from "path";
 import koaBody from "koa-body";
+import koaQs from "koa-qs";
 import staticServe from "koa-static";
 import router from "./router";
 import SocketIO from "socket.io";
-import cookie from "cookie";
-import Responsitory from "../repository";
+import cookieParser from "cookie";
+import Repository from "../repository";
 
 export default class UiServer {
 
@@ -14,19 +15,25 @@ export default class UiServer {
         this.webUiPort = webUiPort;
 
         // 数据存储服务
-        this.runTimeInfoRepository = Responsitory.getRuntimeInfoRepository();
-        this.httpTrafficRepository = Responsitory.getHttpTrafficRepository();
-        this.confRepository = Responsitory.getConfigureRepository();
-        this.hostRepository = Responsitory.getHostRepository();
-        this.mockDataRepository = Responsitory.getMockDataRepository();
-        this.ruleRepository = Responsitory.getRuleRepository();
-        this.wsMockRepository = Responsitory.getWsMockRepository();
-        this.userRepository = Responsitory.getUserRepository();
+        this.runTimeInfoRepository = Repository.getRuntimeInfoRepository();
+        this.httpTrafficRepository = Repository.getHttpTrafficRepository();
+        this.confRepository = Repository.getConfigureRepository();
+        this.hostRepository = Repository.getHostRepository();
+        this.mockDataRepository = Repository.getMockDataRepository();
+        this.ruleRepository = Repository.getRuleRepository();
+        this.wsMockRepository = Repository.getWsMockRepository();
+        this.userRepository = Repository.getUserRepository();
 
         // 初始化koa
         this.app = koa();
+        koaQs(this.app);
         this.app.use(koaBody({multipart: true}));
         this.app.use(staticServe(path.join(__dirname, '../../../webui')));
+        this.app.use(async (ctx, next) => {
+            let cookies = cookieParser.parse(ctx.request.headers.cookie);
+            ctx.userId = cookies['userId'] || '0';
+            await next();
+        });
         this.app.use(router());
 
         // 创建server
@@ -176,7 +183,7 @@ export default class UiServer {
 
     // 通用函数，获取socket连接中的用户id
     _getUserId(socketIOConn) {
-        let cookies = cookie.parse(socketIOConn.request.headers.cookie);
+        let cookies = cookieParser.parse(socketIOConn.request.headers.cookie);
         return cookies['userId'] || '0';
     }
 }

@@ -11,4 +11,13 @@ export default class mockDataRepository {
     getDataFileList(){
 
     }
+    getDataFilePath(){
+
+    }
+    saveDataFileContent(){
+
+    }
+    saveDataEntryFromTraffic(){
+
+    }
 }

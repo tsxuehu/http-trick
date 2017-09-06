@@ -3,36 +3,42 @@
  */
 var fs = require('fs');
 var path = require('path');
-var dc = require('../../datacenter');
 var _ = require('lodash');
-
+import Repository from "../../repository";
 export default class ConfigController {
+    constructor() {
+        this.confRepository = Repository.getConfigureRepository();
+        this.rootCertRepository = Repository.getRootCertRepository();
+    }
+
     regist(router) {
-        router.get('/conf/getfile', function*(next) {
-            this.body = {
-                code: 0,
-                data: dc.getConf()
-            };
-        });
-        router.post('/conf/savefile', function*(next) {
-            dc.setConf(this.request.body);
-            this.body = {
+
+        router.post('/conf/savefile', (ctx, next) => {
+            let userId = ctx.userId;
+            this.confRepository.setConf(userId, ctx.request.body);
+            ctx.body = {
                 code: 0
             };
         });
-        router.post('/conf/setRuleState', function*(next) {
+
+        router.post('/conf/setRuleState', (ctx, next) => {
+            let userId = ctx.userId;
             if (this.query.rulestate) {
-                dc.enableRule();
+                this.confRepository.enableRule(userId);
             } else {
-                dc.disableRule();
+                this.confRepository.disableRule(userId);
             }
-            this.body = {
+            ctx.body = {
                 code: 0
             };
         });
-        router.get('/rootCA.crt', function*(next) {
-            this.body = dc.getRootCACertPem();
-            this.set('Content-disposition', 'attachment;filename=zproxy.crt');
+        /**
+         * 下载证书
+         */
+        router.get('/rootCA.crt', (ctx, next) => {
+            let userId = ctx.userId;
+            ctx.body = this.rootCertRepository.getRootCACertPem(userId);
+            ctx.set('Content-disposition', 'attachment;filename=zproxy.crt');
         });
     }
 

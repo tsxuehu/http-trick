@@ -67,4 +67,8 @@ export default class Respository {
     static getWsMockRepository(){
 
     }
+
+    static getRootCertRepository(){
+
+    }
 }
