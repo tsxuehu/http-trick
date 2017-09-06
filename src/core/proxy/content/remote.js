@@ -96,7 +96,7 @@ export default class Remote {
         // 一般性异常，  req和 httpclient抛出的异常
         // 异常时 打印vm的运行状态
         proxy.on('error', function (err, req, res, url, source) {
-            this.log.getRequestLog().error(req.urlObj.id + ' ' + source + ' ' + req.urlObj.href + ' ' + err.code + ' ' + err.message + ' error');
+            this.log.error(req.urlObj.id + ' ' + source + ' ' + req.urlObj.href + ' ' + err.code + ' ' + err.message + ' error');
             if (res.headersSent) return;
             res.statusCode = 500;
             res.setHeader('Content-Length', 0);
@@ -109,7 +109,7 @@ export default class Remote {
         //  proxyReq.on('error', proxyError);
         //  特殊异常： req.socket.destroyed && err.code === 'ECONNRESET'
         proxy.on('econnreset', function (err, req, res, url, source) {
-            requestLog.error(req.urlObj.id + ' ' + source + ' ' + req.urlObj.href + ' ' + err.code + ' ' + err.message + ' econnreset');
+            this.log.error(req.urlObj.id + ' ' + source + ' ' + req.urlObj.href + ' ' + err.code + ' ' + err.message + ' econnreset');
             if (res.headersSent) return;
             res.statusCode = 500;
             res.setHeader('Content-Length', 0);

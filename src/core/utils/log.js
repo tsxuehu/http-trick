@@ -1,7 +1,7 @@
-import path from  'path';
+import path from "path";
 
-import log4js from  'log4js';
-import * as appInfo from '../../appInfo';
+import log4js from "log4js";
+import * as appInfo from "../../appInfo";
 
 let log;
 export default class Log {
@@ -18,19 +18,23 @@ export default class Log {
 
     }
 
-    getExceptionLog() {
+    error(msg) {
+
+    }
+
+    _getExceptionLog() {
         var log = log4js.getLogger('exception');
         log.setLevel('error');
         return log;
     }
 
-    getConnectLog() {
+    _getConnectLog() {
         var log = log4js.getLogger('connect');
         log.setLevel('error');
         return log;
     }
 
-    getRequestLog() {
+    _getRequestLog() {
         var log = log4js.getLogger('request');
         log.setLevel('error');
         return log;

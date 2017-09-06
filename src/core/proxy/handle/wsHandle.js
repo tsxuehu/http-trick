@@ -57,7 +57,7 @@ export default class WsHandle {
 
         });
         proxy.on('error', function (err, req, socket) {
-            this.log.getRequestLog().error(err);
+            this.log.error(err);
         });
     }
 }
