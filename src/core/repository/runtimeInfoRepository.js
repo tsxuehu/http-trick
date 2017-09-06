@@ -71,18 +71,7 @@ export default class RuntimeInfoRepository {
     }
 
 
-    // 数据中心监控
-    hasStoreMonitor() {
-        return store.runtimeInfo.storeMonitorCnt > 0;
-    }
-
-    inStoreMonitor() {
-        return store.runtimeInfo.storeMonitorCnt++;
-    }
-
-    outStoreMonitor() {
-        return store.runtimeInfo.storeMonitorCnt--;
-    }
+   
 
     // ws mock 客户端
     hasWsMockClient() {

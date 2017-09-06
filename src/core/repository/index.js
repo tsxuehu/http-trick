@@ -56,27 +56,31 @@ export default class Respository {
 
     }
 
-    static getFilterRepository(){
+    static getFilterRepository() {
 
     }
 
-    static getUserRepository(){
+    static getUserRepository() {
 
     }
 
-    static getWsMockRepository(){
+    static getWsMockRepository() {
 
     }
 
-    static getRootCertRepository(){
+    static getRootCertRepository() {
 
     }
 
-    static getLogRepository(){
+    static getLogRepository() {
 
     }
 
-    static getCertificationRepository(){
+    static getCertificationRepository() {
+
+    }
+
+    static getAppInfoRepository() {
 
     }
 }

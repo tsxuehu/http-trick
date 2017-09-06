@@ -59,9 +59,9 @@ export default class UiServer {
 
             client.join(userId, err => {
             });
-            this.runTimeInfoRepository.incHttpTrafficMonitor(userId);
+            this.hasHttpTraficMonitor.incHttpTrafficMonitor(userId);
             client.on('disconnect', function () {
-                this.runTimeInfoRepository.decHttpTrafficMonitor(userId);
+                this.hasHttpTraficMonitor.decHttpTrafficMonitor(userId);
             });
         });
 

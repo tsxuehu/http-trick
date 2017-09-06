@@ -49,7 +49,7 @@ export default class HttpHandle {
         }
 
         // 如果有客户端监听请求内容，则做记录
-        if (this.runtimeRepository.hasHttpTraficMonitor()) {
+        if (this.httpTrafficRepository.hasHttpTraficMonitor(clientIp)) {
             // 记录请求
             let id = ++idx;
             if (idx > 2000) idx = 0;
