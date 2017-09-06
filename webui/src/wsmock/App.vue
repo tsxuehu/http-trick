@@ -69,6 +69,7 @@
             }
           ]
         });
+          // todo http接口
         socket.emit('opensession', urlPattern);
       },
       closeSession(localId){
@@ -78,6 +79,7 @@
         var sesionId = this.sessions[index].sessionId;
 
         this.sessions.splice(index, 1);
+        // todo http接口
         socket.emit('closesession', sesionId);
 
         // 重新选择当前会话
@@ -120,6 +122,7 @@
           date: new Date(),
           type: 'me'
         });
+          // todo http接口
         socket.emit('debuggermsg', this.currentSession.sessionId, data);
       },
       recieve(sessionId, data){

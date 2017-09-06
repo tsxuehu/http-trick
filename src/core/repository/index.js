@@ -71,4 +71,12 @@ export default class Respository {
     static getRootCertRepository(){
 
     }
+
+    static getLogRepository(){
+
+    }
+
+    static getCertificationRepository(){
+
+    }
 }

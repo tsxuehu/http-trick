@@ -1,8 +1,7 @@
 import https from "https";
 import tls from "tls";
 import crypto from "crypto";
-
-import CertificationManager from "../certificationManager";
+import Repository from "../repository";
 import HttpHandle from "./handle/httpHandle";
 import WsHandle from "./handle/wsHandle";
 
@@ -15,11 +14,11 @@ let createSecureContext = tls.createSecureContext || crypto.createSecureContext;
 export default class HttpsServer {
     constructor(httpsPort) {
         this.httpsPort = httpsPort;
-        this.certManger = CertificationManager.getCertificationManager();
+        this.certificationRepository = Repository.getCertificationRepository();
     }
 
     async start() {
-        let certification = await certManger.getCertificationForHost('internal_https_server');
+        let certification = await this.certificationRepository.getCertificationForHost('internal_https_server');
 
         this.httpsProxyServer = https.createServer({
             SNICallback: this.SNIPrepareCert,
@@ -32,16 +31,17 @@ export default class HttpsServer {
             console.log(err);
             process.exit(0);
         });
-        this.httpsProxyServer.listen(this.httpsPort,"0.0.0.0");
+        this.httpsProxyServer.listen(this.httpsPort, "0.0.0.0");
     }
 
     SNIPrepareCert(serverName, SNICallback) {
-        cert.generateCertForHost(serverName, function (certificate, privateKey) {
-            var ctx = createSecureContext({
-                key: privateKey,
-                cert: certificate
+        this.certificationRepository.getCertificationForHost(serverName)
+            .then(function (certificate, privateKey) {
+                let ctx = createSecureContext({
+                    key: privateKey,
+                    cert: certificate
+                });
+                SNICallback(null, ctx);
             });
-            SNICallback(null, ctx);
-        });
     }
 }

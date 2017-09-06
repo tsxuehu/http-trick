@@ -1,10 +1,12 @@
+import EventEmitter from "events";
 /**
  * 代理运转需要的规则数据
  * 代理端口、超时时间、gitlab token、工程路径、是否启用转发规则
  * Created by tsxuehu on 8/3/17.
  */
-export default class ConfigureRepository {
+export default class ConfigureRepository extends EventEmitter {
     constructor() {
+        super();
         this.defaultConf = {};
     }
 

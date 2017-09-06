@@ -17,4 +17,12 @@ export default class WsMockRespository {
     closeAllSessionInSocket(socketId) {
 
     }
+
+    /**
+     * 为用户分配一个连接id
+     * @param userId
+     */
+    newConnectionId(userId){
+
+    }
 }

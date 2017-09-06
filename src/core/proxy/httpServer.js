@@ -33,6 +33,6 @@ export default class HttpServer {
             process.exit(0);
         });
 
-        this.httpProxyServer.listen(httpProxyPort, "0.0.0.0");
+        this.httpProxyServer.listen(this.httpPort, "0.0.0.0");
     }
 }

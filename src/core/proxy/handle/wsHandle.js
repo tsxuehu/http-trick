@@ -1,8 +1,7 @@
 import url from "url";
-import Log from "../../utils/log";
 import WsMock from "../wsmock";
 import HttpProxy from "http-proxy";
-
+import Repository from "../repository";
 let wsHandle;
 export default class WsHandle {
     static getWsHandle() {
@@ -13,7 +12,7 @@ export default class WsHandle {
     }
 
     constructor() {
-        this.log = Log.getLog();
+        this.log = Repository.getLogRepository();
         // 创建httpProxy
         this.proxy = HttpProxy.createProxyServer({
             secure: false // http-proxy api  在request的option里设置 rejectUnauthorized = false

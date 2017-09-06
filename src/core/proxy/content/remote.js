@@ -2,7 +2,6 @@ import axios from "axios";
 import HttpProxy from "http-proxy";
 import Repository from "../repository";
 import {defaultHttpAgent, defaultHttpsAgent} from "../../utils/agent";
-import Log from "../../utils/log";
 /**
  * 请求连接获取返回结果
  */
@@ -18,7 +17,7 @@ export default class Remote {
 
     constructor() {
         let timeout = Repository.getConfigureRepository().getRequestTimeoutTime();
-        this.log = Log.getLog();
+        this.log = Repository.getLogRepository();
         this.proxy = HttpProxy.createProxyServer({
             proxyTimeout: timeout,
             secure: false // http-proxy api  在request的option里设置 rejectUnauthorized = false

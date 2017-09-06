@@ -136,19 +136,23 @@ export default class UiServer {
             let userId = this._getUserId(debugClient);
             debugClient.join(userId, err => {
             });
-            // 用户开启调试会话,返回会话id
-            debugClient.on('opensession', urlPattern => {
-                let sessionId = this.wsMockRepository.openSession(userId, debugClient.id, urlPattern);
-                this.sendAssignedSessionIdToUser(userId, urlPattern, sessionId);
-            });
-            // 用户关闭会话
-            debugClient.on('closesession', function (sessionId) {
-                this.wsMockRepository.closeSession(sessionId);
-            });
-            // mock 界面发回的数据 ， 需要返回给正在mock的页面
-            debugClient.on('debuggermsg', function (sessionId, data) {
-                this.wsMockRepository.sendToPageMsg(sessionId, data);
-            });
+            // 将websocket的id返回给浏览器
+            let connection = this.wsMockRepository.newConnectionId(userId);
+
+            debugClient.emit('connection-id', connection);
+            /* // 用户开启调试会话,返回会话id
+             debugClient.on('opensession', urlPattern => {
+             let sessionId = this.wsMockRepository.openSession(userId, debugClient.id, urlPattern);
+             this.sendAssignedSessionIdToUser(userId, urlPattern, sessionId);
+             });
+             // 用户关闭会话
+             debugClient.on('closesession', function (sessionId) {
+             this.wsMockRepository.closeSession(sessionId);
+             });
+             // mock 界面发回的数据 ， 需要返回给正在mock的页面
+             debugClient.on('debuggermsg', function (sessionId, data) {
+             this.wsMockRepository.sendToPageMsg(sessionId, data);
+             });*/
             // 用户关闭ws界面  关闭该链接相关的所有会话
             debugClient.on('disconnect', function () {
                 this.wsMockRepository.closeAllSessionInSocket(debugClient.id);
