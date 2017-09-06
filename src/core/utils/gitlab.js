@@ -2,8 +2,8 @@
  * Created by tsxuehu on 4/11/17.
  */
 
-var axios = require('axios');
-exports.getEtag = function (url, gitlabToken, callback) {
+import axios from 'axios';
+export function getEtag(url, gitlabToken, callback) {
 
     axios({
         method: 'Head',
@@ -18,7 +18,7 @@ exports.getEtag = function (url, gitlabToken, callback) {
     });
 };
 
-exports.getContent = function (url, gitlabToken) {
+export function getContent(url, gitlabToken) {
     return axios({
         method: 'Get',
         url: url,
@@ -27,8 +27,15 @@ exports.getContent = function (url, gitlabToken) {
         }
     });
 };
-
-exports.api = function (url, method, data, gitlabToken) {
+/**
+ * 调用gitlab的接口
+ * @param url
+ * @param method
+ * @param data
+ * @param gitlabToken
+ * @returns {AxiosPromise}
+ */
+export function api(url, method, data, gitlabToken) {
     return axios({
         method: method || 'Get',
         url: url,
