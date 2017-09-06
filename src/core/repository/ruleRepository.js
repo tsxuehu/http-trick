@@ -7,14 +7,14 @@ let passRule = {
     "actionList": [{
         "type": "bypass",
     }]
-}
+};
 
 export default class ruleRepository {
     constructor({configureRepository}) {
         this.configureRepository = configureRepository;
     }
 
-    createRuleFile(userId) {
+    createRuleFile(userId, name, description) {
 
     }
 
@@ -22,7 +22,19 @@ export default class ruleRepository {
 
     }
 
-    getInuseRules(clientIp) {
+    deleteRuleFile(userId, name) {
+
+    }
+
+    setRuleFileCheckStatus(userId, name, checked) {
+
+    }
+
+    getRuleFile(userId, name) {
+
+    }
+
+    saveRuleFile(userId, name, content) {
 
     }
 
@@ -35,7 +47,7 @@ export default class ruleRepository {
         let candidateRule = null;
         if (this.configureRepository.getEnableRule(clientIp)) {
             // 规则匹配部分
-            let inusingRules = this.getInuseRules(clientIp);
+            let inusingRules = this._getInuseRules(clientIp);
             for (let i = 0; i < inusingRules.length; i++) {
                 let rule = inusingRules[i];
                 // 捕获规则
@@ -50,6 +62,10 @@ export default class ruleRepository {
             candidateRule = passRule
         }
         return candidateRule;
+    }
+
+    _getInuseRules(clientIp) {
+
     }
 
     // 请求的方法是否匹配规则

@@ -1,23 +1,39 @@
 /**
  * Created by tsxuehu on 8/3/17.
  */
-export default class mockDataRepository {
+export default class MockDataRepository {
     getDataFilePath(clientIp, dataId) {
 
     }
-    getDataFileContentType(clientIp, dataId){
+
+    getDataFileContentType(clientIp, dataId) {
 
     }
-    getDataFileList(){
+
+    getMockDataList(userId) {
 
     }
-    getDataFilePath(){
+
+    saveMockDataList(userId, dataList) {
 
     }
-    saveDataFileContent(){
+
+    getDataFilePath(userId, dataFileId) {
 
     }
-    saveDataEntryFromTraffic(){
+
+    saveDataFileContent(userId, dataFileId, content) {
+
+    }
+
+    getDataFileContent(userId, dataFileId) {
+
+    }
+
+    /**
+     * 用户从监控窗保存一个数据文件
+     */
+    saveDataEntryFromTraffic(userId, dataFileId, fileName, contentType, reqId) {
 
     }
 }

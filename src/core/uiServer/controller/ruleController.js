@@ -2,35 +2,41 @@
  * Created by tsxuehu on 4/11/17.
  */
 import _ from "lodash";
+import Repository from "../../repository";
 var gitlab = require('../../utils/gitlab');
 
 export default class RuleController {
+    constructor() {
+        this.ruleRepository = Repository.getRuleRepository();
+    }
+
     regist(router) {
-//{
+        //{
         //    name:name,
         //    description:description
         //}
         router.post('/rule/create', (ctx, next) => {
             let userId = ctx.userId;
-            var result = dc.createRuleFile(this.request.body.name
-                , this.request.body.description);
+            let result = this.ruleRepository.createRuleFile(userId, ctx.request.body.name
+                , ctx.request.body.description);
             this.body = {
                 code: result ? 0 : 1,
                 msg: result ? '' : '文件已存在'
             };
         });
         // /rule/filelist
-        router.get('/rule/filelist', (ctx, next) => {
+        router.get('/rule/filelist', async (ctx, next) => {
             let userId = ctx.userId;
+            let ruleFileList = await this.ruleRepository.getRuleFileList(userId);
             this.body = {
                 code: 0,
-                list: dc.getRuleFileList()
+                list: ruleFileList
             }
         });
         // /rule/deletefile?name=${name}
         router.get('/rule/deletefile', (ctx, next) => {
             let userId = ctx.userId;
-            dc.deleteRuleFile(this.query.name);
+            this.ruleRepository.deleteRuleFile(userId, ctx.query.name);
             this.body = {
                 code: 0
             }
@@ -38,40 +44,41 @@ export default class RuleController {
         // /rule/setfilecheckstatus?name=${name}&checked=${checked?1:0}
         router.get('/rule/setfilecheckstatus', (ctx, next) => {
             let userId = ctx.userId;
-            dc.setRuleFilecheckStatus(this.query.name,
-                this.query.checked == 1 ? true : false);
+            this.ruleRepository.setRuleFileCheckStatus(userId, ctx.query.name,
+                ctx.query.checked == 1 ? true : false);
             this.body = {
                 code: 0
             };
         });
-// /rule/getfile?name=${name}
-        router.get('/rule/getfile', (ctx, next) => {
+        // /rule/getfile?name=${name}
+        router.get('/rule/getfile', async (ctx, next) => {
             let userId = ctx.userId;
+            let content = await this.ruleRepository.getRuleFile(userId, ctx.query.name);
             this.body = {
                 code: 0,
-                data: dc.getRuleFile(this.query.name)
+                data: content
             };
         });
-// /rule/savefile?name=${name} ,content
+        // /rule/savefile?name=${name} ,content
         router.post('/rule/savefile', (ctx, next) => {
             let userId = ctx.userId;
-            dc.saveRuleFile(this.query.name, this.request.body);
+            this.ruleRepository.saveRuleFile(userId, ctx.query.name, ctx.request.body);
             this.body = {
                 code: 0
             };
         });
 
-// 导出规则文件
-// /rule/download?name=${name}
-        router.get('/rule/download', (ctx, next) => {
+        // 导出规则文件
+        // /rule/download?name=${name}
+        router.get('/rule/download', async (ctx, next) => {
             let userId = ctx.userId;
-            var name = this.query.name;
-            var content = dc.getRuleFile(name);
-            this.set('Content-disposition', 'attachment;filename=' + name + '.json');
+            let name = this.query.name;
+            let content = await this.ruleRepository.getRuleFile(userId, name);
+            ctx.response.header['Content-disposition'] = `attachment;filename=${name}.json`;
             this.body = content;
         });
 
-// /rule/test
+        // /rule/test
         router.post('/rule/test', (ctx, next) => {
             /*
              url: '',// 请求url
@@ -120,7 +127,7 @@ export default class RuleController {
 
         router.get('/rule/getremoteFile', (ctx, next) => {
             let userId = ctx.userId;
-            var url = this.query.url;
+            var url = ctx.query.url;
             var response = yield gitlab.getContent(url, dc.getGitlabToken());
             this.body = {
                 headers: response.headers,

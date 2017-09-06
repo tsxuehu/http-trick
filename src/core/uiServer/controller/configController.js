@@ -1,9 +1,6 @@
 /**
  * Created by tsxuehu on 4/11/17.
  */
-var fs = require('fs');
-var path = require('path');
-var _ = require('lodash');
 import Repository from "../../repository";
 export default class ConfigController {
     constructor() {
@@ -23,7 +20,7 @@ export default class ConfigController {
 
         router.post('/conf/setRuleState', (ctx, next) => {
             let userId = ctx.userId;
-            if (this.query.rulestate) {
+            if (ctx.query.rulestate) {
                 this.confRepository.enableRule(userId);
             } else {
                 this.confRepository.disableRule(userId);
@@ -35,10 +32,10 @@ export default class ConfigController {
         /**
          * 下载证书
          */
-        router.get('/rootCA.crt', (ctx, next) => {
+        router.get('/rootCA.crt', async (ctx, next) => {
             let userId = ctx.userId;
-            ctx.body = this.rootCertRepository.getRootCACertPem(userId);
-            ctx.set('Content-disposition', 'attachment;filename=zproxy.crt');
+            ctx.body = await this.rootCertRepository.getRootCACertPem(userId);
+            ctx.response.header['Content-disposition'] = 'attachment;filename=zproxy.crt';
         });
     }
 

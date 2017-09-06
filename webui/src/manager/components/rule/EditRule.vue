@@ -47,7 +47,7 @@
       </el-table-column>
     </el-table>
     <!-- 测试正则匹配对话框 -->
-    <el-dialog title="匹配规则测试" v-model="testMatchRuleFormVisible" size="large">
+    <el-dialog title="匹配规则测试(只测试正则匹配，没有请求方法)" v-model="testMatchRuleFormVisible" size="large">
       <el-form :model="testMatchRuleForm" label-width="120px">
         <el-form-item label="请求url">
           <el-input v-model="testMatchRuleForm.url"></el-input>

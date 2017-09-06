@@ -2,61 +2,60 @@
  * Created by tsxuehu on 4/11/17.
  */
 
-var fs = require('fs');
-var path = require('path');
-var _ = require('lodash');
 import Repository from "../../repository";
-import cofs from 'co-fs';
 
 export default class DataController {
     constructor() {
+        this.mockDataRepository = Repository.getMockDataRepository();
     }
 
     regist(router) {
-        let _mockDataRepository = Repository.getMockDataRepository();
         /**
          * 数据文件相关api
          */
-        router.get('/data/getdatalist', (ctx, next)=> {
+        router.get('/data/getdatalist', async (ctx, next) => {
             let userId = ctx.userId;
-            this.body = {
+            let dataList = await this.mockDataRepository.getMockDataList(userId);
+            ctx.body = {
                 code: 0,
-                data: _mockDataRepository.getDataList()
+                data: dataList
             };
         });
 
-        router.post('/data/savedatalist', (ctx, next)=> {
+        router.post('/data/savedatalist', (ctx, next) => {
             let userId = ctx.userId;
-            _mockDataRepository.saveDataList(this.request.body);
-            this.body = {
+            this.mockDataRepository.saveMockDataList(userId, ctx.request.body);
+            ctx.body = {
                 code: 0
             };
         });
 
         // 读取数据文件
-        router.get('/data/getdatafile', (ctx, next)=> {
+        router.get('/data/getdatafile', async (ctx, next) => {
             let userId = ctx.userId;
-            var datafilePath = _mockDataRepository.getDataFilePath(this.query.id);
-            var content = yield cofs.readFile(datafilePath);
-            this.body = {
+            let content = await this.mockDataRepository.getDataFileContent(userId, ctx.query.id);
+            ctx.body = {
                 code: 0,
-                data: content.toString('utf8')
+                data: content
             };
         });
         // 保存数据文件
-        router.post('/data/savedatafile', (ctx, next)=> {
+        router.post('/data/savedatafile', (ctx, next) => {
             let userId = ctx.userId;
-            _mockDataRepository.saveDataFileContent(this.query.id, this.request.body.fields.content);
-            this.body = {
+            this.mockDataRepository.saveDataFileContent(userId, ctx.query.id, ctx.request.body.fields.content);
+            ctx.body = {
                 code: 0
             };
         });
 
-        router.post('/data/savedatafromtraffic', (ctx, next)=> {
+        router.post('/data/savedatafromtraffic', (ctx, next) => {
             let userId = ctx.userId;
-            _mockDataRepository.saveDataEntryFromTraffic(this.request.body.id, this.request.body.name,
-                this.request.body.contenttype, this.request.body.reqid);
-            this.body = {
+            this.mockDataRepository.saveDataEntryFromTraffic(userId,
+                ctx.request.body.id,
+                ctx.request.body.name,
+                ctx.request.body.contenttype,
+                ctx.request.body.reqid);
+            ctx.body = {
                 code: 0
             };
         });
