@@ -34,7 +34,7 @@ export default class HttpHandle {
      * 正常的http请求处理流程，
      * 处理流程 更具转发规则、mock规则
      */
-    handle(req, res) {
+    async handle(req, res) {
         // 解析请求参数
         let urlObj = parseUrl(req);
 
@@ -49,7 +49,7 @@ export default class HttpHandle {
         }
 
         // 如果有客户端监听请求内容，则做记录
-        if (this.httpTrafficRepository.hasHttpTraficMonitor(clientIp)) {
+        if (this.httpTrafficRepository.hasMonitor(clientIp)) {
             // 记录请求
             let id = ++idx;
             if (idx > 2000) idx = 0;
@@ -68,15 +68,20 @@ export default class HttpHandle {
 
         // =========================================
         // 断点
-        if (this.breakpointRepository.hasBreakpoint(clientIp, req.method, urlObj)) {
+        let breakpointId = await this.breakpointRepository.getBreakpointId(clientIp, req.method, urlObj);
+        if (breakpointId > 0) {
+            let requestContent = await this._getRequestContent(
+                req,
+                urlObj);
             this.breakpoint.run({
-                req, res, urlObj, clientIp
+                req, res, urlObj, clientIp, breakpointId, requestContent
             });
             return;
         }
 
         // =====================================================
         // 限流 https://github.com/tjgq/node-stream-throttle
+
 
         let matchedRule = this.ruleRepository.getProcessRule(clientIp, req.method, urlObj);
 

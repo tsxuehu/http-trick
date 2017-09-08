@@ -105,7 +105,7 @@ export default class WsMock {
         delete sessionIdInfo[sessionId];
     }
 
-    closeAllSessionInSocket(socketId) {
+    closeAllSessionInConnection(socketId) {
         var sessionIds = [];
         _.forEach(sessionIdInfo, function (sessionInfo, sessionId) {
             if (sessionInfo.socketId == socketId) {

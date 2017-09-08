@@ -52,6 +52,27 @@ export default class logRepository {
         var filepath = path.join(saveResponseDirPath, id + '_res_body');
     }
 
+    // 数据中心监控
+    hasMonitor(clientIp) {
+        return store.runtimeInfo.storeMonitorCnt > 0;
+    }
+
+    incMonitor(userId) {
+        return store.runtimeInfo.storeMonitorCnt++;
+    }
+
+    decMonitor(userId) {
+        return store.runtimeInfo.storeMonitorCnt--;
+    }
+
+    /**
+     * 获取 http 请求id
+     * @param clientIp
+     */
+    getHttpTrafficId(clientIp){
+
+    }
+
     request({clientIp, id, req, res, urlObj}) {
 
         let {protocol, host, pathname, port} = urlObj;

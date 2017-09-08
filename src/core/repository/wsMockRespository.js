@@ -14,7 +14,12 @@ export default class WsMockRespository {
 
     }
 
-    closeAllSessionInSocket(socketId) {
+    /**
+     * 用户关闭连接，当一个用户没有连接时，关闭该用户的所有调试会话
+     * @param userId
+     * @param connectionId
+     */
+    connectionClosed(userId, connectionId) {
 
     }
 

@@ -38,9 +38,10 @@ export default class ruleRepository {
 
     }
 
-    getRemoteRuleFile(userId,url){
+    getRemoteRuleFile(userId, url) {
 
     }
+
     /**
      * 根据请求,获取处理请求的规则
      * @param method
@@ -54,7 +55,8 @@ export default class ruleRepository {
             for (let i = 0; i < inusingRules.length; i++) {
                 let rule = inusingRules[i];
                 // 捕获规则
-                if (this._isUrlMatch(urlObj.href, rule.match) && this._isMethodMatch(method, rule.method)) {
+                if (this._isUrlMatch(urlObj.href, rule.match)
+                    && this._isMethodMatch(method, rule.method)) {
                     candidateRule = rule;
                     break
                 }
@@ -73,13 +75,16 @@ export default class ruleRepository {
 
     // 请求的方法是否匹配规则
     _isMethodMatch(reqMethod, ruleMethod) {
-        var loweredReqMethod = _.lowerCase(reqMethod);
-        var loweredRuleMethod = _.lowerCase(ruleMethod);
-        return loweredReqMethod == loweredRuleMethod || !ruleMethod || loweredReqMethod == 'option';
+        let loweredReqMethod = _.lowerCase(reqMethod);
+        let loweredRuleMethod = _.lowerCase(ruleMethod);
+        return loweredReqMethod == loweredRuleMethod
+            || !ruleMethod
+            || loweredReqMethod == 'option';
     }
 
     // 请求的url是否匹配规则
     _isUrlMatch(reqUrl, ruleMatchStr) {
-        return ruleMatchStr && (reqUrl.indexOf(ruleMatchStr) >= 0 || (new RegExp(ruleMatchStr)).test(reqUrl));
+        return ruleMatchStr && (reqUrl.indexOf(ruleMatchStr) >= 0
+            || (new RegExp(ruleMatchStr)).test(reqUrl));
     }
 }

@@ -346,11 +346,8 @@
         this.setSize();
       }, 200));
       if (!window.io) return;
-      var socket = io('/store');
-      socket.emit('internal state');
-      socket.on('runtime', (data) => {
-        this.runtime = data;
-      });
+      var socket = io('/manager');
+
       socket.on('conf', (data) => {
         this.conf = data;
         var paramarray = [];
@@ -361,15 +358,6 @@
           })
         });
         this.paramarray = paramarray;
-      });
-      socket.on('host', (data) => {
-        this.host = data;
-      });
-      socket.on('globhost', (data) => {
-        this.globhost = data;
-      });
-      socket.on('rule', (data) => {
-        this.rule = data;
       });
       socket.on('hostfilelist', (data) => {
         this.hostFileList = data;

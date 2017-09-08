@@ -3,36 +3,7 @@
  */
 export default class RuntimeInfoRepository {
 
-    /**
-     * 用户新开一个HttpTrafficMonitor窗口
-     */
-    incHttpTrafficMonitor(userId) {
 
-    }
-
-    /**
-     * 用户关闭一个HttpTrafficMonitor窗口
-     * @param userId
-     */
-    decHttpTrafficMonitor(userId) {
-
-    }
-
-    /**
-     * 用户是否有HttpTrafficMonitor窗口
-     * @param userId
-     */
-    hasHttpTrafficMonitor(userId) {
-
-    }
-
-    /**
-     * 获取 http 请求id
-     * @param clientIp
-     */
-    getHttpTrafficId(clientIp){
-
-    }
 
     /**
      * 获取保存请求记录的目录
