@@ -224,7 +224,7 @@ export default class HttpHandle {
 
     async _getRequestContent(req, urlObj) {
         let body = await this._getRequestBody(req);
-        let {protocol, hostname, pathname, port} = urlObj;
+        let {protocol, hostname, href, pathname, port} = urlObj;
         let query = queryString.parse(urlObj.search);
         return {
             hasContent: true,

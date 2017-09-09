@@ -2,6 +2,7 @@ import axios from "axios";
 import HttpProxy from "http-proxy";
 import Repository from "../repository";
 import {defaultHttpAgent, defaultHttpsAgent} from "../../utils/agent";
+import queryString from "query-string";
 /**
  * 请求连接获取返回结果
  */
@@ -29,7 +30,7 @@ export default class Remote {
     /**
      * 将请求远程的响应内容直接返回给浏览器
      */
-    pipe({req, res, protocol, hostname, path, port, headers}) {
+    async pipe({req, res, protocol, hostname, path, port, headers}) {
         let isHttps = protocol.indexOf('https') > -1;
         this.proxy.web(req, res, {
             target: {
@@ -42,28 +43,43 @@ export default class Remote {
             ignorePath: true,
             agent: isHttps ? defaultHttpsAgent : defaultHttpAgent
         });
-        return Promise.resolve(true);
     }
 
     /**
      * 将请求远程的响应内容
      */
-    cache({req, res, targetUrl, headers, toClientResponse}) {
+    async cache({req, res, targetUrl, headers, toClientResponse}) {
         // 设置超时时间，节约socket资源
-        return Promise.resolve().then(() => {
-            return axios({
-                method: req.method,
-                url: targetUrl,
-                headers: headers,
-                maxRedirects: 0,
-                responseType: 'text',
-                data: req
-            });
-        }).then(response => {
-            toClientResponse.hasContent = true;
-            toClientResponse.headers = _.assign({}, response.headers, toClientResponse.headers);
-            toClientResponse.body = response.data;
+        let response = await axios({
+            method: req.method,
+            url: targetUrl,
+            headers: headers,
+            maxRedirects: 0,
+            responseType: 'text',
+            data: req
         });
+        toClientResponse.hasContent = true;
+        toClientResponse.headers = _.assign({}, response.headers, toClientResponse.headers);
+        toClientResponse.body = response.data;
+    }
+
+    /**
+     * 更具RequestContent
+     */
+    async cacheFromRequestContent({requestContent, toClientResponse}) {
+        let {protocol, host, pathname, port, query} = requestContent;
+        let href = `${protocol}//${host}:${port}${pathname}?${queryString.stringify(query)}`;
+        let response = await axios({
+            method: requestContent.method,
+            url: href,
+            headers: requestContent.headers,
+            maxRedirects: 0,
+            responseType: 'text',
+            data: requestContent.body
+        });
+        toClientResponse.hasContent = true;
+        toClientResponse.headers = _.assign({}, response.headers, toClientResponse.headers);
+        toClientResponse.body = response.data;
     }
 
     /**

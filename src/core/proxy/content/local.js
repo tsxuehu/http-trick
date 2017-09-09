@@ -47,7 +47,7 @@ export default class Local {
             fs.stat(path, function (err, stat) {
                 if (err || !stat.isFile()) {
                     sendErrorToClient(req, res, 404, 'can not read file' + path);
-                    resolve(true);
+                    resolve(false);
                     return;
                 }
                 toClientResponse.hasContent = true;
@@ -55,7 +55,7 @@ export default class Local {
                 toClientResponse.headers['Content-Length'] = stat.size;
                 toClientResponse.headers['Content-Type'] = contentType + ';charset=utf-8';
                 toClientResponse.body = fs.readFileSync(path);
-                resolve(false);
+                resolve(true);
             });
         });
     }
