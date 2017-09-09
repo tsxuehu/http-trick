@@ -84,6 +84,14 @@ export default class BreakpointRepository extends EventEmitter {
         return finded.id;
     }
 
+    async hasRequestBreak(breakpointId){
+        return this.breakpoints[breakpointId].requestBreak;
+    }
+
+    async hasResponseBreak(breakpointId){
+        return this.breakpoints[breakpointId].responseBreak;
+    }
+
     /**
      * 获取用户的所有断点
      * @param userId

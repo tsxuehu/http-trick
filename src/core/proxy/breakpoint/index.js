@@ -24,15 +24,16 @@ export default class Breakpoint {
     }
 
     run({
-            req, res, urlObj, clientIp, breakpointId, requestContent
+            req, res, breakpointId, requestContent
         }) {
-        // 是否有请求断点，若有则放入repository，函数返回
-
+        // 放入repository，若有请求断点，函数返回
+        this.breakpointRepository.setClientRequestContent(breakpointId, requestContent, req, res);
+        if (this.breakpointRepository.hasRequestBreak(breakpointId)) return;
         // 获取服务器端内容
-
+        this.breakpointRepository.sendToServer(breakpointId);
         // 是否有响应断点，若有则放入repository，函数返回
-
+        if (this.breakpointRepository.hasResponseBreak(breakpointId)) return;
         // 响应浏览器（一个空断点会执行到这一步）
-
+        this.breakpointRepository.sendToClient(breakpointId);
     }
 }
