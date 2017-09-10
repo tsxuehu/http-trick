@@ -1,12 +1,14 @@
 import EventEmitter from "events";
+import _ from "lodash";
 /**
  * 代理运转需要的规则数据
  * 代理端口、超时时间、gitlab token、工程路径、是否启用转发规则
  * Created by tsxuehu on 8/3/17.
  */
 export default class ConfigureRepository extends EventEmitter {
-    constructor() {
+    constructor(userRepository) {
         super();
+        this.userRepository = userRepository;
         this.defaultConf = {
             "projectPath": {
                 "project name": "path to your project"
@@ -38,24 +40,26 @@ export default class ConfigureRepository extends EventEmitter {
      * @param target
      */
     calcPathbyUser(userId, href, match, target) {
-
         if (match) {
             try {
-                var matchList = href.match(new RegExp(match));
+                let matchList = href.match(new RegExp(match));
                 _.forEach(matchList, function (value, index) {
                     if (index == 0) return;
                     var reg = new RegExp('\\$' + index, 'g');
                     target = target.replace(reg, value);
                 });
+                let compiled = _.template(target);
+                let projectPath = this.getConf(userId).projectPath;
                 // 解析应用的变量
-                return dc.resolvePath(target);
+                return compiled(projectPath);
             } catch (e) {
             }
         }
     }
 
     calcPathbyClientIp(clientIp, href, match, target) {
-
+        let userId = this.userRepository.getClientIpMappedUserId(clientIp);
+        return this.calcPathbyUser(userId, href, match, target);
     }
 
     /**
