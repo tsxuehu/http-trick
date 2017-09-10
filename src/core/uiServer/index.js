@@ -82,16 +82,16 @@ export default class UiServer {
             client.join(userId, err => {
             });
         });
-        this.confRepository.on("dataChange", (userId, conf) => {
+        this.confRepository.on("data-change", (userId, conf) => {
             this.managerNS.to(userId).emit('conf', conf);
         });
-        this.hostRepository.on("dataChange", (userId, hostFilelist) => {
+        this.hostRepository.on("data-change", (userId, hostFilelist) => {
             this.managerNS.to(userId).emit('hostfilelist', hostFilelist);
         });
-        this.ruleRepository.on("dataChange", (userId, ruleFilelist) => {
+        this.ruleRepository.on("data-change", (userId, ruleFilelist) => {
             this.managerNS.to(userId).emit('rulefilelist', ruleFilelist);
         });
-        this.mockDataRepository.on("dataChange", (userId, dataFilelist) => {
+        this.mockDataRepository.on("data-change", (userId, dataFilelist) => {
             this.managerNS.to(userId).emit('datalist', dataFilelist);
         });
     }

@@ -52,6 +52,12 @@ export default class logRepository {
         var filepath = path.join(saveResponseDirPath, id + '_res_body');
     }
 
+    // 为请求分配id
+    getRequestId(clientIp){
+        if (idx > 2000) idx = 0;
+
+    }
+
     // 数据中心监控
     hasMonitor(clientIp) {
         return store.runtimeInfo.storeMonitorCnt > 0;

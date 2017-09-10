@@ -5,8 +5,8 @@ import Action from "../action/action";
 import queryString from "query-string";
 import getClientIp from "../../utils/getClientIp";
 import Breakpoint from "../breakpoint";
+import _ from 'lodash';
 // request session id seed
-let idx = 0;
 let httpHandle;
 export default class HttpHandle {
 
@@ -42,7 +42,7 @@ export default class HttpHandle {
         let clientIp = getClientIp(req);
 
         // 如果是 ui server请求，则直接转发不做记录
-        if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == this.configureRepository.getPcIp())
+        if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == this.runtimeRepository.getPcIp())
             && urlObj.port == this.configureRepository.getRealUiPort()) {
             this.actionMap['bypass'].run({req, res, urlObj});
             return;
@@ -51,8 +51,7 @@ export default class HttpHandle {
         // 如果有客户端监听请求内容，则做记录
         if (this.httpTrafficRepository.hasMonitor(clientIp)) {
             // 记录请求
-            let id = ++idx;
-            if (idx > 2000) idx = 0;
+            let id = this.httpTrafficRepository.getRequestId(clientIp);
             this.httpTrafficRepository.request({clientIp, id, req, res, urlObj});
 
             // 日记记录body
@@ -68,7 +67,8 @@ export default class HttpHandle {
 
         // =========================================
         // 断点
-        let breakpointId = await this.breakpointRepository.getBreakpointId(clientIp, req.method, urlObj);
+        let breakpointId = await this.breakpointRepository
+            .getBreakpointId(clientIp, req.method, urlObj);
         if (breakpointId > 0) {
             let requestContent = await this._getRequestContent(
                 req,

@@ -1,12 +1,14 @@
 import EventEmitter from "events";
 import _ from "lodash";
 import sendSpecificToClient from "../proxy/sendToClient/specific";
+import Remote from "../proxy/content/remote";
 /**
  * Created by tsxuehu on 8/3/17.
  */
 export default class BreakpointRepository extends EventEmitter {
     constructor(userRepository) {
         super();
+        this.remote = Remote.getRemote();
         this.userRepository = userRepository;
         this.currentConnectionId = 20;
         this.currentBreakpointId = 10;
@@ -84,11 +86,11 @@ export default class BreakpointRepository extends EventEmitter {
         return finded.id;
     }
 
-    async hasRequestBreak(breakpointId){
+    async hasRequestBreak(breakpointId) {
         return this.breakpoints[breakpointId].requestBreak;
     }
 
-    async hasResponseBreak(breakpointId){
+    async hasResponseBreak(breakpointId) {
         return this.breakpoints[breakpointId].responseBreak;
     }
 
@@ -170,10 +172,13 @@ export default class BreakpointRepository extends EventEmitter {
     /**
      * 将请求数据发送给服务端
      */
-    sendToServer(id) {
+    async sendToServer(breakpointId) {
         // 向服务器发送请求
-
-        // 设置数据
+        let requestContent = this.breakpoints[breakpointId].requestContent;
+        let responseContent = this.breakpoints[breakpointId].responseContent;
+        await this.remote.cacheFromRequestContent({
+            requestContent, toClientResponse: responseContent
+        });
     }
 
     /**

@@ -7,15 +7,26 @@ import EventEmitter from "events";
 export default class ConfigureRepository extends EventEmitter {
     constructor() {
         super();
-        this.defaultConf = {};
+        this.defaultConf = {
+            "projectPath": {
+                "project name": "path to your project"
+            },
+            "proxyPort": 8001,
+            "requestTimeoutTime": 10000,
+            "gitlabToken": "",
+            "enableRule": true
+        };
+        this.userConfMap = {};
     }
 
-    getConf() {
-
+    getConf(userId) {
+        return this.userConfMap[userId];
     }
 
     setConf(userId, conf) {
-
+        this.userConfMap[userId] = conf;
+        // 发送通知
+        this.emit('data-change', userId, conf)
     }
 
     /**

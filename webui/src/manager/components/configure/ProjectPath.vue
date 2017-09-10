@@ -5,7 +5,7 @@
     </div>
     <el-form :model="filecontent" ref="ruleForm" label-width="100px" class="demo-ruleForm"
              style="margin:20px;width:80%;min-width:800px;">
-      <template v-for="(obj ,index) in $dc.paramarray">
+      <template v-for="(obj ,index) in $dc.projectPathArray">
         <el-form-item :label="'工程'+(index+1)" :key="index">
           <div style="padding-left: 5px">
             <el-row :gutter="10">
@@ -24,7 +24,7 @@
                 <el-input v-model="obj.value" placeholder="工程在本地的绝对路径"></el-input>
               </el-col>
               <el-col :span="2">
-                <el-button type="danger" icon='delete' size="mini"  @click='deleteParam(obj,index,paramarray)'>
+                <el-button type="danger" icon='delete' size="mini"  @click='deleteParam(obj,index,projectPathArray)'>
                 </el-button>
               </el-col>
             </el-row>
@@ -51,13 +51,13 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$dc.paramarray.splice(index, 1);
+          this.$dc.projectPathArray.splice(index, 1);
         })
       },
       saveFile() {
         // 由host数组组装文件
         var responderParams = {};
-        forEach(this.$dc.paramarray, (obj) => {
+        forEach(this.$dc.projectPathArray, (obj) => {
           responderParams[obj.key] = obj.value;
         });
         this.$dc.conf.responderParams = responderParams;
@@ -75,7 +75,7 @@
         });
       },
       addParam() {
-        this.$dc.paramarray.push({
+        this.$dc.projectPathArray.push({
           key: "",
           value: ""
         })

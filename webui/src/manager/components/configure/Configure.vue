@@ -33,13 +33,13 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$dc.paramarray.splice(index, 1);
+          this.$dc.projectPathArray.splice(index, 1);
         })
       },
       saveFile() {
         // 由host数组组装文件
         var responderParams = {};
-        forEach(this.$dc.paramarray, (obj) => {
+        forEach(this.$dc.projectPathArray, (obj) => {
           responderParams[obj.key] = obj.value;
         });
         this.$dc.conf.responderParams = responderParams;
@@ -58,7 +58,7 @@
         });
       },
       addParam() {
-        this.$dc.paramarray.push({
+        this.$dc.projectPathArray.push({
           key: "",
           value: ""
         })

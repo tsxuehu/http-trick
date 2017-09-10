@@ -131,7 +131,7 @@
         // 基本配置信息
         conf: {},
         // conf中的参数设置
-        paramarray: [],
+        projectPathArray: [],
         // 生效的host
         host: {},
         // 生效的globHost
@@ -350,14 +350,14 @@
 
       socket.on('conf', (data) => {
         this.conf = data;
-        var paramarray = [];
-        _.forEach(this.conf.responderParams, (value, key) => {
-          paramarray.push({
+        var projectPathArray = [];
+        _.forEach(this.conf.projectPath, (value, key) => {
+          projectPathArray.push({
             key: key,
             value: value
           })
         });
-        this.paramarray = paramarray;
+        this.projectPathArray = projectPathArray;
       });
       socket.on('hostfilelist', (data) => {
         this.hostFileList = data;
