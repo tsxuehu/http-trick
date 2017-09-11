@@ -81,6 +81,11 @@ export default class UiServer {
             let userId = this._getUserId(client);
             client.join(userId, err => {
             });
+            // 推送最新数据
+            client.emit('conf',this.confRepository.getConf(userId));
+            client.emit('hostfilelist',this.hostRepository.getHostFileList(userId));
+            client.emit('rulefilelist',this.ruleRepository.getConf(userId));
+            client.emit('datalist',this.mockDataRepository.getConf(userId));
         });
         this.confRepository.on("data-change", (userId, conf) => {
             this.managerNS.to(userId).emit('conf', conf);
@@ -109,11 +114,13 @@ export default class UiServer {
             let connectionId = this.wsMockRepository.newConnectionId(userId);
 
             debugClient.emit('connection-id', connectionId);
-            // 用户关闭ws界面  关闭该链接相关的所有会话
+            // 用户关闭ws界面
             debugClient.on('disconnect', _ => {
                 this.wsMockRepository.connectionClosed(userId, connectionId);
             });
+            debugClient.emit('sessions',this.wsMockRepository.getSessions(userId));
         });
+
         this.wsMockRepository.on("page-connected", (userId, sessionId) => {
             this.wsMockRepository.to(userId).emit('page-connected', sessionId);
         });
@@ -149,6 +156,8 @@ export default class UiServer {
             client.on('disconnect', _ => {
                 this.breakpointRepository.connectionClosed(userId, connectionId);
             });
+            // 发送当前所有的断点
+            client.emit('breakpoints',this.breakpointRepository.getUserBreakPoints(userId));
         });
 
         this.breakpointRepository.on('instance-add', (userId, instance) => {

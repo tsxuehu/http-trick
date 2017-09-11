@@ -43,7 +43,7 @@
     data(){
       var certUrl = 'http://' + location.hostname
         + ':' + (location.port || 80)
-        + '/rootCA.crt';
+        + '/utils/rootCA.crt';
       return {
         url: certUrl,
         imgUrl: qrcode.toDataURL(certUrl, 4)

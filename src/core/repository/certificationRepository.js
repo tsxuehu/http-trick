@@ -3,23 +3,10 @@ import parseDomain from "parse-domain";
 import * as fileUtils from "../utils/file";
 import pem from "pem";
 
-let manager;
 /**
  * 证书管理
  */
 export default class CertificationRepository {
-    /**
-     *
-     * @returns {*}
-     */
-    static getCertificationManager() {
-        if (!manager) {
-            // 获取临时目录 和 根证书
-
-            manager = new CertificationManager(certTempDir, root);
-        }
-        return manager;
-    }
 
     /**
      * 为指定域名创建证书 (使用自定义的根证书)
@@ -63,7 +50,6 @@ export default class CertificationRepository {
             },
             maxAge: 1000 * 60 * 60
         });
-        //todo 证书存储目录校验，如果缓存目录下的rootca和root不样，则抛异常。 若没有则写入rootca
     }
 
     /**
@@ -73,6 +59,15 @@ export default class CertificationRepository {
      */
     async getCertificationForHost(host) {
         let domain = host;
+        /**
+         * 解析后 www.baidu.com
+         * {
+         *   domain: "baidu"
+         *   subdomain: "www"
+         *   tld: "com"
+         *  }
+         * @type {*}
+         */
         let parsed = parseDomain(host);
         // 寻找一级域名
         if (parsed && parsed.subdomain) {
@@ -100,7 +95,7 @@ export default class CertificationRepository {
 
         // 调用openssl生成证书，并保存到临时文件夹里
         if (!cert || !key) {
-            ({key, cert} = await CertificationManager.createCertificate(domain, this.root));
+            ({key, cert} = await CertificationRepository.createCertificate(domain, this.root));
             // 保存到文件
             await fileUtils.writeFile(keykey, key);
             await fileUtils.writeFile(certKey, cert);
@@ -117,15 +112,8 @@ export default class CertificationRepository {
         };
     }
 
-    /**
-     * todo 重置根证书
-     * @param root
-     * @returns {Promise<void>}
-     */
-    async resetRootCertificate(root) {
-        // 清证书缓存
-
-        // 设置值
+    getRootCACertPem() {
+        return this.root.cert;
     }
 }
 

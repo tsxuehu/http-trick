@@ -36,4 +36,12 @@ export default class MockDataRepository {
     saveDataEntryFromTraffic(userId, dataFileId, fileName, contentType, reqId) {
 
     }
+
+    /**
+     * 获取用户所有的调试会话
+     * @param userId
+     */
+    getSessions(userId){
+
+    }
 }

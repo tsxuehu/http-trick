@@ -64,7 +64,7 @@ export default class Respository {
 
     }
 
-    static getRootCertRepository() {
+    static getCertRepository() {
 
     }
 
