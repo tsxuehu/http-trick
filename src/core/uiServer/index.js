@@ -150,6 +150,7 @@ export default class UiServer {
                 this.breakpointRepository.connectionClosed(userId, connectionId);
             });
         });
+
         this.breakpointRepository.on('instance-add', (userId, instance) => {
             this.breakpointRepository.to(userId).emit('instance-add', instance);
         });
@@ -162,6 +163,7 @@ export default class UiServer {
         this.breakpointRepository.on('instance-end', (userId, instanceId) => {
             this.breakpointRepository.to(userId).emit('instance-end', instanceId);
         });
+
         this.breakpointRepository.on('breakpoint-save', (userId, breakpoint) => {
             this.breakpointRepository.to(userId).emit('breakpoint-save', breakpoint);
         });

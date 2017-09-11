@@ -42,7 +42,7 @@ export default class Breakpoint {
         if (this.breakpointRepository.hasRequestBreak(breakpointId)) return;
 
         // 获取服务器端内容
-        let responseContent = await this.sendToServer(breakpointId);
+        let responseContent = await this.getServerResponse(breakpointId);
         this.breakpointRepository.setInstanceServerResponseContent(instanceId, responseContent);
         // 是否有响应断点，若有则放入repository，函数返回
         if (this.breakpointRepository.hasResponseBreak(breakpointId)) return;
@@ -53,9 +53,9 @@ export default class Breakpoint {
     }
 
     /**
-     * 将请求数据发送给服务端
+     * 将请求数据发送给服务端,获取服务器返回内容
      */
-    async sendToServer(instanceId) {
+    async getServerResponse(instanceId) {
         // 向服务器发送请求
 
         let requestContent = this.breakpointRepository.getInstanceRequestContent(instanceId);
@@ -63,7 +63,7 @@ export default class Breakpoint {
         await this.remote.cacheFromRequestContent({
             requestContent, toClientResponse: responseContent
         });
-        this.breakpointRepository.setInstanceServerResponseContent(instanceId,responseContent);
+        this.breakpointRepository.setInstanceServerResponseContent(instanceId, responseContent);
     }
 
     /**

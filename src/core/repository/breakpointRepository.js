@@ -117,13 +117,13 @@ export default class BreakpointRepository extends EventEmitter {
      * @param method
      * @param urlObj
      */
-    getBreakpointId(clientIp, method, urlObj) {
+    async getBreakpointId(clientIp, method, urlObj) {
         // clientIp 转 userId
         let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
         let connectionsCnt = await this.getUserConnectionCount(userId);
         // 没有断点界面，则断点不生效
         if (connectionsCnt == 0) return -1;
-        let userBreakPoints = await  this.getUserBreakPoints();
+        let userBreakPoints = await this.getUserBreakPoints(userId);
         let finded = _.find(userBreakPoints, (breakpoint, id) => {
                 return breakpoint.userId == userId
                     && this._isMethodMatch(method, breakpoint.method)
@@ -165,7 +165,7 @@ export default class BreakpointRepository extends EventEmitter {
         this.emit('breakpoint-save', userId, breakpoint);
     }
 
-    deleteBreakpoint({userId, breakpointId}) {
+    deleteBreakpoint(userId, breakpointId) {
         // 删除断点
         delete this.breakpoints[breakpointId];
         // 删除断点实例
