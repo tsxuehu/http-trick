@@ -150,14 +150,23 @@ export default class UiServer {
                 this.breakpointRepository.connectionClosed(userId, connectionId);
             });
         });
-        this.breakpointRepository.on('client-request', (userId, breakpointId, content) => {
-            this.breakpointRepository.to(userId).emit('client-request', breakpointId, content);
+        this.breakpointRepository.on('instance-add', (userId, instance) => {
+            this.breakpointRepository.to(userId).emit('instance-add', instance);
         });
-        this.breakpointRepository.on('server-response', (userId, breakpointId, content) => {
-            this.breakpointRepository.to(userId).emit('server-response', breakpointId, content);
+        this.breakpointRepository.on('instance-client-request', (userId, instanceId, content) => {
+            this.breakpointRepository.to(userId).emit('client-request', instanceId, content);
         });
-        this.breakpointRepository.on('breakpoints', (userId, breakpoints) => {
-            this.breakpointRepository.to(userId).emit('breakpoints', breakpoints);
+        this.breakpointRepository.on('instance-server-response', (userId, instanceId, content) => {
+            this.breakpointRepository.to(userId).emit('server-response', instanceId, content);
+        });
+        this.breakpointRepository.on('instance-end', (userId, instanceId) => {
+            this.breakpointRepository.to(userId).emit('instance-end', instanceId);
+        });
+        this.breakpointRepository.on('breakpoint-save', (userId, breakpoint) => {
+            this.breakpointRepository.to(userId).emit('breakpoint-save', breakpoint);
+        });
+        this.breakpointRepository.on('breakpoint-delete', (userId, breakpointId) => {
+            this.breakpointRepository.to(userId).emit('breakpoint-delete', breakpointId);
         });
     }
 

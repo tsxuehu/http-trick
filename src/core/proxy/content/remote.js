@@ -9,7 +9,7 @@ import queryString from "query-string";
 
 let remote;
 export default class Remote {
-    static getRemote() {
+    static getRemote(t) {
         if (!remote) {
             remote = new Remote();
         }

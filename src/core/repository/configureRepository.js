@@ -13,9 +13,6 @@ export default class ConfigureRepository extends EventEmitter {
             "projectPath": {
                 "project name": "path to your project"
             },
-            "proxyPort": 8001,
-            "requestTimeoutTime": 10000,
-            "gitlabToken": "",
             "enableRule": true
         };
         this.userConfMap = {};
@@ -63,43 +60,14 @@ export default class ConfigureRepository extends EventEmitter {
     }
 
     /**
-     * 保存用户的配置
-     * @param userId
-     * @param config
-     */
-    setConfigByUserId(userId, config) {
-
-    }
-
-    /**
-     * 获取用户的配置
-     * @param userId
-     */
-    getConfigByUserId(userId) {
-
-    }
-
-    /**
-     * 获取端口号
-     */
-    getProxyPort() {
-    }
-
-    /**
-     * 获取gitlab token
-     * @param userId
-     */
-    getGitlabTokenByUserId(userId) {
-
-    }
-
-    /**
      *
      * @param userId
      * @param enable
      */
-    setEnableRuleByUserId(userId, enable) {
-
+    setEnableRule(userId, enable) {
+        let conf = this.userConfMap[userId];
+        conf.enableRule = enable;
+        this.setConf(userId, this.userConfMap[userId]);
     }
 
     /**
@@ -107,31 +75,6 @@ export default class ConfigureRepository extends EventEmitter {
      * @param clientIp
      */
     getEnableRule(clientIp) {
-
-    }
-
-    enableRule(userId) {
-
-    }
-
-    disableRule(userId) {
-
-    }
-
-    /**
-     * 获取工程路径配置
-     * @param clientIp
-     */
-    getProjectPath(clientIp) {
-
-    }
-
-    /**
-     * 代理超时时间
-     * @param clientIp
-     * @returns {number}
-     */
-    getRequestTimeoutTime() {
-        return 10000;
+        return this.getConf(userId).enableRule;
     }
 }

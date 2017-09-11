@@ -1,17 +1,21 @@
 import EventEmitter from "events";
 import _ from "lodash";
-import sendSpecificToClient from "../proxy/sendToClient/specific";
-import Remote from "../proxy/content/remote";
+
 /**
+ * 记录三个维护的数据
+ * 1、用户打开的断点页面数（连接数）
+ * 2、断点请求
+ * 3、断点
  * Created by tsxuehu on 8/3/17.
  */
 export default class BreakpointRepository extends EventEmitter {
     constructor(userRepository) {
         super();
-        this.remote = Remote.getRemote();
+
         this.userRepository = userRepository;
-        this.currentConnectionId = 20;
-        this.currentBreakpointId = 10;
+        this.currentConnectionId = 10;// 连接id
+        this.currentBreakpointId = 200;// 断点id
+        this.currentInstanceId = 3000;// 断点实例id
         /**
          * 断点id-> 断点
          * 断点格式如下：
@@ -22,13 +26,13 @@ export default class BreakpointRepository extends EventEmitter {
          *        responseBreak: false, // 响应断点
          *        userId: '', // 设置断点的用户id
          *        connectionId,// 界面连接id
-         *        req: '', // 浏览器请求对象
-         *        res: '', // 浏览器响应对象
          *        requestContent: '',// 浏览器请求内容 （格式参见 HttpHandle._getRequestContent 函数）
          *        responseContent: '',// 服务器响应内容
          *    }
          */
         this.breakpoints = {};
+        // 断点实例
+        this.instances = {};
 
         /**
          * userId -> connectionId 数组
@@ -36,48 +40,90 @@ export default class BreakpointRepository extends EventEmitter {
         this.userConnectionMap = {};
     }
 
-    addBreakPoint({
-                      userId,
-                      connectionId,
-                      method,
-                      match,
-                      requestBreak = false,
-                      responseBreak = false
-                  }) {
-        let id = (this.currentBreakpointId++) + '';
-
-        this.breakpoints[id] = {
-            id,
-            match, // 匹配正则
-            method,// 请求方法
-            requestBreak, // 请求断点
-            responseBreak, // 响应断点
-            userId, // 设置断点的用户id
-            connectionId,// 界面连接id
-            req: null, // 浏览器请求对象
-            res: null, // 浏览器响应对象
+    addInstance({breakpointId, clientIp, href, method}) {
+        // 分配断点实例id
+        let instanceId = (this.currentInstanceId++) + '';
+        let instance = {
+            id: instanceId,
+            breakpointId,
+            clientIp,
+            href,
+            method,
+            sendedToServer: false, // 有没有发送给服务器
+            sendedToClient: false, // 有没有发送给浏览器
             requestContent: {},// 浏览器请求内容 （格式参见 HttpHandle._getRequestContent 函数）
             responseContent: {}// 服务器响应内容
         };
+        this.instances[instanceId] = instance;
         // 触发断点列表变化通知
         // (分布式环境中，向zookeeper推送通知，repository监听zookeeper通知，然后推送消息给浏览器)
-        this.emit('breakpoints', userId, this._getUserBreakPoints(userId));
-        return id;
+        this.emit('instance-add', userId, instance);
+        return instanceId;
     }
 
+    setInstanceRequestContent(instanceId, requestContent) {
+        let instance = this.instances[instanceId];
+
+        let breakpointId = instance['breakpointId'];
+        let breakpoint = this.breakpoints[breakpointId];
+
+        let userId = breakpoint.userId;
+        instance.requestContent = requestContent;
+        if (breakpoint.requestBreak) {
+            this.emit('instance-client-request', userId, instanceId, requestContent);
+        }
+    }
+
+    setInstanceServerResponseContent(instanceId, responseContent) {
+        let instance = this.instances[instanceId];
+
+        let breakpointId = instance['breakpointId'];
+        let breakpoint = this.breakpoints[breakpointId];
+
+        let userId = breakpoint.userId;
+        instance.responseContent = responseContent;
+        instance.sendedToServer = true;
+        if (breakpoint.responseBreak) {
+            this.emit('instance-server-response', userId, instanceId, responseContent);
+        }
+    }
+
+    /**
+     * 请求结束
+     * @param instanceId
+     */
+    sendedInstanceServerResponseToClient(instanceId) {
+        let instance = this.instances[instanceId];
+
+        let breakpointId = instance['breakpointId'];
+        let breakpoint = this.breakpoints[breakpointId];
+
+        let userId = breakpoint.userId;
+
+        instance.sendedToClient = true;
+        this.emit('instance-end', userId, instanceId);
+    }
+
+    getInstanceRequestContent(instanceId){
+        return this.instances[instanceId].requestContent;
+    }
+
+    getInstanceResponseContent(instanceId){
+        return this.instances[instanceId].responseContent;
+    }
     /**
      * 如果有断点返回断点id，没有断点则返回-1
      * @param clientIp
      * @param method
      * @param urlObj
      */
-    async getBreakpointId(clientIp, method, urlObj) {
+    getBreakpointId(clientIp, method, urlObj) {
         // clientIp 转 userId
         let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
-        let connectionsCnt = await this._getUserConnectionCount(userId);
+        let connectionsCnt = await this.getUserConnectionCount(userId);
         // 没有断点界面，则断点不生效
         if (connectionsCnt == 0) return -1;
-        let userBreakPoints = await  this._getUserBreakPoints();
+        let userBreakPoints = await  this.getUserBreakPoints();
         let finded = _.find(userBreakPoints, (breakpoint, id) => {
                 return breakpoint.userId == userId
                     && this._isMethodMatch(method, breakpoint.method)
@@ -86,12 +132,53 @@ export default class BreakpointRepository extends EventEmitter {
         return finded.id;
     }
 
-    async hasRequestBreak(breakpointId) {
+    hasRequestBreak(breakpointId) {
         return this.breakpoints[breakpointId].requestBreak;
     }
 
-    async hasResponseBreak(breakpointId) {
+    hasResponseBreak(breakpointId) {
         return this.breakpoints[breakpointId].responseBreak;
+    }
+
+    /**
+     * 保存断点
+     * @param userId
+     * @param breakpoints 要保存的断点，如果有id 则是update
+     */
+    saveBreakpoint({
+                       userId, connectionId, match, requestBreak = false, breakpointId,
+                       responseBreak = false
+                   }) {
+        let id = breakpointId;
+        if (!id) {
+            id = (this.currentBreakpointId++) + '';
+        }
+        let breakpoint = {
+            id,
+            match, // 匹配
+            requestBreak, // 请求断点
+            responseBreak, // 响应断点
+            userId: '', // 设置断点的用户id
+            connectionId,// 界面连接id
+        };
+        this.breakpoints[id] = breakpoint;
+        this.emit('breakpoint-save', userId, breakpoint);
+    }
+
+    deleteBreakpoint({userId, breakpointId}) {
+        // 删除断点
+        delete this.breakpoints[breakpointId];
+        // 删除断点实例
+        let toDeleteInstance = [];
+        _.forEach(this.instances, instance => {
+            if (instance.breakpointId == breakpointId) {
+                toDeleteInstance.push(instance.id);
+            }
+        });
+        _.forEach(toDeleteInstance, id => {
+            delete this.instances[id];
+        });
+        this.emit('breakpoint-delete', userId, breakpointId);
     }
 
     /**
@@ -99,49 +186,8 @@ export default class BreakpointRepository extends EventEmitter {
      * @param userId
      * @private
      */
-    _getUserBreakPoints(userId) {
-        let breakpointsOrigin = _.filter(this.breakpoints, breakpoint => breakpoint.userId == userId);
-        return _.map(breakpointsOrigin, breakpoint => {
-            return {
-                id: breakpoint.id,
-                match: breakpoint.match, // 匹配正则
-                method: breakpoint.method,// 请求方法
-                requestBreak: breakpoint.requestBreak, // 请求断点
-                responseBreak: breakpoint.responseBreak, // 响应断点
-                userId: breakpoint.userId, // 设置断点的用户id
-                connectionId: breakpoint.connectionId,// 界面连接id
-                requestContent: breakpoint.requestContent,//
-                responseContent: breakpoint.responseContent,//
-            }
-        })
-    }
-
-    /**
-     * 获取用户的断点总数
-     * @param userId
-     * @returns {Number}
-     * @private
-     */
-    _getUserConnectionCount(userId) {
-        return (this.userConnectionMap[userId] || []).length;
-    }
-
-    setClientRequestContent(id, requestContent, req, res) {
-        let userId = this.breakpoints[id].userId;
-        this.breakpoints[id].requestContent = requestContent;
-        this.breakpoints[id].req = req;
-        this.breakpoints[id].res = res;
-        if (this.breakpoints[id].requestBreak) {
-            this.emit('client-request', userId, id, requestContent);
-        }
-    }
-
-    setServerResponseContent(id, responseContent) {
-        let userId = this.breakpoints[id].userId;
-        this.breakpoints[id].responseContent = responseContent;
-        if (this.breakpoints[id].responseBreak) {
-            this.emit('server-response', userId, id, responseContent);
-        }
+    getUserBreakPoints(userId) {
+        return _.filter(this.breakpoints, breakpoint => breakpoint.userId == userId);
     }
 
     /**
@@ -170,31 +216,13 @@ export default class BreakpointRepository extends EventEmitter {
     }
 
     /**
-     * 将请求数据发送给服务端
+     * 获取用户的链接总数
+     * @param userId
+     * @returns {Number}
+     * @private
      */
-    async sendToServer(breakpointId) {
-        // 向服务器发送请求
-        let requestContent = this.breakpoints[breakpointId].requestContent;
-        let responseContent = this.breakpoints[breakpointId].responseContent;
-        await this.remote.cacheFromRequestContent({
-            requestContent, toClientResponse: responseContent
-        });
-    }
-
-    /**
-     * 将内容发送给浏览器
-     * @param id
-     */
-    sendToClient(id) {
-        // 响应浏览器
-        let breakpoint = this.breakpoints[id];
-        let res = breakpoint.res;
-        let responseContent = breakpoint.responseContent;
-        sendSpecificToClient({
-            res, statusCode: 200, headers: responseContent.headers, content: responseContent.content
-        });
-        // 删除
-        delete this.breakpoints[id];
+    getUserConnectionCount(userId) {
+        return (this.userConnectionMap[userId] || []).length;
     }
 
     // 请求的方法是否匹配规则
