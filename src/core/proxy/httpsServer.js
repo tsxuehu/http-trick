@@ -18,7 +18,8 @@ export default class HttpsServer {
     }
 
     async start() {
-        let certification = await this.certificationRepository.getCertificationForHost('internal_https_server');
+        let certification =
+            await this.certificationRepository.getCertificationForHost('internal_https_server');
 
         this.httpsProxyServer = https.createServer({
             SNICallback: this.SNIPrepareCert,

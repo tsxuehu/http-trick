@@ -20,10 +20,9 @@ export default class HttpHandle {
     constructor() {
         this.actionMap = Action.getActionMap();
         this.breakpoint = Breakpoint.getBreakpoint();
-
         this.ruleRepository = Repository.getRuleRepository();
         this.configureRepository = Repository.getConfigureRepository();
-        this.runtimeRepository = Repository.getRuntimeInfoRepository();
+        this.appInfoRepository = Repository.getAppInfoRepository();
         this.breakpointRepository = Repository.getBreakpointRepository();
         this.filterRepository = Repository.getFilterRepository();
         this.httpTrafficRepository = Repository.getHttpTrafficRepository();
@@ -42,8 +41,8 @@ export default class HttpHandle {
         let clientIp = getClientIp(req);
 
         // 如果是 ui server请求，则直接转发不做记录
-        if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == this.runtimeRepository.getPcIp())
-            && urlObj.port == this.configureRepository.getRealUiPort()) {
+        if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == this.appInfoRepository.getPcIp())
+            && urlObj.port == this.appInfoRepository.getRealUiPort()) {
             this.actionMap['bypass'].run({req, res, urlObj});
             return;
         }

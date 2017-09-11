@@ -11,7 +11,7 @@ export default class Launcher {
     constructor(port, repositories) {
         Repository.setRepositories(repositories);
         this.configureRepository = Repository.getConfigureRepository();
-        this.runtimeInfoRepository = Repository.getRuntimeInfoRepository();
+        this.appInfoRepository = Repository.getAppInfoRepository();
         this.port = port;
     }
 
@@ -22,10 +22,10 @@ export default class Launcher {
     async start() {
         // 如果不存在 则从datacenter取默认值
         if (!this.port) {
-            this.port = this.configureRepository.getProxyPort();
+            this.port = this.appInfoRepository.getProxyPort();
         }
         // 记录运行时的代理端口
-        this.runtimeInfoRepository.setRealProxyPort(this.port);
+        this.appInfoRepository.setRealProxyPort(this.port);
 
         let httpsPort = await getPort(40005);
 
@@ -38,7 +38,7 @@ export default class Launcher {
         let webUiPort = await getPort(40001);
 
         // 设置运行时的用户界面端口
-        this.runtimeInfoRepository.setRealUiPort(webUiPort);
+        this.appInfoRepository.setRealUiPort(webUiPort);
 
         // 启动web ui
         await new WebUiServer(webUiPort).start();
