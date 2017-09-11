@@ -84,8 +84,8 @@ export default class UiServer {
             // 推送最新数据
             client.emit('conf',this.confRepository.getConf(userId));
             client.emit('hostfilelist',this.hostRepository.getHostFileList(userId));
-            client.emit('rulefilelist',this.ruleRepository.getConf(userId));
-            client.emit('datalist',this.mockDataRepository.getConf(userId));
+            client.emit('rulefilelist',this.ruleRepository.getRuleFileList(userId));
+            client.emit('datalist',this.mockDataRepository.getMockDataList(userId));
         });
         this.confRepository.on("data-change", (userId, conf) => {
             this.managerNS.to(userId).emit('conf', conf);

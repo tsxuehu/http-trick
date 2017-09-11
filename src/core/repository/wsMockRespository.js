@@ -30,4 +30,12 @@ export default class WsMockRespository {
     newConnectionId(userId){
 
     }
+
+    /**
+     * 获取用户所有的调试会话
+     * @param userId
+     */
+    getSessions(userId){
+
+    }
 }

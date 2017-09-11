@@ -66,7 +66,7 @@ export default class HttpHandle {
 
         // =========================================
         // 断点
-        let breakpointId = await this.breakpointRepository
+        let breakpointId = await this.breakpoint
             .getBreakpointId(clientIp, req.method, urlObj);
         if (breakpointId > 0) {
             let requestContent = await this._getRequestContent(

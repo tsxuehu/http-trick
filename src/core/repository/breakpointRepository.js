@@ -104,40 +104,12 @@ export default class BreakpointRepository extends EventEmitter {
         this.emit('instance-end', userId, instanceId);
     }
 
-    getInstanceRequestContent(instanceId){
+    getInstanceRequestContent(instanceId) {
         return this.instances[instanceId].requestContent;
     }
 
-    getInstanceResponseContent(instanceId){
+    getInstanceResponseContent(instanceId) {
         return this.instances[instanceId].responseContent;
-    }
-    /**
-     * 如果有断点返回断点id，没有断点则返回-1
-     * @param clientIp
-     * @param method
-     * @param urlObj
-     */
-    async getBreakpointId(clientIp, method, urlObj) {
-        // clientIp 转 userId
-        let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
-        let connectionsCnt = await this.getUserConnectionCount(userId);
-        // 没有断点界面，则断点不生效
-        if (connectionsCnt == 0) return -1;
-        let userBreakPoints = await this.getUserBreakPoints(userId);
-        let finded = _.find(userBreakPoints, (breakpoint, id) => {
-                return breakpoint.userId == userId
-                    && this._isMethodMatch(method, breakpoint.method)
-                    && this._isUrlMatch(urlObj.href, breakpoint.match)
-            }) || {id: -1};
-        return finded.id;
-    }
-
-    hasRequestBreak(breakpointId) {
-        return this.breakpoints[breakpointId].requestBreak;
-    }
-
-    hasResponseBreak(breakpointId) {
-        return this.breakpoints[breakpointId].responseBreak;
     }
 
     /**
@@ -163,6 +135,10 @@ export default class BreakpointRepository extends EventEmitter {
         };
         this.breakpoints[id] = breakpoint;
         this.emit('breakpoint-save', userId, breakpoint);
+    }
+
+    getBreakpoint(breakpointId) {
+        return this.breakpoints[breakpointId];
     }
 
     deleteBreakpoint(userId, breakpointId) {
@@ -223,19 +199,5 @@ export default class BreakpointRepository extends EventEmitter {
      */
     getUserConnectionCount(userId) {
         return (this.userConnectionMap[userId] || []).length;
-    }
-
-    // 请求的方法是否匹配规则
-    _isMethodMatch(reqMethod, breakpointMethod) {
-        let loweredReqMethod = _.lowerCase(reqMethod);
-        let loweredBreakpointMethod = _.lowerCase(breakpointMethod);
-        return loweredReqMethod == loweredBreakpointMethod
-            || !breakpointMethod;
-    }
-
-    // 请求的url是否匹配规则
-    _isUrlMatch(reqUrl, breakpointMatchStr) {
-        return breakpointMatchStr && (reqUrl.indexOf(breakpointMatchStr) >= 0
-            || (new RegExp(breakpointMatchStr)).test(reqUrl));
     }
 }
