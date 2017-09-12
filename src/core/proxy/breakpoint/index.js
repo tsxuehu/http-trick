@@ -1,6 +1,7 @@
 import Repository from "../../repository";
 import sendSpecificToClient from "../proxy/sendToClient/specific";
 import Remote from "../proxy/content/remote";
+import _ from "lodash";
 /**
  * 断点处理
  * 可在两个地方设置断点 request 、 response
@@ -93,8 +94,7 @@ export default class Breakpoint {
         if (connectionsCnt == 0) return -1;
         let userBreakPoints = await this.breakpointRepository.getUserBreakPoints(userId);
         let finded = _.find(userBreakPoints, (breakpoint, id) => {
-                return breakpoint.userId == userId
-                    && this._isMethodMatch(method, breakpoint.method)
+                return this._isMethodMatch(method, breakpoint.method)
                     && this._isUrlMatch(urlObj.href, breakpoint.match)
             }) || {id: -1};
         return finded.id;

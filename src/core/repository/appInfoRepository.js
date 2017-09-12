@@ -12,9 +12,6 @@ export default class AppInfo {
         let userHome = process.env.HOME || process.env.USERPROFILE;
 
         this.proxyDataDir = path.join(userHome, ".front-end-proxy");
-        // 配置目录
-        this.tempDir = path.join(this.proxyDataDir, "temp"); // http请求存放目录
-        this.confDir = path.join(this.proxyDataDir, "conf"); // conf请求存放目录
 
         this.appInfo = {
             "mode": mode,

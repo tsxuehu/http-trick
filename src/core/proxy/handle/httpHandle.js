@@ -5,7 +5,7 @@ import Action from "../action/action";
 import queryString from "query-string";
 import getClientIp from "../../utils/getClientIp";
 import Breakpoint from "../breakpoint";
-import _ from 'lodash';
+import _ from "lodash";
 // request session id seed
 let httpHandle;
 export default class HttpHandle {
@@ -51,16 +51,18 @@ export default class HttpHandle {
         if (this.httpTrafficRepository.hasMonitor(clientIp)) {
             // 记录请求
             let id = this.httpTrafficRepository.getRequestId(clientIp);
-            this.httpTrafficRepository.request({clientIp, id, req, res, urlObj});
+            if (id > -1) {
+                this.httpTrafficRepository.request({clientIp, id, req, res, urlObj});
 
-            // 日记记录body
-            this._getRequestBody().then(body => {
-                this.httpTrafficRepository.reqBody({clientIp, id, req, res, body});
-            });
+                // 日记记录body
+                this._getRequestBody().then(body => {
+                    this.httpTrafficRepository.reqBody({clientIp, id, req, res, body});
+                });
 
-            this._getResponseToClient(res).then(responseContent => {
-                this.httpTrafficRepository.response({clientIp, id, req, res, responseContent});
-            });
+                this._getResponseToClient(res).then(responseContent => {
+                    this.httpTrafficRepository.response({clientIp, id, req, res, responseContent});
+                });
+            }
         }
 
 
@@ -121,7 +123,7 @@ export default class HttpHandle {
         toClientResponse.headers['fe-proxy-uid'] = this.userRepository.getClientIpMappedUserId(clientIp);
 
         // 查找过滤器
-        let filterRuleList = this.filterRepository.getFilterRuleList(clientIp, urlObj);
+        let filterRuleList = await this.filterRepository.getMatchedRuleList(clientIp, req.method, urlObj);
 
         // 获得要执行的action列表
         let willRunActionList = this._mergeToRunAction(filterRuleList, rule);

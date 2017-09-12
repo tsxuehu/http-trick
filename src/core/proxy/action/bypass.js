@@ -41,7 +41,7 @@ export default class Bypass extends Action {
         // 构造url
         let {protocol, hostname, path, port} = urlObj;
 
-        let ipOrHost = this.hostRepository.resolveHost(clientIp, hostname);
+        let ipOrHost = await this.hostRepository.resolveHost(clientIp, hostname);
         let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
 
         toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);

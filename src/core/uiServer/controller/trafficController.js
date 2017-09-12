@@ -12,5 +12,12 @@ export default class TrafficController {
             let content = await this.httpTrafficRepository.getResponseBody(userId, id);
             this.body = content;
         });
+
+        router.get('/traffic/getRequestBody', async (ctx, next) => {
+            let userId = ctx.userId;
+            let id = ctx.query.id;
+            let content = await this.httpTrafficRepository.getRequestBody(userId, id);
+            this.body = content;
+        });
     }
 }

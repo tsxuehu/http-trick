@@ -78,7 +78,7 @@ export default class RuleController {
         });
 
         // /rule/test
-        router.post('/rule/test', (ctx, next) => {
+        router.post('/rule/test', async (ctx, next) => {
             /*
              url: '',// 请求url
              match: '',// url匹配规则
@@ -96,7 +96,7 @@ export default class RuleController {
             }
 
             let targetTpl = ctx.request.body.targetTpl;
-            let targetRlt = this.configRepository.calcPathbyUser(userId, url, match, targetTpl);
+            let targetRlt = await this.configRepository.calcPathbyUser(userId, url, match, targetTpl);
 
             // 测试规则
             this.body = {

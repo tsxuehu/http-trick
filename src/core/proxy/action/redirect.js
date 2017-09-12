@@ -45,7 +45,7 @@ export default class Redirect extends Action {
         //================== 转发到本地 或远程
         let {href} = urlObj;
         // 解析目标
-        let target = this.configureRepository.calcPathbyClientIp(clientIp, href, rule.match, action.data.target);
+        let target = await this.configureRepository.calcPathbyClientIp(clientIp, href, rule.match, action.data.target);
         if (!target) {
             toClientResponse.sendedToClient = true;
             sendErrorToClient(req, res, 500, 'target parse error' + action.data.target);
@@ -93,7 +93,7 @@ export default class Redirect extends Action {
         let redirectUrlObj = url.parse(target);
         let {protocol, hostname, path, port} = redirectUrlObj;
 
-        let ipOrHost = this.hostRepository.resolveHost(clientIp, hostname);
+        let ipOrHost = await this.hostRepository.resolveHost(clientIp, hostname);
 
         port = port || ('https:' == protocol ? 443 : 80);
 

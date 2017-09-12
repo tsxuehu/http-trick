@@ -20,6 +20,7 @@ export default class UiServer {
         this.hostRepository = Repository.getHostRepository();
         this.mockDataRepository = Repository.getMockDataRepository();
         this.ruleRepository = Repository.getRuleRepository();
+        this.filterRepository = Repository.getFilterRepository();
         this.wsMockRepository = Repository.getWsMockRepository();
         this.breakpointRepository = Repository.getBreakpointRepository();
 
@@ -60,6 +61,8 @@ export default class UiServer {
             client.join(userId, err => {
             });
             this.httpTrafficRepository.incMonitor(userId);
+            this.httpTrafficRepository.resetRequestId(userId);
+
             client.on('disconnect', function () {
                 this.httpTrafficRepository.decMonitor(userId);
             });
@@ -76,17 +79,19 @@ export default class UiServer {
         this.managerNS = this.io.of('/manager');
 
         // 注册通知
-        this.managerNS.on('connection', client => {
+        this.managerNS.on('connection', async client => {
             // 监听内部状态的客户端,这些客户端获取当前生效的host、rule
             let userId = this._getUserId(client);
             client.join(userId, err => {
             });
             // 推送最新数据
-            client.emit('conf',this.confRepository.getConf(userId));
-            client.emit('hostfilelist',this.hostRepository.getHostFileList(userId));
-            client.emit('rulefilelist',this.ruleRepository.getRuleFileList(userId));
-            client.emit('datalist',this.mockDataRepository.getMockDataList(userId));
+            client.emit('conf', await this.confRepository.getConf(userId));
+            client.emit('hostfilelist', await this.hostRepository.getHostFileList(userId));
+            client.emit('rulefilelist', await this.ruleRepository.getRuleFileList(userId));
+            client.emit('datalist', await this.mockDataRepository.getMockDataList(userId));
+            client.emit('filters', await this.filterRepository.getFilterRuleList(userId));
         });
+
         this.confRepository.on("data-change", (userId, conf) => {
             this.managerNS.to(userId).emit('conf', conf);
         });
@@ -99,26 +104,29 @@ export default class UiServer {
         this.mockDataRepository.on("data-change", (userId, dataFilelist) => {
             this.managerNS.to(userId).emit('datalist', dataFilelist);
         });
+        this.filterRepository.on("data-change", (userId, filters) => {
+            this.managerNS.to(userId).emit('filters', filters);
+        });
     }
 
     // ws mock 相关函数
     _initWsMock() {
         this.wsmockNS = this.io.of('/wsmock');
 
-        this.wsmockNS.on('connection', debugClient => {
+        this.wsmockNS.on('connection', async debugClient => {
 
             let userId = this._getUserId(debugClient);
             debugClient.join(userId, err => {
             });
             // 将websocket的id返回给浏览器
-            let connectionId = this.wsMockRepository.newConnectionId(userId);
+            let connectionId = await this.wsMockRepository.newConnectionId(userId);
 
             debugClient.emit('connection-id', connectionId);
             // 用户关闭ws界面
             debugClient.on('disconnect', _ => {
                 this.wsMockRepository.connectionClosed(userId, connectionId);
             });
-            debugClient.emit('sessions',this.wsMockRepository.getSessions(userId));
+            debugClient.emit('sessions', await this.wsMockRepository.getSessions(userId));
         });
 
         this.wsMockRepository.on("page-connected", (userId, sessionId) => {
@@ -157,7 +165,7 @@ export default class UiServer {
                 this.breakpointRepository.connectionClosed(userId, connectionId);
             });
             // 发送当前所有的断点
-            client.emit('breakpoints',this.breakpointRepository.getUserBreakPoints(userId));
+            client.emit('breakpoints', this.breakpointRepository.getUserBreakPoints(userId));
         });
 
         this.breakpointRepository.on('instance-add', (userId, instance) => {
