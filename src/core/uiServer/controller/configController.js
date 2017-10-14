@@ -4,14 +4,14 @@
 import Repository from "../../repository";
 export default class ConfigController {
     constructor() {
-        this.confRepository = Repository.getConfigureRepository();
+        this.confService = Repository.getConfigureRepository();
 
     }
 
     regist(router) {
         router.post('/conf/savefile', (ctx, next) => {
             let userId = ctx.userId;
-            this.confRepository.setConf(userId, ctx.request.body);
+            this.confService.setConf(userId, ctx.request.body);
             ctx.body = {
                 code: 0
             };
@@ -19,7 +19,7 @@ export default class ConfigController {
 
         router.post('/conf/setRuleState', async (ctx, next) => {
             let userId = ctx.userId;
-            await this.confRepository.setEnableRule(userId, !!ctx.query.rulestate);
+            await this.confService.setEnableRule(userId, !!ctx.query.rulestate);
             ctx.body = {
                 code: 0
             };

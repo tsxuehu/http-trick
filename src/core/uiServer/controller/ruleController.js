@@ -5,63 +5,69 @@ import Repository from "../../repository";
 
 export default class RuleController {
     constructor() {
-        this.ruleRepository = Repository.getRuleRepository();
-        this.configRepository = Repository.getConfigureRepository();
+        this.ruleService = Repository.getRuleRepository();
+        this.configService = Repository.getConfigureRepository();
     }
 
     regist(router) {
+        // 创建规则
         //{
         //    name:name,
         //    description:description
         //}
         router.post('/rule/create', (ctx, next) => {
             let userId = ctx.userId;
-            let result = this.ruleRepository.createRuleFile(userId, ctx.request.body.name
+            let result = this.ruleService.createRuleFile(userId, ctx.request.body.name
                 , ctx.request.body.description);
             this.body = {
                 code: result ? 0 : 1,
                 msg: result ? '' : '文件已存在'
             };
         });
+        // 获取规则文件列表
         // /rule/filelist
         router.get('/rule/filelist', async (ctx, next) => {
             let userId = ctx.userId;
-            let ruleFileList = await this.ruleRepository.getRuleFileList(userId);
+            let ruleFileList = await this.ruleService.getRuleFileList(userId);
             this.body = {
                 code: 0,
                 list: ruleFileList
             }
         });
+        // 删除规则文件
         // /rule/deletefile?name=${name}
         router.get('/rule/deletefile', (ctx, next) => {
             let userId = ctx.userId;
-            this.ruleRepository.deleteRuleFile(userId, ctx.query.name);
+            this.ruleService.deleteRuleFile(userId, ctx.query.name);
             this.body = {
                 code: 0
             }
         });
+        // 设置文件勾选状态
         // /rule/setfilecheckstatus?name=${name}&checked=${checked?1:0}
         router.get('/rule/setfilecheckstatus', (ctx, next) => {
             let userId = ctx.userId;
-            this.ruleRepository.setRuleFileCheckStatus(userId, ctx.query.name,
+            this.ruleService.setRuleFileCheckStatus(userId, ctx.query.name,
                 ctx.query.checked == 1 ? true : false);
             this.body = {
                 code: 0
             };
         });
+        // 获取规则文件
         // /rule/getfile?name=${name}
         router.get('/rule/getfile', async (ctx, next) => {
             let userId = ctx.userId;
-            let content = await this.ruleRepository.getRuleFile(userId, ctx.query.name);
+            let content = await this.ruleService.getRuleFile(userId, ctx.query.name);
             this.body = {
                 code: 0,
                 data: content
             };
         });
+        // 保存规则文件
         // /rule/savefile?name=${name} ,content
         router.post('/rule/savefile', (ctx, next) => {
             let userId = ctx.userId;
-            this.ruleRepository.saveRuleFile(userId, ctx.query.name, ctx.request.body);
+            this.ruleService.saveRuleFile(userId, ctx.query.name, ctx.request.body);
             this.body = {
                 code: 0
             };
@@ -72,11 +78,11 @@ export default class RuleController {
         router.get('/rule/download', async (ctx, next) => {
             let userId = ctx.userId;
             let name = this.query.name;
-            let content = await this.ruleRepository.getRuleFile(userId, name);
+            let content = await this.ruleService.getRuleFile(userId, name);
             ctx.response.header['Content-disposition'] = `attachment;filename=${name}.json`;
             this.body = content;
         });
-
+        // 测试规则
         // /rule/test
         router.post('/rule/test', async (ctx, next) => {
             /*
@@ -96,7 +102,7 @@ export default class RuleController {
             }
 
             let targetTpl = ctx.request.body.targetTpl;
-            let targetRlt = await this.configRepository.calcPathbyUser(userId, url, match, targetTpl);
+            let targetRlt = await this.configService.calcPathbyUser(userId, url, match, targetTpl);
 
             // 测试规则
             this.body = {

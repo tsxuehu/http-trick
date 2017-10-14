@@ -2,21 +2,23 @@ import Repository from "../../repository";
 
 export default class TrafficController {
     constructor() {
-        this.httpTrafficRepository = Repository.getHttpTrafficRepository();
+        this.httpTrafficService = Repository.getHttpTrafficRepository();
     }
 
     regist(router) {
+        // 获取响应body
         router.get('/traffic/getResponseBody', async (ctx, next) => {
             let userId = ctx.userId;
             let id = ctx.query.id;
-            let content = await this.httpTrafficRepository.getResponseBody(userId, id);
+            let content = await this.httpTrafficService.getResponseBody(userId, id);
             this.body = content;
         });
 
+        // 获取请求body
         router.get('/traffic/getRequestBody', async (ctx, next) => {
             let userId = ctx.userId;
             let id = ctx.query.id;
-            let content = await this.httpTrafficRepository.getRequestBody(userId, id);
+            let content = await this.httpTrafficService.getRequestBody(userId, id);
             this.body = content;
         });
     }
