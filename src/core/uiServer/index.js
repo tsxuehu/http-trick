@@ -7,7 +7,7 @@ import staticServe from "koa-static";
 import router from "./router";
 import SocketIO from "socket.io";
 import cookieParser from "cookie";
-import Repository from "../repository";
+import Service from "../service";
 
 export default class UiServer {
 
@@ -15,14 +15,14 @@ export default class UiServer {
         this.webUiPort = webUiPort;
 
         // 数据存储服务
-        this.httpTrafficRepository = Repository.getHttpTrafficRepository();
-        this.confRepository = Repository.getConfigureRepository();
-        this.hostRepository = Repository.getHostRepository();
-        this.mockDataRepository = Repository.getMockDataRepository();
-        this.ruleRepository = Repository.getRuleRepository();
-        this.filterRepository = Repository.getFilterRepository();
-        this.wsMockRepository = Repository.getWsMockRepository();
-        this.breakpointRepository = Repository.getBreakpointRepository();
+        this.httpTrafficService = Service.getHttpTrafficRepository();
+        this.confService = Service.getConfigureRepository();
+        this.hostService = Service.getHostRepository();
+        this.mockDataService = Service.getMockDataRepository();
+        this.ruleService = Service.getRuleRepository();
+        this.filterService = Service.getFilterRepository();
+        this.wsMockService = Service.getWsMockRepository();
+        this.breakpointService = Service.getBreakpointRepository();
 
         // 初始化koa
         this.app = koa();
@@ -60,16 +60,16 @@ export default class UiServer {
 
             client.join(userId, err => {
             });
-            this.httpTrafficRepository.incMonitor(userId);
-            this.httpTrafficRepository.resetRequestId(userId);
+            this.httpTrafficService.incMonitor(userId);
+            this.httpTrafficService.resetRequestId(userId);
 
             client.on('disconnect', function () {
-                this.httpTrafficRepository.decMonitor(userId);
+                this.httpTrafficService.decMonitor(userId);
             });
         });
 
         // 监听logRespository事件
-        this.httpTrafficRepository.on('traffic', (userId, rows) => {
+        this.httpTrafficService.on('traffic', (userId, rows) => {
             this.httpTraficMonitorNS.to(userId).emit('rows', rows);
         });
     }
@@ -85,26 +85,26 @@ export default class UiServer {
             client.join(userId, err => {
             });
             // 推送最新数据
-            client.emit('conf', await this.confRepository.getConf(userId));
-            client.emit('hostfilelist', await this.hostRepository.getHostFileList(userId));
-            client.emit('rulefilelist', await this.ruleRepository.getRuleFileList(userId));
-            client.emit('datalist', await this.mockDataRepository.getMockDataList(userId));
-            client.emit('filters', await this.filterRepository.getFilterRuleList(userId));
+            client.emit('conf', await this.confService.getConf(userId));
+            client.emit('hostfilelist', await this.hostService.getHostFileList(userId));
+            client.emit('rulefilelist', await this.ruleService.getRuleFileList(userId));
+            client.emit('datalist', await this.mockDataService.getMockDataList(userId));
+            client.emit('filters', await this.filterService.getFilterRuleList(userId));
         });
 
-        this.confRepository.on("data-change", (userId, conf) => {
+        this.confService.on("data-change", (userId, conf) => {
             this.managerNS.to(userId).emit('conf', conf);
         });
-        this.hostRepository.on("data-change", (userId, hostFilelist) => {
+        this.hostService.on("data-change", (userId, hostFilelist) => {
             this.managerNS.to(userId).emit('hostfilelist', hostFilelist);
         });
-        this.ruleRepository.on("data-change", (userId, ruleFilelist) => {
+        this.ruleService.on("data-change", (userId, ruleFilelist) => {
             this.managerNS.to(userId).emit('rulefilelist', ruleFilelist);
         });
-        this.mockDataRepository.on("data-change", (userId, dataFilelist) => {
+        this.mockDataService.on("data-change", (userId, dataFilelist) => {
             this.managerNS.to(userId).emit('datalist', dataFilelist);
         });
-        this.filterRepository.on("data-change", (userId, filters) => {
+        this.filterService.on("data-change", (userId, filters) => {
             this.managerNS.to(userId).emit('filters', filters);
         });
     }
@@ -119,27 +119,27 @@ export default class UiServer {
             debugClient.join(userId, err => {
             });
             // 将websocket的id返回给浏览器
-            let connectionId = await this.wsMockRepository.newConnectionId(userId);
+            let connectionId = await this.wsMockService.newConnectionId(userId);
 
             debugClient.emit('connection-id', connectionId);
             // 用户关闭ws界面
             debugClient.on('disconnect', _ => {
-                this.wsMockRepository.connectionClosed(userId, connectionId);
+                this.wsMockService.connectionClosed(userId, connectionId);
             });
-            debugClient.emit('sessions', await this.wsMockRepository.getSessions(userId));
+            debugClient.emit('sessions', await this.wsMockService.getSessions(userId));
         });
 
-        this.wsMockRepository.on("page-connected", (userId, sessionId) => {
-            this.wsMockRepository.to(userId).emit('page-connected', sessionId);
+        this.wsMockService.on("page-connected", (userId, sessionId) => {
+            this.wsMockService.to(userId).emit('page-connected', sessionId);
         });
-        this.wsMockRepository.on("page-msg", (userId, sessionId, data) => {
-            this.wsMockRepository.to(userId).emit('page-msg', sessionId, data);
+        this.wsMockService.on("page-msg", (userId, sessionId, data) => {
+            this.wsMockService.to(userId).emit('page-msg', sessionId, data);
         });
-        this.wsMockRepository.on("page-closed", (userId, sessionId) => {
-            this.wsMockRepository.to(userId).emit('page-closed', sessionId);
+        this.wsMockService.on("page-closed", (userId, sessionId) => {
+            this.wsMockService.to(userId).emit('page-closed', sessionId);
         });
-        this.wsMockRepository.on("sessions", (userId, sessions) => {
-            this.wsMockRepository.to(userId).emit('sessions', sessions);
+        this.wsMockService.on("sessions", (userId, sessions) => {
+            this.wsMockService.to(userId).emit('sessions', sessions);
         });
     }
 
@@ -157,35 +157,35 @@ export default class UiServer {
             client.join(userId, err => {
             });
 
-            let connectionId = this.breakpointRepository.newConnectionId(userId);
+            let connectionId = this.breakpointService.newConnectionId(userId);
 
             client.emit('connection-id', connectionId);
             // 用户关闭断点界面  关闭该链接相关的所有断点
             client.on('disconnect', _ => {
-                this.breakpointRepository.connectionClosed(userId, connectionId);
+                this.breakpointService.connectionClosed(userId, connectionId);
             });
             // 发送当前所有的断点
-            client.emit('breakpoints', this.breakpointRepository.getUserBreakPoints(userId));
+            client.emit('breakpoints', this.breakpointService.getUserBreakPoints(userId));
         });
 
-        this.breakpointRepository.on('instance-add', (userId, instance) => {
-            this.breakpointRepository.to(userId).emit('instance-add', instance);
+        this.breakpointService.on('instance-add', (userId, instance) => {
+            this.breakpointService.to(userId).emit('instance-add', instance);
         });
-        this.breakpointRepository.on('instance-client-request', (userId, instanceId, content) => {
-            this.breakpointRepository.to(userId).emit('client-request', instanceId, content);
+        this.breakpointService.on('instance-client-request', (userId, instanceId, content) => {
+            this.breakpointService.to(userId).emit('client-request', instanceId, content);
         });
-        this.breakpointRepository.on('instance-server-response', (userId, instanceId, content) => {
-            this.breakpointRepository.to(userId).emit('server-response', instanceId, content);
+        this.breakpointService.on('instance-server-response', (userId, instanceId, content) => {
+            this.breakpointService.to(userId).emit('server-response', instanceId, content);
         });
-        this.breakpointRepository.on('instance-end', (userId, instanceId) => {
-            this.breakpointRepository.to(userId).emit('instance-end', instanceId);
+        this.breakpointService.on('instance-end', (userId, instanceId) => {
+            this.breakpointService.to(userId).emit('instance-end', instanceId);
         });
 
-        this.breakpointRepository.on('breakpoint-save', (userId, breakpoint) => {
-            this.breakpointRepository.to(userId).emit('breakpoint-save', breakpoint);
+        this.breakpointService.on('breakpoint-save', (userId, breakpoint) => {
+            this.breakpointService.to(userId).emit('breakpoint-save', breakpoint);
         });
-        this.breakpointRepository.on('breakpoint-delete', (userId, breakpointId) => {
-            this.breakpointRepository.to(userId).emit('breakpoint-delete', breakpointId);
+        this.breakpointService.on('breakpoint-delete', (userId, breakpointId) => {
+            this.breakpointService.to(userId).emit('breakpoint-delete', breakpointId);
         });
     }
 

@@ -1,10 +1,10 @@
 /**
  * Created by tsxuehu on 4/11/17.
  */
-import Repository from "../../repository";
+import Service from "../../service";
 export default class ConfigController {
     constructor() {
-        this.filterService = Repository.getFilterRepository();
+        this.filterService = Service.getFilterRepository();
 
     }
 

@@ -1,9 +1,9 @@
-import Repository from "../../repository";
+import Service from "../../service";
 import * as gitlab from "../../utils/gitlab";
 export default class TrafficController {
     constructor() {
-        this.appInfoService = Repository.getAppInfoRepository();
-        this.rootCertService = Repository.getCertRepository();
+        this.appInfoService = Service.getAppInfoRepository();
+        this.rootCertService = Service.getCertRepository();
     }
 
     regist(router) {

@@ -1,12 +1,12 @@
 /**
  * Created by tsxuehu on 4/11/17.
  */
-import Repository from "../../repository";
+import Service from "../../service";
 
 export default class RuleController {
     constructor() {
-        this.ruleService = Repository.getRuleRepository();
-        this.configService = Repository.getConfigureRepository();
+        this.ruleService = Service.getRuleRepository();
+        this.configService = Service.getConfigureRepository();
     }
 
     regist(router) {

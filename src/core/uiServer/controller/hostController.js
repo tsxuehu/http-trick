@@ -1,9 +1,9 @@
-import Repository from "../../repository";
+import Service from "../../service";
 
 export default class HostController {
     constructor() {
 
-        this.hostService = Repository.getHostRepository();
+        this.hostService = Service.getHostRepository();
 
     }
 

@@ -1,8 +1,8 @@
-import Repository from "../../repository";
+import Service from "../../service";
 
 export default class WsMockController {
     constructor() {
-        this.wsMockService = Repository.getWsMockRepository();
+        this.wsMockService = Service.getWsMockRepository();
     }
 
     regist(router) {

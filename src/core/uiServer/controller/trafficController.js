@@ -1,8 +1,8 @@
-import Repository from "../../repository";
+import Service from "../../service";
 
 export default class TrafficController {
     constructor() {
-        this.httpTrafficService = Repository.getHttpTrafficRepository();
+        this.httpTrafficService = Service.getHttpTrafficRepository();
     }
 
     regist(router) {

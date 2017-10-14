@@ -1,8 +1,8 @@
-import Repository from "../../repository";
+import Service from "../../service";
 import Breakpoint from "../../proxy/breakpoint";
 export default class BreakpointController {
     constructor() {
-        this.breakpointService = Repository.getBreakpointRepository();
+        this.breakpointService = Service.getBreakpointRepository();
         this.breakpoint = Breakpoint.getBreakpoint();
     }
 

@@ -2,13 +2,13 @@
  * Created by tsxuehu on 4/11/17.
  */
 
-import Repository from "../../repository";
+import Service from "../../service";
 /**
  * 数据文件相关api
  */
 export default class DataController {
     constructor() {
-        this.mockDataService = Repository.getMockDataRepository();
+        this.mockDataService = Service.getMockDataRepository();
     }
 
     regist(router) {
