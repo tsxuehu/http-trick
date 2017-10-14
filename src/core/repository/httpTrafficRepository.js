@@ -24,8 +24,7 @@ export default class HttpTrafficRepository {
     }
 
     sendCachedData() {
-        _.forEach(this.cache, async (rows, clientIp) => {
-            let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
+        _.forEach(this.cache, async (rows, userId) => {
             this.emit("traffic", userId, rows);
         });
         this.cache = {};
@@ -68,15 +67,16 @@ export default class HttpTrafficRepository {
         this.userMonitorCount[userId] = cnt;
     }
 
-    request({clientIp, id, req, res, urlObj}) {
-
+    async request({clientIp, id, req, res, urlObj}) {
+        let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
         let {protocol, host, pathname, port} = urlObj;
 
-        let queue = this.cache[clientIp] || [];
+        let queue = this.cache[userId] || [];
         queue.push({
             id: id,
             start: true, // 请求开始的标记
             result: '-', // 状态码
+            clientIp,
             protocol: protocol.toUpperCase(),
             host: host,
             url: req.url,
@@ -89,7 +89,7 @@ export default class HttpTrafficRepository {
             reqTime: +new Date()
         });
 
-        this.cache[clientIp] = queue;
+        this.cache[userId] = queue;
     }
 
     async reqBody({clientIp, id, req, res, body}) {
@@ -102,7 +102,8 @@ export default class HttpTrafficRepository {
 
     async response({clientIp, id, req, res, responseContent}) {
 
-        let queue = this.cache[clientIp] || [];
+        let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
+        let queue = this.cache[userId] || [];
 
         let expires = res.getHeader('expires');
         queue.push({
@@ -115,8 +116,7 @@ export default class HttpTrafficRepository {
             resTime: +new Date()
         });
 
-        this.cache[clientIp] = queue;
-        let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
+        this.cache[userId] = queue;
 
         let bodyPath = this.getResponseBodyPath(userId, id);
         await fileUtil.writeFile(bodyPath, responseContent);

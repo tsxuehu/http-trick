@@ -3,6 +3,7 @@ import HttpProxy from "http-proxy";
 import Repository from "../repository";
 import {defaultHttpAgent, defaultHttpsAgent} from "../../utils/agent";
 import queryString from "query-string";
+import resovleIp from '../../utils/dns'
 /**
  * 请求连接获取返回结果
  */
@@ -32,10 +33,12 @@ export default class Remote {
      */
     async pipe({req, res, protocol, hostname, path, port, headers}) {
         let isHttps = protocol.indexOf('https') > -1;
+        // http.request 解析dns时，偶尔会出错
+        let ip = await resovleIp(hostname);
         this.proxy.web(req, res, {
             target: {
                 protocol,
-                hostname,
+                hostname: ip,
                 path,
                 port
             },

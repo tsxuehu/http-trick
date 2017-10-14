@@ -3,7 +3,7 @@
  */
 import Action from "./action";
 import Repository from "../../repository";
-import Local from "../content/local";
+import sendSpecificToClient from "../sendToClient/specific";
 import addHeaderToResponse from "../../utils/addHeaderToResponse";
 
 export default class MockData extends Action {
@@ -38,26 +38,21 @@ export default class MockData extends Action {
               }) {
         // 获取数据文件id
         let dataId = action.data.dataId;
-        let filepath = this.mockDataRepository.getDataFilePath(clientIp, dataId);
-        let contentType = this.mockDataRepository.getDataFileContentType(clientIp, dataId);
-        toClientResponse.headers['fe-proxy-content'] = encodeURI(filepath);
+        let content = await this.mockDataRepository.getDataContent(clientIp, dataId);
+        let contentType = await this.mockDataRepository.getDataFileContentType(clientIp, dataId);
+        toClientResponse.headers['fe-proxy-content'] = `mock data ${dataId}`;
+        toClientResponse.headers['Content-Type'] = contentType;
         if (last) {
             toClientResponse.sendedToClient = true;
             addHeaderToResponse(res, toClientResponse.headers);
-            this.local.pipe({
-                req,
+            sendSpecificToClient({
                 res,
-                path: filepath,
-                contentType
+                statusCode: 200,
+                headers: toClientResponse.headers,
+                content
             });
         } else {
-            await this.local.pipe({
-                req,
-                res,
-                path: filepath,
-                toClientResponse,
-                contentType
-            });
+            toClientResponse.body = content;
         }
 
     }

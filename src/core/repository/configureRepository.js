@@ -43,6 +43,7 @@ export default class ConfigureRepository extends EventEmitter {
                 _.forEach(matchList, function (value, index) {
                     if (index == 0) return;
                     var reg = new RegExp('\\$' + index, 'g');
+                    if (value === undefined) value = '';
                     target = target.replace(reg, value);
                 });
                 let compiled = _.template(target);

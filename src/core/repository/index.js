@@ -64,10 +64,6 @@ export default class Respository {
 
     }
 
-    static getCertRepository() {
-
-    }
-
     static getLogRepository() {
 
     }
