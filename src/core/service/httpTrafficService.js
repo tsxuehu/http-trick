@@ -54,13 +54,13 @@ export default class HttpTrafficRepository {
         let cnt = this.userMonitorCount[userId] || 0;
         return cnt > 0;
     }
-
+    // 用户连接数加1
     incMonitor(userId) {
         let cnt = this.userMonitorCount[userId] || 0;
         cnt++;
         this.userMonitorCount[userId] = cnt;
     }
-
+    // 用户连接数减一
     decMonitor(userId) {
         let cnt = this.userMonitorCount[userId] || 0;
         cnt--;
