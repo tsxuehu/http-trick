@@ -7,7 +7,7 @@ const staticServe = require( "koa-static");
 const router = require( "./router");
 const SocketIO = require( "socket.io");
 const cookieParser = require( "cookie");
-const Service = require( "../service");
+const ServiceRegistry = require( "../service");
 
 module.exports = class UiServer {
 
@@ -15,14 +15,14 @@ module.exports = class UiServer {
         this.webUiPort = webUiPort;
 
         // 引用服务
-        this.httpTrafficService = Service.getHttpTrafficRepository();
-        this.confService = Service.getConfigureRepository();
-        this.hostService = Service.getHostRepository();
-        this.mockDataService = Service.getMockDataRepository();
-        this.ruleService = Service.getRuleRepository();
-        this.filterService = Service.getFilterRepository();
-        this.wsMockService = Service.getWsMockRepository();
-        this.breakpointService = Service.getBreakpointRepository();
+        this.httpTrafficService = ServiceRegistry.getHttpTrafficRepository();
+        this.confService = ServiceRegistry.getConfigureRepository();
+        this.hostService = ServiceRegistry.getHostRepository();
+        this.mockDataService = ServiceRegistry.getMockDataRepository();
+        this.ruleService = ServiceRegistry.getRuleRepository();
+        this.filterService = ServiceRegistry.getFilterRepository();
+        this.wsMockService = ServiceRegistry.getWsMockRepository();
+        this.breakpointService = ServiceRegistry.getBreakpointRepository();
 
         // 初始化koa
         this.app = koa();

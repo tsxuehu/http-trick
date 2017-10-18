@@ -1,9 +1,9 @@
-const Service = require( "../../service");
+const ServiceRegistry = require( "../../service");
 
 module.exports = class HostController {
     constructor() {
 
-        this.hostService = Service.getHostRepository();
+        this.hostService = ServiceRegistry.getHostRepository();
 
     }
 

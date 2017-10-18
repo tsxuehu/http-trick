@@ -1,10 +1,10 @@
 /**
  * Created by tsxuehu on 4/11/17.
  */
-const Service = require("../../service");
+const ServiceRegistry = require("../../service");
 module.exports = class ConfigController {
     constructor() {
-        this.confService = Service.getConfigureRepository();
+        this.confService = ServiceRegistry.getConfigureRepository();
 
     }
 

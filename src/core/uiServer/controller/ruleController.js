@@ -1,12 +1,12 @@
 /**
  * Created by tsxuehu on 4/11/17.
  */
-const Service = require( "../../service");
+const ServiceRegistry = require( "../../service");
 
 module.exports =  class RuleController {
     constructor() {
-        this.ruleService = Service.getRuleRepository();
-        this.configService = Service.getConfigureRepository();
+        this.ruleService = ServiceRegistry.getRuleRepository();
+        this.configService = ServiceRegistry.getConfigureRepository();
     }
 
     regist(router) {

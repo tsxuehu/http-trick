@@ -1,8 +1,8 @@
-const Service = require("../../service");
+const ServiceRegistry = require("../../service");
 
 module.exports = class WsMockController {
     constructor() {
-        this.wsMockService = Service.getWsMockRepository();
+        this.wsMockService = ServiceRegistry.getWsMockRepository();
     }
 
     regist(router) {

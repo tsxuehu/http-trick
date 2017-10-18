@@ -1,7 +1,6 @@
 const Router = require("koa-router");
 const cookieParser = require("cookie");
 
-
 module.exports = function getRouter() {
     let router = new Router();
     // 注册中间件，获取用户身份

@@ -2,13 +2,13 @@
  * Created by tsxuehu on 4/11/17.
  */
 
-const Service = require("../../service");
+const ServiceRegistry = require("../../service");
 /**
  * 数据文件相关api
  */
 module.exports = class DataController {
     constructor() {
-        this.mockDataService = Service.getMockDataRepository();
+        this.mockDataService = ServiceRegistry.getMockDataRepository();
     }
 
     regist(router) {
