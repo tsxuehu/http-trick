@@ -23,7 +23,7 @@
  };
  */
 
-export default class Respository {
+module.exports = class Respository {
     static setRepositories(respositories) {
 
     }

@@ -1,12 +1,12 @@
-import LRU from "lru-cache";
-import parseDomain from "parse-domain";
-import * as fileUtils from "../utils/file";
-import pem from "pem";
+const LRU = require("lru-cache");
+const parseDomain = require("parse-domain");
+const fileUtils = require("../utils/file");
+const pem = require("pem");
 
 /**
  * 证书管理
  */
-export default class CertificationRepository {
+module.exports = class CertificationRepository {
 
     /**
      * 为指定域名创建证书 (使用自定义的根证书)

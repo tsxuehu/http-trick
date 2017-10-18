@@ -1,7 +1,7 @@
-import EventEmitter from "events";
-import _ from "lodash";
+const EventEmitter = require("events");
+const _ = require("lodash");
 
-export default class FilterRepository extends EventEmitter {
+module.exports = class FilterRepository extends EventEmitter {
     constructor(userRepository) {
         super();
         // user -> filters 映射

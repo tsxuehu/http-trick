@@ -1,4 +1,4 @@
-export default class UserRepository {
+module.exports =  class UserRepository {
 
     constructor() {
 

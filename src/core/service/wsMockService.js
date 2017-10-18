@@ -1,7 +1,7 @@
 /**
  * Created by tsxuehu on 8/27/17.
  */
-export default class WsMockRespository {
+module.exports = class WsMockRespository {
     openSession(userId, socketId, urlPattern) {
 
     }

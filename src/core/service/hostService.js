@@ -1,9 +1,9 @@
-import EventEmitter from "events";
-import _ from "lodash";
+const EventEmitter = require("events");
+const _ = require("lodash");
 /**
  * Created by tsxuehu on 8/3/17.
  */
-export default class HostRepository extends EventEmitter {
+module.exports = class HostRepository extends EventEmitter {
     constructor(userRepository) {
         super();
         // 用户 -> host列表

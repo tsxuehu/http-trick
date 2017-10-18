@@ -1,11 +1,11 @@
-import EventEmitter from "events";
-import _ from "lodash";
-import * as fileUtil from "../utils/file";
+const EventEmitter = require("events");
+const _ = require("lodash");
+const fileUtil = require("../utils/file");
 
 /**
  * Created by tsxuehu on 8/3/17.
  */
-export default class MockDataRepository extends EventEmitter {
+module.exports = class MockDataRepository extends EventEmitter {
     constructor(userRepository, appInfoRepository) {
         super();
         this.userRepository = userRepository;
@@ -41,6 +41,7 @@ export default class MockDataRepository extends EventEmitter {
     getMockDataList(userId) {
         return this.mockDataList[userId];
     }
+
     // 保存数据文件列表，清除无用的数据文件
     saveMockDataList(userId, dataList) {
         // 找出被删除的数据文件

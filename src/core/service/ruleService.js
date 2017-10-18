@@ -1,4 +1,4 @@
-import _ from "lodash";
+const _ = require( "lodash");
 
 
 let passRule = {
@@ -9,7 +9,7 @@ let passRule = {
     }]
 };
 
-export default class ruleRepository {
+module.exports = class ruleRepository {
     constructor({configureRepository}) {
         this.configureRepository = configureRepository;
     }

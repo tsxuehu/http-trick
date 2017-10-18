@@ -1,13 +1,13 @@
 /**
  * Created by tsxuehu on 8/3/17.
  */
-import fs from "fs";
-import path from "path";
-import rimraf from "rimraf";
-import _ from "lodash";
-import * as fileUtil from "../utils/file";
+const fs = require("fs");
+const path = require("path");
+const rimraf = require("rimraf");
+const _ = require("lodash");
+const fileUtil = require("../utils/file");
 
-export default class HttpTrafficRepository {
+module.exports = class HttpTrafficRepository {
 
     constructor(userRepository, appInfoRepository) {
         this.userRepository = userRepository;
@@ -54,12 +54,14 @@ export default class HttpTrafficRepository {
         let cnt = this.userMonitorCount[userId] || 0;
         return cnt > 0;
     }
+
     // 用户连接数加1
     incMonitor(userId) {
         let cnt = this.userMonitorCount[userId] || 0;
         cnt++;
         this.userMonitorCount[userId] = cnt;
     }
+
     // 用户连接数减一
     decMonitor(userId) {
         let cnt = this.userMonitorCount[userId] || 0;

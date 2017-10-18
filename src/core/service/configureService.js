@@ -1,11 +1,11 @@
-import EventEmitter from "events";
-import _ from "lodash";
+const EventEmitter = require("events");
+const _ = require("lodash");
 /**
  * 代理运转需要的规则数据
  * 代理端口、超时时间、gitlab token、工程路径、是否启用转发规则
  * Created by tsxuehu on 8/3/17.
  */
-export default class ConfigureRepository extends EventEmitter {
+module.exports = class ConfigureRepository extends EventEmitter {
     constructor(userRepository) {
         super();
         this.userRepository = userRepository;
