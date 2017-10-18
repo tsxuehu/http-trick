@@ -8,7 +8,7 @@ let passRule = {
         "type": "bypass",
     }]
 };
-
+// 
 module.exports = class ruleRepository {
     constructor({configureRepository}) {
         this.configureRepository = configureRepository;

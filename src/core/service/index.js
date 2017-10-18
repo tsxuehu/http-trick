@@ -1,29 +1,10 @@
-/*
- import BreakpointRepository from "./breakpointRepository";
- import ConfigureRepository from "./configureRepository";
- import HostRepository from "./hostRepository";
- import LogRepository from "./logRepository";
- import MockDataRepository from "./mockDataRepository";
- import RuleRepository from "./ruleRepository";
- import RuntimeInfoRepository from "./runtimeInfoRepository";
-
-
-
- /!**
- * 数据仓库接口
- *!/
- export {
- BreakpointRepository,
- ConfigureRepository,
- HostRepository,
- LogRepository,
- MockDataRepository,
- RuleRepository,
- RuntimeInfoRepository
- };
+/**
+ * 服务注册
+ * 应用启动的时候首先创建服务，然后注册到ServiceRegistry
+ * 业务处理时需要使用服务时从ServiceRegistry取服务
+ * @type {ServiceRegistry}
  */
-
-module.exports = class Respository {
+module.exports = class ServiceRegistry {
     static setRepositories(respositories) {
 
     }
