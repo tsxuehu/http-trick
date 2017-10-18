@@ -1,10 +1,10 @@
-import jsonfile from "jsonfile";
-import fs from "fs";
+const jsonfile = require("jsonfile");
+const fs = require("fs");
 /**
  * 如果文件不存在，则返回空字符串
  * Created by tsxuehu on 8/2/17.
  */
-export function readFile(path) {
+module.exports.readFile = function readFile(path) {
     return new Promise((resolve, reject) => {
         fs.readFile(path, (err, data) => {
             if (!err) {
@@ -15,7 +15,7 @@ export function readFile(path) {
         })
     });
 }
-export function writeFile(path, content) {
+module.exports.writeFile = function writeFile(path, content) {
     return new Promise((resolve, reject) => {
         fs.writeFile(path, content, (err) => {
             if (!err) {
@@ -27,7 +27,7 @@ export function writeFile(path, content) {
     });
 }
 
-export function readJsonFromFile(path) {
+module.exports.readJsonFromFile = function readJsonFromFile(path) {
     return new Promise((resolve, reject) => {
         jsonfile.readFile(path, (err, obj) => {
             if (!err) {
@@ -39,7 +39,7 @@ export function readJsonFromFile(path) {
     });
 }
 
-export async function writeJsonToFile(path, data) {
+module.exports.writeJsonToFile = function writeJsonToFile(path, data) {
     return new Promise((resolve, reject) => {
         jsonfile.writeFile(path, data, {spaces: 2}, (err) => {
             if (!err) {

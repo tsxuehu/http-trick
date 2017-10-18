@@ -4,7 +4,7 @@ import dns from "dns";
  * @param host
  * @returns {Promise}
  */
-export default function resovleIp(host) {
+module.exports = function resovleIp(host) {
     return new Promise((resolve, reject) => {
         var re = /((?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d))/;
         if (re.test(host)) {

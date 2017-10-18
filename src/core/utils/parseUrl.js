@@ -15,9 +15,9 @@
   path: '/aa?b=2',
   href: 'https://www.youzan.com/aa?b=2' }
  */
-var url = require('url');
-var log = require('./log');
-export default function parseUrl(req) {
+const url = require('url');
+const log = require('./log');
+module.exports =  function parseUrl(req) {
     var host = req.headers.host;
     var protocol = (!!req.connection.encrypted && !/^http:/.test(req.url)) ? "https" : "http";
     // http代理协议里 path部分会包含全路径 （如 GET http://www.baidu.com/ HTTP/1.0）

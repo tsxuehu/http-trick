@@ -1,6 +1,6 @@
 
-import _ from 'lodash'
-export default function addHeaderToResponse(response, headers) {
+const _ = require("lodash");
+module.exports = function addHeaderToResponse(response, headers) {
     _.forEach(headers,(value,key)=>{
         response.setHeader(key, value);
     })

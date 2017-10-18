@@ -2,8 +2,8 @@
  * Created by tsxuehu on 4/11/17.
  */
 
-import axios from 'axios';
-export function getEtag(url, gitlabToken, callback) {
+const axios = require('axios');
+module.exports.getEtag = function getEtag(url, gitlabToken, callback) {
 
     axios({
         method: 'Head',
@@ -18,7 +18,7 @@ export function getEtag(url, gitlabToken, callback) {
     });
 };
 
-export function getContent(url, gitlabToken) {
+module.exports.getContent = function getContent(url, gitlabToken) {
     return axios({
         method: 'Get',
         url: url,
@@ -35,7 +35,7 @@ export function getContent(url, gitlabToken) {
  * @param gitlabToken
  * @returns {AxiosPromise}
  */
-export function api(url, method, data, gitlabToken) {
+module.exports.api = function api(url, method, data, gitlabToken) {
     return axios({
         method: method || 'Get',
         url: url,
