@@ -1,6 +1,6 @@
-import Service from "../../service";
+const Service = require("../../service");
 
-export default class TrafficController {
+module.exports = class TrafficController {
     constructor() {
         this.httpTrafficService = Service.getHttpTrafficRepository();
     }

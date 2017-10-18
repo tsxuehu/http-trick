@@ -1,6 +1,6 @@
-import Service from "../../service";
-import Breakpoint from "../../proxy/breakpoint";
-export default class BreakpointController {
+const Service = require("../../service");
+const Breakpoint = require("../../proxy/breakpoint");
+module.exports = class BreakpointController {
     constructor() {
         this.breakpointService = Service.getBreakpointRepository();
         this.breakpoint = Breakpoint.getBreakpoint();

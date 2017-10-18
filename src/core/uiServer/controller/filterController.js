@@ -1,8 +1,8 @@
 /**
  * Created by tsxuehu on 4/11/17.
  */
-import Service from "../../service";
-export default class ConfigController {
+const Service = require("../../service");
+module.exports = class ConfigController {
     constructor() {
         this.filterService = Service.getFilterRepository();
 

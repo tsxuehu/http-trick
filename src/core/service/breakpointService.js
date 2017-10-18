@@ -1,5 +1,5 @@
-import EventEmitter from "events";
-import _ from "lodash";
+const EventEmitter = require("events");
+const _ = require("lodash");
 
 /**
  * 记录三个维护的数据
@@ -8,11 +8,11 @@ import _ from "lodash";
  * 3、断点
  * Created by tsxuehu on 8/3/17.
  */
-export default class BreakpointRepository extends EventEmitter {
-    constructor(userRepository) {
-        super();
+module.exports = class BreakpointRepository extends EventEmitter {
 
-        this.userRepository = userRepository;
+    constructor(userService) {
+        super();
+        this.userService = userService;
         this.currentConnectionId = 10;// 连接id
         this.currentBreakpointId = 200;// 断点id
         this.currentInstanceId = 3000;// 断点实例id
@@ -40,6 +40,7 @@ export default class BreakpointRepository extends EventEmitter {
         this.userConnectionMap = {};
     }
 
+    // 断点实例
     addInstance({breakpointId, clientIp, href, method}) {
         // 分配断点实例id
         let instanceId = (this.currentInstanceId++) + '';
@@ -60,20 +61,22 @@ export default class BreakpointRepository extends EventEmitter {
         this.emit('instance-add', userId, instance);
         return instanceId;
     }
-
+    // 设置断点请求内容
     setInstanceRequestContent(instanceId, requestContent) {
         let instance = this.instances[instanceId];
-
+        // 找出断点关联的实例
         let breakpointId = instance['breakpointId'];
         let breakpoint = this.breakpoints[breakpointId];
 
         let userId = breakpoint.userId;
+
         instance.requestContent = requestContent;
         if (breakpoint.requestBreak) {
             this.emit('instance-client-request', userId, instanceId, requestContent);
         }
     }
 
+    // 设置断点的服务器返回内容
     setInstanceServerResponseContent(instanceId, responseContent) {
         let instance = this.instances[instanceId];
 

@@ -1,6 +1,6 @@
-import Service from "../../service";
+const Service = require("../../service");
 
-export default class WsMockController {
+module.exports = class WsMockController {
     constructor() {
         this.wsMockService = Service.getWsMockRepository();
     }

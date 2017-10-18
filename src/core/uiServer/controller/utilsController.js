@@ -1,6 +1,6 @@
-import Service from "../../service";
-import * as gitlab from "../../utils/gitlab";
-export default class TrafficController {
+const Service = require("../../service");
+const gitlab = require("../../utils/gitlab");
+module.exports = class TrafficController {
     constructor() {
         this.appInfoService = Service.getAppInfoRepository();
         this.rootCertService = Service.getCertRepository();

@@ -1,6 +1,6 @@
-import Service from "../../service";
+const Service = require( "../../service");
 
-export default class HostController {
+module.exports = class HostController {
     constructor() {
 
         this.hostService = Service.getHostRepository();

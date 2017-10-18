@@ -1,15 +1,15 @@
-import http from "http";
-import koa from "koa";
-import path from "path";
-import koaBody from "koa-body";
-import koaQs from "koa-qs";
-import staticServe from "koa-static";
-import router from "./router";
-import SocketIO from "socket.io";
-import cookieParser from "cookie";
-import Service from "../service";
+const http = require( "http");
+const koa = require( "koa");
+const path = require( "path");
+const koaBody = require( "koa-body");
+const koaQs = require( "koa-qs");
+const staticServe = require( "koa-static");
+const router = require( "./router");
+const SocketIO = require( "socket.io");
+const cookieParser = require( "cookie");
+const Service = require( "../service");
 
-export default class UiServer {
+module.exports = class UiServer {
 
     constructor(webUiPort) {
         this.webUiPort = webUiPort;

@@ -1,9 +1,9 @@
 /**
  * Created by tsxuehu on 4/11/17.
  */
-import Service from "../../service";
+const Service = require( "../../service");
 
-export default class RuleController {
+module.exports =  class RuleController {
     constructor() {
         this.ruleService = Service.getRuleRepository();
         this.configService = Service.getConfigureRepository();

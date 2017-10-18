@@ -1,18 +1,20 @@
-import path from "path";
-import _ from "lodash";
-export default class AppInfo {
+const path = require("path");
+const EventEmitter = require("events");
+const _ = require("lodash");
+module.exports = class AppInfo extends EventEmitter {
 
     constructor(mode) {
+        super();
         /**
          * 是否运行在服务器端
          * @returns {boolean}
          */
         this.isDesktop = mode == 'desktop' ? true : false;
-
+        // 用户home目录
         let userHome = process.env.HOME || process.env.USERPROFILE;
-
+        // proxy data存放目录
         this.proxyDataDir = path.join(userHome, ".front-end-proxy");
-
+        // app信息
         this.appInfo = {
             "mode": mode,
             "proxyPort": 8001,

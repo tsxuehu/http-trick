@@ -2,11 +2,11 @@
  * Created by tsxuehu on 4/11/17.
  */
 
-import Service from "../../service";
+const Service = require("../../service");
 /**
  * 数据文件相关api
  */
-export default class DataController {
+module.exports = class DataController {
     constructor() {
         this.mockDataService = Service.getMockDataRepository();
     }
