@@ -1,34 +1,44 @@
 const EventEmitter = require("events");
 const _ = require("lodash");
+const path = require("path");
 const fileUtil = require("../utils/file");
 
 /**
- * Created by tsxuehu on 8/3/17.
+ * 数据mock
  */
 module.exports = class MockDataRepository extends EventEmitter {
-    constructor(userRepository, appInfoRepository) {
+    constructor(userService, appInfoService) {
         super();
-        this.userRepository = userRepository;
-        this.appInfoRepository = appInfoRepository;
-        let proxyDataDir = this.appInfoRepository.getProxyDataDir();
+        this.userService = userService;
+        this.appInfoService = appInfoService;
+
+        let proxyDataDir = this.appInfoService.getProxyDataDir();
+
+        // 存放mock data的目录
         this.mockDataDir = path.join(proxyDataDir, "mock-data");
         // userId -> datalist
         this.mockDataList = {};
     }
 
+    /**
+     * 获取数据文件内容
+     * @param clientIp
+     * @param dataId
+     */
     async getDataContent(clientIp, dataId) {
-        let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
+        let userId = await this.userService.getClientIpMappedUserId(clientIp);
         let dataFilePath = this._getDataFilePath(userId, dataId);
         return await fileUtil.readFile(dataFilePath);
     }
 
 
     /**
+     * 获取数据文件的 content type
      * {id:'',contenttype:'',name:''}
      * @returns {*}
      */
     async getDataFileContentType(clientIp, dataId) {
-        let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
+        let userId = await this.userService.getClientIpMappedUserId(clientIp);
         let list = this.mockDataList[userId];
         // 寻找
         let finded = _.find(list, entry => {
@@ -38,60 +48,99 @@ module.exports = class MockDataRepository extends EventEmitter {
         return finded.contenttype + ';charset=utf-8';
     }
 
+    /**
+     * 获取某个用户的数据列表
+     * @param userId
+     * @returns {*}
+     */
     getMockDataList(userId) {
         return this.mockDataList[userId];
     }
 
-    // 保存数据文件列表，清除无用的数据文件
-    saveMockDataList(userId, dataList) {
-        // 找出被删除的数据文件
-        store.dataList = content;
-        file.writeJsonFile(dataListPath, content);
-        file.readFileInDir(datafileDir, function (nameList) {
-            var fileNameList = _.filter(nameList, function (name) {
-                return name.length > 20;
-            });
-            var tobeDelete = fileNameList;
-            var toBeAdded = [];
-            _.forEach(store.dataList, function (entry) {
-                var index = _.findIndex(tobeDelete, function (id) {
-                    return id == entry.id;
-                });
-                // 如果找到则保留
-                if (index > -1) {
-                    tobeDelete.splice(index, 1);
-                } else {
-                    toBeAdded.push(entry.id);
-                }
-            });
-            // 进行文件操作
-            _.forEach(toBeAdded, function (id) {// 写空文件
-                file.writeFileUTF8(path.join(datafileDir, id), '');
-            });
-            _.forEach(tobeDelete, function (id) {// 写空文件
-                file.deleteFile(path.join(datafileDir, id));
-            });
-        })
+    /**
+     * 保存数据文件列表，清除无用的数据文件
+     * @param userId
+     * @param dataList
+     */
+    async saveMockDataList(userId, dataList) {
+        // 找出要被被删除的数据文件, 老的数据文件里有，而新的没有
+        let newDataKeys = new Set();
+        let toRemove = [];
+        dataList.forEach(data => {
+            newDataKeys.add(data.id)
+        });
+        this.mockDataList[userId].forEach(data => {
+            if (!newDataKeys.has(data.id)) {
+                toRemove.push(data.id);
+            }
+        });
+        // 设置新值
+        this.mockDataList[userId] = dataList;
+        let listFilePath = this._getListFilePath(userId);
+        fileUtil.writeJsonToFile(listFilePath, content);
 
+        // 删除文件
+        for (let data of toRemove) {
+            let dataPath = this._getDataFilePath(userId, data.id);
+            await fileUtil.readFile(dataPath);
+        }
     }
 
-    saveDataFileContent(userId, dataFileId, content) {
-
+    /**
+     * 用户保存数据文件
+     * @param userId
+     * @param dataFileId
+     * @param content
+     */
+    async saveDataFileContent(userId, dataFileId, content) {
+        let dataFilePath = this._getDataFilePath(userId, dataFileId);
+        await fileUtil.writeFile(dataFilePath, content);
     }
 
-    getDataFileContent(userId, dataFileId) {
-
+    /**
+     * 用户获取数据文件详情
+     * @param userId
+     * @param dataFileId
+     */
+    async getDataFileContent(userId, dataFileId) {
+        let dataFilePath = this._getDataFilePath(userId, dataFileId);
+        return await fileUtil.readFile(dataFilePath);
     }
 
     /**
      * 用户从监控窗保存一个数据文件
      */
-    saveDataEntryFromTraffic(userId, dataFileId, fileName, contentType, reqId) {
-
+    async saveDataEntryFromTraffic(userId, dataFileId, fileName, contentType, content) {
+        let dataList = this.mockDataList[userId];
+        dataList.push({
+            id: dataFileId,
+            name: fileName,
+            contenttype: contentType
+        });
+        // 保存mock数据文件列表
+        let listFilePath = this._getListFilePath(userId);
+        fileUtil.writeJsonToFile(listFilePath, content);
+        // 保存数据文件
+        let dataFilePath = this._getDataFilePath(userId, dataFileId);
+        await fileUtil.writeFile(dataFilePath, content);
     }
 
+    /**
+     * 获取数据文件路径
+     * @param userId
+     * @param dataId
+     * @private
+     */
     _getDataFilePath(userId, dataId) {
-
+        return path.join(this.mockDataDir, "data", userId + "_" + dataId);
     }
 
+    /**
+     * 获取数据文件列表
+     * @param userId
+     * @private
+     */
+    _getListFilePath(userId) {
+        return path.join(this.mockDataDir, "list", userId + ".json");
+    }
 }

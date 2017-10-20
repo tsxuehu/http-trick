@@ -9,6 +9,7 @@ const ServiceRegistry = require("../../service");
 module.exports = class DataController {
     constructor() {
         this.mockDataService = ServiceRegistry.getMockDataRepository();
+        this.httpTrafficService = ServiceRegistry.getHttpTrafficRepository();
     }
 
     regist(router) {
@@ -49,13 +50,16 @@ module.exports = class DataController {
             };
         });
         // 从http请求日志中保存 mock 数据
-        router.post('/data/savedatafromtraffic', (ctx, next) => {
+        router.post('/data/savedatafromtraffic', async (ctx, next) => {
             let userId = ctx.userId;
-            this.mockDataService.saveDataEntryFromTraffic(userId,
+
+            let content = await httpTrafficService.getResponseBody(userId, ctx.request.body.reqid);
+            // 获取数据文件内容 在保存
+            await this.mockDataService.saveDataEntryFromTraffic(userId,
                 ctx.request.body.id,
                 ctx.request.body.name,
                 ctx.request.body.contenttype,
-                ctx.request.body.reqid);
+                content);
             ctx.body = {
                 code: 0
             };

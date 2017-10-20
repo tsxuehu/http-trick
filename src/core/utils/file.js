@@ -27,6 +27,18 @@ module.exports.writeFile = function writeFile(path, content) {
     });
 }
 
+module.exports.removeFile = function removeFile(path) {
+    return new Promise((resolve, reject) => {
+        fs.unlink(path, (err) => {
+            if (!err) {
+                resolve(true);
+            } else {
+                reject(err);
+            }
+        })
+    });
+}
+
 module.exports.readJsonFromFile = function readJsonFromFile(path) {
     return new Promise((resolve, reject) => {
         jsonfile.readFile(path, (err, obj) => {

@@ -9,7 +9,7 @@ module.exports = class AppInfo extends EventEmitter {
          * 是否运行在服务器端
          * @returns {boolean}
          */
-        this.isDesktop = mode == 'desktop' ? true : false;
+        this.single = mode == 'single' ? true : false;
         // 用户home目录
         let userHome = process.env.HOME || process.env.USERPROFILE;
         // proxy data存放目录
@@ -31,8 +31,12 @@ module.exports = class AppInfo extends EventEmitter {
         this.emit('data-change', this.appInfo)
     }
 
-    isDesktop() {
-        return this.isDesktop;
+    /**
+     * 是否是单用户模式
+     * @returns {boolean|*}
+     */
+    isSingle() {
+        return this.single;
     }
 
     getProxyDataDir() {

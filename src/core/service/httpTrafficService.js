@@ -6,16 +6,27 @@ const path = require("path");
 const rimraf = require("rimraf");
 const _ = require("lodash");
 const fileUtil = require("../utils/file");
-
+const logCountPerUser = 500;
+/**
+ * 缓存监控数据、发送给监控窗
+ * 记录用户打开的监控窗数量
+ * 每个用户最多只记录500个请求，超过500个后 不在记录
+ * @type {HttpTrafficRepository}
+ */
 module.exports = class HttpTrafficRepository {
 
-    constructor(userRepository, appInfoRepository) {
-        this.userRepository = userRepository;
-        this.appInfoRepository = appInfoRepository;
+    constructor(userService, appInfoService) {
+        this.userService = userService;
+        this.appInfoService = appInfoService;
+        // http请求缓存数据 userId - > [{record}，{record}，{record}]
         this.cache = {};
+        // 用户的请求id  一个用户可以关联多个请求设备，用户的请求分配唯一个一个请求id
         this.userRequestPointer = {};
+        // 记录用户的监视窗数量
         this.userMonitorCount = {};
-        let proxyDataDir = this.appInfoRepository.getProxyDataDir();
+
+        let proxyDataDir = this.appInfoService.getProxyDataDir();
+        // 监控数据缓存目录
         this.trafficDir = path.join(proxyDataDir, "traffic");
         // 创建定时任务，推送日志记录
         setInterval(_ => {
@@ -23,6 +34,7 @@ module.exports = class HttpTrafficRepository {
         }, 2500);
     }
 
+    // 将缓存数据发送给用户
     sendCachedData() {
         _.forEach(this.cache, async (rows, userId) => {
             this.emit("traffic", userId, rows);
@@ -33,11 +45,12 @@ module.exports = class HttpTrafficRepository {
 
     // 为请求分配id
     async getRequestId(clientIp) {
-        let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
-
+        // 根据请求机器的ip获取对应的用户
+        let userId = await this.userService.getClientIpMappedUserId(clientIp);
+        // 获取当前ip
         let id = this.userRequestPointer[userId] || 0;
         // 超过500个请求则不再记录
-        if (id > 500) return -1;
+        if (id > logCountPerUser) return -1;
 
         id++;
         this.userRequestPointer[userId] = id;
@@ -48,29 +61,30 @@ module.exports = class HttpTrafficRepository {
         this.userRequestPointer[userId] = 0;
     }
 
-    // 数据中心监控
+    // 获取监控窗口的数量，没有监控窗口 则不做记录
     async hasMonitor(clientIp) {
-        let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
+        let userId = await this.userService.getClientIpMappedUserId(clientIp);
         let cnt = this.userMonitorCount[userId] || 0;
         return cnt > 0;
     }
 
-    // 用户连接数加1
+    // 用户监控窗数加1
     incMonitor(userId) {
         let cnt = this.userMonitorCount[userId] || 0;
         cnt++;
         this.userMonitorCount[userId] = cnt;
     }
 
-    // 用户连接数减一
+    // 用户监控窗数减一
     decMonitor(userId) {
         let cnt = this.userMonitorCount[userId] || 0;
         cnt--;
         this.userMonitorCount[userId] = cnt;
     }
 
+    // 记录请求
     async request({clientIp, id, req, res, urlObj}) {
-        let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
+        let userId = await this.userService.getClientIpMappedUserId(clientIp);
         let {protocol, host, pathname, port} = urlObj;
 
         let queue = this.cache[userId] || [];
@@ -94,17 +108,19 @@ module.exports = class HttpTrafficRepository {
         this.cache[userId] = queue;
     }
 
+    // 记录请求body
     async reqBody({clientIp, id, req, res, body}) {
         // 将body写文件
-        let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
+        let userId = await this.userService.getClientIpMappedUserId(clientIp);
 
         let bodyPath = this.getRequestBodyPath(userId, id);
         await fileUtil.writeFile(bodyPath, body);
     }
 
+    // 记录响应
     async response({clientIp, id, req, res, responseContent}) {
 
-        let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
+        let userId = await this.userService.getClientIpMappedUserId(clientIp);
         let queue = this.cache[userId] || [];
 
         let expires = res.getHeader('expires');
@@ -150,10 +166,12 @@ module.exports = class HttpTrafficRepository {
         return await fileUtil.readFile(saveResponsePath);
     }
 
+    // 获取请求记录path
     getRequestBodyPath(userId, requestId) {
         return path.join(this.trafficDir, userId + '_' + requestId + '_req_body');
     }
 
+    // 获取响应记录path
     getResponseBodyPath(userId, requestId) {
         return path.join(this.trafficDir, userId + '_' + requestId + '_res_body');
     }
