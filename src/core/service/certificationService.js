@@ -2,7 +2,7 @@ const LRU = require("lru-cache");
 const parseDomain = require("parse-domain");
 const fileUtils = require("../utils/file");
 const pem = require("pem");
-
+const path = require("path");
 /**
  * 证书管理
  */
@@ -19,7 +19,7 @@ module.exports = class CertificationRepository {
                 serviceKey: root.key,
                 serviceCertificate: root.cert,
                 commonName: host,
-                clientKey: clientKey,
+                clientKey: clientKey,// 可忽略
                 altNames: [host],
                 days: 365 * 10
             }, function (err, result) {
@@ -30,17 +30,35 @@ module.exports = class CertificationRepository {
 
     }
 
+    static createSelfSignedCert(host) {
+        return new Promise((resolve, reject) => {
+            pem.createCertificate({
+                commonName: host,
+                selfSigned: true,
+                altNames: [host],
+                days: 365 * 10
+            }, function (err, result) {
+                if (err) reject(err);
+                resolve({key: result.clientKey, cert: result.certificate});
+            })
+        });
+    }
+
     /**
      *
      * @param certTempDir 存放证书的目录
      * @param root 根证书的key 和 cert
      */
-    constructor(certTempDir,
+    constructor(appInfoService,
                 root) {
         // 存放证书的目录
-        this.certTempDir = certTempDir;
+        this.appInfoService = appInfoService;
+        let proxyDataDir = this.appInfoService.getProxyDataDir();
+        // 监控数据缓存目录
+        this.certTempDir = path.join(proxyDataDir, "cert");
         // 根证书
-        this.root = root;
+
+        // 缓存
         this.cache = LRU({
             max: 500,
             length: function (n, key) {
@@ -50,6 +68,18 @@ module.exports = class CertificationRepository {
             },
             maxAge: 1000 * 60 * 60
         });
+    }
+
+    async start() {
+        // 读取根证书
+        let appDir = this.appInfoService.getAppDir();
+
+        let key = await fileUtils.readFile(path.join(appDir, 'certificate/zproxy.key.pem'));
+        let cert = await fileUtils.readFile(path.join(appDir, 'certificate/zproxy.crt.pem'));
+        this.root = {
+            cert,
+            key
+        };
     }
 
     /**

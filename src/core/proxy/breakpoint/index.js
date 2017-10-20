@@ -86,6 +86,13 @@ export default class Breakpoint {
         delete this.instanceReqRes[instanceId];
     }
 
+    /**
+     * 根据请求匹配断点
+     * @param clientIp
+     * @param method
+     * @param urlObj
+     * @returns {Promise.<*>}
+     */
     async getBreakpointId(clientIp, method, urlObj) {
         // clientIp 转 userId
         let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
@@ -95,7 +102,7 @@ export default class Breakpoint {
         let userBreakPoints = await this.breakpointRepository.getUserBreakPoints(userId);
         let finded = _.find(userBreakPoints, (breakpoint, id) => {
                 return this._isMethodMatch(method, breakpoint.method)
-                    && this._isUrlMatch(urlObj.href, breakpoint.match)
+                    && this._isUrlMatch(urlObj.href, breakpoint.match) && breakpoint.enable
             }) || {id: -1};
         return finded.id;
     }
