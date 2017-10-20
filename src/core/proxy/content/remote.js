@@ -5,12 +5,13 @@ import {defaultHttpAgent, defaultHttpsAgent} from "../../utils/agent";
 import queryString from "query-string";
 import resovleIp from '../../utils/dns'
 /**
- * 请求连接获取返回结果
+ * 从远程服务器上获取响应内容
  */
 
 let remote;
+
 export default class Remote {
-    static getRemote(t) {
+    static getRemote() {
         if (!remote) {
             remote = new Remote();
         }
@@ -67,7 +68,7 @@ export default class Remote {
     }
 
     /**
-     * 更具RequestContent
+     * 根据RequestContent
      */
     async cacheFromRequestContent({requestContent, toClientResponse}) {
         let {protocol, host, pathname, port, query} = requestContent;
@@ -83,6 +84,7 @@ export default class Remote {
         toClientResponse.hasContent = true;
         toClientResponse.headers = _.assign({}, response.headers, toClientResponse.headers);
         toClientResponse.body = response.data;
+        return toClientResponse;
     }
 
     /**

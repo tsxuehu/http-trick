@@ -1,14 +1,14 @@
-import zlib from "zlib";
-import parseUrl from "../../utils/parseUrl";
-import Repository from "../../repository";
-import Action from "../action/action";
-import queryString from "query-string";
-import getClientIp from "../../utils/getClientIp";
-import Breakpoint from "../breakpoint";
-import _ from "lodash";
+const zlib = require("zlib");
+const parseUrl = require("../../utils/parseUrl");
+const Repository = require("../../repository");
+const Action = require("../action/action");
+const queryString = require("query-string");
+const getClientIp = require("../../utils/getClientIp");
+const Breakpoint = require("../breakpoint");
+const _ = require("lodash");
 // request session id seed
 let httpHandle;
-export default class HttpHandle {
+module.exports = class HttpHandle {
 
     static getHttpHandle() {
         if (!httpHandle) {
@@ -19,6 +19,7 @@ export default class HttpHandle {
 
     constructor() {
         this.actionMap = Action.getActionMap();
+
         this.breakpoint = Breakpoint.getBreakpoint();
         this.ruleRepository = Repository.getRuleRepository();
         this.configureRepository = Repository.getConfigureRepository();
@@ -36,7 +37,6 @@ export default class HttpHandle {
     async handle(req, res) {
         // 解析请求参数
         let urlObj = parseUrl(req);
-
 
         let clientIp = getClientIp(req);
 

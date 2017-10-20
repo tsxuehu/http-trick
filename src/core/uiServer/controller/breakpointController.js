@@ -47,8 +47,8 @@ module.exports = class BreakpointController {
         router.get('/breakpoint/delete', async (ctx, next) => {
             let userId = ctx.userId;
             let breakpointId = ctx.query.breakpointId;
-            await this.breakpointService.deleteBreakpoint(userId, breakpointId);
-
+            let deletedInstanceIds = await this.breakpointService.deleteBreakpoint(userId, breakpointId);
+            await this.breakpoint.endRequest(deletedInstanceIds);
             this.body = {
                 code: 0
             };

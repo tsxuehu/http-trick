@@ -92,7 +92,8 @@ module.exports = class BreakpointRepository extends EventEmitter {
         await fileUtils.writeJsonToFile(this.breakpointSaveFile, this.breakpoints);
     }
 
-    getBreakpoint(userId,breakpointId) {
+    getBreakpoint(clientIp, breakpointId) {
+        let userId = this.userService.getClientIpMappedUserId(clientIp);
         return this.breakpoints[userId][breakpointId];
     }
 
@@ -112,6 +113,8 @@ module.exports = class BreakpointRepository extends EventEmitter {
         this.emit('breakpoint-delete', userId, breakpointId);
         // 保存断点
         await fileUtils.writeJsonToFile(this.breakpointSaveFile, this.breakpoints);
+        // 返回删除的instance id
+        return toDeleteInstance;
     }
 
     /**
@@ -222,7 +225,7 @@ module.exports = class BreakpointRepository extends EventEmitter {
      */
     connectionClosed(userId, connectionId) {
         let connections = this.userConnectionMap[userId] || [];
-        _.remove(connections,  n => {
+        _.remove(connections, n => {
             return n == connectionId;
         });
         this.userConnectionMap[userId] = connections;
