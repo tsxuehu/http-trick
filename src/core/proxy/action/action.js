@@ -30,18 +30,26 @@ export default class Action {
         return actionMap;
     }
 
+    static getAction(type) {
+        return Action.getActionMap()[type];
+    }
+
+    static getBypassAction() {
+        return Bypass.getBypass();
+    }
+
     /**
      * 动作运行是否需要浏览器的请求内容
      */
     needRequestContent() {
-        return false;
+        throw new Error("not implement");
     }
 
     /**
      * 动作运行是否需要服务器端的返回内容
      */
     needResponse() {
-        return false;
+        throw new Error("not implement");
     }
 
     /**
@@ -50,7 +58,7 @@ export default class Action {
      * @returns {boolean}
      */
     willGetContent() {
-        return false;
+        throw new Error("not implement");
     }
 
     /**
@@ -68,6 +76,6 @@ export default class Action {
                   toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
                   last = true
               }) {
-
+        throw new Error("not implement");
     }
 }

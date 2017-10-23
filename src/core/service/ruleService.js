@@ -47,7 +47,7 @@ module.exports = class ruleRepository {
      * @param method
      * @param urlObj
      */
-    getProcessRule(clientIp, method, urlObj) {
+    getProcessRuleList(clientIp, method, urlObj) {
         let candidateRule = null;
         if (this.configureRepository.getEnableRule(clientIp)) {
             // 规则匹配部分

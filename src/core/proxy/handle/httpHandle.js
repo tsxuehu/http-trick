@@ -6,6 +6,7 @@ const queryString = require("query-string");
 const getClientIp = require("../../utils/getClientIp");
 const Breakpoint = require("../breakpoint");
 const _ = require("lodash");
+
 // request session id seed
 let httpHandle;
 module.exports = class HttpHandle {
@@ -18,8 +19,6 @@ module.exports = class HttpHandle {
     }
 
     constructor() {
-        this.actionMap = Action.getActionMap();
-
         this.breakpoint = Breakpoint.getBreakpoint();
         this.ruleRepository = Repository.getRuleRepository();
         this.configureRepository = Repository.getConfigureRepository();
@@ -43,7 +42,7 @@ module.exports = class HttpHandle {
         // 如果是 ui server请求，则直接转发不做记录
         if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == this.appInfoRepository.getPcIp())
             && urlObj.port == this.appInfoRepository.getRealUiPort()) {
-            this.actionMap['bypass'].run({req, res, urlObj});
+            Action.getBypassAction().run({req, res, urlObj});
             return;
         }
 
@@ -65,7 +64,6 @@ module.exports = class HttpHandle {
             }
         }
 
-
         // =========================================
         // 断点
         let breakpointId = await this.breakpoint
@@ -84,13 +82,18 @@ module.exports = class HttpHandle {
         // 限流 https://github.com/tjgq/node-stream-throttle
 
 
-        let matchedRule = this.ruleRepository.getProcessRule(clientIp, req.method, urlObj);
+        let matchedRule = this.ruleRepository.getProcessRuleList(clientIp, req.method, urlObj);
 
         this._runAtions({req, res, urlObj, clientIp, rule: matchedRule});
     }
 
     /**
-     * 运行动作
+     * 运行规则
+     * @param req
+     * @param res
+     * @param urlObj
+     * @param clientIp
+     * @param rule 请求匹配到的规则
      * @returns {Promise.<void>}
      * @private
      */
@@ -119,16 +122,18 @@ module.exports = class HttpHandle {
         if (!this.configureRepository.getEnableRule(clientIp)) {// 判断转发规则有没有开启
             toClientResponse.headers['fe-proxy-rule-disabled'] = "true";
         }
+        // 记录请求对应的用户id
+        toClientResponse.headers['fe-proxy-userId'] = this.userRepository.getClientIpMappedUserId(clientIp);
 
-        toClientResponse.headers['fe-proxy-uid'] = this.userRepository.getClientIpMappedUserId(clientIp);
-
-        // 查找过滤器
+        // 查找匹配到的过滤规则
         let filterRuleList = await this.filterRepository.getMatchedRuleList(clientIp, req.method, urlObj);
 
-        // 获得要执行的action列表
+        // 合并所有匹配到的过滤器规则的action列表、请求匹配的规则的 action 列表
+        // 动作分为请求前和请求后两种类型, 合并后的顺序，前置过滤器动作 -> 请求匹配到的动作 -> 后置过滤器的动作
+        // 合并后的数组 item 格式 {action, rule}， action: 要执行的动作，rule: 动作所属的rule
         let willRunActionList = this._mergeToRunAction(filterRuleList, rule);
-
         let willRunActionListLength = willRunActionList.length;
+
         // 执行前置动作
         for (let i = 0; i < willRunActionListLength; i++) {
 
@@ -136,14 +141,14 @@ module.exports = class HttpHandle {
             if (toClientResponse.sendedToClient) {
                 break;
             }
-
-            // 对每一个规则 执行action
+            // 取出将要运行的动作描述信息
             let actionInfo = willRunActionList[i];
+            // 对每一个规则 执行action
             let action = actionInfo.action;
             let rule = actionInfo.rule;
-            let actionHandler = this.actionMap[action.type];
+            let actionHandler = Action.getAction(action.type);
 
-
+            // 若action handle不存在，则处理下一个
             if (!actionHandler) {
                 toClientResponse.headers[`fe-proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-notfound`);
                 continue;
@@ -153,11 +158,12 @@ module.exports = class HttpHandle {
                 toClientResponse.headers[`fe-proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-notrun`);
                 continue;
             }
+            // 响应头里面记录运行的动作
             toClientResponse.headers[`fe-proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-run`);
 
             // 动作需要返回内容，但是当前却没有返回内容
             if (actionHandler.needResponse() && !toClientResponse.hasContent) {
-                await this.actionMap['bypass'].run({
+                await Action.getBypassAction().run({
                     req,
                     res,
                     urlObj,
@@ -190,9 +196,9 @@ module.exports = class HttpHandle {
                 last: i == (willRunActionListLength - 1)
             });
         }
-
     }
 
+    // 获取请求body
     // 同一个请求，返回同一个Promise
     _getRequestBody(req) {
 
@@ -204,9 +210,12 @@ module.exports = class HttpHandle {
         let promise = new Promise(_ => {
             resolve = _;
         });
-
-        if (req.method == 'POST' || req.method == 'PUT' || req.method == 'PATCH') {
-            // 二进制文件 不记录 todo
+        // 对带body请求 获取body， 其他method返回空字符串
+        let type = this._getContentType(req);
+        let method = req.method.lowerCase();
+        if (type
+            && ['application/json', 'application/x-www-form-urlencoded', 'text/plain', 'text/html'].indexOf(type) > -1
+            && ['post', 'put', 'patch'].indexOf(method) > -1) {
             let body = '';
             // 图片类型的body需要进行特殊处理
             req.on('data', function (data) {
@@ -218,11 +227,26 @@ module.exports = class HttpHandle {
         } else {
             resolve("");
         }
-
         req.fetchDataPromise = promise;
         return req.fetchDataPromise;
     }
 
+    // 获取请求的content type
+    _getContentType(request) {
+        let headers = request.headers;
+        let contentType = headers['content-type'];
+        if (!contentType) {
+            return;
+        }
+        if (Array.isArray(contentType)) {
+            contentType = contentType[0];
+        }
+        const index = contentType.indexOf(';');
+        return index > -1 ? contentType.substr(0, index) : contentType;
+    }
+
+    // 获取请求内容
+    // 从_getRequestBody返回的 body 组装请求内容
     async _getRequestContent(req, urlObj) {
         let body = await this._getRequestBody(req);
         let {protocol, hostname, href, pathname, port} = urlObj;
@@ -239,7 +263,8 @@ module.exports = class HttpHandle {
             body // 请求body
         };
     }
-
+    // 获取返回给client的内容
+    // 原理：两个流pipe时有pipe事件，监听输入流上的数据
     _getResponseToClient(res) {
         if (res.responseToClientPromise) {
             return req.responseToClientPromise;
@@ -293,11 +318,11 @@ module.exports = class HttpHandle {
 
         _.forEach(filterRules, rule => {
             _.forEach(rule.actionList, action => {
-                let actionHandler = this.actionMap[action.type];
+                let actionHandler = Action.getAction(action.type);
                 if (actionHandler.needResponse()) {
                     afterFilterActionsInfo.push({
-                        action: action,
-                        rule: rule
+                        action: action, // 动作
+                        rule: rule // 动作关联的规则
                     })
                 } else {
                     beforeFilterActionsInfo.push({
