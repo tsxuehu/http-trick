@@ -1,42 +1,4 @@
-import AddRequestCookie from "./addRequestCookie";
-import AddRequestHeader from "./addRequestHeader";
-import Bypass from "./bypass";
-import DataMock from "./dataMock";
-import ModifyResponse from "./modifyResponse";
-import Redirect from "./redirect";
-
-/**
- * 按照处理实际分为三种类型的处理器
- * 1）修改请求
- * 2）获取响应内容
- * 3）修改响应内容
- */
-let actionMap;
-export default class Action {
-    /**
-     * 获取所有的action名和 action 映射关系 map
-     */
-    static getActionMap() {
-        if (!actionMap) {
-            actionMap = {
-                mockData: DataMock.getMockData(),
-                addRequestCookie: AddRequestCookie.getAddRequestCookie(),
-                addRequestHeader: AddRequestHeader.getAddRequestHeader(),
-                modifyResponse: ModifyResponse.getModifyResponse(),
-                bypass: Bypass.getBypass(),
-                redirect: Redirect.getRedirect()
-            };
-        }
-        return actionMap;
-    }
-
-    static getAction(type) {
-        return Action.getActionMap()[type];
-    }
-
-    static getBypassAction() {
-        return Bypass.getBypass();
-    }
+module.exports = class Action {
 
     /**
      * 动作运行是否需要浏览器的请求内容

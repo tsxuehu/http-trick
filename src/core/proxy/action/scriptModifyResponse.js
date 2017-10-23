@@ -1,12 +1,28 @@
-import Action from "./action";
+const Action = require("./action");
 /**
  * 自定义js脚本修改响应内容
  */
-export default class ScriptModifyResponse extends Action {
 
+let scriptModifyResponse;
+module.exports = class ScriptModifyResponse extends Action {
+
+    static getAction() {
+        if (!scriptModifyResponse) {
+            scriptModifyResponse = new ScriptModifyResponse();
+        }
+        return scriptModifyResponse;
+    }
+
+    needRequestContent() {
+        return false;
+    }
 
     needResponse() {
         return true;
+    }
+
+    willGetContent() {
+        return false;
     }
 
     async run({

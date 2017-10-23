@@ -1,12 +1,12 @@
-import Action from "./action";
-import Remote from "../content/remote";
-import _ from "lodash";
-import Repository from "../../repository";
-import addHeaderToResponse from "../../utils/addHeaderToResponse";
+const Action = require("./action");
+const Remote = require("../content/remote");
+const _ = require("lodash");
+const Repository = require("../../repository");
+const addHeaderToResponse = require("../../utils/addHeaderToResponse");
 
 let bypass;
-export default class Bypass extends Action {
-    static getBypass() {
+module.exports = class Bypass extends Action {
+    static getAction() {
         if (!bypass) {
             bypass = new Bypass();
         }
@@ -17,6 +17,14 @@ export default class Bypass extends Action {
         super();
         this.hostRepository = Repository.getHostRepository();
         this.remote = Remote.getRemote();
+    }
+
+    needRequestContent() {
+        return false;
+    }
+
+    needResponse() {
+        return false;
     }
 
     willGetContent() {

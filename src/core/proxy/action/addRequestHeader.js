@@ -1,16 +1,28 @@
-import Action from "./action";
-import _ from "lodash";
+const Action = require("./action");
+const _ = require("lodash");
 
 let addRequestHeader;
 /**
  * 增加请求头
  */
-export default class AddRequestHeader extends Action {
-    static getAddRequestHeader() {
+module.exports = class AddRequestHeader extends Action {
+    static getAction() {
         if (!addRequestHeader) {
             addRequestHeader = new AddRequestHeader();
         }
         return addRequestHeader;
+    }
+
+    needRequestContent() {
+        return false;
+    }
+
+    needResponse() {
+        return false;
+    }
+
+    willGetContent() {
+        return false;
     }
 
     /**

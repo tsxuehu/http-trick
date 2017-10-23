@@ -1,14 +1,27 @@
-import Action from "./action";
-import queryString from "query-string";
-import sendErrorToClient from "../sendToClient/error";
-import _ from "lodash";
-export default class ModifyResponse extends Action {
-    static getModifyResponse() {
+const Action = require( "./action");
+const queryString = require( "query-string");
+const sendErrorToClient = require( "../sendToClient/error");
+const _ = require( "lodash");
 
+let modifyResponse;
+module.exports = class ModifyResponse extends Action {
+    static getAction() {
+        if (!modifyResponse) {
+            modifyResponse = new ModifyResponse();
+        }
+        return modifyResponse;
+    }
+
+    needRequestContent() {
+        return false;
     }
 
     needResponse() {
         return true;
+    }
+
+    willGetContent() {
+        return false;
     }
 
     /**

@@ -1,20 +1,32 @@
 /**
  * Created by tsxuehu on 17/3/19.
  */
-import Action from "./action";
-import Repository from "../../repository";
-import sendSpecificToClient from "../sendToClient/specific";
-import addHeaderToResponse from "../../utils/addHeaderToResponse";
+const Action = require("./action");
+const Repository = require("../../repository");
+const sendSpecificToClient = require("../sendToClient/specific");
+const addHeaderToResponse = require("../../utils/addHeaderToResponse");
 
-export default class MockData extends Action {
-    static getMockData() {
-
+let mockData;
+module.exports = class MockData extends Action {
+    static getAction() {
+        if (!mockData) {
+            mockData = new MockData();
+        }
+        return mockData;
     }
 
     constructor() {
         super();
         this.mockDataRepository = Repository.getMockDataRepository();
         this.local = Local.getLocal();
+    }
+
+    needRequestContent() {
+        return false;
+    }
+
+    needResponse() {
+        return false;
     }
 
     willGetContent() {

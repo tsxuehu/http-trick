@@ -1,27 +1,40 @@
-import Action from "./action";
-import _ from "lodash";
-import Repository from "../../repository";
-import sendErrorToClient from "../sendToClient/error";
-import Local from "../content/local";
-import url from "url";
-import Remote from "../content/remote";
-import addHeaderToResponse from "../../utils/addHeaderToResponse";
+const Action = require( "./action");
+const _ = require( "lodash");
+const ServiceRegistry = require( "../../service");
+const sendErrorToClient = require( "../sendToClient/error");
+const Local = require( "../content/local");
+const url = require( "url");
+const Remote = require( "../content/remote");
+const addHeaderToResponse = require( "../../utils/addHeaderToResponse");
 
 /**
  * 重定向 本地 或者 远程
  */
-export default class Redirect extends Action {
-    static getRedirect() {
-
+let redirect;
+module.exports = class Redirect extends Action {
+    static getAction() {
+        if (!redirect) {
+            redirect = new Redirect();
+        }
+        return redirect;
     }
 
     constructor() {
         super();
-        this.hostRepository = Repository.getHostRepository();
-        this.configureRepository = Repository.getConfigureRepository();
+        this.hostRepository = ServiceRegistry.getHostRepository();
+        this.configureRepository = ServiceRegistry.getConfigureRepository();
         this.remote = Remote.getRemote();
         this.local = Local.getLocal();
     }
+
+    needRequestContent() {
+        return false;
+    }
+
+    needResponse() {
+        return false;
+    }
+
 
     willGetContent() {
         return true;

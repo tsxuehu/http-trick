@@ -1,11 +1,24 @@
-import Action from "./action";
+const Action = require("./action");
 /**
  * 自定义js脚本修改请求内容
  */
-export default class ScriptModifyRequest extends Action {
+let scriptModifyRequest;
+
+module.exports = class ScriptModifyRequest extends Action {
+
+    static getAction() {
+        if (!scriptModifyRequest) {
+            scriptModifyRequest = new ScriptModifyRequest();
+        }
+        return scriptModifyRequest;
+    }
 
     needRequestContent() {
         return true;
+    }
+
+    needResponse() {
+        return false;
     }
 
     willGetContent() {

@@ -1,15 +1,27 @@
-import Action from "./action";
+const Action = require("./action");
 
-import cookie from "cookie";
-import _ from "lodash";
+const cookie = require("cookie");
+const _ = require("lodash");
 
 let addRequestCookie;
-export default class AddRequestCookie extends Action {
-    static getAddRequestCookie() {
+module.exports = class AddRequestCookie extends Action {
+    static getAction() {
         if (!addRequestCookie) {
             addRequestCookie = new AddRequestCookie();
         }
         return addRequestCookie;
+    }
+
+    needRequestContent() {
+        return false;
+    }
+
+    needResponse() {
+        return false;
+    }
+
+    willGetContent() {
+        return false;
     }
 
     async run({
@@ -26,14 +38,14 @@ export default class AddRequestCookie extends Action {
               }) {
         let cookies = cookie.parse(req.headers.cookie);
         let tobeSet = cookie.parse(action.data.cookie);
+        let added = cookie.parse(extraRequestHeaders.Cookie);
 
-        _.forEach(tobeSet, (value, key) => {
-            cookies[key] = value;
-        });
+        let merged = {};
+        Object.assign(merged, cookies, tobeSet, added);
 
         let arr = [];
 
-        _.forEach(cookies, (value, key) => {
+        _.forEach(merged, (value, key) => {
             arr.push(`${key}=${value}`)
         });
 
