@@ -6,7 +6,7 @@ const Action = require("./action");
 let scriptModifyResponse;
 module.exports = class ScriptModifyResponse extends Action {
 
-    static getAction() {
+    static getInstance() {
         if (!scriptModifyResponse) {
             scriptModifyResponse = new ScriptModifyResponse();
         }

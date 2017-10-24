@@ -2,9 +2,9 @@
  * Created by tsxuehu on 17/3/31.
  */
 // 向客户端返回置顶内容
-import _ from "lodash";
+const _ = require("lodash");
 
-export default function ({res, statusCode, headers, content}) {
+module.exports = function ({res, statusCode, headers, content}) {
     res.statusCode = statusCode || 200;
     let buffer = Buffer.from(content, 'utf-8');
 

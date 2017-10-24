@@ -5,7 +5,7 @@ const _ = require("lodash");
 
 let addRequestCookie;
 module.exports = class AddRequestCookie extends Action {
-    static getAction() {
+    static getInstance() {
         if (!addRequestCookie) {
             addRequestCookie = new AddRequestCookie();
         }

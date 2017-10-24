@@ -1,23 +1,23 @@
 /**
  * Created by tsxuehu on 17/3/21.
  */
-var _ = require('lodash');
+const _ = require('lodash');
 
-
-var EventEmitter = require('events');
+const ServiceRegistry = require("../../service");
+const EventEmitter = require('events');
 
 /**
  * hack， 创建一个不监听端口的server，让wss暴露handleUpgrade函数
  */
-var WebSocket = require('ws');
-var http = require('http');
-var wss = new WebSocket.Server({
+const WebSocket = require('ws');
+const http = require('http');
+const wss = new WebSocket.Server({
     server: http.createServer(function (req, res) {
         res.end();
     })
 });
 
-var currentSessionId = 1024;
+let currentSessionId = 1024;
 /**
  * sessionId 及其对应的 信息说明
  * 信息说明格式为
@@ -27,16 +27,16 @@ var currentSessionId = 1024;
  * assigned
  * page
  */
-var sessionIdInfo = {};
+let sessionIdInfo = {};
 let wsMock;
 
 /**
  * websocket mock
  * 和ws mock responsitory通信 实现mock功能
  */
-export default class WsMock {
+export default class WsMock extends EventEmitter {
 
-    static getWsMock() {
+    static getInstance() {
         if (!wsMock) {
             wsMock = new WsMock();
         }
@@ -44,12 +44,12 @@ export default class WsMock {
     }
 
     constructor() {
-        this.event = new EventEmitter();
-
+        super();
+        this.WsMockService = ServiceRegistry.getWsMockRepository();
     }
 
     getFreeSession(url) {
-        var session = _.find(sessionIdInfo, function (sessionInfo) {
+        let session = _.find(sessionIdInfo, function (sessionInfo) {
             return !sessionInfo.assigned && url.indexOf(sessionInfo.urlPattern) > -1;
         });
         if (!session) return false;
@@ -60,17 +60,17 @@ export default class WsMock {
 
     handleUpgrade(req, socket, head, sessionId, url) {
 
-        this.event.emit('page-connected', sessionId);
-        this.event.emit('page-msg', sessionId, '[url]: ' + url);
+        this.WsMockService.pageConnected(sessionId);
+        this.WsMockService.pageSendMessage(sessionId, '[url]: ' + url);
         wss.handleUpgrade(req, socket, head, function (page) {
             sessionIdInfo[sessionId].page = page;
             // 浏览器页面发出的消息，转发给监控终端
             page.on('message', function (data) {
-                event.emit('page-msg', sessionId, data);
+                this.WsMockService.pageSendMessage(sessionId, data);
             });
 
             page.on('close', function () {
-                this.event.emit('page-closed', sessionId);
+                this.WsMockService.pageClosed(sessionId);
                 // 调试结束 释放会话
                 if (!sessionIdInfo[sessionId]) return;
                 sessionIdInfo[sessionId].assigned = false;
@@ -79,17 +79,18 @@ export default class WsMock {
         });
     }
 
+    /**
+     * 向页面发送消息
+     * @param sessionId
+     * @param data
+     */
     sendToPageMsg(sessionId, data) {
         sessionIdInfo[sessionId].page && sessionIdInfo[sessionId].page.send(data);
     }
 
-    on(eventanme, callback) {
-        this.event.on(eventanme, callback);
-    }
-
     // 分配调试会话id
     openSession(socketId, urlPattern) {
-        var sessionId = currentSessionId++;
+        let sessionId = currentSessionId++;
         sessionIdInfo[sessionId] = {
             sessionId: sessionId, // 会话id
             socketId: socketId, // session对应的调试者socket id
@@ -106,7 +107,7 @@ export default class WsMock {
     }
 
     closeAllSessionInConnection(socketId) {
-        var sessionIds = [];
+        let sessionIds = [];
         _.forEach(sessionIdInfo, function (sessionInfo, sessionId) {
             if (sessionInfo.socketId == socketId) {
                 // 关闭session

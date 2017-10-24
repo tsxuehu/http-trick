@@ -1,7 +1,29 @@
 /**
  * Created by tsxuehu on 8/27/17.
  */
-module.exports = class WsMockRespository {
+module.exports = class WsMockService {
+    /**
+     * 获取一个空闲session
+     * @param clientIp
+     * @param url
+     */
+    getFreeSession(clientIp, url) {
+
+    }
+
+    pageConnected(sessionId) {
+
+    }
+
+    pageSendMessage(sessionId, message) {
+
+    }
+
+    pageClosed(sessionId) {
+
+    }
+
+
     openSession(userId, socketId, urlPattern) {
 
     }
@@ -23,11 +45,12 @@ module.exports = class WsMockRespository {
 
     }
 
+
     /**
      * 为用户分配一个连接id
      * @param userId
      */
-    newConnectionId(userId){
+    newConnectionId(userId) {
 
     }
 
@@ -35,7 +58,9 @@ module.exports = class WsMockRespository {
      * 获取用户所有的调试会话
      * @param userId
      */
-    getSessions(userId){
+    getSessions(userId) {
 
     }
+
+
 }

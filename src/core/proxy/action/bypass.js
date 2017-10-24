@@ -1,12 +1,12 @@
 const Action = require("./action");
 const Remote = require("../content/remote");
 const _ = require("lodash");
-const Repository = require("../../repository");
+const ServiceRegistry = require("../../service");
 const addHeaderToResponse = require("../../utils/addHeaderToResponse");
 
 let bypass;
 module.exports = class Bypass extends Action {
-    static getAction() {
+    static getInstance() {
         if (!bypass) {
             bypass = new Bypass();
         }
@@ -15,7 +15,7 @@ module.exports = class Bypass extends Action {
 
     constructor() {
         super();
-        this.hostRepository = Repository.getHostRepository();
+        this.hostRepository = ServiceRegistry.getHostRepository();
         this.remote = Remote.getRemote();
     }
 

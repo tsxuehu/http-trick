@@ -5,7 +5,7 @@ const _ = require( "lodash");
 
 let modifyResponse;
 module.exports = class ModifyResponse extends Action {
-    static getAction() {
+    static getInstance() {
         if (!modifyResponse) {
             modifyResponse = new ModifyResponse();
         }

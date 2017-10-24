@@ -21,14 +21,14 @@ module.exports = class Action {
     static getActionMap() {
         if (!actionMap) {
             actionMap = {
-                mockData: MockData.getAction(),
-                addRequestCookie: AddRequestCookie.getAction(),
-                addRequestHeader: AddRequestHeader.getAction(),
-                modifyResponse: ModifyResponse.getAction(),
-                bypass: Bypass.getAction(),
-                redirect: Redirect.getAction(),
-                scriptModifyResponse: ScriptModifyResponse.getAction(),
-                scriptModifyRequest: ScriptModifyRequest.getAction(),
+                mockData: MockData.getInstance(),
+                addRequestCookie: AddRequestCookie.getInstance(),
+                addRequestHeader: AddRequestHeader.getInstance(),
+                modifyResponse: ModifyResponse.getInstance(),
+                bypass: Bypass.getInstance(),
+                redirect: Redirect.getInstance(),
+                scriptModifyResponse: ScriptModifyResponse.getInstance(),
+                scriptModifyRequest: ScriptModifyRequest.getInstance(),
             };
         }
         return actionMap;
@@ -39,6 +39,6 @@ module.exports = class Action {
     }
 
     static getBypassAction() {
-        return Bypass.getBypass();
+        return Bypass.getInstance();
     }
 }

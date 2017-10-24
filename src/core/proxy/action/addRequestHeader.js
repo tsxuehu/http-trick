@@ -6,7 +6,7 @@ let addRequestHeader;
  * 增加请求头
  */
 module.exports = class AddRequestHeader extends Action {
-    static getAction() {
+    static getInstance() {
         if (!addRequestHeader) {
             addRequestHeader = new AddRequestHeader();
         }

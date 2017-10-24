@@ -1,12 +1,12 @@
 // 读取本地文件返回给客户端
 
-import mime from "mime";
-import fs from "fs";
-import sendErrorToClient from "../sendToClient/error";
+const mime = require( "mime");
+const fs = require( "fs");
+const sendErrorToClient = require( "../sendToClient/error");
 
 let local;
-export default class Local {
-    static getLocal() {
+module.exports =  class Local {
+    static getInstance() {
         if (!local) {
             local = new Local();
         }

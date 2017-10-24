@@ -1,6 +1,6 @@
 const zlib = require("zlib");
 const parseUrl = require("../../utils/parseUrl");
-const Repository = require("../../repository");
+const ServiceRegistry = require("../../service");
 const Action = require("../action/index");
 const queryString = require("query-string");
 const getClientIp = require("../../utils/getClientIp");
@@ -11,7 +11,7 @@ const _ = require("lodash");
 let httpHandle;
 module.exports = class HttpHandle {
 
-    static getHttpHandle() {
+    static getInstance() {
         if (!httpHandle) {
             httpHandle = new HttpHandle();
         }
@@ -20,13 +20,13 @@ module.exports = class HttpHandle {
 
     constructor() {
         this.breakpoint = Breakpoint.getBreakpoint();
-        this.ruleRepository = Repository.getRuleRepository();
-        this.configureRepository = Repository.getConfigureRepository();
-        this.appInfoRepository = Repository.getAppInfoRepository();
-        this.breakpointRepository = Repository.getBreakpointRepository();
-        this.filterRepository = Repository.getFilterRepository();
-        this.httpTrafficRepository = Repository.getHttpTrafficRepository();
-        this.userRepository = Repository.getUserRepository();
+        this.ruleRepository = ServiceRegistry.getRuleRepository();
+        this.configureRepository = ServiceRegistry.getConfigureRepository();
+        this.appInfoRepository = ServiceRegistry.getAppInfoRepository();
+        this.breakpointRepository = ServiceRegistry.getBreakpointRepository();
+        this.filterRepository = ServiceRegistry.getFilterRepository();
+        this.httpTrafficRepository = ServiceRegistry.getHttpTrafficRepository();
+        this.userRepository = ServiceRegistry.getUserRepository();
     }
 
     /**

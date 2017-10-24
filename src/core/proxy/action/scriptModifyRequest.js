@@ -6,7 +6,7 @@ let scriptModifyRequest;
 
 module.exports = class ScriptModifyRequest extends Action {
 
-    static getAction() {
+    static getInstance() {
         if (!scriptModifyRequest) {
             scriptModifyRequest = new ScriptModifyRequest();
         }

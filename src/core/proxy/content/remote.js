@@ -1,17 +1,17 @@
-import axios from "axios";
-import HttpProxy from "http-proxy";
-import Repository from "../repository";
-import {defaultHttpAgent, defaultHttpsAgent} from "../../utils/agent";
-import queryString from "query-string";
-import resovleIp from '../../utils/dns'
+const axios = require( "axios");
+const HttpProxy = require( "http-proxy");
+const Repository = require( "../repository");
+const {defaultHttpAgent, defaultHttpsAgent} = require( "../../utils/agent");
+const queryString = require( "query-string");
+const resovleIp = require( '../../utils/dns');
 /**
  * 从远程服务器上获取响应内容
  */
 
 let remote;
 
-export default class Remote {
-    static getRemote() {
+module.exports =  class Remote {
+    static getInstance() {
         if (!remote) {
             remote = new Remote();
         }

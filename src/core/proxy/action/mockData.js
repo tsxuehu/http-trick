@@ -2,13 +2,13 @@
  * Created by tsxuehu on 17/3/19.
  */
 const Action = require("./action");
-const Repository = require("../../repository");
+const ServiceRegistry = require("../../service");
 const sendSpecificToClient = require("../sendToClient/specific");
 const addHeaderToResponse = require("../../utils/addHeaderToResponse");
 
 let mockData;
 module.exports = class MockData extends Action {
-    static getAction() {
+    static getInstance() {
         if (!mockData) {
             mockData = new MockData();
         }
@@ -17,7 +17,7 @@ module.exports = class MockData extends Action {
 
     constructor() {
         super();
-        this.mockDataRepository = Repository.getMockDataRepository();
+        this.mockDataRepository = ServiceRegistry.getMockDataRepository();
         this.local = Local.getLocal();
     }
 

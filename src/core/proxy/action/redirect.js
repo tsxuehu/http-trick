@@ -12,7 +12,7 @@ const addHeaderToResponse = require( "../../utils/addHeaderToResponse");
  */
 let redirect;
 module.exports = class Redirect extends Action {
-    static getAction() {
+    static getInstance() {
         if (!redirect) {
             redirect = new Redirect();
         }
