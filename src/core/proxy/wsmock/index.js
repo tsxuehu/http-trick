@@ -17,17 +17,13 @@ const wss = new WebSocket.Server({
     })
 });
 
-let currentSessionId = 1024;
 /**
  * sessionId 及其对应的 信息说明
  * 信息说明格式为
  * sessionId
- * socketId
- * urlPattern
- * assigned
  * page
  */
-let sessionIdInfo = {};
+let sessionIdPageMap = {};
 let wsMock;
 
 /**
@@ -45,36 +41,25 @@ export default class WsMock extends EventEmitter {
 
     constructor() {
         super();
-        this.WsMockService = ServiceRegistry.getWsMockRepository();
-    }
-
-    getFreeSession(url) {
-        let session = _.find(sessionIdInfo, function (sessionInfo) {
-            return !sessionInfo.assigned && url.indexOf(sessionInfo.urlPattern) > -1;
-        });
-        if (!session) return false;
-        // 分配mock终端，返回终端id
-        session.assigned = true;
-        return session.sessionId;
+        this.wsMockService = ServiceRegistry.getWsMockRepository();
     }
 
     handleUpgrade(req, socket, head, sessionId, url) {
 
-        this.WsMockService.pageConnected(sessionId);
-        this.WsMockService.pageSendMessage(sessionId, '[url]: ' + url);
+        this.wsMockService.pageConnected(sessionId);
+        this.wsMockService.pageSendMessage(sessionId, '[url]: ' + url);
         wss.handleUpgrade(req, socket, head, function (page) {
-            sessionIdInfo[sessionId].page = page;
+            sessionIdPageMap[sessionId] = {page};
             // 浏览器页面发出的消息，转发给监控终端
             page.on('message', function (data) {
-                this.WsMockService.pageSendMessage(sessionId, data);
+                this.wsMockService.pageSendMessage(sessionId, data);
             });
 
             page.on('close', function () {
-                this.WsMockService.pageClosed(sessionId);
+                this.wsMockService.pageClosed(sessionId);
                 // 调试结束 释放会话
-                if (!sessionIdInfo[sessionId]) return;
-                sessionIdInfo[sessionId].assigned = false;
-                sessionIdInfo[sessionId].page = null;
+                if (!sessionIdPageMap[sessionId]) return;
+                sessionIdPageMap[sessionId].page = null;
             });
         });
     }
@@ -85,38 +70,20 @@ export default class WsMock extends EventEmitter {
      * @param data
      */
     sendToPageMsg(sessionId, data) {
-        sessionIdInfo[sessionId].page && sessionIdInfo[sessionId].page.send(data);
+        sessionIdPageMap[sessionId].page && sessionIdPageMap[sessionId].page.send(data);
     }
 
-    // 分配调试会话id
-    openSession(socketId, urlPattern) {
-        let sessionId = currentSessionId++;
-        sessionIdInfo[sessionId] = {
-            sessionId: sessionId, // 会话id
-            socketId: socketId, // session对应的调试者socket id
-            urlPattern: urlPattern,// url特征
-            assigned: false, // 是否分配被调试的页面
-            page: null // 会话对应的调试页面
-        };
-        return sessionId;
-    }
 
+    // 关闭会话，向会话关联的页面发送关闭通知
     closeSession(sessionId) {
-        sessionIdInfo[sessionId] && sessionIdInfo[sessionId].page && sessionIdInfo[sessionId].page.close();
-        delete sessionIdInfo[sessionId];
+        sessionIdPageMap[sessionId] && sessionIdPageMap[sessionId].page && sessionIdPageMap[sessionId].page.close();
+        delete sessionIdPageMap[sessionId];
     }
 
-    closeAllSessionInConnection(socketId) {
-        let sessionIds = [];
-        _.forEach(sessionIdInfo, function (sessionInfo, sessionId) {
-            if (sessionInfo.socketId == socketId) {
-                // 关闭session
-                sessionInfo.page && sessionInfo.page.close();
-                sessionIds.push(sessionId);
-            }
-        });
-        _.forEach(sessionIds, function (sessionId) {
-            delete sessionIdInfo[sessionId];
-        });
+    // 批量关闭session，用户所有的ws mock界面关闭时，会批量关闭调试会话
+    closeSessionBatch(sessionIds) {
+        for(let sessionId of sessionIds){
+            this.closeSession(sessionId);
+        }
     }
 };

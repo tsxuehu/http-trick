@@ -35,7 +35,7 @@ module.exports = class WsHandle {
         let protocal = (!!req.connection.encrypted && !/^http:/.test(req.url)) ? "https" : "http";
         let clientIp = getClientIp(req);
         let sessionId = this.wsMockService.getFreeSession(clientIp, req.headers.host + path);
-        if (sessionId) {
+        if (sessionId > 0) {
             // 有监控的客户端
             this.wsMock.handleUpgrade(req, socket, head, sessionId, req.headers.host + path)
         } else { // 不需要监听ws
