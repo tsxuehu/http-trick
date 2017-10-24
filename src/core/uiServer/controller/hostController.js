@@ -3,7 +3,7 @@ const ServiceRegistry = require( "../../service");
 module.exports = class HostController {
     constructor() {
 
-        this.hostService = ServiceRegistry.getHostRepository();
+        this.hostService = ServiceRegistry.getHostService();
 
     }
 

@@ -8,8 +8,8 @@ const ServiceRegistry = require("../../service");
  */
 module.exports = class DataController {
     constructor() {
-        this.mockDataService = ServiceRegistry.getMockDataRepository();
-        this.httpTrafficService = ServiceRegistry.getHttpTrafficRepository();
+        this.mockDataService = ServiceRegistry.getMockDataService();
+        this.httpTrafficService = ServiceRegistry.getHttpTrafficService();
     }
 
     regist(router) {

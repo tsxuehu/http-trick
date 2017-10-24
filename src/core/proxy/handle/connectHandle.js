@@ -16,7 +16,7 @@ export default class ConnectHandle {
     constructor(httpProxyPort, httpsProxyPort) {
         this.httpProxyPort = httpProxyPort;
         this.httpsProxyPort = httpsProxyPort;
-        this.logService = ServiceRegistry.getLogRepository();
+        this.logService = ServiceRegistry.getLogService();
     }
 
     handle(req, socket, head) {

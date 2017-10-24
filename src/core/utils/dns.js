@@ -1,4 +1,4 @@
-import dns from "dns";
+const dns = require("dns");
 /**
  * node 调用getAddress会出问题
  * @param host

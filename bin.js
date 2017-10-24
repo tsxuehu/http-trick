@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 require('babel-polyfill');
 var program = require('commander');
-var packageInfo = require("./../package.json");
+var packageInfo = require("./package.json");
 var lauchProxy = require('./src/launchProxy');
 
 var log = require('./core/utils/log').getConnectLog();
@@ -20,6 +20,3 @@ process.on("SIGINT", function () {
 process.on("uncaughtException", function (err) {
     log.error(err);
 });
-
-
-

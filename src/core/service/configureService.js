@@ -78,4 +78,9 @@ module.exports = class ConfigureRepository extends EventEmitter {
     getEnableRule(clientIp) {
         return this.getConf(userId).enableRule;
     }
+
+    getProxyPort(clientIp){
+        let userId = this.userRepository.getClientIpMappedUserId(clientIp);
+        return this.getConf(userId).proxyPort;
+    }
 }

@@ -2,7 +2,7 @@ const ServiceRegistry = require("../../service");
 
 module.exports = class TrafficController {
     constructor() {
-        this.httpTrafficService = ServiceRegistry.getHttpTrafficRepository();
+        this.httpTrafficService = ServiceRegistry.getHttpTrafficService();
     }
 
     regist(router) {

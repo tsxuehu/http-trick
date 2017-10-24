@@ -1,10 +1,7 @@
 /**
  * Created by tsxuehu on 17/3/21.
  */
-const _ = require('lodash');
-
 const ServiceRegistry = require("../../service");
-const EventEmitter = require('events');
 
 /**
  * hack， 创建一个不监听端口的server，让wss暴露handleUpgrade函数
@@ -30,7 +27,7 @@ let wsMock;
  * websocket mock
  * 和ws mock responsitory通信 实现mock功能
  */
-export default class WsMock extends EventEmitter {
+module.exports = class WsMock {
 
     static getInstance() {
         if (!wsMock) {
@@ -40,8 +37,7 @@ export default class WsMock extends EventEmitter {
     }
 
     constructor() {
-        super();
-        this.wsMockService = ServiceRegistry.getWsMockRepository();
+        this.wsMockService = ServiceRegistry.getWsMockService();
     }
 
     handleUpgrade(req, socket, head, sessionId, url) {
@@ -73,16 +69,20 @@ export default class WsMock extends EventEmitter {
         sessionIdPageMap[sessionId].page && sessionIdPageMap[sessionId].page.send(data);
     }
 
-
-    // 关闭会话，向会话关联的页面发送关闭通知
+    /**
+     * 关闭会话，向会话关联的页面发送关闭通知
+     */
     closeSession(sessionId) {
         sessionIdPageMap[sessionId] && sessionIdPageMap[sessionId].page && sessionIdPageMap[sessionId].page.close();
         delete sessionIdPageMap[sessionId];
     }
 
-    // 批量关闭session，用户所有的ws mock界面关闭时，会批量关闭调试会话
+    /**
+     * 批量关闭session，用户所有的ws mock界面关闭时，会批量关闭调试会话
+     * @param sessionIds
+     */
     closeSessionBatch(sessionIds) {
-        for(let sessionId of sessionIds){
+        for (let sessionId of sessionIds) {
             this.closeSession(sessionId);
         }
     }

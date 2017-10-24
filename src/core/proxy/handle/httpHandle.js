@@ -20,13 +20,13 @@ module.exports = class HttpHandle {
 
     constructor() {
         this.breakpoint = Breakpoint.getBreakpoint();
-        this.ruleRepository = ServiceRegistry.getRuleRepository();
-        this.configureRepository = ServiceRegistry.getConfigureRepository();
-        this.appInfoRepository = ServiceRegistry.getAppInfoRepository();
-        this.breakpointRepository = ServiceRegistry.getBreakpointRepository();
-        this.filterRepository = ServiceRegistry.getFilterRepository();
-        this.httpTrafficRepository = ServiceRegistry.getHttpTrafficRepository();
-        this.userRepository = ServiceRegistry.getUserRepository();
+        this.ruleService = ServiceRegistry.getRuleService();
+        this.configureService = ServiceRegistry.getConfigureService();
+        this.appInfoService = ServiceRegistry.getAppInfoService();
+        this.breakpointService = ServiceRegistry.getBreakpointService();
+        this.filterService = ServiceRegistry.getFilterService();
+        this.httpTrafficService = ServiceRegistry.getHttpTrafficService();
+        this.userService = ServiceRegistry.getUserService();
     }
 
     /**
@@ -40,26 +40,26 @@ module.exports = class HttpHandle {
         let clientIp = getClientIp(req);
 
         // 如果是 ui server请求，则直接转发不做记录
-        if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == this.appInfoRepository.getPcIp())
-            && urlObj.port == this.appInfoRepository.getRealUiPort()) {
+        if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == this.appInfoService.getPcIp())
+            && urlObj.port == this.appInfoService.getRealUiPort()) {
             Action.getBypassAction().run({req, res, urlObj});
             return;
         }
 
         // 如果有客户端监听请求内容，则做记录
-        if (this.httpTrafficRepository.hasMonitor(clientIp)) {
+        if (this.httpTrafficService.hasMonitor(clientIp)) {
             // 记录请求
-            let id = this.httpTrafficRepository.getRequestId(clientIp);
+            let id = this.httpTrafficService.getRequestId(clientIp);
             if (id > -1) {
-                this.httpTrafficRepository.request({clientIp, id, req, res, urlObj});
+                this.httpTrafficService.request({clientIp, id, req, res, urlObj});
 
                 // 日记记录body
                 this._getRequestBody().then(body => {
-                    this.httpTrafficRepository.reqBody({clientIp, id, req, res, body});
+                    this.httpTrafficService.reqBody({clientIp, id, req, res, body});
                 });
 
                 this._getResponseToClient(res).then(responseContent => {
-                    this.httpTrafficRepository.response({clientIp, id, req, res, responseContent});
+                    this.httpTrafficService.response({clientIp, id, req, res, responseContent});
                 });
             }
         }
@@ -82,7 +82,7 @@ module.exports = class HttpHandle {
         // 限流 https://github.com/tjgq/node-stream-throttle
 
 
-        let matchedRule = this.ruleRepository.getProcessRuleList(clientIp, req.method, urlObj);
+        let matchedRule = this.ruleService.getProcessRuleList(clientIp, req.method, urlObj);
 
         this._runAtions({req, res, urlObj, clientIp, rule: matchedRule});
     }
@@ -119,14 +119,14 @@ module.exports = class HttpHandle {
         };
 
         // 转发规则处理
-        if (!this.configureRepository.getEnableRule(clientIp)) {// 判断转发规则有没有开启
+        if (!this.configureService.getEnableRule(clientIp)) {// 判断转发规则有没有开启
             toClientResponse.headers['fe-proxy-rule-disabled'] = "true";
         }
         // 记录请求对应的用户id
-        toClientResponse.headers['fe-proxy-userId'] = this.userRepository.getClientIpMappedUserId(clientIp);
+        toClientResponse.headers['fe-proxy-userId'] = this.userService.getClientIpMappedUserId(clientIp);
 
         // 查找匹配到的过滤规则
-        let filterRuleList = await this.filterRepository.getMatchedRuleList(clientIp, req.method, urlObj);
+        let filterRuleList = await this.filterService.getMatchedRuleList(clientIp, req.method, urlObj);
 
         // 合并所有匹配到的过滤器规则的action列表、请求匹配的规则的 action 列表
         // 动作分为请求前和请求后两种类型, 合并后的顺序，前置过滤器动作 -> 请求匹配到的动作 -> 后置过滤器的动作

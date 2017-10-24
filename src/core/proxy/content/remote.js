@@ -19,8 +19,8 @@ module.exports =  class Remote {
     }
 
     constructor() {
-        let timeout = Repository.getConfigureRepository().getRequestTimeoutTime();
-        this.log = Repository.getLogRepository();
+        let timeout = Repository.getConfigureService().getRequestTimeoutTime();
+        this.log = Repository.getLogService();
         this.proxy = HttpProxy.createProxyServer({
             proxyTimeout: timeout,
             secure: false // http-proxy api  在request的option里设置 rejectUnauthorized = false

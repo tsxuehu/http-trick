@@ -1,17 +1,18 @@
-import getPort from "get-port";
-import Repository from "../repository";
-import HttpServer from "./httpServer";
-import HttpsServer from "./httpsServer";
-import WebUiServer from "./webui";
-export default class Launcher {
+const getPort = require("get-port");
+const ServiceRegistry = require("./core/service/index");
+const HttpServer = require("./httpServer");
+const HttpsServer = require("./httpsServer");
+const WebUiServer = require("./webui");
+module.exports = class Launcher {
     /**
      * 设置repositories
      * @param repositories
      */
     constructor(port, repositories) {
-        Repository.setRepositories(repositories);
-        this.configureRepository = Repository.getConfigureRepository();
-        this.appInfoRepository = Repository.getAppInfoRepository();
+        ServiceRegistry.registeServices(repositories);
+        this.configureRepository = ServiceRegistry.getConfigureService();
+        this.appInfoService = ServiceRegistry.getAppInfoService();
+        this.configureService = ServiceRegistry.getConfigureService();
         this.port = port;
     }
 
@@ -22,10 +23,10 @@ export default class Launcher {
     async start() {
         // 如果不存在 则从datacenter取默认值
         if (!this.port) {
-            this.port = this.appInfoRepository.getProxyPort();
+            this.port = this.configureService.getProxyPort();
         }
         // 记录运行时的代理端口
-        this.appInfoRepository.setRealProxyPort(this.port);
+        this.appInfoService.setRealProxyPort(this.port);
 
         let httpsPort = await getPort(40005);
 
@@ -38,7 +39,7 @@ export default class Launcher {
         let webUiPort = await getPort(40001);
 
         // 设置运行时的用户界面端口
-        this.appInfoRepository.setRealUiPort(webUiPort);
+        this.appInfoService.setRealUiPort(webUiPort);
 
         // 启动web ui
         await new WebUiServer(webUiPort).start();

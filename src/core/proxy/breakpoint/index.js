@@ -25,8 +25,8 @@ module.exports = class Breakpoint {
         // 记录客户端的请求、响应对象
         this.instanceReqRes = {};
 
-        this.breakpointService = ServiceRegistry.getBreakpointRepository();
-        this.userService = ServiceRegistry.getUserRepository();
+        this.breakpointService = ServiceRegistry.getBreakpointService();
+        this.userService = ServiceRegistry.getUserService();
 
         this.remote = Remote.getRemote();
     }

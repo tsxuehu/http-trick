@@ -17,7 +17,7 @@ module.exports = class MockData extends Action {
 
     constructor() {
         super();
-        this.mockDataRepository = ServiceRegistry.getMockDataRepository();
+        this.mockDataRepository = ServiceRegistry.getMockDataService();
         this.local = Local.getLocal();
     }
 

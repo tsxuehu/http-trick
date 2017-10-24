@@ -2,10 +2,10 @@
  * Created by tsxuehu on 8/22/17.
  */
 
-import http from "http";
-import HttpHandle from "./handle/httpHandle";
-import ConnectHandle from "./handle/connectHandle";
-import WsHandle from "./handle/wsHandle";
+const http = require("http");
+const HttpHandle = require("./handle/httpHandle");
+const ConnectHandle = require("./handle/connectHandle");
+const WsHandle = require("./handle/wsHandle");
 
 
 /**
@@ -13,7 +13,7 @@ import WsHandle from "./handle/wsHandle";
  * 2、转发http请求
  * 3、转发 ws请求
  */
-export default class HttpServer {
+module.exports = class HttpServer {
     constructor(httpPort, httpsPort) {
         this.httpPort = httpPort;
         this.httpsPort = httpsPort;

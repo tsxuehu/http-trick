@@ -4,7 +4,7 @@
 const ServiceRegistry = require("../../service");
 module.exports = class ConfigController {
     constructor() {
-        this.filterService = ServiceRegistry.getFilterRepository();
+        this.filterService = ServiceRegistry.getFilterService();
 
     }
 

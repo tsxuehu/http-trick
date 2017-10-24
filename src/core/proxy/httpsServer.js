@@ -1,9 +1,9 @@
-import https from "https";
-import tls from "tls";
-import crypto from "crypto";
-import Repository from "../repository";
-import HttpHandle from "./handle/httpHandle";
-import WsHandle from "./handle/wsHandle";
+const https = require("https");
+const tls = require("tls");
+const crypto = require("crypto");
+const ServiceRegistry = require("../service");
+const HttpHandle = require("./handle/httpHandle");
+const WsHandle = require("./handle/wsHandle");
 
 let createSecureContext = tls.createSecureContext || crypto.createSecureContext;
 
@@ -11,21 +11,21 @@ let createSecureContext = tls.createSecureContext || crypto.createSecureContext;
  * 1、转发https请求
  * 2、转发wss请求
  */
-export default class HttpsServer {
+module.exports = class HttpsServer {
     constructor(httpsPort) {
         this.httpsPort = httpsPort;
-        this.certificationRepository = Repository.getCertificationRepository();
+        this.certificationService = ServiceRegistry.getCertificationService();
     }
 
     async start() {
         let certification =
-            await this.certificationRepository.getCertificationForHost('internal_https_server');
+            await this.certificationService.getCertificationForHost('internal_https_server');
 
         this.httpsProxyServer = https.createServer({
             SNICallback: this.SNIPrepareCert,
             key: certification.key,
             cert: certification.cert
-        }, HttpHandle.getHttpHandle().handle);
+        }, HttpHandle.getInstance().handle);
 
         this.httpsProxyServer.on('upgrade', WsHandle.getWsHandle().handle);
         this.httpsProxyServer.on('error', function (err) {
@@ -36,7 +36,7 @@ export default class HttpsServer {
     }
 
     SNIPrepareCert(serverName, SNICallback) {
-        this.certificationRepository.getCertificationForHost(serverName)
+        this.certificationService.getCertificationForHost(serverName)
             .then(function (certificate, privateKey) {
                 let ctx = createSecureContext({
                     key: privateKey,

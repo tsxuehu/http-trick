@@ -2,7 +2,7 @@ const ServiceRegistry = require("../../service");
 const Breakpoint = require("../../proxy/breakpoint");
 module.exports = class BreakpointController {
     constructor() {
-        this.breakpointService = ServiceRegistry.getBreakpointRepository();
+        this.breakpointService = ServiceRegistry.getBreakpointService();
         this.breakpoint = Breakpoint.getBreakpoint();
     }
 

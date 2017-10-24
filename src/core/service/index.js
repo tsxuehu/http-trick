@@ -5,55 +5,55 @@
  * @type {ServiceRegistry}
  */
 module.exports = class ServiceRegistry {
-    static setRepositories(respositories) {
+    static registeServices(respositories) {
 
     }
 
-    static getBreakpointRepository() {
+    static getBreakpointService() {
 
     }
 
-    static getConfigureRepository() {
+    static getConfigureService() {
 
     }
 
-    static getHostRepository() {
+    static getHostService() {
 
     }
 
-    static getHttpTrafficRepository() {
+    static getHttpTrafficService() {
 
     }
 
-    static getMockDataRepository() {
+    static getMockDataService() {
 
     }
 
-    static getRuleRepository() {
+    static getRuleService() {
 
     }
 
-    static getFilterRepository() {
+    static getFilterService() {
 
     }
 
-    static getUserRepository() {
+    static getUserService() {
 
     }
 
-    static getWsMockRepository() {
+    static getWsMockService() {
 
     }
 
-    static getLogRepository() {
+    static getLogService() {
 
     }
 
-    static getCertificationRepository() {
+    static getCertificationService() {
 
     }
 
-    static getAppInfoRepository() {
+    static getAppInfoService() {
 
     }
 }

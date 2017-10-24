@@ -21,8 +21,8 @@ module.exports = class Redirect extends Action {
 
     constructor() {
         super();
-        this.hostRepository = ServiceRegistry.getHostRepository();
-        this.configureRepository = ServiceRegistry.getConfigureRepository();
+        this.hostRepository = ServiceRegistry.getHostService();
+        this.configureRepository = ServiceRegistry.getConfigureService();
         this.remote = Remote.getRemote();
         this.local = Local.getLocal();
     }

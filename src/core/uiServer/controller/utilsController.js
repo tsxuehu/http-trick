@@ -2,7 +2,7 @@ const ServiceRegistry = require("../../service");
 const gitlab = require("../../utils/gitlab");
 module.exports = class TrafficController {
     constructor() {
-        this.appInfoService = ServiceRegistry.getAppInfoRepository();
+        this.appInfoService = ServiceRegistry.getAppInfoService();
         this.rootCertService = ServiceRegistry.getCertRepository();
     }
 

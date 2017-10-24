@@ -1,13 +1,11 @@
-
-
-module.exports =  class UserRepository {
+module.exports = class UserRepository {
 
     constructor() {
 
     }
+
     // 获取clientIp对应的user id
     getClientIpMappedUserId(clientIp) {
-        return '0';
+        return 'root';
     }
-
 }

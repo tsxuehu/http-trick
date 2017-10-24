@@ -15,14 +15,14 @@ module.exports = class UiServer {
         this.webUiPort = webUiPort;
 
         // 引用服务
-        this.httpTrafficService = ServiceRegistry.getHttpTrafficRepository();
-        this.confService = ServiceRegistry.getConfigureRepository();
-        this.hostService = ServiceRegistry.getHostRepository();
-        this.mockDataService = ServiceRegistry.getMockDataRepository();
-        this.ruleService = ServiceRegistry.getRuleRepository();
-        this.filterService = ServiceRegistry.getFilterRepository();
-        this.wsMockService = ServiceRegistry.getWsMockRepository();
-        this.breakpointService = ServiceRegistry.getBreakpointRepository();
+        this.httpTrafficService = ServiceRegistry.getHttpTrafficService();
+        this.confService = ServiceRegistry.getConfigureService();
+        this.hostService = ServiceRegistry.getHostService();
+        this.mockDataService = ServiceRegistry.getMockDataService();
+        this.ruleService = ServiceRegistry.getRuleService();
+        this.filterService = ServiceRegistry.getFilterService();
+        this.wsMockService = ServiceRegistry.getWsMockService();
+        this.breakpointService = ServiceRegistry.getBreakpointService();
 
         // 初始化koa
         this.app = koa();
