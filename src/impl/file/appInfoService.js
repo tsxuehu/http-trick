@@ -3,13 +3,13 @@ const EventEmitter = require("events");
 const _ = require("lodash");
 module.exports = class AppInfoService extends EventEmitter {
 
-    constructor(mode) {
+    constructor(single) {
         super();
         /**
          * 是否运行在服务器端
          * @returns {boolean}
          */
-        this.single = mode == 'single' ? true : false;
+        this.single = single;
         // 用户home目录
         let userHome = process.env.HOME || process.env.USERPROFILE;
         // proxy data存放目录

@@ -64,7 +64,7 @@ module.exports = class Launcher {
     }
 
     // 初始化各种服务
-    _initService() {
+    async _initService() {
         let appInfoService;
         let breakpointService;
         let certificationService;
@@ -85,29 +85,53 @@ module.exports = class Launcher {
 
         } else {
             // 基于文件的服务
-            let appInfoService;
-            let breakpointService;
-            let certificationService;
-            let configureService;
-            let filterService;
-            let hostService;
-            let httpTrafficService;
-            let logService;
-            let mockDataService;
-            let ruleService;
-            let userService;
-            let wsMockService;
-        }
 
-        if (this.userMode == "single") {
-            // 单用户模式
-        } else {
-            // 多用户模式
-
+            // 基础服务
+            logService = new FileLogService();
+            appInfoService = new FileAppInfoService(this.userMode == "single");
+            userService = new FileUserService();
+            let baseService = {logService, appInfoService, userService};
+            // 复合服务
+            breakpointService = new FileBreakpointService(baseService);
+            certificationService = new FileCertificationService();
+            configureService = new FileConfigureService();
+            filterService = new FileFilterService();
+            hostService = new FileHostService();
+            httpTrafficService = new FileHttpTrafficService();
+            mockDataService = new FileMockDataService();
+            ruleService = new FileRuleService();
+            wsMockService = new FilewsMockService();
         }
 
         // 启动服务
+        await appInfoService.start();
+        await breakpointService.start();
+        await certificationService.start();
+        await configureService.start();
+        await filterService.start();
+        await hostService.start();
+        await httpTrafficService.start();
+        await logService.start();
+        await mockDataService.start();
+        await ruleService.start();
+        await userService.start();
+        await wsMockService.start();
 
+        // 注册服务
+        ServiceRegistry.registeServices({
+            appInfoService,
+            breakpointService,
+            certificationService,
+            configureService,
+            filterService,
+            hostService,
+            httpTrafficService,
+            logService,
+            mockDataService,
+            ruleService,
+            userService,
+            wsMockService,
+        });
     }
 
     // 初始化服务器

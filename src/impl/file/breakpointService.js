@@ -11,7 +11,7 @@ const fileUtils = require("../../core/utils/file");
  */
 module.exports = class BreakpointService extends EventEmitter {
 
-    constructor(userService, appInfoService) {
+    constructor({userService, appInfoService, logService}) {
         super();
         this.userService = userService;
         this.appInfoService = appInfoService;
