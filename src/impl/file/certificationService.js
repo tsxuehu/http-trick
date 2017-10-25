@@ -49,8 +49,7 @@ module.exports = class CertificationService {
      * @param certTempDir 存放证书的目录
      * @param root 根证书的key 和 cert
      */
-    constructor(appInfoService,
-                root) {
+    constructor({appInfoService}) {
         // 存放证书的目录
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();

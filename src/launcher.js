@@ -93,14 +93,14 @@ module.exports = class Launcher {
             let baseService = {logService, appInfoService, userService};
             // 复合服务
             breakpointService = new FileBreakpointService(baseService);
-            certificationService = new FileCertificationService();
-            configureService = new FileConfigureService();
-            filterService = new FileFilterService();
-            hostService = new FileHostService();
-            httpTrafficService = new FileHttpTrafficService();
-            mockDataService = new FileMockDataService();
-            ruleService = new FileRuleService();
-            wsMockService = new FilewsMockService();
+            certificationService = new FileCertificationService(baseService);
+            configureService = new FileConfigureService(baseService);
+            filterService = new FileFilterService(baseService);
+            hostService = new FileHostService(baseService);
+            httpTrafficService = new FileHttpTrafficService(baseService);
+            mockDataService = new FileMockDataService(baseService);
+            ruleService = new FileRuleService({configureService, ...baseService});
+            wsMockService = new FilewsMockService(baseService);
         }
 
         // 启动服务

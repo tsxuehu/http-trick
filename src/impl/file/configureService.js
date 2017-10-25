@@ -6,9 +6,9 @@ const _ = require("lodash");
  * Created by tsxuehu on 8/3/17.
  */
 module.exports = class ConfigureService extends EventEmitter {
-    constructor(userRepository) {
+    constructor({userService}) {
         super();
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.defaultConf = {
             "projectPath": {
                 "project name": "path to your project"
@@ -60,7 +60,7 @@ module.exports = class ConfigureService extends EventEmitter {
     }
 
     calcPathbyClientIp(clientIp, href, match, target) {
-        let userId = this.userRepository.getClientIpMappedUserId(clientIp);
+        let userId = this.userService.getClientIpMappedUserId(clientIp);
         return this.calcPathbyUser(userId, href, match, target);
     }
 
@@ -84,7 +84,7 @@ module.exports = class ConfigureService extends EventEmitter {
     }
 
     getProxyPort(clientIp){
-        let userId = this.userRepository.getClientIpMappedUserId(clientIp);
+        let userId = this.userService.getClientIpMappedUserId(clientIp);
         return this.getConf(userId).proxyPort;
     }
 }

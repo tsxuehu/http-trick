@@ -3,6 +3,10 @@
  */
 module.exports = class WsMockService {
 
+    constructor(){
+
+    }
+
     start(){
 
     }

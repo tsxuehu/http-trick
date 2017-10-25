@@ -7,7 +7,7 @@ const fileUtil = require("../../core/utils/file");
  * 数据mock
  */
 module.exports = class MockDataService extends EventEmitter {
-    constructor(userService, appInfoService) {
+    constructor({userService, appInfoService}) {
         super();
         this.userService = userService;
         this.appInfoService = appInfoService;

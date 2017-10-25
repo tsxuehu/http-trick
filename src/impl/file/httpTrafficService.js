@@ -15,7 +15,7 @@ const logCountPerUser = 500;
  */
 module.exports = class HttpTrafficService {
 
-    constructor(userService, appInfoService) {
+    constructor({userService, appInfoService}) {
         this.userService = userService;
         this.appInfoService = appInfoService;
         // http请求缓存数据 userId - > [{record}，{record}，{record}]

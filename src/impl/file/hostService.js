@@ -4,7 +4,7 @@ const _ = require("lodash");
  * Created by tsxuehu on 8/3/17.
  */
 module.exports = class HostService extends EventEmitter {
-    constructor(userRepository) {
+    constructor({userService}) {
         super();
         // 用户 -> host列表
         this.userHostFilesMap = {};
@@ -13,16 +13,16 @@ module.exports = class HostService extends EventEmitter {
         // 缓存
         // userId, {globHostMap, hostMap}
         this.inUsingHostsMap = {};
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
-    start(){
+    start() {
 
     }
 
     async resolveHost(clientIp, hostname) {
         if (!hostname) return hostname;
-        let userId = await this.userRepository.getClientIpMappedUserId(clientIp);
+        let userId = await this.userService.getClientIpMappedUserId(clientIp);
         let inUsingHosts = await this.getInUsingHosts(userId);
         let ip = inUsingHosts.hostMap[hostname];
         if (ip) return ip;

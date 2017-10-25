@@ -10,8 +10,8 @@ let passRule = {
 };
 // 
 module.exports = class RuleService {
-    constructor({configureRepository}) {
-        this.configureRepository = configureRepository;
+    constructor({configureService}) {
+        this.configureService = configureService;
     }
 
     start(){
@@ -53,7 +53,7 @@ module.exports = class RuleService {
      */
     getProcessRuleList(clientIp, method, urlObj) {
         let candidateRule = null;
-        if (this.configureRepository.getEnableRule(clientIp)) {
+        if (this.configureService.getEnableRule(clientIp)) {
             // 规则匹配部分
             let inusingRules = this._getInuseRules(clientIp);
             for (let i = 0; i < inusingRules.length; i++) {
