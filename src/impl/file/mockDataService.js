@@ -1,7 +1,7 @@
 const EventEmitter = require("events");
 const _ = require("lodash");
 const path = require("path");
-const fileUtil = require("../utils/file");
+const fileUtil = require("../../core/utils/file");
 
 /**
  * 数据mock

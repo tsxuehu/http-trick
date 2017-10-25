@@ -1,6 +1,6 @@
 const LRU = require("lru-cache");
 const parseDomain = require("parse-domain");
-const fileUtils = require("../utils/file");
+const fileUtils = require("../../core/utils/file");
 const pem = require("pem");
 const path = require("path");
 /**

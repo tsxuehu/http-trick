@@ -3,6 +3,21 @@ const ServiceRegistry = require("./core/service/index");
 const HttpServer = require("./httpServer");
 const HttpsServer = require("./httpsServer");
 const WebUiServer = require("./webui");
+
+// service导入
+const FileAppInfoService = require("./impl/file/appInfoService");
+const FileBreakpointService = require("./impl/file/breakpointService");
+const FileCertificationService = require("./impl/file/certificationService");
+const FileConfigureService = require("./impl/file/configureService");
+const FileFilterService = require("./impl/file/filterService");
+const FileHostService = require("./impl/file/hostService");
+const FileHttpTrafficService = require("./impl/file/httpTrafficService");
+const FileLogService = require("./impl/file/logService");
+const FileMockDataService = require("./impl/file/mockDataService");
+const FileRuleService = require("./impl/file/ruleService");
+const FileUserService = require("./impl/file/userService");
+const FilewsMockService = require("./impl/file/wsMockService");
+
 module.exports = class Launcher {
     /**
      * 设置repositories
@@ -70,6 +85,18 @@ module.exports = class Launcher {
 
         } else {
             // 基于文件的服务
+            let appInfoService;
+            let breakpointService;
+            let certificationService;
+            let configureService;
+            let filterService;
+            let hostService;
+            let httpTrafficService;
+            let logService;
+            let mockDataService;
+            let ruleService;
+            let userService;
+            let wsMockService;
         }
 
         if (this.userMode == "single") {

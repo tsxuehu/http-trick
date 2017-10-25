@@ -1,7 +1,7 @@
 const EventEmitter = require("events");
 const _ = require("lodash");
 const path = require("path");
-const fileUtils = require("../utils/file");
+const fileUtils = require("../../core/utils/file");
 /**
  * 记录三个维护的数据
  * 1、用户打开的断点页面数（连接数）
