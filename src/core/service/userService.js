@@ -1,6 +1,10 @@
-module.exports = class UserRepository {
+module.exports = class UserService {
 
     constructor() {
+
+    }
+
+    start(){
 
     }
 

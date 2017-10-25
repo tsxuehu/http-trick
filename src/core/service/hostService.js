@@ -3,7 +3,7 @@ const _ = require("lodash");
 /**
  * Created by tsxuehu on 8/3/17.
  */
-module.exports = class HostRepository extends EventEmitter {
+module.exports = class HostService extends EventEmitter {
     constructor(userRepository) {
         super();
         // 用户 -> host列表
@@ -14,6 +14,10 @@ module.exports = class HostRepository extends EventEmitter {
         // userId, {globHostMap, hostMap}
         this.inUsingHostsMap = {};
         this.userRepository = userRepository;
+    }
+
+    start(){
+
     }
 
     async resolveHost(clientIp, hostname) {

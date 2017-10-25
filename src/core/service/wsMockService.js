@@ -3,6 +3,10 @@
  */
 module.exports = class WsMockService {
 
+    start(){
+
+    }
+
     /**
      * 为用户分配一个连接id
      * @param userId
@@ -23,6 +27,7 @@ module.exports = class WsMockService {
         };
         return sessionId;
     }
+
     /**
      * 获取一个空闲session
      * @param clientIp
@@ -70,9 +75,6 @@ module.exports = class WsMockService {
 
     }
 
-
-
-
     /**
      * 获取用户所有的调试会话
      * @param userId
@@ -80,6 +82,5 @@ module.exports = class WsMockService {
     getSessions(userId) {
 
     }
-
 
 }

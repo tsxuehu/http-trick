@@ -1,7 +1,7 @@
 const path = require("path");
 const EventEmitter = require("events");
 const _ = require("lodash");
-module.exports = class AppInfo extends EventEmitter {
+module.exports = class AppInfoService extends EventEmitter {
 
     constructor(mode) {
         super();

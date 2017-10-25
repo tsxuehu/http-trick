@@ -6,7 +6,7 @@ const fileUtil = require("../utils/file");
 /**
  * 数据mock
  */
-module.exports = class MockDataRepository extends EventEmitter {
+module.exports = class MockDataService extends EventEmitter {
     constructor(userService, appInfoService) {
         super();
         this.userService = userService;
@@ -18,6 +18,10 @@ module.exports = class MockDataRepository extends EventEmitter {
         this.mockDataDir = path.join(proxyDataDir, "mock-data");
         // userId -> datalist
         this.mockDataList = {};
+    }
+
+    start(){
+
     }
 
     /**

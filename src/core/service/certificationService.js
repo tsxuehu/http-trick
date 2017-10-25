@@ -6,7 +6,7 @@ const path = require("path");
 /**
  * 证书管理
  */
-module.exports = class CertificationRepository {
+module.exports = class CertificationService {
 
     /**
      * 为指定域名创建证书 (使用自定义的根证书)

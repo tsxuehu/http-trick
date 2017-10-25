@@ -13,7 +13,7 @@ const logCountPerUser = 500;
  * 每个用户最多只记录500个请求，超过500个后 不在记录
  * @type {HttpTrafficRepository}
  */
-module.exports = class HttpTrafficRepository {
+module.exports = class HttpTrafficService {
 
     constructor(userService, appInfoService) {
         this.userService = userService;
@@ -32,6 +32,10 @@ module.exports = class HttpTrafficRepository {
         setInterval(_ => {
             this.sendCachedData();
         }, 2500);
+    }
+
+    start(){
+
     }
 
     // 将缓存数据发送给用户

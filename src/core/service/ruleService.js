@@ -9,9 +9,13 @@ let passRule = {
     }]
 };
 // 
-module.exports = class ruleRepository {
+module.exports = class RuleService {
     constructor({configureRepository}) {
         this.configureRepository = configureRepository;
+    }
+
+    start(){
+
     }
 
     createRuleFile(userId, name, description) {

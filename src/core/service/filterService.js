@@ -1,12 +1,16 @@
 const EventEmitter = require("events");
 const _ = require("lodash");
 
-module.exports = class FilterRepository extends EventEmitter {
+module.exports = class FilterService extends EventEmitter {
     constructor(userRepository) {
         super();
         // user -> filters 映射
         this.filters = {};
         this.userRepository = userRepository;
+    }
+
+    start(){
+
     }
 
     async getMatchedRuleList(clientIp, method, urlObj) {

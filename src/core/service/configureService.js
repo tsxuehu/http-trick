@@ -5,7 +5,7 @@ const _ = require("lodash");
  * 代理端口、超时时间、gitlab token、工程路径、是否启用转发规则
  * Created by tsxuehu on 8/3/17.
  */
-module.exports = class ConfigureRepository extends EventEmitter {
+module.exports = class ConfigureService extends EventEmitter {
     constructor(userRepository) {
         super();
         this.userRepository = userRepository;
@@ -16,6 +16,10 @@ module.exports = class ConfigureRepository extends EventEmitter {
             "enableRule": true
         };
         this.userConfMap = {};
+    }
+
+    start(){
+
     }
 
     getConf(userId) {

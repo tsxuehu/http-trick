@@ -9,7 +9,7 @@ const fileUtils = require("../utils/file");
  * 3、断点
  * Created by tsxuehu on 8/3/17.
  */
-module.exports = class BreakpointRepository extends EventEmitter {
+module.exports = class BreakpointService extends EventEmitter {
 
     constructor(userService, appInfoService) {
         super();
