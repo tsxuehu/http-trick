@@ -29,8 +29,7 @@ module.exports = class MockDataService extends EventEmitter {
      * @param clientIp
      * @param dataId
      */
-    async getDataContent(clientIp, dataId) {
-        let userId = await this.userService.getClientIpMappedUserId(clientIp);
+    async getDataContent(userId, dataId) {
         let dataFilePath = this._getDataFilePath(userId, dataId);
         return await fileUtil.readFile(dataFilePath);
     }
@@ -41,8 +40,7 @@ module.exports = class MockDataService extends EventEmitter {
      * {id:'',contenttype:'',name:''}
      * @returns {*}
      */
-    async getDataFileContentType(clientIp, dataId) {
-        let userId = await this.userService.getClientIpMappedUserId(clientIp);
+    async getDataFileContentType(userId, dataId) {
         let list = this.mockDataList[userId];
         // 寻找
         let finded = _.find(list, entry => {

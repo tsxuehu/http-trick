@@ -39,6 +39,7 @@ module.exports = class Bypass extends Action {
                   res,
                   urlObj,
                   clientIp,
+                  userId,
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容
@@ -49,7 +50,7 @@ module.exports = class Bypass extends Action {
         // 构造url
         let {protocol, hostname, path, port} = urlObj;
 
-        let ipOrHost = await this.hostRepository.resolveHost(clientIp, hostname);
+        let ipOrHost = await this.hostRepository.resolveHost(userId, hostname);
         let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
 
         toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);

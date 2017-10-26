@@ -38,6 +38,8 @@ module.exports = class HttpHandle {
         let urlObj = parseUrl(req);
 
         let clientIp = getClientIp(req);
+        let userId = this.userService.getClientIpMappedUserId(clientIp);
+
 
         // 如果是 ui server请求，则直接转发不做记录
         if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == this.appInfoService.getPcIp())
@@ -47,19 +49,19 @@ module.exports = class HttpHandle {
         }
 
         // 如果有客户端监听请求内容，则做记录
-        if (this.httpTrafficService.hasMonitor(clientIp)) {
+        if (this.httpTrafficService.hasMonitor(userId)) {
             // 记录请求
-            let id = this.httpTrafficService.getRequestId(clientIp);
+            let id = this.httpTrafficService.getRequestId(userId);
             if (id > -1) {
-                this.httpTrafficService.request({clientIp, id, req, res, urlObj});
+                this.httpTrafficService.requestBegin({userId, clientIp, id, req, res, urlObj});
 
                 // 日记记录body
                 this._getRequestBody().then(body => {
-                    this.httpTrafficService.reqBody({clientIp, id, req, res, body});
+                    this.httpTrafficService.requestBody({userId, id, req, res, body});
                 });
 
                 this._getResponseToClient(res).then(responseContent => {
-                    this.httpTrafficService.response({clientIp, id, req, res, responseContent});
+                    this.httpTrafficService.requestReturn({userId, id, req, res, responseContent});
                 });
             }
         }
@@ -67,13 +69,13 @@ module.exports = class HttpHandle {
         // =========================================
         // 断点
         let breakpointId = await this.breakpoint
-            .getBreakpointId(clientIp, req.method, urlObj);
+            .getBreakpointId(userId, req.method, urlObj);
         if (breakpointId > 0) {
             let requestContent = await this._getRequestContent(
                 req,
                 urlObj);
             this.breakpoint.run({
-                req, res, urlObj, clientIp, breakpointId, requestContent
+                req, res, urlObj, userId, breakpointId, requestContent
             });
             return;
         }
@@ -82,9 +84,9 @@ module.exports = class HttpHandle {
         // 限流 https://github.com/tjgq/node-stream-throttle
 
 
-        let matchedRule = this.ruleService.getProcessRuleList(clientIp, req.method, urlObj);
+        let matchedRule = this.ruleService.getProcessRuleList(userId, req.method, urlObj);
 
-        this._runAtions({req, res, urlObj, clientIp, rule: matchedRule});
+        this._runAtions({req, res, urlObj, clientIp, userId, rule: matchedRule});
     }
 
     /**
@@ -97,7 +99,7 @@ module.exports = class HttpHandle {
      * @returns {Promise.<void>}
      * @private
      */
-    async _runAtions({req, res, urlObj, clientIp, rule}) {
+    async _runAtions({req, res, urlObj, rule, clientIp, userId}) {
         // 原始的请求头部
         let requestContent = {
             hasContent: false,
@@ -119,14 +121,14 @@ module.exports = class HttpHandle {
         };
 
         // 转发规则处理
-        if (!this.configureService.getEnableRule(clientIp)) {// 判断转发规则有没有开启
+        if (!this.configureService.enableRule(userId)) {// 判断转发规则有没有开启
             toClientResponse.headers['fe-proxy-rule-disabled'] = "true";
         }
         // 记录请求对应的用户id
-        toClientResponse.headers['fe-proxy-userId'] = this.userService.getClientIpMappedUserId(clientIp);
+        toClientResponse.headers['fe-proxy-userId'] = userId;
 
         // 查找匹配到的过滤规则
-        let filterRuleList = await this.filterService.getMatchedRuleList(clientIp, req.method, urlObj);
+        let filterRuleList = await this.filterService.getMatchedRuleList(userId, req.method, urlObj);
 
         // 合并所有匹配到的过滤器规则的action列表、请求匹配的规则的 action 列表
         // 动作分为请求前和请求后两种类型, 合并后的顺序，前置过滤器动作 -> 请求匹配到的动作 -> 后置过滤器的动作
@@ -168,6 +170,7 @@ module.exports = class HttpHandle {
                     res,
                     urlObj,
                     clientIp,
+                    userId,
                     rule, // 规则
                     action, // 规则里的一个动作
                     requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
@@ -188,6 +191,7 @@ module.exports = class HttpHandle {
                 res,
                 urlObj,
                 clientIp,
+                userId,
                 rule, // 规则
                 action, // 规则里的一个动作
                 requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
@@ -263,6 +267,7 @@ module.exports = class HttpHandle {
             body // 请求body
         };
     }
+
     // 获取返回给client的内容
     // 原理：两个流pipe时有pipe事件，监听输入流上的数据
     _getResponseToClient(res) {

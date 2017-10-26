@@ -10,38 +10,40 @@ let passRule = {
 };
 // 
 module.exports = class RuleService {
-    constructor({configureService}) {
+    constructor({configureService,userService}) {
         this.configureService = configureService;
+        this.userService = userService;
     }
 
-    start(){
+    async start(){
+        // 读取规则文件
 
     }
-
+    // 创建规则文件
     createRuleFile(userId, name, description) {
 
     }
-
+    // 返回用户的规则文件列表
     getRuleFileList(userId) {
 
     }
-
+    // 删除规则文件
     deleteRuleFile(userId, name) {
 
     }
-
+    // 设置规则文件的使用状态
     setRuleFileCheckStatus(userId, name, checked) {
 
     }
-
+    // 获取规则文件的内容
     getRuleFile(userId, name) {
 
     }
-
+    // 保存规则文件
     saveRuleFile(userId, name, content) {
 
     }
-
+    //
     getRemoteRuleFile(userId, url) {
 
     }
@@ -51,11 +53,11 @@ module.exports = class RuleService {
      * @param method
      * @param urlObj
      */
-    getProcessRuleList(clientIp, method, urlObj) {
+    getProcessRuleList(userId, method, urlObj) {
         let candidateRule = null;
-        if (this.configureService.getEnableRule(clientIp)) {
+        if (this.configureService.enableRule(userId)) {
             // 规则匹配部分
-            let inusingRules = this._getInuseRules(clientIp);
+            let inusingRules = this._getInuseRules(userId);
             for (let i = 0; i < inusingRules.length; i++) {
                 let rule = inusingRules[i];
                 // 捕获规则
@@ -73,7 +75,7 @@ module.exports = class RuleService {
         return candidateRule;
     }
 
-    _getInuseRules(clientIp) {
+    _getInuseRules(userId) {
 
     }
 

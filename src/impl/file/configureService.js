@@ -40,7 +40,7 @@ module.exports = class ConfigureService extends EventEmitter {
      * @param match
      * @param target
      */
-    calcPathbyUser(userId, href, match, target) {
+    calcPath(userId, href, match, target) {
         if (match) {
             try {
                 let matchList = href.match(new RegExp(match));
@@ -59,11 +59,6 @@ module.exports = class ConfigureService extends EventEmitter {
         }
     }
 
-    calcPathbyClientIp(clientIp, href, match, target) {
-        let userId = this.userService.getClientIpMappedUserId(clientIp);
-        return this.calcPathbyUser(userId, href, match, target);
-    }
-
     /**
      *
      * @param userId
@@ -79,7 +74,7 @@ module.exports = class ConfigureService extends EventEmitter {
      * 获取转发规则启用开关
      * @param clientIp
      */
-    getEnableRule(clientIp) {
+    enableRule(userId) {
         return this.getConf(userId).enableRule;
     }
 

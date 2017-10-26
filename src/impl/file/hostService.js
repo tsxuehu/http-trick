@@ -20,9 +20,8 @@ module.exports = class HostService extends EventEmitter {
 
     }
 
-    async resolveHost(clientIp, hostname) {
+    async resolveHost(userId, hostname) {
         if (!hostname) return hostname;
-        let userId = await this.userService.getClientIpMappedUserId(clientIp);
         let inUsingHosts = await this.getInUsingHosts(userId);
         let ip = inUsingHosts.hostMap[hostname];
         if (ip) return ip;

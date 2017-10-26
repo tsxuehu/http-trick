@@ -109,9 +109,8 @@ module.exports = class Breakpoint {
      * @param urlObj
      * @returns {Promise.<*>}
      */
-    async getBreakpointId(clientIp, method, urlObj) {
+    async getBreakpointId(userId, method, urlObj) {
         // clientIp 转 userId
-        let userId = await this.userService.getClientIpMappedUserId(clientIp);
         let connectionsCnt = await this.breakpointService.getUserConnectionCount(userId);
         // 没有断点界面，则断点不生效
         if (connectionsCnt == 0) return -1;

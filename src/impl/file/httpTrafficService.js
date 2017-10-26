@@ -34,7 +34,7 @@ module.exports = class HttpTrafficService {
         }, 2500);
     }
 
-    start(){
+    start() {
 
     }
 
@@ -48,9 +48,8 @@ module.exports = class HttpTrafficService {
 
 
     // 为请求分配id
-    async getRequestId(clientIp) {
-        // 根据请求机器的ip获取对应的用户
-        let userId = await this.userService.getClientIpMappedUserId(clientIp);
+    async getRequestId(userId) {
+
         // 获取当前ip
         let id = this.userRequestPointer[userId] || 0;
         // 超过500个请求则不再记录
@@ -66,8 +65,7 @@ module.exports = class HttpTrafficService {
     }
 
     // 获取监控窗口的数量，没有监控窗口 则不做记录
-    async hasMonitor(clientIp) {
-        let userId = await this.userService.getClientIpMappedUserId(clientIp);
+    async hasMonitor(userId) {
         let cnt = this.userMonitorCount[userId] || 0;
         return cnt > 0;
     }
@@ -87,8 +85,7 @@ module.exports = class HttpTrafficService {
     }
 
     // 记录请求
-    async request({clientIp, id, req, res, urlObj}) {
-        let userId = await this.userService.getClientIpMappedUserId(clientIp);
+    async requestBegin({userId, clientIp, id, req, res, urlObj}) {
         let {protocol, host, pathname, port} = urlObj;
 
         let queue = this.cache[userId] || [];
@@ -113,18 +110,16 @@ module.exports = class HttpTrafficService {
     }
 
     // 记录请求body
-    async reqBody({clientIp, id, req, res, body}) {
+    async requestBody({userId,  id, req, res, body}) {
         // 将body写文件
-        let userId = await this.userService.getClientIpMappedUserId(clientIp);
 
         let bodyPath = this.getRequestBodyPath(userId, id);
         await fileUtil.writeFile(bodyPath, body);
     }
 
     // 记录响应
-    async response({clientIp, id, req, res, responseContent}) {
+    async requestReturn({userId, id, req, res, responseContent}) {
 
-        let userId = await this.userService.getClientIpMappedUserId(clientIp);
         let queue = this.cache[userId] || [];
 
         let expires = res.getHeader('expires');
