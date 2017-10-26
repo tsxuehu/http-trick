@@ -2,9 +2,9 @@ const Action = require( "./action");
 const _ = require( "lodash");
 const ServiceRegistry = require( "../../service");
 const sendErrorToClient = require( "../sendToClient/error");
-const Local = require( "../content/local");
+const Local = require( "../../utils/local");
 const url = require( "url");
-const Remote = require( "../content/remote");
+const Remote = require( "../../utils/remote");
 const addHeaderToResponse = require( "../../utils/addHeaderToResponse");
 
 /**

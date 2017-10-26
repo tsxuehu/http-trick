@@ -5,24 +5,16 @@ module.exports = class AppInfoService extends EventEmitter {
 
     constructor(single) {
         super();
-        /**
-         * 是否运行在服务器端
-         * @returns {boolean}
-         */
-        this.single = single;
         // 用户home目录
         let userHome = process.env.HOME || process.env.USERPROFILE;
         // proxy data存放目录
         this.proxyDataDir = path.join(userHome, ".front-end-proxy");
         // app信息
         this.appInfo = {
-            "mode": mode,
-            "proxyPort": 8001,
+            "single": single,
             "realUiPort": "",
             "realProxyPort": "",
             "pcIp": "",
-            "requestTimeoutTime": 10000,
-            "gitlabToken": "",
         };
 
         this.appDir = path.join(__dirname, "../../../")
@@ -50,7 +42,7 @@ module.exports = class AppInfoService extends EventEmitter {
      * @returns {boolean|*}
      */
     isSingle() {
-        return this.single;
+        return this.appInfo.single;
     }
 
     /**
@@ -59,14 +51,6 @@ module.exports = class AppInfoService extends EventEmitter {
      */
     getProxyDataDir() {
         return this.proxyDataDir;
-    }
-
-    /**
-     * 获取gitlab token
-     * @param userId
-     */
-    getGitlabToken() {
-        return this.appInfo.gitlabToken;
     }
 
     /**
@@ -121,14 +105,5 @@ module.exports = class AppInfoService extends EventEmitter {
      */
     getPcIp() {
         return this.appInfo.pcIp;
-    }
-
-    /**
-     * 代理超时时间
-     * @param clientIp
-     * @returns {number}
-     */
-    getRequestTimeoutTime() {
-        return this.appInfo.requestTimeoutTime;
     }
 }

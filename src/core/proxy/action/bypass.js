@@ -1,5 +1,5 @@
 const Action = require("./action");
-const Remote = require("../content/remote");
+const Remote = require("../../utils/remote");
 const _ = require("lodash");
 const ServiceRegistry = require("../../service");
 const addHeaderToResponse = require("../../utils/addHeaderToResponse");

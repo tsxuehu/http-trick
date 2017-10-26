@@ -1,16 +1,15 @@
-const axios = require( "axios");
-const HttpProxy = require( "http-proxy");
-const Repository = require( "../repository");
-const {defaultHttpAgent, defaultHttpsAgent} = require( "../../utils/agent");
-const queryString = require( "query-string");
-const resovleIp = require( '../../utils/dns');
+const axios = require("axios");
+const HttpProxy = require("http-proxy");
+const {defaultHttpAgent, defaultHttpsAgent} = require("agent");
+const queryString = require("query-string");
+const resovleIp = require('dns');
 /**
  * 从远程服务器上获取响应内容
  */
 
 let remote;
 
-module.exports =  class Remote {
+module.exports = class Remote {
     static getInstance() {
         if (!remote) {
             remote = new Remote();
@@ -19,10 +18,7 @@ module.exports =  class Remote {
     }
 
     constructor() {
-        let timeout = Repository.getConfigureService().getRequestTimeoutTime();
-        this.log = Repository.getLogService();
         this.proxy = HttpProxy.createProxyServer({
-            proxyTimeout: timeout,
             secure: false // http-proxy api  在request的option里设置 rejectUnauthorized = false
         });
 
@@ -32,7 +28,7 @@ module.exports =  class Remote {
     /**
      * 将请求远程的响应内容直接返回给浏览器
      */
-    async pipe({req, res, protocol, hostname, path, port, headers}) {
+    async pipe({req, res, protocol, hostname, path, port, headers, timeout}) {
         let isHttps = protocol.indexOf('https') > -1;
         // http.request 解析dns时，偶尔会出错
         let ip = await resovleIp(hostname);
@@ -45,6 +41,7 @@ module.exports =  class Remote {
             },
             headers,
             ignorePath: true,
+            proxyTimeout: timeout,
             agent: isHttps ? defaultHttpsAgent : defaultHttpAgent
         });
     }
@@ -52,7 +49,7 @@ module.exports =  class Remote {
     /**
      * 将请求远程的响应内容
      */
-    async cache({req, res, targetUrl, headers, toClientResponse}) {
+    async cache({req, res, targetUrl, headers, toClientResponse, timeout}) {
         // 设置超时时间，节约socket资源
         let response = await axios({
             method: req.method,
@@ -70,7 +67,7 @@ module.exports =  class Remote {
     /**
      * 根据RequestContent
      */
-    async cacheFromRequestContent({requestContent, toClientResponse}) {
+    async cacheFromRequestContent({requestContent, toClientResponse, timeout}) {
         let {protocol, host, pathname, port, query} = requestContent;
         let href = `${protocol}//${host}:${port}${pathname}?${queryString.stringify(query)}`;
         let response = await axios({

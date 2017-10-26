@@ -173,13 +173,13 @@ module.exports = class UiServer {
         this.breakpointService.on('instance-add', (userId, instance) => {
             this.breakpointNS.to(userId).emit('instance-add', instance);
         });
-        this.breakpointService.on('instance-client-request', (userId, instanceId, content) => {
+        this.breakpointService.on('set-instance-request-content', (userId, instanceId, content) => {
             this.breakpointNS.to(userId).emit('client-request', instanceId, content);
         });
-        this.breakpointService.on('instance-server-response', (userId, instanceId, content) => {
+        this.breakpointService.on('set-instance-server-response', (userId, instanceId, content) => {
             this.breakpointNS.to(userId).emit('server-response', instanceId, content);
         });
-        this.breakpointService.on('instance-end', (userId, instanceId) => {
+        this.breakpointService.on('send-instance-to-client', (userId, instanceId) => {
             this.breakpointNS.to(userId).emit('instance-end', instanceId);
         });
         this.breakpointService.on('breakpoint-save', (userId, breakpoint) => {

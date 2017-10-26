@@ -29,6 +29,14 @@ module.exports = class Breakpoint {
         this.userService = ServiceRegistry.getUserService();
 
         this.remote = Remote.getRemote();
+        // 删除断点后，释放断点实例
+        this.breakpointService.on('breakpoint-delete', (userId, breakpointId, toDeleteInstance) => {
+            this.endRequest(toDeleteInstance);
+        })
+        // 将请求发送给客户端
+        this.breakpointService.on('send-instance-to-client', ( instanceId) => {
+            this.sendToClient(instanceId);
+        })
     }
 
     async run({
@@ -55,23 +63,11 @@ module.exports = class Breakpoint {
         if (breakpoint.responseBreak) return;
         // 响应浏览器（一个空断点会执行到这一步）
         await this.sendToClient(instanceId);
-        // 将请求发送给浏览器
-        this.breakpointService.sendedInstanceServerResponseToClient(instanceId);
+        // 删除记录信息
+        this.breakpointService.deleteInstanceSlient(instanceId);
+
     }
 
-    /**
-     * 将请求数据发送给服务端,获取服务器返回内容
-     */
-    async getServerResponse(instanceId) {
-        // 向服务器发送请求
-
-        let requestContent = this.breakpointService.getInstanceRequestContent(instanceId);
-        let responseContent = {};
-        await this.remote.cacheFromRequestContent({
-            requestContent, toClientResponse: responseContent
-        });
-        this.breakpointService.setInstanceServerResponseContent(instanceId, responseContent);
-    }
 
     /**
      * 将内容发送给浏览器
@@ -96,6 +92,7 @@ module.exports = class Breakpoint {
     endRequest(instanceIds) {
         for (let instanceId of instanceIds) {
             let instance = this.instanceReqRes[instanceId];
+            if (!instance) continue;
             let res = instance.res;
             sendSpecificToClient({
                 res, statusCode: 500, headers: {breakpoint: "user close breakpoint"}, content: "user close breakpoint"

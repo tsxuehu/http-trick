@@ -2,6 +2,8 @@ const EventEmitter = require("events");
 const _ = require("lodash");
 const path = require("path");
 const fileUtils = require("../../core/utils/file");
+const Remote = require('../../core/utils/remote');
+
 /**
  * 记录三个维护的数据
  * 1、用户打开的断点页面数（连接数）
@@ -18,6 +20,7 @@ module.exports = class BreakpointService extends EventEmitter {
         this.currentConnectionId = 10;// 连接id
         this.currentInstanceId = 3000;// 断点实例id
 
+        this.remote = Remote.getInstance();
 
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
@@ -47,7 +50,7 @@ module.exports = class BreakpointService extends EventEmitter {
          *   href,
          *   method,
          *   gettedServerResponse: false, // 有没有发送给服务器
-         *   responsedToClient: false, // 有没有发送给浏览器
+         *   sendedToClient: false, // 有没有发送给浏览器
          *   requestContent: {},// 浏览器请求内容 （格式参见 HttpHandle._getRequestContent 函数）
          *   responseContent: {}// 服务器响应内容
          *}
@@ -110,7 +113,7 @@ module.exports = class BreakpointService extends EventEmitter {
         _.forEach(toDeleteInstance, id => {
             delete this.instances[id];
         });
-        this.emit('breakpoint-delete', userId, breakpointId);
+        this.emit('breakpoint-delete', userId, breakpointId, toDeleteInstance);
         // 保存断点
         await fileUtils.writeJsonToFile(this.breakpointSaveFile, this.breakpoints);
         // 返回删除的instance id
@@ -140,7 +143,7 @@ module.exports = class BreakpointService extends EventEmitter {
             href,
             method,
             gettedServerResponse: false, // 有没有发送给服务器
-            responsedToClient: false, // 有没有发送给浏览器
+            sendedToClient: false, // 有没有发送给浏览器
             requestContent: {},// 浏览器请求内容 （格式参见 HttpHandle._getRequestContent 函数）
             responseContent: {}// 服务器响应内容
         };
@@ -162,8 +165,22 @@ module.exports = class BreakpointService extends EventEmitter {
         instance.requestContent = requestContent;
         // 如果是请求断点，则将内容发送给界面
         if (breakpoint.requestBreak) {
-            this.emit('instance-client-request', userId, instanceId, requestContent);
+            this.emit('set-instance-request-content', userId, instanceId, requestContent);
         }
+    }
+
+    /**
+     * 将请求数据发送给服务端,获取服务器返回内容
+     */
+    async getServerResponse(instanceId){
+        let requestContent = this.getInstanceRequestContent(instanceId);
+        let responseContent = {};
+        await this.remote.cacheFromRequestContent({
+            requestContent, toClientResponse: responseContent
+        });
+        // 设置返回内容
+        this.setInstanceServerResponseContent(instanceId, responseContent);
+
     }
 
     // 设置断点的服务器返回内容
@@ -177,24 +194,18 @@ module.exports = class BreakpointService extends EventEmitter {
         instance.responseContent = responseContent;
         instance.gettedServerResponse = true;
         if (breakpoint.responseBreak) {
-            this.emit('instance-server-response', userId, instanceId, responseContent);
+            this.emit('set-instance-server-response', userId, instanceId, responseContent);
         }
     }
 
-    /**
-     * 请求结束
-     * @param instanceId
-     */
-    sendedInstanceServerResponseToClient(instanceId) {
+    sendToClient(instanceId){
         let instance = this.instances[instanceId];
+        instance.sendedToClient = true;
+        this.emit('send-instance-to-client', instanceId);
+    }
 
-        let breakpointId = instance['breakpointId'];
-        let breakpoint = this.breakpoints[breakpointId];
-
-        let userId = breakpoint.userId;
-
-        instance.responsedToClient = true;
-        this.emit('instance-end', userId, instanceId);
+    deleteInstanceSlient(instanceId){
+        delete this.instances[instanceId];
     }
 
     getInstanceRequestContent(instanceId) {
@@ -240,4 +251,4 @@ module.exports = class BreakpointService extends EventEmitter {
     getUserConnectionCount(userId) {
         return (this.userConnectionMap[userId] || []).length;
     }
-}
+};

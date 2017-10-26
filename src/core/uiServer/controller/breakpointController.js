@@ -8,23 +8,23 @@ module.exports = class BreakpointController {
 
     regist(router) {
         // 将请求发送给服务器 获取响应内容
-        router.get('/breakpoint/getResponseContent', async (ctx, next) => {
+        router.get('/breakpoint/setRequestContent', async (ctx, next) => {
             let userId = ctx.userId;
             let instanceId = ctx.query.instanceId;
             let requestContent = ctx.body;
             await this.breakpointService.setInstanceRequestContent(instanceId, requestContent);
-            await this.breakpoint.getServerResponse(instanceId);
+            await this.breakpointService.getServerResponse(instanceId);
             this.body = {
                 code: 0
             };
         });
         // 将请求发送给浏览器
-        router.get('/breakpoint/instanceSendToClient', async (ctx, next) => {
+        router.get('/breakpoint/setResponseContent', async (ctx, next) => {
             let userId = ctx.userId;
             let instanceId = ctx.query.instanceId;
             let responseContent = ctx.body;
             await this.breakpointService.setInstanceServerResponseContent(instanceId, responseContent);
-            await this.breakpoint.sendToClient(instanceId);
+            await this.breakpointService.sendToClient(instanceId);
             this.body = '';
         });
         // 保存断点
@@ -47,8 +47,7 @@ module.exports = class BreakpointController {
         router.get('/breakpoint/delete', async (ctx, next) => {
             let userId = ctx.userId;
             let breakpointId = ctx.query.breakpointId;
-            let deletedInstanceIds = await this.breakpointService.deleteBreakpoint(userId, breakpointId);
-            await this.breakpoint.endRequest(deletedInstanceIds);
+            await this.breakpointService.deleteBreakpoint(userId, breakpointId);
             this.body = {
                 code: 0
             };

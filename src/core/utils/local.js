@@ -2,7 +2,7 @@
 
 const mime = require( "mime");
 const fs = require( "fs");
-const sendErrorToClient = require( "../sendToClient/error");
+const sendErrorToClient = require( "../proxy/sendToClient/error");
 
 let local;
 module.exports =  class Local {
