@@ -9,7 +9,7 @@ module.exports = class FilterService extends EventEmitter {
         this.userService = userService;
     }
 
-    start(){
+    start() {
 
     }
 
@@ -23,7 +23,7 @@ module.exports = class FilterService extends EventEmitter {
     }
 
     async getFilterRuleList(userId) {
-        return this.filters[userId];
+        return this.filters[userId] || [];
     }
 
     save(userId, filters) {

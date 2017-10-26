@@ -87,11 +87,16 @@ module.exports = class UiServer {
             client.join(userId, err => {
             });
             // 推送最新数据
-            client.emit('conf', await this.confService.getConf(userId));
-            client.emit('hostfilelist', await this.hostService.getHostFileList(userId));
-            client.emit('rulefilelist', await this.ruleService.getRuleFileList(userId));
-            client.emit('datalist', await this.mockDataService.getMockDataList(userId));
-            client.emit('filters', await this.filterService.getFilterRuleList(userId));
+            let config = await this.confService.getConf(userId);
+            client.emit('conf', config);
+            let hostFileList = await this.hostService.getHostFileList(userId);
+            client.emit('hostfilelist', hostFileList);
+            let ruleFileList = await this.ruleService.getRuleFileList(userId);
+            client.emit('rulefilelist', ruleFileList);
+            let dataList = await this.mockDataService.getMockDataList(userId);
+            client.emit('datalist', dataList);
+            let filters = await this.filterService.getFilterRuleList(userId);
+            client.emit('filters', filters);
         });
 
         this.confService.on("data-change", (userId, conf) => {
@@ -122,13 +127,15 @@ module.exports = class UiServer {
             });
             // 将websocket的id返回给浏览器
             let connectionId = await this.wsMockService.newConnectionId(userId);
-
+            // 向客户端 发送 连接id
             debugClient.emit('connection-id', connectionId);
+            // 向客户端发送当前所有的session
+            debugClient.emit('sessions', await this.wsMockService.getSessions(userId));
+
             // 用户关闭ws界面
             debugClient.on('disconnect', _ => {
                 this.wsMockService.connectionClosed(userId, connectionId);
             });
-            debugClient.emit('sessions', await this.wsMockService.getSessions(userId));
         });
 
         this.wsMockService.on("page-connected", (userId, sessionId) => {
@@ -160,8 +167,8 @@ module.exports = class UiServer {
             });
 
             let connectionId = this.breakpointService.newConnectionId(userId);
-
             client.emit('connection-id', connectionId);
+
             // 用户关闭断点界面  关闭该链接相关的所有断点
             client.on('disconnect', _ => {
                 this.breakpointService.connectionClosed(userId, connectionId);
