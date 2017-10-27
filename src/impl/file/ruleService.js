@@ -27,23 +27,28 @@ module.exports = class RuleService {
     getRuleFileList(userId) {
 
     }
+
     // 删除规则文件
     deleteRuleFile(userId, name) {
 
     }
+
     // 设置规则文件的使用状态
     setRuleFileCheckStatus(userId, name, checked) {
 
     }
+
     // 获取规则文件的内容
     getRuleFile(userId, name) {
 
     }
+
     // 保存规则文件
     saveRuleFile(userId, name, content) {
 
     }
-    //
+
+    // 
     getRemoteRuleFile(userId, url) {
 
     }

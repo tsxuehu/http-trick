@@ -12,4 +12,4 @@ module.exports = class UserService {
     getClientIpMappedUserId(clientIp) {
         return 'root';
     }
-}
+};
