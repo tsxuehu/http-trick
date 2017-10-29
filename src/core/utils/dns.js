@@ -18,7 +18,5 @@ module.exports = function resovleIp(host) {
                 }
             });
         }
-
     });
-
 }
