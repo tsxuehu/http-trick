@@ -8,6 +8,9 @@ module.exports = class TrafficController {
 
     regist(router) {
         // 下载gitlab 文件
+        // 导入远程文件步骤
+        // 1、client调用这个接口获取远程文件
+        // 2、client保存远程文件
         router.get('/utils/getGitlabFile', async (ctx, next) => {
             let userId = ctx.userId;
             let url = ctx.query.url;

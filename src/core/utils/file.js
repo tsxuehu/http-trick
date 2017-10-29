@@ -1,5 +1,6 @@
 const jsonfile = require("jsonfile");
 const fs = require("fs");
+const path = require("path");
 /**
  * 如果文件不存在，则返回空字符串
  * Created by tsxuehu on 8/2/17.
@@ -17,6 +18,7 @@ module.exports.readFile = function readFile(path) {
         })
     });
 }
+
 module.exports.writeFile = function writeFile(path, content) {
     return new Promise((resolve, reject) => {
         fs.writeFile(path, content, {
@@ -30,6 +32,14 @@ module.exports.writeFile = function writeFile(path, content) {
         });
     });
 }
+
+exports.deleteFile = function deleteFile(path) {
+    return new Promise((resolve, reject) => {
+        fs.unlink(path, function () {
+            resolve();
+        })
+    })
+};
 
 module.exports.removeFile = function removeFile(path) {
     return new Promise((resolve, reject) => {
@@ -67,3 +77,29 @@ module.exports.writeJsonToFile = function writeJsonToFile(path, data) {
     });
 }
 
+
+module.exports.getJsonFileNameListInDir = function getJsonFileNameListInDir(dir) {
+    return new Promise((resolve, reject) => {
+        fs.readdir(dir, function (err, files) {
+            if (err) reject(err);
+            let jsonFileNames = files.map(nameWithExtention => {
+                if (!nameWithExtention.endsWith('.json')) {
+                    return false;
+                } else {
+                    return true;
+                }
+            });
+            resolve(jsonFileNames);
+        })
+    });
+}
+
+module.exports.getJsonFileContentInDir = async function getJsonFileContentInDir(dir) {
+    let files = await getJsonFileNameListInDir(dir);
+    let contentMap = {};
+    for (let file of files) {
+        let content = await readJsonFromFile(path.join(dir, file));
+        contentMap[file] = content;
+    }
+    return contentMap;
+}
