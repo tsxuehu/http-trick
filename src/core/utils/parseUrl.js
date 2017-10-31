@@ -19,17 +19,32 @@ const url = require('url');
 const log = require('./log');
 module.exports =  function parseUrl(req) {
     var host = req.headers.host;
-    var protocol = (!!req.connection.encrypted && !/^http:/.test(req.url)) ? "https" : "http";
-    // http代理协议里 path部分会包含全路径 （如 GET http://www.baidu.com/ HTTP/1.0）
-    // https协议必定是443端口，http协议的端口在req.url中（GET http://www.baidu.com/status?name=ryan HTTP/1.1\r\n）
-    var fullUrl = protocol === "http" ? req.url : (protocol + '://' + host + req.url);
-    var urlObj = url.parse(fullUrl);
-    urlObj.port = urlObj.port || (protocol == 'https'? 443 : 80);
+    var protocol = '';
+    if (!req.connection.encrypted) {
+        // http的代理协议 代理访问https请求 (小程序开发工具使用了这种方法代理https协议)
+        if (/^https:/.test(req.url)) {
+            protocol = "https";
+        } else {
+            protocol = "http";
+        }
+    } else {
+        // 正常的https请求 url里只能读取到 path部分，http代理协议里才能读到完成的url
+        if (!/^http:/.test(req.url)) {
+            protocol = "https";
+        } else {
+            protocol = "http";
+        }
+    }
+    var fullUrl = "";
+    // http代理协议 代理http请求，  http协议代理https请求
+    if (protocol == 'http' || /^https:/.test(req.url)){
+        fullUrl = req.url;
+    } else {
+        fullUrl = protocol + '://' + host + req.url;
+    }
 
-    // if (fullUrl.indexOf(' ') > -1 || urlObj.hostname.indexOf(' ') > -1) {
-    //     log.error('http request: url - ' + fullUrl);
-    //     log.error(req);
-    // }
+    var urlObj = url.parse(fullUrl);
+    urlObj.port = urlObj.port || (protocol == 'https' ? 443 : 80);
 
     return urlObj;
 }

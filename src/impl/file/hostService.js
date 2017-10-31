@@ -12,7 +12,7 @@ module.exports = class HostService extends EventEmitter {
         this.userHostFileList = {};
         // 缓存
         // userId, {globHostMap, hostMap}
-        this.inUsingHostsMap = {};
+        this._inUsingHostsMapCache = {};
         this.userService = userService;
     }
 
@@ -33,7 +33,7 @@ module.exports = class HostService extends EventEmitter {
     }
 
     getInUsingHosts(userId) {
-        let hosts = this.inUsingHostsMap[userId];
+        let hosts = this._inUsingHostsMapCache[userId];
         if (!hosts) {
             // 读文件加载host
             let hostMap = {};
@@ -53,7 +53,7 @@ module.exports = class HostService extends EventEmitter {
             hosts = {
                 hostMap, globHostMap
             };
-            this.inUsingHostsMap[userId] = hosts;
+            this._inUsingHostsMapCache[userId] = hosts;
         }
         return hosts;
     }
@@ -104,7 +104,7 @@ module.exports = class HostService extends EventEmitter {
     deleteHostFile(userId, name) {
         delete this.userHostFilesMap[userId][name];
         delete this.userHostFileList[userId];
-        delete this.inUsingHostsMap[userId];
+        delete this._inUsingHostsMapCache[userId];
         this.emit("data-change", userId, this.getHostFileList(userId));
         this.emit("host-deleted", userId, name);
     }
@@ -119,7 +119,7 @@ module.exports = class HostService extends EventEmitter {
 
         });
         delete this.userHostFileList[userId];
-        delete this.inUsingHostsMap[userId];
+        delete this._inUsingHostsMapCache[userId];
         this.emit("data-change", userId, this.getHostFileList(userId));
     }
 

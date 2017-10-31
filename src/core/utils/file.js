@@ -35,14 +35,6 @@ module.exports.writeFile = function writeFile(path, content) {
 
 exports.deleteFile = function deleteFile(path) {
     return new Promise((resolve, reject) => {
-        fs.unlink(path, function () {
-            resolve();
-        })
-    })
-};
-
-module.exports.removeFile = function removeFile(path) {
-    return new Promise((resolve, reject) => {
         fs.unlink(path, (err) => {
             if (!err) {
                 resolve(true);
@@ -51,7 +43,7 @@ module.exports.removeFile = function removeFile(path) {
             }
         })
     });
-}
+};
 
 module.exports.readJsonFromFile = function readJsonFromFile(path) {
     return new Promise((resolve, reject) => {
