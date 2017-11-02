@@ -1,5 +1,5 @@
 const _ = require("lodash");
-const fileUtil = require("../../core/utils")
+const fileUtil = require("../../core/utils/file");
 const path = require('path');
 const EventEmitter = require("events");
 let passRule = {

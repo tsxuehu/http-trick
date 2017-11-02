@@ -6,7 +6,7 @@ const _ = require("lodash");
  * Created by tsxuehu on 8/3/17.
  */
 module.exports = class ConfigureService extends EventEmitter {
-    constructor({userService}) {
+    constructor({userService, appInfoService}) {
         super();
         this.userService = userService;
         this.defaultConf = {
@@ -16,9 +16,13 @@ module.exports = class ConfigureService extends EventEmitter {
             "enableRule": true
         };
         this.userConfMap = {};
+        this.appInfoService = appInfoService;
+        let proxyDataDir = this.appInfoService.getProxyDataDir();
+        this.configureSaveDir = path.join(proxyDataDir, "configure");
     }
 
-    start(){
+    async start() {
+        let contentMap = await fileUtil.getJsonFileContentInDir(this.ruleSaveDir);
 
     }
 
@@ -78,7 +82,7 @@ module.exports = class ConfigureService extends EventEmitter {
         return this.getConf(userId).enableRule;
     }
 
-    getProxyPort(clientIp){
+    getProxyPort(clientIp) {
         let userId = this.userService.getClientIpMappedUserId(clientIp);
         return this.getConf(userId).proxyPort;
     }

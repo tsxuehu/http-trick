@@ -1,6 +1,5 @@
 const ServiceRegistry = require("../../service");
-const sendSpecificToClient = require("../proxy/sendToClient/specific");
-const Remote = require("../proxy/content/remote");
+const sendSpecificToClient = require("../sendToClient/specific");
 const _ = require("lodash");
 /**
  * 断点处理
@@ -28,7 +27,6 @@ module.exports = class Breakpoint {
         this.breakpointService = ServiceRegistry.getBreakpointService();
         this.userService = ServiceRegistry.getUserService();
 
-        this.remote = Remote.getRemote();
         // 删除断点后，释放断点实例
         this.breakpointService.on('breakpoint-delete', (userId, breakpointId, toDeleteInstance) => {
             this.endRequest(toDeleteInstance);
@@ -57,7 +55,7 @@ module.exports = class Breakpoint {
         if (breakpoint.requestBreak) return;
 
         // 获取服务器端内容
-        let responseContent = await this.getServerResponse(breakpointId);
+        let responseContent = await this.breakpointService.getServerResponse(breakpointId);
         this.breakpointService.setInstanceServerResponseContent(instanceId, responseContent);
         // 是否有响应断点，若有则放入repository，函数返回
         if (breakpoint.responseBreak) return;

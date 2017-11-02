@@ -5,7 +5,7 @@ let connectHandle = null;
 // https ws wss 都会发送connect请求
 // 代理服务器的目的只要抓取http https请求
 // 折中方案：抓取所有的http请求、端口号为443的https请求
-export default class ConnectHandle {
+module.exports = class ConnectHandle {
     static getInstance(httpProxyPort, httpsProxyPort) {
         if (!connectHandle) {
             connectHandle = new ConnectHandle(httpProxyPort, httpsProxyPort);

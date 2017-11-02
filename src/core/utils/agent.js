@@ -1,4 +1,5 @@
-
+let http = require('http');
+let https = require('https');
 module.exports.defaultHttpAgent = new http.Agent({
     keepAlive: true,
     maxSockets: 5

@@ -1,6 +1,6 @@
 const axios = require("axios");
 const HttpProxy = require("http-proxy");
-const {defaultHttpAgent, defaultHttpsAgent} = require("agent");
+const {defaultHttpAgent, defaultHttpsAgent} = require("./agent");
 const queryString = require("query-string");
 const resovleIp = require('dns');
 /**

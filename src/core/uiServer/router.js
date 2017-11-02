@@ -9,7 +9,6 @@ module.exports = function getRouter() {
         let cookies = cookieParser.parse(ctx.request.headers.cookie);
         ctx.userId = cookies['userId'] || '0';
         await next();
-        yield next;
     });
 
     require('./controller/config-controller').regist(router);

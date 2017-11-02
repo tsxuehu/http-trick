@@ -1,8 +1,8 @@
 const getPort = require("get-port");
 const ServiceRegistry = require("./core/service/index");
-const HttpServer = require("./httpServer");
-const HttpsServer = require("./httpsServer");
-const WebUiServer = require("./webui");
+const HttpServer = require("./core/proxy/httpServer");
+const HttpsServer = require("./core/proxy/httpsServer");
+const WebUiServer = require("./core/uiServer");
 
 // 基于文件的service导入
 const FileAppInfoService = require("./impl/file/appInfoService");
@@ -24,9 +24,9 @@ module.exports = class Launcher {
      * @param serviceType 使用的服务类型
      * @param isSingle 是否是单用户模式
      */
-    constructor(port, serviceType = "file", isSingle = true) {
+    constructor(port, serviceType = "file", userMode = "single") {
         this.serviceType = serviceType;
-        this.single = isSingle;
+        this.single = userMode != "multi";
         this.port = port;
     }
 
