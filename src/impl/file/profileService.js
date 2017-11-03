@@ -28,9 +28,12 @@ module.exports = class ProfileService extends EventEmitter {
     }
 
     async start() {
-        this.userProfileMap = await fileUtil.readJsonFromFile(this.profileSaveFile);
+        let savedUserProfileMap = await fileUtil.readJsonFromFile(this.profileSaveFile);
         this.clientIpUserMap = await fileUtil.readJsonFromFile(this.clientIpUserMapSaveFile);
-        // TODO 设置默认数据
+        // 数据补全
+        _.forEach(savedUserProfileMap, (profile, userId) => {
+            this.userProfileMap[userId] = _.assign({}, defaultProfile, profile);
+        });
     }
 
     getProfile(userId) {
@@ -77,10 +80,10 @@ module.exports = class ProfileService extends EventEmitter {
      * @param userId
      * @param enable
      */
-    setEnableRule(userId, enable) {
+    async setEnableRule(userId, enable) {
         let conf = this.userProfileMap[userId];
         conf.enableRule = enable;
-        this.setProfile(userId, this.userProfileMap[userId]);
+        await this.setProfile(userId, this.userProfileMap[userId]);
     }
 
     /**
