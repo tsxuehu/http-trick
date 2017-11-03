@@ -21,7 +21,7 @@ module.exports = class HttpHandle {
     constructor() {
         this.breakpoint = Breakpoint.getBreakpoint();
         this.ruleService = ServiceRegistry.getRuleService();
-        this.configureService = ServiceRegistry.getConfigureService();
+        this.profileService = ServiceRegistry.getProfileService();
         this.appInfoService = ServiceRegistry.getAppInfoService();
         this.breakpointService = ServiceRegistry.getBreakpointService();
         this.filterService = ServiceRegistry.getFilterService();
@@ -121,7 +121,7 @@ module.exports = class HttpHandle {
         };
 
         // 转发规则处理
-        if (!this.configureService.enableRule(userId)) {// 判断转发规则有没有开启
+        if (!this.profileService.enableRule(userId)) {// 判断转发规则有没有开启
             toClientResponse.headers['fe-proxy-rule-disabled'] = "true";
         }
         // 记录请求对应的用户id

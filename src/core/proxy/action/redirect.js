@@ -22,7 +22,7 @@ module.exports = class Redirect extends Action {
     constructor() {
         super();
         this.hostRepository = ServiceRegistry.getHostService();
-        this.configureRepository = ServiceRegistry.getConfigureService();
+        this.profileService = ServiceRegistry.getProfileService();
         this.remote = Remote.getRemote();
         this.local = Local.getLocal();
     }
@@ -59,7 +59,7 @@ module.exports = class Redirect extends Action {
         //================== 转发到本地 或远程
         let {href} = urlObj;
         // 解析目标
-        let target = await this.configureRepository.calcPath(userId, href, rule.match, action.data.target);
+        let target = await this.profileService.calcPath(userId, href, rule.match, action.data.target);
         if (!target) {
             toClientResponse.sendedToClient = true;
             sendErrorToClient(req, res, 500, 'target parse error' + action.data.target);

@@ -11,9 +11,9 @@ let passRule = {
 };
 // 
 module.exports = class RuleService extends EventEmitter {
-    constructor({configureService, appInfoService}) {
+    constructor({profileService, appInfoService}) {
         super();
-        this.configureService = configureService;
+        this.profileService = profileService;
         // userId - > (filename -> rule)
         this.rules = {};
         // 缓存数据: 正在使用的规则 userId -> inUsingRuleList
@@ -135,7 +135,7 @@ module.exports = class RuleService extends EventEmitter {
      */
     getProcessRuleList(userId, method, urlObj) {
         let candidateRule = null;
-        if (this.configureService.enableRule(userId)) {
+        if (this.profileService.enableRule(userId)) {
             // 规则匹配部分
             let inusingRules = this._getInuseRules(userId);
             for (let i = 0; i < inusingRules.length; i++) {

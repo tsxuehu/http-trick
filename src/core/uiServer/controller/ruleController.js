@@ -6,7 +6,7 @@ const ServiceRegistry = require( "../../service");
 module.exports =  class RuleController {
     constructor() {
         this.ruleService = ServiceRegistry.getRuleService();
-        this.configService = ServiceRegistry.getConfigureService();
+        this.configService = ServiceRegistry.getProfileService();
     }
 
     regist(router) {

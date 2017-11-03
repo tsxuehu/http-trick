@@ -13,7 +13,7 @@ module.exports = class ServiceRegistry {
 
     }
 
-    static getConfigureService() {
+    static getProfileService() {
 
     }
 

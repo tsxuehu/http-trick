@@ -8,7 +8,7 @@ const WebUiServer = require("./core/uiServer");
 const FileAppInfoService = require("./impl/file/appInfoService");
 const FileBreakpointService = require("./impl/file/breakpointService");
 const FileCertificationService = require("./impl/file/certificationService");
-const FileConfigureService = require("./impl/file/configureService");
+const FileProfileService = require("./impl/file/profileService");
 const FileFilterService = require("./impl/file/filterService");
 const FileHostService = require("./impl/file/hostService");
 const FileHttpTrafficService = require("./impl/file/httpTrafficService");
@@ -44,7 +44,7 @@ module.exports = class Launcher {
         let appInfoService;
         let breakpointService;
         let certificationService;
-        let configureService;
+        let profileService;
         let filterService;
         let hostService;
         let httpTrafficService;
@@ -70,12 +70,12 @@ module.exports = class Launcher {
             // 复合服务
             breakpointService = new FileBreakpointService(baseService);
             certificationService = new FileCertificationService(baseService);
-            configureService = new FileConfigureService(baseService);
+            profileService = new FileProfileService(baseService);
             filterService = new FileFilterService(baseService);
             hostService = new FileHostService(baseService);
             httpTrafficService = new FileHttpTrafficService(baseService);
             mockDataService = new FileMockDataService(baseService);
-            ruleService = new FileRuleService({configureService, ...baseService});
+            ruleService = new FileRuleService({profileService, ...baseService});
             wsMockService = new FilewsMockService(baseService);
         }
 
@@ -83,7 +83,7 @@ module.exports = class Launcher {
         await appInfoService.start();
         await breakpointService.start();
         await certificationService.start();
-        await configureService.start();
+        await profileService.start();
         await filterService.start();
         await hostService.start();
         await httpTrafficService.start();
@@ -98,7 +98,7 @@ module.exports = class Launcher {
             appInfoService,
             breakpointService,
             certificationService,
-            configureService,
+            profileService,
             filterService,
             hostService,
             httpTrafficService,
@@ -112,13 +112,13 @@ module.exports = class Launcher {
 
     // 初始化服务器
     async _startServer() {
-        this.configureRepository = ServiceRegistry.getConfigureService();
+        this.profileService = ServiceRegistry.getProfileService();
         this.appInfoService = ServiceRegistry.getAppInfoService();
-        this.configureService = ServiceRegistry.getConfigureService();
+        this.profileService = ServiceRegistry.getProfileService();
 
         // 如果不存在 则从配种中取默认值
         if (!this.port) {
-            this.port = this.configureService.getProxyPort();
+            this.port = this.profileService.getProxyPort();
         }
         // 记录运行时的代理端口
         this.appInfoService.setRealProxyPort(this.port);

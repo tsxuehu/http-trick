@@ -16,7 +16,7 @@ module.exports = class UiServer {
 
         // 引用服务
         this.httpTrafficService = ServiceRegistry.getHttpTrafficService();
-        this.confService = ServiceRegistry.getConfigureService();
+        this.confService = ServiceRegistry.getProfileService();
         this.hostService = ServiceRegistry.getHostService();
         this.mockDataService = ServiceRegistry.getMockDataService();
         this.ruleService = ServiceRegistry.getRuleService();

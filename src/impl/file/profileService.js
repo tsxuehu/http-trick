@@ -1,28 +1,32 @@
 const EventEmitter = require("events");
 const _ = require("lodash");
+const fileUtil = require("../../core/utils/file");
+
+
+const defaultProfile = {
+    "projectPath": {
+        "project name": "path to your project"
+    },
+    "enableRule": true
+};
 /**
  * 代理运转需要的规则数据
  * 代理端口、超时时间、gitlab token、工程路径、是否启用转发规则
  * Created by tsxuehu on 8/3/17.
  */
-module.exports = class ConfigureService extends EventEmitter {
+module.exports = class ProfileService extends EventEmitter {
     constructor({userService, appInfoService}) {
         super();
         this.userService = userService;
-        this.defaultConf = {
-            "projectPath": {
-                "project name": "path to your project"
-            },
-            "enableRule": true
-        };
+
         this.userConfMap = {};
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
-        this.configureSaveDir = path.join(proxyDataDir, "configure");
+        this.configureSaveDir = path.join(proxyDataDir, "profile");
     }
 
     async start() {
-        let contentMap = await fileUtil.getJsonFileContentInDir(this.ruleSaveDir);
+        let profileMap = await fileUtil.getJsonFileContentInDir(this.ruleSaveDir);
 
     }
 
