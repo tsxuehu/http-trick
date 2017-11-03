@@ -1,12 +1,10 @@
 const EventEmitter = require("events");
 const _ = require("lodash");
 const fileUtil = require("../../core/utils/file");
-
+const path = require('path');
 
 const defaultProfile = {
-    "projectPath": {
-        "project name": "path to your project"
-    },
+    "projectPath": {},
     "enableRule": true
 };
 /**
@@ -19,7 +17,7 @@ module.exports = class ProfileService extends EventEmitter {
         super();
         this.userService = userService;
 
-        this.userConfMap = {};
+        this.userProfileMap = {};
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
         this.configureSaveDir = path.join(proxyDataDir, "profile");
@@ -27,15 +25,18 @@ module.exports = class ProfileService extends EventEmitter {
 
     async start() {
         let profileMap = await fileUtil.getJsonFileContentInDir(this.ruleSaveDir);
-
+        _.forEach(profileMap, (content, fileName) => {
+            let userId = path.basename(fileName, '.json');
+            this.userProfileMap[userId] = content;
+        })
     }
 
     getConf(userId) {
-        return this.userConfMap[userId];
+        return this.userProfileMap[userId];
     }
 
     setConf(userId, conf) {
-        this.userConfMap[userId] = conf;
+        this.userProfileMap[userId] = conf;
         // 发送通知
         this.emit('data-change', userId, conf)
     }
@@ -73,9 +74,9 @@ module.exports = class ProfileService extends EventEmitter {
      * @param enable
      */
     setEnableRule(userId, enable) {
-        let conf = this.userConfMap[userId];
+        let conf = this.userProfileMap[userId];
         conf.enableRule = enable;
-        this.setConf(userId, this.userConfMap[userId]);
+        this.setConf(userId, this.userProfileMap[userId]);
     }
 
     /**
