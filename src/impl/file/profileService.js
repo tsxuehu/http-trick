@@ -16,29 +16,33 @@ module.exports = class ProfileService extends EventEmitter {
     constructor({userService, appInfoService}) {
         super();
         this.userService = userService;
-
+        // userId -> profile
         this.userProfileMap = {};
+        // clientIp -> userId
+        this.clientIpUserMap = {};
+
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
-        this.configureSaveDir = path.join(proxyDataDir, "profile");
+        this.profileSaveFile = path.join(proxyDataDir, "profile.json");
+        this.clientIpUserMapSaveFile = path.join(proxyDataDir, "clientIpUserMap.json");
     }
 
     async start() {
-        let profileMap = await fileUtil.getJsonFileContentInDir(this.ruleSaveDir);
-        _.forEach(profileMap, (content, fileName) => {
-            let userId = path.basename(fileName, '.json');
-            this.userProfileMap[userId] = content;
-        })
+        this.userProfileMap = await fileUtil.readJsonFromFile(this.profileSaveFile);
+        this.clientIpUserMap = await fileUtil.readJsonFromFile(this.clientIpUserMapSaveFile);
+        // TODO 设置默认数据
     }
 
-    getConf(userId) {
+    getProfile(userId) {
         return this.userProfileMap[userId];
     }
 
-    setConf(userId, conf) {
+    async setProfile(userId, conf) {
         this.userProfileMap[userId] = conf;
         // 发送通知
-        this.emit('data-change', userId, conf)
+        this.emit('data-change-profile', userId, conf);
+        // 将数据写入文件
+        await fileUtil.writeJsonToFile(this.profileSaveFile, this.userProfileMap);
     }
 
     /**
@@ -60,7 +64,7 @@ module.exports = class ProfileService extends EventEmitter {
                     target = target.replace(reg, value);
                 });
                 let compiled = _.template(target);
-                let projectPath = this.getConf(userId).projectPath;
+                let projectPath = this.getProfile(userId).projectPath;
                 // 解析应用的变量
                 return compiled(projectPath);
             } catch (e) {
@@ -76,7 +80,7 @@ module.exports = class ProfileService extends EventEmitter {
     setEnableRule(userId, enable) {
         let conf = this.userProfileMap[userId];
         conf.enableRule = enable;
-        this.setConf(userId, this.userProfileMap[userId]);
+        this.setProfile(userId, this.userProfileMap[userId]);
     }
 
     /**
@@ -84,11 +88,43 @@ module.exports = class ProfileService extends EventEmitter {
      * @param clientIp
      */
     enableRule(userId) {
-        return this.getConf(userId).enableRule;
+        return this.getProfile(userId).enableRule;
     }
 
     getProxyPort(clientIp) {
         let userId = this.userService.getClientIpMappedUserId(clientIp);
-        return this.getConf(userId).proxyPort;
+        return this.getProfile(userId).proxyPort;
     }
-}
+
+    // 获取clientIp对应的user id
+    getClientIpMappedUserId(clientIp) {
+        return this.clientIpUserMap[clientIp] || 'root';
+    }
+
+    // 将ip绑定至用户
+    async bindClientIp(userId, clientIp) {
+        let originUserId = this.clientIpUserMap[clientIp];
+        this.clientIpUserMap[clientIp] = userId;
+
+        await fileUtil.writeJsonToFile(this.clientIpUserMapSaveFile, this.clientIpUserMap);
+
+        let clientIpList = this.getClientIpsMappedToUserId(userId);
+        this.emit('data-change-clientIpUserMap', userId, clientIpList);
+
+        if (originUserId) {
+            let originClientIpList = this.getClientIpsMappedToUserId(originUserId);
+            this.emit('data-change-clientIpUserMap', originUserId, originClientIpList);
+        }
+    }
+
+    // 获取用户绑定的clientip
+    getClientIpsMappedToUserId(userId) {
+        let ips = [];
+        _.forEach(this.clientIpUserMap, (mapedUserId, ip) => {
+            if (mapedUserId == userId) {
+                ips.push(ip);
+            }
+        });
+        return ips;
+    }
+};

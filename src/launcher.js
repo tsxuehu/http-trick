@@ -9,13 +9,13 @@ const FileAppInfoService = require("./impl/file/appInfoService");
 const FileBreakpointService = require("./impl/file/breakpointService");
 const FileCertificationService = require("./impl/file/certificationService");
 const FileProfileService = require("./impl/file/profileService");
+const FileConfigureService = require("./impl/file/configureService");
 const FileFilterService = require("./impl/file/filterService");
 const FileHostService = require("./impl/file/hostService");
 const FileHttpTrafficService = require("./impl/file/httpTrafficService");
 const FileLogService = require("./impl/file/logService");
 const FileMockDataService = require("./impl/file/mockDataService");
 const FileRuleService = require("./impl/file/ruleService");
-const FileUserService = require("./impl/file/userService");
 const FilewsMockService = require("./impl/file/wsMockService");
 
 module.exports = class Launcher {
@@ -45,13 +45,13 @@ module.exports = class Launcher {
         let breakpointService;
         let certificationService;
         let profileService;
+        let configureService;
         let filterService;
         let hostService;
         let httpTrafficService;
         let logService;
         let mockDataService;
         let ruleService;
-        let userService;
         let wsMockService;
         if (this.serviceType == "db") {
             // 基于数据库的服务
@@ -65,8 +65,8 @@ module.exports = class Launcher {
             // 基础服务
             logService = new FileLogService();
             appInfoService = new FileAppInfoService(this.single);
-            userService = new FileUserService();
-            let baseService = {logService, appInfoService, userService};
+            configureService = new FileConfigureService();
+            let baseService = {logService, appInfoService, configureService};
             // 复合服务
             breakpointService = new FileBreakpointService(baseService);
             certificationService = new FileCertificationService(baseService);
@@ -90,7 +90,6 @@ module.exports = class Launcher {
         await logService.start();
         await mockDataService.start();
         await ruleService.start();
-        await userService.start();
         await wsMockService.start();
 
         // 注册服务
@@ -99,13 +98,13 @@ module.exports = class Launcher {
             breakpointService,
             certificationService,
             profileService,
+            configureService,
             filterService,
             hostService,
             httpTrafficService,
             logService,
             mockDataService,
             ruleService,
-            userService,
             wsMockService,
         });
     }
@@ -115,10 +114,11 @@ module.exports = class Launcher {
         this.profileService = ServiceRegistry.getProfileService();
         this.appInfoService = ServiceRegistry.getAppInfoService();
         this.profileService = ServiceRegistry.getProfileService();
+        this.configureService = ServiceRegistry.getConfigureService();
 
         // 如果不存在 则从配种中取默认值
         if (!this.port) {
-            this.port = this.profileService.getProxyPort();
+            this.port = this.configureService.getProxyPort();
         }
         // 记录运行时的代理端口
         this.appInfoService.setRealProxyPort(this.port);

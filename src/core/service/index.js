@@ -4,9 +4,10 @@
  * 业务处理时需要使用服务时从ServiceRegistry取服务
  * @type {ServiceRegistry}
  */
+let registry ;
 module.exports = class ServiceRegistry {
-    static registeServices(respositories) {
-
+    static registeServices(services) {
+        registry = services;
     }
 
     static getBreakpointService() {
@@ -14,6 +15,10 @@ module.exports = class ServiceRegistry {
     }
 
     static getProfileService() {
+
+    }
+
+    static getConfigureService() {
 
     }
 

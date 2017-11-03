@@ -18,29 +18,27 @@ module.exports = class ProfileService extends EventEmitter {
         super();
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
-        this.configureSaveDir = path.join(proxyDataDir, "profile");
+        this.configureFile = path.join(proxyDataDir, "configure.json");
+        this.configure = {};
     }
 
     async start() {
-        let profileMap = await fileUtil.getJsonFileContentInDir(this.ruleSaveDir);
-        _.forEach(profileMap, (content, fileName) => {
-            let userId = path.basename(fileName, '.json');
-            this.userProfileMap[userId] = content;
-        })
+        let customConfigure = await fileUtil.readJsonFromFile(this.configureFile);
+        this.configure = _.assign({}, defaultConfigure, customConfigure);
     }
 
     getConfigure() {
-        return this.userProfileMap[userId];
+        return this.configure;
     }
 
     setConfigure(configure) {
-        this.userProfileMap[userId] = conf;
+        this.configure = configure;
+        fileUtil.writeJsonToFile(this.configureFile, this.configure);
         // 发送通知
-        this.emit('data-change', userId, conf)
+        this.emit('data-change', this.configure)
     }
 
-    getProxyPort(clientIp) {
-        let userId = this.userService.getClientIpMappedUserId(clientIp);
-        return this.getConf(userId).proxyPort;
+    getProxyPort() {
+        return this.configure.proxyPort;
     }
 }
