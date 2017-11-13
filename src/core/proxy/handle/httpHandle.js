@@ -26,7 +26,7 @@ module.exports = class HttpHandle {
         this.breakpointService = ServiceRegistry.getBreakpointService();
         this.filterService = ServiceRegistry.getFilterService();
         this.httpTrafficService = ServiceRegistry.getHttpTrafficService();
-        this.userService = ServiceRegistry.getUserService();
+        this.profileService = ServiceRegistry.getProfileService();
     }
 
     /**
@@ -38,7 +38,7 @@ module.exports = class HttpHandle {
         let urlObj = parseUrl(req);
 
         let clientIp = getClientIp(req);
-        let userId = this.userService.getClientIpMappedUserId(clientIp);
+        let userId = this.profileService.getClientIpMappedUserId(clientIp);
 
 
         // 如果是 ui server请求，则直接转发不做记录

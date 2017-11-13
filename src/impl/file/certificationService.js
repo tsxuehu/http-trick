@@ -19,7 +19,7 @@ module.exports = class CertificationService {
                 serviceKey: root.key,
                 serviceCertificate: root.cert,
                 commonName: host,
-                clientKey: clientKey,// 可忽略
+               // clientKey: clientKey,// 可忽略
                 altNames: [host],
                 days: 365 * 10
             }, function (err, result) {
@@ -54,7 +54,7 @@ module.exports = class CertificationService {
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
         // 监控数据缓存目录
-        this.certTempDir = path.join(proxyDataDir, "cert");
+        this.certTempDir = path.join(proxyDataDir, "certificate");
         // 根证书
 
         // 缓存
@@ -109,26 +109,28 @@ module.exports = class CertificationService {
 
         let certKey = domain + '.crt';
         let keykey = domain + '.key';
+
         let cacheHit = true; // 是否命中缓存标识
 
         // 从缓存里取数据
         let cert = this.cache.get(certKey);
         let key = this.cache.get(keykey);
-
-        // 从存放证书的临时文件夹里取数据
-        if (!cert || !key) {
-            cert = await fileUtils.readFile(certKey);
-            key = await fileUtils.readFile(keykey);
-            cacheHit = false;
-        }
-
-        // 调用openssl生成证书，并保存到临时文件夹里
-        if (!cert || !key) {
-            ({key, cert} = await CertificationRepository.createCertificate(domain, this.root));
-            // 保存到文件
-            await fileUtils.writeFile(keykey, key);
-            await fileUtils.writeFile(certKey, cert);
-            cacheHit = false;
+        try {
+            // 从存放证书的临时文件夹里取数据
+            if (!cert || !key) {
+                cert = await fileUtils.readFile(path.join(this.certTempDir, certKey));
+                key = await fileUtils.readFile(path.join(this.certTempDir, keykey));
+                cacheHit = false;
+            }
+        } catch (e) {
+            // 调用openssl生成证书，并保存到临时文件夹里
+            if (!cert || !key) {
+                ({key, cert} = await CertificationService.createCertificate(domain, this.root));
+                // 保存到文件
+                await fileUtils.writeFile(path.join(this.certTempDir, keykey), key);
+                await fileUtils.writeFile(path.join(this.certTempDir, certKey), cert);
+                cacheHit = false;
+            }
         }
         if (!cacheHit) {
             // 放到缓存

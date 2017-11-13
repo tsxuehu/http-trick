@@ -1,5 +1,12 @@
 const Router = require("koa-router");
 const cookieParser = require("cookie");
+let BreakpointController= require('./controller/breakpointController');
+let ConfigController= require('./controller/configController');
+let HostController= require('./controller/hostController');
+let HttpTrafficController= require('./controller/httpTrafficController');
+let FilterController= require('./controller/filterController');
+let MockDataController= require('./controller/mockDataController');
+let RuleController = require('./controller/ruleController');
 
 module.exports = function getRouter() {
     let router = new Router();
@@ -10,12 +17,12 @@ module.exports = function getRouter() {
         ctx.userId = cookies['userId'] || '0';
         await next();
     });
-
-    require('./controller/config-controller').regist(router);
-    require('./controller/data-controller').regist(router);
-    require('./controller/host-controller').regist(router);
-    require('./controller/rule-controller').regist(router);
-
-
+    BreakpointController.getInstance().regist(router);
+    ConfigController.getInstance().regist(router);
+    HostController.getInstance().regist(router);
+    HttpTrafficController.getInstance().regist(router);
+    FilterController.getInstance().regist(router);
+    MockDataController.getInstance().regist(router);
+    RuleController.getInstance().regist(router);
     return router.routes();
-}
+};

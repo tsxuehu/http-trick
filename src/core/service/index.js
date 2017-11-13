@@ -11,54 +11,50 @@ module.exports = class ServiceRegistry {
     }
 
     static getBreakpointService() {
-
+        return registry.breakpointService;
     }
 
     static getProfileService() {
-
+        return registry.profileService;
     }
 
     static getConfigureService() {
-
+        return registry.configureService;
     }
 
     static getHostService() {
-
+        return registry.hostService;
     }
 
     static getHttpTrafficService() {
-
+        return registry.httpTrafficService;
     }
 
     static getMockDataService() {
-
+        return registry.mockDataService;
     }
 
     static getRuleService() {
-
+        return registry.ruleService;
     }
 
     static getFilterService() {
-
-    }
-
-    static getUserService() {
-
+        return registry.filterService;
     }
 
     static getWsMockService() {
-
+        return registry.wsMockService;
     }
 
     static getLogService() {
-
+        return registry.logService;
     }
 
     static getCertificationService() {
-
+        return registry.certificationService;
     }
 
     static getAppInfoService() {
-
+        return registry.appInfoService;
     }
 }

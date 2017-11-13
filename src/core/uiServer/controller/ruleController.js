@@ -3,7 +3,14 @@
  */
 const ServiceRegistry = require( "../../service");
 
+let instance;
 module.exports =  class RuleController {
+    static getInstance() {
+        if (!instance) {
+            instance = new RuleController();
+        }
+        return instance;
+    }
     constructor() {
         this.ruleService = ServiceRegistry.getRuleService();
         this.configService = ServiceRegistry.getProfileService();

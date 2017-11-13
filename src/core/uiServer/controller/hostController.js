@@ -1,6 +1,13 @@
 const ServiceRegistry = require( "../../service");
 
+let instance;
 module.exports = class HostController {
+    static getInstance() {
+        if (!instance) {
+            instance = new HostController();
+        }
+        return instance;
+    }
     constructor() {
 
         this.hostService = ServiceRegistry.getHostService();

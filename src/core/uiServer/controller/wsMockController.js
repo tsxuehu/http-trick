@@ -1,6 +1,13 @@
 const ServiceRegistry = require("../../service");
 
+let instance;
 module.exports = class WsMockController {
+    static getInstance() {
+        if (!instance) {
+            instance = new WsMockController();
+        }
+        return instance;
+    }
     constructor() {
         this.wsMockService = ServiceRegistry.getWsMockService();
     }

@@ -13,9 +13,8 @@ const defaultProfile = {
  * Created by tsxuehu on 8/3/17.
  */
 module.exports = class ProfileService extends EventEmitter {
-    constructor({userService, appInfoService}) {
+    constructor({ appInfoService}) {
         super();
-        this.userService = userService;
         // userId -> profile
         this.userProfileMap = {};
         // clientIp -> userId
@@ -92,11 +91,6 @@ module.exports = class ProfileService extends EventEmitter {
      */
     enableRule(userId) {
         return this.getProfile(userId).enableRule;
-    }
-
-    getProxyPort(clientIp) {
-        let userId = this.userService.getClientIpMappedUserId(clientIp);
-        return this.getProfile(userId).proxyPort;
     }
 
     // 获取clientIp对应的user id

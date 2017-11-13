@@ -65,11 +65,15 @@ module.exports = class Launcher {
             // 基础服务
             logService = new FileLogService();
             appInfoService = new FileAppInfoService(this.single);
-            configureService = new FileConfigureService();
+
+            configureService = new FileConfigureService({appInfoService});
+
             let baseService = {logService, appInfoService, configureService};
+
             // 复合服务
             breakpointService = new FileBreakpointService(baseService);
             certificationService = new FileCertificationService(baseService);
+
             profileService = new FileProfileService(baseService);
             filterService = new FileFilterService(baseService);
             hostService = new FileHostService(baseService);
@@ -77,12 +81,14 @@ module.exports = class Launcher {
             mockDataService = new FileMockDataService(baseService);
             ruleService = new FileRuleService({profileService, ...baseService});
             wsMockService = new FilewsMockService(baseService);
+
         }
 
         // 启动服务
         await appInfoService.start();
         await breakpointService.start();
         await certificationService.start();
+        await configureService.start();
         await profileService.start();
         await filterService.start();
         await hostService.start();
@@ -126,7 +132,7 @@ module.exports = class Launcher {
         let httpsPort = await getPort(40005);
 
         // 启动http转发服务器
-        await new HttpServer(port, httpsPort).start();
+        await new HttpServer(this.port, httpsPort).start();
 
         // 启动https转发服务器
         await new HttpsServer(httpsPort).start();
@@ -138,5 +144,7 @@ module.exports = class Launcher {
 
         // 启动web ui
         await new WebUiServer(webUiPort).start();
+
+        this.appInfoService.printRuntimeInfo();
     }
 }

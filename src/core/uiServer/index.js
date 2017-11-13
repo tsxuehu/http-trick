@@ -25,7 +25,7 @@ module.exports = class UiServer {
         this.breakpointService = ServiceRegistry.getBreakpointService();
 
         // 初始化koa
-        this.app = koa();
+        this.app = new koa();
         // query string
         koaQs(this.app);
         // body解析

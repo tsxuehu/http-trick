@@ -25,7 +25,6 @@ module.exports = class Breakpoint {
         this.instanceReqRes = {};
 
         this.breakpointService = ServiceRegistry.getBreakpointService();
-        this.userService = ServiceRegistry.getUserService();
 
         // 删除断点后，释放断点实例
         this.breakpointService.on('breakpoint-delete', (userId, breakpointId, toDeleteInstance) => {

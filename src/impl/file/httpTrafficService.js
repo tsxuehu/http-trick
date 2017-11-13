@@ -7,15 +7,17 @@ const rimraf = require("rimraf");
 const _ = require("lodash");
 const fileUtil = require("../../core/utils/file");
 const logCountPerUser = 500;
+const EventEmitter = require("events");
 /**
  * 缓存监控数据、发送给监控窗
  * 记录用户打开的监控窗数量
  * 每个用户最多只记录500个请求，超过500个后 不在记录
  * @type {HttpTrafficRepository}
  */
-module.exports = class HttpTrafficService {
+module.exports = class HttpTrafficService extends EventEmitter {
 
     constructor({userService, appInfoService}) {
+        super();
         this.userService = userService;
         this.appInfoService = appInfoService;
         // http请求缓存数据 userId - > [{record}，{record}，{record}]

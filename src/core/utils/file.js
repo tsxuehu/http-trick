@@ -5,7 +5,7 @@ const path = require("path");
  * 如果文件不存在，则返回空字符串
  * Created by tsxuehu on 8/2/17.
  */
-module.exports.readFile = function readFile(path) {
+function readFile(path) {
     return new Promise((resolve, reject) => {
         fs.readFile(path, {
             encoding: 'utf-8'
@@ -19,7 +19,7 @@ module.exports.readFile = function readFile(path) {
     });
 }
 
-module.exports.writeFile = function writeFile(path, content) {
+function writeFile(path, content) {
     return new Promise((resolve, reject) => {
         fs.writeFile(path, content, {
             encoding: 'utf-8'
@@ -33,7 +33,7 @@ module.exports.writeFile = function writeFile(path, content) {
     });
 }
 
-exports.deleteFile = function deleteFile(path) {
+function deleteFile(path) {
     return new Promise((resolve, reject) => {
         fs.unlink(path, (err) => {
             if (!err) {
@@ -45,7 +45,31 @@ exports.deleteFile = function deleteFile(path) {
     });
 };
 
-module.exports.readJsonFromFile = function readJsonFromFile(path) {
+function makeDir(path) {
+    return new Promise((resolve, reject) => {
+        fs.mkdir(path, (err) => {
+            if (!err) {
+                resolve(true);
+            } else {
+                reject(err);
+            }
+        })
+    });
+}
+
+function exists(path) {
+    return new Promise((resolve, reject) => {
+        fs.access(path, fs.constants.F_OK, (err) => {
+            if (err) {
+                resolve(false);
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
+
+function readJsonFromFile(path) {
     return new Promise((resolve, reject) => {
         jsonfile.readFile(path, (err, obj) => {
             if (!err) {
@@ -57,7 +81,7 @@ module.exports.readJsonFromFile = function readJsonFromFile(path) {
     });
 }
 
-module.exports.writeJsonToFile = function writeJsonToFile(path, data) {
+function writeJsonToFile(path, data) {
     return new Promise((resolve, reject) => {
         jsonfile.writeFile(path, data, {spaces: 2}, (err) => {
             if (!err) {
@@ -70,7 +94,7 @@ module.exports.writeJsonToFile = function writeJsonToFile(path, data) {
 }
 
 
-module.exports.getJsonFileNameListInDir = function getJsonFileNameListInDir(dir) {
+function getJsonFileNameListInDir(dir) {
     return new Promise((resolve, reject) => {
         fs.readdir(dir, function (err, files) {
             if (err) reject(err);
@@ -86,7 +110,7 @@ module.exports.getJsonFileNameListInDir = function getJsonFileNameListInDir(dir)
     });
 }
 
-module.exports.getJsonFileContentInDir = async function getJsonFileContentInDir(dir) {
+async function getJsonFileContentInDir(dir) {
     let files = await getJsonFileNameListInDir(dir);
     let contentMap = {};
     for (let file of files) {
@@ -95,3 +119,12 @@ module.exports.getJsonFileContentInDir = async function getJsonFileContentInDir(
     }
     return contentMap;
 }
+module.exports.readFile = readFile;
+module.exports.writeFile = writeFile;
+exports.deleteFile = deleteFile;
+exports.makeDir = makeDir;
+exports.exists = exists;
+module.exports.readJsonFromFile = readJsonFromFile;
+module.exports.writeJsonToFile = writeJsonToFile;
+module.exports.getJsonFileNameListInDir = getJsonFileNameListInDir;
+module.exports.getJsonFileContentInDir = getJsonFileContentInDir;

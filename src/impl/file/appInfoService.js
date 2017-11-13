@@ -1,6 +1,7 @@
 const path = require("path");
 const EventEmitter = require("events");
 const _ = require("lodash");
+const ip = require('ip');
 module.exports = class AppInfoService extends EventEmitter {
 
     constructor(single) {
@@ -20,8 +21,12 @@ module.exports = class AppInfoService extends EventEmitter {
         this.appDir = path.join(__dirname, "../../../")
     }
 
-    start(){
+    start() {
+        // 获取真实的ip
 
+        this.setAppInfo({
+            pcIp: ip.address()
+        })
     }
 
     getAppDir() {
@@ -105,5 +110,10 @@ module.exports = class AppInfoService extends EventEmitter {
      */
     getPcIp() {
         return this.appInfo.pcIp;
+    }
+
+    printRuntimeInfo() {
+        console.log(`Proxy Port: ${ this.appInfo.realProxyPort}`);
+        console.log(`Manager: http://${this.appInfo.pcIp}:${this.appInfo.realUiPort}`);
     }
 }

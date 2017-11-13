@@ -1,10 +1,11 @@
+const EventEmitter = require("events");
 /**
  * 记录 用户 -> 连接 -> session
  */
-module.exports = class WsMockService {
+module.exports = class WsMockService extends  EventEmitter{
 
     constructor(){
-
+        super();
     }
 
     start(){

@@ -6,7 +6,14 @@ const ServiceRegistry = require("../../service");
 /**
  * 数据文件相关api
  */
-module.exports = class DataController {
+let instance;
+module.exports = class MockDataController {
+    static getInstance() {
+        if (!instance) {
+            instance = new MockDataController();
+        }
+        return instance;
+    }
     constructor() {
         this.mockDataService = ServiceRegistry.getMockDataService();
         this.httpTrafficService = ServiceRegistry.getHttpTrafficService();

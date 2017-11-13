@@ -1,6 +1,13 @@
 const ServiceRegistry = require("../../service");
 
+let instance;
 module.exports = class TrafficController {
+    static getInstance() {
+        if (!instance) {
+            instance = new TrafficController();
+        }
+        return instance;
+    }
     constructor() {
         this.httpTrafficService = ServiceRegistry.getHttpTrafficService();
     }

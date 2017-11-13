@@ -16,13 +16,22 @@ module.exports = class ConfigController {
     }
 
     regist(router) {
-        router.post('/configure/savefile', (ctx, next) => {
+        router.post('/profile/savefile', (ctx, next) => {
             let userId = ctx.userId;
             this.confService.setConf(userId, ctx.request.body);
             ctx.body = {
                 code: 0
             };
         });
+
+        router.post('/profile/setRuleState', async (ctx, next) => {
+            let userId = ctx.userId;
+            await this.confService.setEnableRule(userId, !!ctx.query.rulestate);
+            ctx.body = {
+                code: 0
+            };
+        });
+
     }
 
 }

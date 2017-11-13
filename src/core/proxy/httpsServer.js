@@ -14,6 +14,7 @@ let createSecureContext = tls.createSecureContext || crypto.createSecureContext;
 module.exports = class HttpsServer {
     constructor(httpsPort) {
         this.httpsPort = httpsPort;
+        this.wsHandle = WsHandle.getInstance();
         this.certificationService = ServiceRegistry.getCertificationService();
     }
 
@@ -27,7 +28,7 @@ module.exports = class HttpsServer {
             cert: certification.cert
         }, HttpHandle.getInstance().handle);
 
-        this.httpsProxyServer.on('upgrade', WsHandle.getWsHandle().handle);
+        this.httpsProxyServer.on('upgrade', this.wsHandle.handle);
         this.httpsProxyServer.on('error', function (err) {
             console.log(err);
             process.exit(0);

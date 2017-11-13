@@ -2,7 +2,14 @@
  * Created by tsxuehu on 4/11/17.
  */
 const ServiceRegistry = require("../../service");
-module.exports = class ConfigController {
+let instance;
+module.exports = class FilterController {
+    static getInstance() {
+        if (!instance) {
+            instance = new FilterController();
+        }
+        return instance;
+    }
     constructor() {
         this.filterService = ServiceRegistry.getFilterService();
 
