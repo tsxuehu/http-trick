@@ -1,4 +1,5 @@
 const dns = require("dns");
+const log = require("./log");
 /**
  * node 调用getAddress会出问题
  * @param host
@@ -12,7 +13,8 @@ module.exports = function resovleIp(host) {
         } else {
             dns.lookup(host, (err, ip) => {
                 if (err) {
-                    reject(err);
+                    log.error("dns解析出错", err);
+                    resolve(host);
                 } else {
                     resolve(ip);
                 }
