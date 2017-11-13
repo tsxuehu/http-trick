@@ -24,11 +24,13 @@ module.exports = class HttpServer {
 
     start() {
         //creat proxy server
-        this.httpProxyServer = http.createServer(this.httpHandle.handle);
+        this.httpProxyServer = http.createServer();
+        // request handle
+        this.httpProxyServer.on('request', this.httpHandle.handle.bind(this.httpHandle));
         // handle CONNECT request for https over http
-        this.httpProxyServer.on('connect', this.connectHandle.handle);
+        this.httpProxyServer.on('connect', this.connectHandle.handle.bind(this.connectHandle));
         // websocket 请求处理
-        this.httpProxyServer.on('upgrade', this.wsHandle.handle);
+        this.httpProxyServer.on('upgrade', this.wsHandle.handle.bind(this.wsHandle));
         //start proxy server 捕获端口冲突
 
         this.httpProxyServer.on('error', function (err) {

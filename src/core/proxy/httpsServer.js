@@ -15,6 +15,7 @@ module.exports = class HttpsServer {
     constructor(httpsPort) {
         this.httpsPort = httpsPort;
         this.wsHandle = WsHandle.getInstance();
+        this.httpHandle = HttpHandle.getInstance();
         this.certificationService = ServiceRegistry.getCertificationService();
     }
 
@@ -23,12 +24,13 @@ module.exports = class HttpsServer {
             await this.certificationService.getCertificationForHost('internal_https_server');
 
         this.httpsProxyServer = https.createServer({
-            SNICallback: this.SNIPrepareCert,
+            SNICallback: this.SNIPrepareCert.bind(this),
             key: certification.key,
             cert: certification.cert
-        }, HttpHandle.getInstance().handle);
+        });
 
-        this.httpsProxyServer.on('upgrade', this.wsHandle.handle);
+        this.httpsProxyServer.on('request', this.httpHandle.handle.bind(this.httpHandle));
+        this.httpsProxyServer.on('upgrade', this.wsHandle.handle.bind(this.wsHandle));
         this.httpsProxyServer.on('error', function (err) {
             console.log(err);
             process.exit(0);
@@ -38,10 +40,10 @@ module.exports = class HttpsServer {
 
     SNIPrepareCert(serverName, SNICallback) {
         this.certificationService.getCertificationForHost(serverName)
-            .then(function (certificate, privateKey) {
+            .then(function ({cert, key}) {
                 let ctx = createSecureContext({
-                    key: privateKey,
-                    cert: certificate
+                    key: key,
+                    cert: cert
                 });
                 SNICallback(null, ctx);
             });

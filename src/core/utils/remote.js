@@ -2,7 +2,8 @@ const axios = require("axios");
 const HttpProxy = require("http-proxy");
 const {defaultHttpAgent, defaultHttpsAgent} = require("./agent");
 const queryString = require("query-string");
-const resovleIp = require('dns');
+const resovleIp = require("./dns");
+const log = require("./log");
 /**
  * 从远程服务器上获取响应内容
  */
@@ -112,8 +113,8 @@ module.exports = class Remote {
         //  proxyReq.on('error', proxyError);
         // 一般性异常，  req和 httpclient抛出的异常
         // 异常时 打印vm的运行状态
-        proxy.on('error', function (err, req, res, url, source) {
-            this.log.error(req.urlObj.id + ' ' + source + ' ' + req.urlObj.href + ' ' + err.code + ' ' + err.message + ' error');
+        proxy.on('error', function (err, req, res, url) {
+            log.error(err,url);
             if (res.headersSent) return;
             res.statusCode = 500;
             res.setHeader('Content-Length', 0);
@@ -125,8 +126,8 @@ module.exports = class Remote {
         //  req.on('error', proxyError);
         //  proxyReq.on('error', proxyError);
         //  特殊异常： req.socket.destroyed && err.code === 'ECONNRESET'
-        proxy.on('econnreset', function (err, req, res, url, source) {
-            this.log.error(req.urlObj.id + ' ' + source + ' ' + req.urlObj.href + ' ' + err.code + ' ' + err.message + ' econnreset');
+        proxy.on('econnreset', function (err, req, res, url) {
+            log.error(err,url);
             if (res.headersSent) return;
             res.statusCode = 500;
             res.setHeader('Content-Length', 0);

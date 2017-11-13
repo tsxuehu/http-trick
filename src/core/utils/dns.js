@@ -10,11 +10,11 @@ module.exports = function resovleIp(host) {
         if (re.test(host)) {
             resolve(host)
         } else {
-            dns.looup(host, (err, ips) => {
+            dns.lookup(host, (err, ip) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(ips[0]);
+                    resolve(ip);
                 }
             });
         }

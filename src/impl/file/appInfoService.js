@@ -14,7 +14,8 @@ module.exports = class AppInfoService extends EventEmitter {
         this.appInfo = {
             "single": single,
             "realUiPort": "",
-            "realProxyPort": "",
+            "httpProxyPort": "",
+            "httpsProxyPort":"",
             "pcIp": "",
         };
 
@@ -80,17 +81,35 @@ module.exports = class AppInfoService extends EventEmitter {
      * 真实的代理端口
      * @returns {string}
      */
-    getRealProxyPort() {
-        return this.appInfo.realProxyPort;
+    getHttpProxyPort() {
+        return this.appInfo.httpProxyPort;
     }
 
     /**
      * 设置正在运行的代理端口
      * @param proxyport
      */
-    setRealProxyPort(proxyport) {
+    setHttpProxyPort(httpProxyPort) {
         this.setAppInfo({
-            realProxyPort: proxyport
+            httpProxyPort: httpProxyPort
+        });
+    }
+
+    /**
+     * 真实的代理端口
+     * @returns {string}
+     */
+    getHttpsProxyPort() {
+        return this.appInfo.httpsProxyPort;
+    }
+
+    /**
+     * 设置正在运行的代理端口
+     * @param proxyport
+     */
+    setHttpsProxyPort(httpsProxyPort) {
+        this.setAppInfo({
+            httpsProxyPort: httpsProxyPort
         });
     }
 
@@ -113,7 +132,7 @@ module.exports = class AppInfoService extends EventEmitter {
     }
 
     printRuntimeInfo() {
-        console.log(`Proxy Port: ${ this.appInfo.realProxyPort}`);
+        console.log(`Proxy Port: ${ this.appInfo.httpProxyPort}`);
         console.log(`Manager: http://${this.appInfo.pcIp}:${this.appInfo.realUiPort}`);
     }
 }

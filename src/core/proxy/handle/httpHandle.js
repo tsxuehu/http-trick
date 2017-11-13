@@ -26,7 +26,6 @@ module.exports = class HttpHandle {
         this.breakpointService = ServiceRegistry.getBreakpointService();
         this.filterService = ServiceRegistry.getFilterService();
         this.httpTrafficService = ServiceRegistry.getHttpTrafficService();
-        this.profileService = ServiceRegistry.getProfileService();
     }
 
     /**
@@ -343,7 +342,7 @@ module.exports = class HttpHandle {
         _.forEach(processRule.actionList, action => {
             ruleActionsInfo.push({
                 action: action,
-                rule: rule
+                rule: processRule
             })
         });
         return beforeFilterActionsInfo.concat(ruleActionsInfo).concat(afterFilterActionsInfo);

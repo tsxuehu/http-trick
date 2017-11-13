@@ -117,19 +117,20 @@ module.exports = class Launcher {
 
     // 初始化服务器
     async _startServer() {
-        this.profileService = ServiceRegistry.getProfileService();
         this.appInfoService = ServiceRegistry.getAppInfoService();
-        this.profileService = ServiceRegistry.getProfileService();
         this.configureService = ServiceRegistry.getConfigureService();
+        this.profileService = ServiceRegistry.getProfileService();
 
         // 如果不存在 则从配种中取默认值
         if (!this.port) {
             this.port = this.configureService.getProxyPort();
         }
         // 记录运行时的代理端口
-        this.appInfoService.setRealProxyPort(this.port);
+        this.appInfoService.setHttpProxyPort(this.port);
 
+        // 获取https代理端口，并记录
         let httpsPort = await getPort(40005);
+        this.appInfoService.setHttpsProxyPort(httpsPort);
 
         // 启动http转发服务器
         await new HttpServer(this.port, httpsPort).start();

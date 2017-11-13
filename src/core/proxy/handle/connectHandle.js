@@ -8,6 +8,13 @@ let connectHandle = null;
 module.exports = class ConnectHandle {
     static getInstance(httpProxyPort, httpsProxyPort) {
         if (!connectHandle) {
+            let appInfoService = ServiceRegistry.getAppInfoService();
+
+            let httpProxyPort = appInfoService.getHttpProxyPort();
+            let httpsProxyPort = appInfoService.getHttpsProxyPort();
+            if (!httpsProxyPort || !httpProxyPort) {
+                throw new Error(`代理端口出错，httpProxyPort: ${httpProxyPort}, httpsProxyPort: ${httpsProxyPort}`);
+            }
             connectHandle = new ConnectHandle(httpProxyPort, httpsProxyPort);
         }
         return connectHandle;

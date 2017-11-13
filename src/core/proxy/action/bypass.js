@@ -16,7 +16,7 @@ module.exports = class Bypass extends Action {
     constructor() {
         super();
         this.hostRepository = ServiceRegistry.getHostService();
-        this.remote = Remote.getRemote();
+        this.remote = Remote.getInstance();
     }
 
     needRequestContent() {

@@ -23,8 +23,8 @@ module.exports = class Redirect extends Action {
         super();
         this.hostRepository = ServiceRegistry.getHostService();
         this.profileService = ServiceRegistry.getProfileService();
-        this.remote = Remote.getRemote();
-        this.local = Local.getLocal();
+        this.remote = Remote.getInstance();
+        this.local = Local.getInstance();
     }
 
     needRequestContent() {

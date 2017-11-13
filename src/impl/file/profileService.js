@@ -36,7 +36,7 @@ module.exports = class ProfileService extends EventEmitter {
     }
 
     getProfile(userId) {
-        return this.userProfileMap[userId];
+        return this.userProfileMap[userId] || defaultProfile;
     }
 
     async setProfile(userId, conf) {

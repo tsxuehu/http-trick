@@ -17,8 +17,7 @@ module.exports = class MockData extends Action {
 
     constructor() {
         super();
-        this.mockDataRepository = ServiceRegistry.getMockDataService();
-        this.local = Local.getLocal();
+        this.mockDataService = ServiceRegistry.getMockDataService();
     }
 
     needRequestContent() {
@@ -51,8 +50,8 @@ module.exports = class MockData extends Action {
               }) {
         // 获取数据文件id
         let dataId = action.data.dataId;
-        let content = await this.mockDataRepository.getDataContent(userId, dataId);
-        let contentType = await this.mockDataRepository.getDataFileContentType(userId, dataId);
+        let content = await this.mockDataService.getDataContent(userId, dataId);
+        let contentType = await this.mockDataService.getDataFileContentType(userId, dataId);
         toClientResponse.headers['fe-proxy-content'] = `mock data ${dataId}`;
         toClientResponse.headers['Content-Type'] = contentType;
         if (last) {
