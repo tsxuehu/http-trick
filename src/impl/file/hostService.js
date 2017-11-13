@@ -1,28 +1,37 @@
 const EventEmitter = require("events");
 const _ = require("lodash");
+const path = require("path");
+const fileUtil = require("../../core/utils/file");
 /**
  * Created by tsxuehu on 8/3/17.
  */
 module.exports = class HostService extends EventEmitter {
-    constructor({userService}) {
+    constructor({appInfoService}) {
         super();
-        // 用户 -> host列表
+        // userId -> { filename -> content}
         this.userHostFilesMap = {};
-        // 缓存
-        this.userHostFileList = {};
         // 缓存
         // userId, {globHostMap, hostMap}
         this._inUsingHostsMapCache = {};
-        this.userService = userService;
+        let proxyDataDir = appInfoService.getProxyDataDir();
+        this.hostSaveDir = path.join(proxyDataDir, "rule");
     }
 
-    start() {
-
+    async start() {
+        // 读取host配置
+        let contentMap = await fileUtil.getJsonFileContentInDir(this.hostSaveDir);
+        _.forEach(contentMap, (content, fileName) => {
+            let hostName = content.name;
+            let userId = fileName.substr(0, this._getUserIdLength(fileName, hostName));
+            this.userHostFilesMap[userId] = this.userHostFilesMap[userId] || {};
+            this.userHostFilesMap[userId][hostName] = content;
+        })
     }
 
     async resolveHost(userId, hostname) {
         if (!hostname) return hostname;
-        let inUsingHosts = await this.getInUsingHosts(userId);
+        let inUsingHosts = this.getInUsingHosts(userId);
+
         let ip = inUsingHosts.hostMap[hostname];
         if (ip) return ip;
         // 配置 *开头的host  计算属性globHostMap已经将*去除
@@ -60,20 +69,15 @@ module.exports = class HostService extends EventEmitter {
 
 
     getHostFileList(userId) {
-        let fileList = this.userHostFileList[userId];
-        if (!fileList) {
-            fileList = [];
-            _.forEach(this.userHostFilesMap[userId], (content, key) => {
-                fileList.push({
-                    name: content.name,
-                    checked: content.checked,
-                    description: content.description,
-                    meta: content.meta
-                })
-            });
-            this.userHostFileList[userId] = fileList;
-        }
-
+        let fileList = [];
+        _.forEach(this.userHostFilesMap[userId], (content, key) => {
+            fileList.push({
+                name: content.name,
+                checked: content.checked,
+                description: content.description,
+                meta: content.meta
+            })
+        });
         return fileList;
     }
 
@@ -93,8 +97,6 @@ module.exports = class HostService extends EventEmitter {
             "content": {}
         };
         this.userHostFilesMap[userId][name] = content;
-        // 删除缓存
-        delete this.userHostFileList[userId];
 
         this.emit("data-change", userId, this.getHostFileList(userId));
         this.emit("host-saved", userId, name, content);
@@ -103,8 +105,11 @@ module.exports = class HostService extends EventEmitter {
 
     deleteHostFile(userId, name) {
         delete this.userHostFilesMap[userId][name];
-        delete this.userHostFileList[userId];
         delete this._inUsingHostsMapCache[userId];
+        /**
+         * 删除文件
+         */
+
         this.emit("data-change", userId, this.getHostFileList(userId));
         this.emit("host-deleted", userId, name);
     }
@@ -118,7 +123,7 @@ module.exports = class HostService extends EventEmitter {
             }
 
         });
-        delete this.userHostFileList[userId];
+        // 保存文件
         delete this._inUsingHostsMapCache[userId];
         this.emit("data-change", userId, this.getHostFileList(userId));
     }
@@ -131,4 +136,14 @@ module.exports = class HostService extends EventEmitter {
         this.userHostFilesMap[userId][name] = content;
         this.emit("host-saved", userId, name, content);
     }
-}
+
+    _getHostFilePath(userId, ruleName) {
+        let fileName = `${userId}_${ruleName}.json`;
+        let filePath = path.join(this.ruleSaveDir, fileName);
+        return filePath;
+    }
+
+    _getUserIdLength(ruleFileName, ruleName) {
+        return ruleFileName.length - ruleName.length - 6;
+    }
+};

@@ -119,6 +119,7 @@ async function getJsonFileContentInDir(dir) {
     }
     return contentMap;
 }
+
 module.exports.readFile = readFile;
 module.exports.writeFile = writeFile;
 exports.deleteFile = deleteFile;

@@ -37,6 +37,7 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     start() {
+        // 删除缓存
 
     }
 
