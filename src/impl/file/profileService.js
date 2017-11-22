@@ -39,10 +39,10 @@ module.exports = class ProfileService extends EventEmitter {
         return this.userProfileMap[userId] || defaultProfile;
     }
 
-    async setProfile(userId, conf) {
-        this.userProfileMap[userId] = conf;
+    async setProfile(userId, profile) {
+        this.userProfileMap[userId] = profile;
         // 发送通知
-        this.emit('data-change-profile', userId, conf);
+        this.emit('data-change-profile', userId, profile);
         // 将数据写入文件
         await fileUtil.writeJsonToFile(this.profileSaveFile, this.userProfileMap);
     }

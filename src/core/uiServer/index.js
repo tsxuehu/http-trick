@@ -1,13 +1,13 @@
-const http = require( "http");
-const koa = require( "koa");
-const path = require( "path");
-const koaBody = require( "koa-body");
-const koaQs = require( "koa-qs");
-const staticServe = require( "koa-static");
-const router = require( "./router");
-const SocketIO = require( "socket.io");
-const cookieParser = require( "cookie");
-const ServiceRegistry = require( "../service");
+const http = require("http");
+const koa = require("koa");
+const path = require("path");
+const koaBody = require("koa-body");
+const koaQs = require("koa-qs");
+const staticServe = require("koa-static");
+const router = require("./router");
+const SocketIO = require("socket.io");
+const cookieParser = require("cookie");
+const ServiceRegistry = require("../service");
 
 module.exports = class UiServer {
 
@@ -16,7 +16,8 @@ module.exports = class UiServer {
 
         // 引用服务
         this.httpTrafficService = ServiceRegistry.getHttpTrafficService();
-        this.confService = ServiceRegistry.getProfileService();
+        this.configureService = ServiceRegistry.getConfigureService();
+        this.profileService = ServiceRegistry.getProfileService();
         this.hostService = ServiceRegistry.getHostService();
         this.mockDataService = ServiceRegistry.getMockDataService();
         this.ruleService = ServiceRegistry.getRuleService();
@@ -29,7 +30,7 @@ module.exports = class UiServer {
         // query string
         koaQs(this.app);
         // body解析
-        this.app.use(koaBody({multipart: true}));
+        this.app.use(koaBody({ multipart: true }));
         // 静态资源服务
         this.app.use(staticServe(path.join(__dirname, '../../../static')));
         // 路由
@@ -87,30 +88,51 @@ module.exports = class UiServer {
             client.join(userId, err => {
             });
             // 推送最新数据
-            let config = await this.confService.getConf(userId);
-            client.emit('conf', config);
+            // proxy配置
+            let config = await this.configureService.getConfigure();
+            client.emit('configure', config);
+            // 个人配置
+            let profile = await this.profileService.getProfile(userId);
+            client.emit('profile', profile);
+            let mappedClientIps = await this.profileService.getClientIpsMappedToUserId(userId);
+            client.emit('mappedClientIps', mappedClientIps);
+            // host文件列表
             let hostFileList = await this.hostService.getHostFileList(userId);
             client.emit('hostfilelist', hostFileList);
+            // 规则列表
             let ruleFileList = await this.ruleService.getRuleFileList(userId);
             client.emit('rulefilelist', ruleFileList);
+            // 数据文件列表
             let dataList = await this.mockDataService.getMockDataList(userId);
             client.emit('datalist', dataList);
+            // 过滤器
             let filters = await this.filterService.getFilterRuleList(userId);
             client.emit('filters', filters);
         });
-
-        this.confService.on("data-change", (userId, conf) => {
-            this.managerNS.to(userId).emit('conf', conf);
+        // proxy配置信息
+        this.configureService.on("data-change", (configure) => {
+            this.managerNS.to(userId).emit('configure', configure);
         });
+        // 个人配置信息
+        this.profileService.on("data-change-profile",( userId, profile)=>{
+            this.managerNS.to(userId).emit('profile', profile);
+        });
+        this.profileService.on("data-change-clientIpUserMap",( userId, clientIpList)=>{
+            this.managerNS.to(userId).emit('mappedClientIps', clientIpList);
+        });
+        // host文件变化
         this.hostService.on("data-change", (userId, hostFilelist) => {
             this.managerNS.to(userId).emit('hostfilelist', hostFilelist);
         });
+        // 规则文件列表
         this.ruleService.on("data-change", (userId, ruleFilelist) => {
             this.managerNS.to(userId).emit('rulefilelist', ruleFilelist);
         });
+        // mock文件列表
         this.mockDataService.on("data-change", (userId, dataFilelist) => {
             this.managerNS.to(userId).emit('datalist', dataFilelist);
         });
+        // 过滤器
         this.filterService.on("data-change", (userId, filters) => {
             this.managerNS.to(userId).emit('filters', filters);
         });
@@ -202,4 +224,4 @@ module.exports = class UiServer {
         let cookies = cookieParser.parse(socketIOConn.request.headers.cookie);
         return cookies['userId'] || '0';
     }
-}
+};

@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <!-- 顶部导航 -->
     <header class="head-nav">
       <el-row>
         <el-col :span="6" class="logo-container">
@@ -42,6 +43,8 @@
         </el-col>
       </el-row>
     </header>
+
+    <!-- 正文 -->
     <div class="left-fixed-right-auto">
       <div class="left" :style="{'height':win_size.height,'width':win_size.width}" id='admin-left'>
         <left-menu></left-menu>
@@ -74,7 +77,7 @@
       </div>
     </el-dialog>
 
-    <!-- 编辑 -->
+    <!-- 编辑数据文件对话框 -->
     <el-dialog title="编辑文件" ref="editDataFileDialog" :close-on-press-escape="false"
                v-model="editDataFileForm.visible">
       <span slot="title">
@@ -376,78 +379,3 @@
   }
 
 </script>
-
-<style lang="postcss">
-  .logo-container {
-    line-height: 60px;
-    text-align: left;
-    padding-left: 10px;
-  }
-
-  .head-nav {
-    width: 100%;
-    height: 60px;
-    background: #324057;
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    z-index: 999;
-    color: #FFF;
-    border-bottom: 1px solid #1F2D3D;
-  }
-
-  .left {
-    position: fixed;
-    left: 0;
-    top: 60px;
-  }
-
-  .left-fixed-right-auto {
-    padding-top: 60px;
-  }
-
-  .content {
-    /*background: #f1f2f7;*/
-    background: #FFF;
-    padding: 16px;
-  }
-
-  .right-content {
-    margin-bottom: 60px;
-    margin-left: 190px;
-    overflow: auto;
-  }
-
-  .bread {
-    height: 40px;
-    line-height: 40px;
-  }
-
-  .monitor-wrap {
-    text-align: right;
-    padding-right: 10px;
-  }
-
-  .monitor-wrap .monitor-btn {
-    margin-top: 16px;
-  }
-
-  .el-icon-check {
-    font-size: 12px;
-    color: #64ff10;
-    margin-left: 5px;
-  }
-
-  .CodeMirror {
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
-  }
-
-  .CodeMirror-fullscreen {
-    z-index: 3000 !important;
-    border-top: none;
-    border-bottom: none;
-  }
-
-
-</style>
