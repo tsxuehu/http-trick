@@ -1,7 +1,9 @@
-.logo-container {
-  line-height: 60px;
-  text-align: left;
-  padding-left: 10px;
+html, body {
+  height: 100%;
+}
+.main-wrapper {
+  height: 100%;
+  width: 100%;
 }
 
 .head-nav {
@@ -14,28 +16,31 @@
   z-index: 999;
   color: #FFF;
   border-bottom: 1px solid #1F2D3D;
-}
-
-.left {
-  position: fixed;
-  left: 0;
-  top: 60px;
+  .logo-container {
+    line-height: 60px;
+    text-align: left;
+    padding-left: 10px;
+  }
 }
 
 .left-fixed-right-auto {
   padding-top: 60px;
+  display: flex;
+  height: 100%;
+  align-items: stretch;
+  .left {
+    width: 190px;
+  }
+  .right {
+    flex-grow: 1;
+    overflow: scroll;
+  }
 }
 
-.content {
+.main-content {
   /*background: #f1f2f7;*/
   background: #FFF;
   padding: 16px;
-}
-
-.right-content {
-  margin-bottom: 60px;
-  margin-left: 190px;
-  overflow: auto;
 }
 
 .bread {

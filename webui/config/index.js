@@ -9,7 +9,7 @@ module.exports = {
     wsmock: path.resolve(__dirname, '../dist/wsmock.html'),
   // js css生成到proxy所在工程
   //  assetsRoot: path.resolve(__dirname, '../dist'),
-    assetsRoot: path.resolve(__dirname, '../../front-end-proxy/webui'),
+    assetsRoot: path.resolve(__dirname, '../../site'),
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     productionSourceMap: true,

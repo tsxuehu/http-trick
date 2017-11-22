@@ -32,7 +32,7 @@ module.exports = class UiServer {
         // body解析
         this.app.use(koaBody({ multipart: true }));
         // 静态资源服务
-        this.app.use(staticServe(path.join(__dirname, '../../../static')));
+        this.app.use(staticServe(path.join(__dirname, '../../../site')));
         // 路由
         this.app.use(router());
 

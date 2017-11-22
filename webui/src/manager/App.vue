@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="main-wrapper">
     <!-- 顶部导航 -->
     <header class="head-nav">
       <el-row>
@@ -46,11 +46,11 @@
 
     <!-- 正文 -->
     <div class="left-fixed-right-auto">
-      <div class="left" :style="{'height':win_size.height,'width':win_size.width}" id='admin-left'>
+      <div class="left">
         <left-menu></left-menu>
       </div>
-      <div class="right-content">
-        <div class="content">
+      <div class="right">
+        <div class="main-content">
           <router-view></router-view>
         </div>
       </div>
