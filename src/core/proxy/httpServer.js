@@ -7,7 +7,6 @@ const HttpHandle = require("./handle/httpHandle");
 const ConnectHandle = require("./handle/connectHandle");
 const WsHandle = require("./handle/wsHandle");
 
-
 /**
  * 1、接受浏览器发出的connect请求（ws、wss、https）
  * 2、转发http请求
@@ -26,11 +25,17 @@ module.exports = class HttpServer {
         //creat proxy server
         this.httpProxyServer = http.createServer();
         // request handle
-        this.httpProxyServer.on('request', this.httpHandle.handle.bind(this.httpHandle));
+        this.httpProxyServer.on('request', (req, res) => {
+            this.httpHandle.handle(req, res);
+        });
         // handle CONNECT request for https over http
-        this.httpProxyServer.on('connect', this.connectHandle.handle.bind(this.connectHandle));
+        this.httpProxyServer.on('connect', (req, res)=>{
+            this.connectHandle.handle(req, res);
+        });
         // websocket 请求处理
-        this.httpProxyServer.on('upgrade', this.wsHandle.handle.bind(this.wsHandle));
+        this.httpProxyServer.on('upgrade', (req, res)=>{
+            this.wsHandle.handle(req, res);
+        });
         //start proxy server 捕获端口冲突
 
         this.httpProxyServer.on('error', function (err) {
@@ -40,4 +45,4 @@ module.exports = class HttpServer {
 
         this.httpProxyServer.listen(this.httpPort, "0.0.0.0");
     }
-}
+};

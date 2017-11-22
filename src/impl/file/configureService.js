@@ -27,17 +27,20 @@ module.exports = class ConfigureService extends EventEmitter {
         this.configure = _.assign({}, defaultConfigure, customConfigure);
     }
 
+    // 获取配置
     getConfigure() {
         return this.configure;
     }
 
-    setConfigure(configure) {
+    // 设置配置，保存到文件
+    async setConfigure(configure) {
         this.configure = configure;
-        fileUtil.writeJsonToFile(this.configureFile, this.configure);
+        await fileUtil.writeJsonToFile(this.configureFile, this.configure);
         // 发送通知
-        this.emit('data-change', this.configure)
+        this.emit('data-change', this.configure);
     }
 
+    // 获取代理端口
     getProxyPort() {
         return this.configure.proxyPort;
     }

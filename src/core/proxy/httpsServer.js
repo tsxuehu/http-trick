@@ -29,8 +29,12 @@ module.exports = class HttpsServer {
             cert: certification.cert
         });
 
-        this.httpsProxyServer.on('request', this.httpHandle.handle.bind(this.httpHandle));
-        this.httpsProxyServer.on('upgrade', this.wsHandle.handle.bind(this.wsHandle));
+        this.httpsProxyServer.on('request', (req, res)=>{
+            this.httpHandle.handle(req, res);
+        });
+        this.httpsProxyServer.on('upgrade', (req, socket, head)=>{
+            this.wsHandle.handle(req, socket, head);
+        });
         this.httpsProxyServer.on('error', function (err) {
             console.log(err);
             process.exit(0);

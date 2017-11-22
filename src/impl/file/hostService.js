@@ -14,7 +14,7 @@ module.exports = class HostService extends EventEmitter {
         // userId, {globHostMap, hostMap}
         this._inUsingHostsMapCache = {};
         let proxyDataDir = appInfoService.getProxyDataDir();
-        this.hostSaveDir = path.join(proxyDataDir, "rule");
+        this.hostSaveDir = path.join(proxyDataDir, "host");
     }
 
     async start() {
@@ -41,6 +41,11 @@ module.exports = class HostService extends EventEmitter {
         return ip || hostname;
     }
 
+    /**
+     * 获取用户生效的host
+     * @param userId
+     * @returns {*}
+     */
     getInUsingHosts(userId) {
         let hosts = this._inUsingHostsMapCache[userId];
         if (!hosts) {
@@ -67,7 +72,11 @@ module.exports = class HostService extends EventEmitter {
         return hosts;
     }
 
-
+    /**
+     * 获取用户的host文件列表
+     * @param userId
+     * @returns {Array}
+     */
     getHostFileList(userId) {
         let fileList = [];
         _.forEach(this.userHostFilesMap[userId], (content, key) => {
@@ -81,6 +90,13 @@ module.exports = class HostService extends EventEmitter {
         return fileList;
     }
 
+    /**
+     * 创建host文件
+     * @param userId
+     * @param name
+     * @param description
+     * @returns {boolean}
+     */
     createHostFile(userId, name, description) {
         if (this.userHostFilesMap[userId][name]) {
             // 文件已经存在不让创建
@@ -97,6 +113,8 @@ module.exports = class HostService extends EventEmitter {
             "content": {}
         };
         this.userHostFilesMap[userId][name] = content;
+
+        let hostfileName = this._getHostFilePath(userId,name);
 
         this.emit("data-change", userId, this.getHostFileList(userId));
         this.emit("host-saved", userId, name, content);
@@ -137,13 +155,13 @@ module.exports = class HostService extends EventEmitter {
         this.emit("host-saved", userId, name, content);
     }
 
-    _getHostFilePath(userId, ruleName) {
-        let fileName = `${userId}_${ruleName}.json`;
+    _getHostFilePath(userId, hostName) {
+        let fileName = `${userId}_${hostName}.json`;
         let filePath = path.join(this.ruleSaveDir, fileName);
         return filePath;
     }
 
-    _getUserIdLength(ruleFileName, ruleName) {
-        return ruleFileName.length - ruleName.length - 6;
+    _getUserIdLength(ruleFileName, hostName) {
+        return ruleFileName.length - hostName.length - 6;
     }
 };
