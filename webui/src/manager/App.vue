@@ -146,10 +146,6 @@
         // rule文件列表
         ruleFileList: [],
         dataList: [],
-        win_size: {
-          height: '',
-          width: '190px'
-        },
         // 新增数据文件对话框使用数据
         addDataFileForm: {
           visible: false,
@@ -171,9 +167,6 @@
       }
     },
     methods: {
-      setSize() {
-        this.win_size.height = ($(window).height() - 60) + "px";
-      },
       selectHostFile(name){
         hostApi.debouncedUseFile(name, (response) => {
           var serverData = response.data;
@@ -343,11 +336,6 @@
       }
     },
     created() {
-      this.setSize();
-
-      $(window).resize(_.debounce(() => {
-        this.setSize();
-      }, 200));
       if (!window.io) return;
       var socket = io('/manager');
 
