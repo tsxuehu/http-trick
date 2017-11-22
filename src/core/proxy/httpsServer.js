@@ -28,12 +28,14 @@ module.exports = class HttpsServer {
             key: certification.key,
             cert: certification.cert
         });
+        // 事件监听函数的this指针会被改变
+        let that = this;
 
         this.httpsProxyServer.on('request', (req, res)=>{
-            this.httpHandle.handle(req, res);
+            that.httpHandle.handle(req, res);
         });
         this.httpsProxyServer.on('upgrade', (req, socket, head)=>{
-            this.wsHandle.handle(req, socket, head);
+            that.wsHandle.handle(req, socket, head);
         });
         this.httpsProxyServer.on('error', function (err) {
             console.log(err);

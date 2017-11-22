@@ -24,17 +24,19 @@ module.exports = class HttpServer {
     start() {
         //creat proxy server
         this.httpProxyServer = http.createServer();
+        // 事件监听函数的this指针会被改变
+        let that = this;
         // request handle
         this.httpProxyServer.on('request', (req, res) => {
-            this.httpHandle.handle(req, res);
+            that.httpHandle.handle(req, res);
         });
         // handle CONNECT request for https over http
         this.httpProxyServer.on('connect', (req, res)=>{
-            this.connectHandle.handle(req, res);
+            that.connectHandle.handle(req, res);
         });
         // websocket 请求处理
         this.httpProxyServer.on('upgrade', (req, res)=>{
-            this.wsHandle.handle(req, res);
+            that.wsHandle.handle(req, res);
         });
         //start proxy server 捕获端口冲突
 
