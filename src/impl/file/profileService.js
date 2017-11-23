@@ -4,8 +4,12 @@ const fileUtil = require("../../core/utils/file");
 const path = require('path');
 
 const defaultProfile = {
-    "projectPath": {},
-    "enableRule": true
+    // 工程路径配置
+    "projectPath": [],
+    // 是否禁用转发规则
+    "enableRule": true,
+    // 是否禁用host解析
+    "enableHost": true
 };
 /**
  * 代理运转需要的规则数据
@@ -82,6 +86,12 @@ module.exports = class ProfileService extends EventEmitter {
     async setEnableRule(userId, enable) {
         let conf = this.userProfileMap[userId];
         conf.enableRule = enable;
+        await this.setProfile(userId, this.userProfileMap[userId]);
+    }
+
+    async setEnableHost(userId, enable) {
+        let conf = this.userProfileMap[userId];
+        conf.enableHost = enable;
         await this.setProfile(userId, this.userProfileMap[userId]);
     }
 

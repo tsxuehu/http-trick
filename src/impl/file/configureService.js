@@ -33,11 +33,11 @@ module.exports = class ConfigureService extends EventEmitter {
     }
 
     // 设置配置，保存到文件
-    async setConfigure(configure) {
+    async setConfigure(userId, configure) {
         this.configure = configure;
         await fileUtil.writeJsonToFile(this.configureFile, this.configure);
         // 发送通知
-        this.emit('data-change', this.configure);
+        this.emit('data-change',userId, this.configure);
     }
 
     // 获取代理端口

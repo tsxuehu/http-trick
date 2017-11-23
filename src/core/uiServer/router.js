@@ -2,6 +2,7 @@ const Router = require("koa-router");
 const cookieParser = require("cookie");
 let BreakpointController= require('./controller/breakpointController');
 let ConfigController= require('./controller/configController');
+let ProfileController= require('./controller/profileController');
 let HostController= require('./controller/hostController');
 let HttpTrafficController= require('./controller/httpTrafficController');
 let FilterController= require('./controller/filterController');
@@ -14,11 +15,12 @@ module.exports = function getRouter() {
     router.use(async (ctx, next) => {
         // 取用户Id
         let cookies = cookieParser.parse(ctx.request.headers.cookie);
-        ctx.userId = cookies['userId'] || '0';
+        ctx.userId = cookies['userId'] || 'root';
         await next();
     });
     BreakpointController.getInstance().regist(router);
     ConfigController.getInstance().regist(router);
+    ProfileController.getInstance().regist(router);
     HostController.getInstance().regist(router);
     HttpTrafficController.getInstance().regist(router);
     FilterController.getInstance().regist(router);
