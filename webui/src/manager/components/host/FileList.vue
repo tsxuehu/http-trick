@@ -11,7 +11,7 @@
     <el-table border align='center' :data="$dc.hostFileList">
       <el-table-column prop="checked" label="启用" align="center" width="70">
         <template scope='scope'>
-          <input type="radio" :value="scope.row.name" v-model="selectedFileName"/>
+          <input type="radio" :value="scope.row.name" :disabled="!$dc.hostState" v-model="selectedFileName"/>
         </template>
       </el-table-column>
       <el-table-column prop="name" label="名字" align="center" width="150" :sortable="true">

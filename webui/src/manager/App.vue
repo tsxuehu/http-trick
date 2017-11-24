@@ -8,13 +8,19 @@
                 </el-col>
                 <el-col :span="15">
                     <div style="margin-top: 16px;">
-                        <el-dropdown menu-align="start" @command="selectHostFile">
+                        <el-dropdown menu-align="start" :hide-on-click="false" @command="selectHostFile">
                             <el-button type="primary" size="small">
                                 Host切换<i class="el-icon-caret-bottom el-icon--right"></i>
                             </el-button>
                             <el-dropdown-menu slot="dropdown">
+                                <!-- 关闭/开启host -->
+                                <el-dropdown-item :command="'pfstatechange'">
+                                    开启
+                                    <i class="el-icon-check" v-if="profile.enableHost"></i>
+                                </el-dropdown-item>
+                                <!-- host文件 -->
                                 <template v-for="hostfile in hostFileList">
-                                    <el-dropdown-item :command="hostfile.name">
+                                    <el-dropdown-item :command="hostfile.name" :disabled="!profile.enableHost">
                                         {{hostfile.name}}
                                         <i class="el-icon-check" v-if="hostfile.checked"></i>
                                     </el-dropdown-item>
@@ -22,20 +28,27 @@
                             </el-dropdown-menu>
                         </el-dropdown>
                         <span style="margin-left: 50px">
-              <el-dropdown :hide-on-click="false" menu-align="start" @command="selectRuleFile">
-                <el-button type="primary" size="small">
-                  Rule设置<i class="el-icon-caret-bottom el-icon--right"></i>
-                </el-button>
-                <el-dropdown-menu slot="dropdown">
-                  <template v-for="rulefile in ruleFileList">
-                    <el-dropdown-item :command="rulefile.name + '-%-' + rulefile.checked" :disabled="!ruleState">
-                      {{rulefile.name}}
-                      <i class="el-icon-check" v-if="rulefile.checked"></i>
-                    </el-dropdown-item>
-                  </template>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </span>
+                              <el-dropdown :hide-on-click="false" menu-align="start" @command="selectRuleFile">
+                                <el-button type="primary" size="small">
+                                  Rule设置<i class="el-icon-caret-bottom el-icon--right"></i>
+                                </el-button>
+                                <el-dropdown-menu slot="dropdown">
+                                    <!-- 关闭/开启rule -->
+                                    <el-dropdown-item :command="'pfstatechange'">
+                                        开启
+                                        <i class="el-icon-check" v-if="profile.enableRule"></i>
+                                    </el-dropdown-item>
+                                    <!-- rule文件 -->
+                                  <template v-for="rulefile in ruleFileList">
+                                    <el-dropdown-item :command="rulefile.name + '-%-' + rulefile.checked"
+                                                      :disabled="!profile.enableRule">
+                                      {{rulefile.name}}
+                                      <i class="el-icon-check" v-if="rulefile.checked"></i>
+                                    </el-dropdown-item>
+                                  </template>
+                                </el-dropdown-menu>
+                              </el-dropdown>
+                        </span>
                     </div>
                 </el-col>
                 <el-col :span="3" class="monitor-wrap">
@@ -109,6 +122,7 @@
     import hostApi from '../api/host';
     import ruleApi from '../api/rule';
     import confApi from '../api/conf';
+    import profileApi from '../api/profile';
     import Vue from 'vue';
     import $ from 'jquery';
     import _ from 'lodash';
@@ -164,10 +178,27 @@
         computed: {
             ruleState(){
                 return this.profile.enableRule || false;
+            },
+            hostState(){
+                return this.profile.enableHost || false;
             }
         },
         methods: {
-            selectHostFile(name){
+            async selectHostFile(command){
+                if (command == 'pfstatechange') {
+                    if (this.profile.enableHost) {
+                        await profileApi.disableHost();
+                    } else {
+                        await profileApi.enableHost();
+                    }
+                    this.$message({
+                        type: 'success',
+                        message: '设置成功!'
+                    });
+                    return;
+                }
+
+                let name = command;
                 hostApi.debouncedUseFile(name, (response) => {
                     var serverData = response.data;
                     if (serverData.code == 0) {
@@ -180,9 +211,17 @@
                     }
                 });
             },
-            selectRuleFile(cmd){
+            selectRuleFile(command){
+                if (command == 'pfstatechange') {
+                    if (this.profile.enableRule) {
+                        profileApi.disableRule();
+                    } else {
+                        profileApi.enableRule();
+                    }
+                    return;
+                }
                 // panama-false
-                var kv = cmd.split('-%-');
+                let kv = command.split('-%-');
                 ruleApi.setFileCheckStatus(kv[0], kv[1] == 'false').then((response) => {
                     var serverData = response.data;
                     if (serverData.code != 0) {
@@ -326,13 +365,6 @@
                         this.$message.error(`出错了，${serverData.msg}`);
                     }
                 });
-            },
-            setRuleState(val) {
-                if (val) {
-                    confApi.enableRule();
-                } else {
-                    confApi.disableRule();
-                }
             }
         },
         created() {

@@ -36,9 +36,9 @@ module.exports = class RuleService extends EventEmitter {
     }
 
     // 创建规则文件
-    createRuleFile(userId, name, description) {
+    async createRuleFile(userId, name, description) {
         if (this.rules[userId] && this.rules[userId][name]) {
-            throw new Error('rule file already exist');
+            return false;
         }
         let ruleFile = {
             "meta": {
@@ -47,18 +47,18 @@ module.exports = class RuleService extends EventEmitter {
                 "ETag": "",
                 "remoteETag": ""
             },
-            "checked": true,
+            "checked": false,
             "name": name,
             "description": description,
             "content": []
         };
         this.rules[userId] = this.rules[userId] || {};
         this.rules[userId][name] = ruleFile;
-        // 发送消息通知
-        this.emit('data-change', userId, this.getRuleFileList(userId));
         // 写文件
         let filePath = this._getRuleFilePath(userId, name);
-        fileUtil.writeJsonToFile(filePath, ruleFile);
+        await fileUtil.writeJsonToFile(filePath, ruleFile);
+        // 发送消息通知
+        this.emit('data-change', userId, this.getRuleFileList(userId));
     }
 
     // 返回用户的规则文件列表

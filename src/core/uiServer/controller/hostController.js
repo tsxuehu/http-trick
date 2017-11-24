@@ -47,9 +47,9 @@ module.exports = class HostController {
             };
         });
         // /host/usefile?name=${name}
-        router.get('/host/usefile', (ctx, next) => {
+        router.get('/host/usefile', async (ctx, next) => {
             let userId = ctx.userId;
-            this.hostService.setUseHost(userId, ctx.query.name);
+            await this.hostService.setUseHost(userId, ctx.query.name);
             ctx.body = {
                 code: 0
             };

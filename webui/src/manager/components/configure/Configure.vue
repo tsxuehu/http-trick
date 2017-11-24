@@ -3,7 +3,7 @@
         <div class='bread'>
             <strong>基础配置修改</strong>
         </div>
-        <el-form :model="filecontent" ref="ruleForm" label-width="250px" class="demo-ruleForm"
+        <el-form  label-width="250px" class="demo-ruleForm"
                  style="margin:20px;width:80%;min-width:800px;">
             <el-form-item label="代理端口">
                 <el-input v-model="$dc.configure.proxyPort" placeholder="proxy的代理端口"></el-input>

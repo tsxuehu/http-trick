@@ -3,7 +3,7 @@
         <div class='bread'>
             <strong>工程路径管理</strong>
         </div>
-        <el-form :model="filecontent" ref="ruleForm" label-width="100px" class="demo-ruleForm"
+        <el-form label-width="100px" class="demo-ruleForm"
                  style="margin:20px;width:80%;min-width:800px;">
             <template v-for="(obj ,index) in $dc.profile.projectPath">
                 <el-form-item :label="'工程'+(index+1)" :key="index">

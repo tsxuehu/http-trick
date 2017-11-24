@@ -6,7 +6,7 @@ const fileUtil = require("../../core/utils/file");
  * Created by tsxuehu on 8/3/17.
  */
 module.exports = class HostService extends EventEmitter {
-    constructor({appInfoService}) {
+    constructor({ appInfoService }) {
         super();
         // userId -> { filename -> content}
         this.userHostFilesMap = {};
@@ -25,7 +25,7 @@ module.exports = class HostService extends EventEmitter {
             let userId = fileName.substr(0, this._getUserIdLength(fileName, hostName));
             this.userHostFilesMap[userId] = this.userHostFilesMap[userId] || {};
             this.userHostFilesMap[userId][hostName] = content;
-        })
+        });
     }
 
     async resolveHost(userId, hostname) {
@@ -85,7 +85,7 @@ module.exports = class HostService extends EventEmitter {
                 checked: content.checked,
                 description: content.description,
                 meta: content.meta
-            })
+            });
         });
         return fileList;
     }
@@ -97,8 +97,8 @@ module.exports = class HostService extends EventEmitter {
      * @param description
      * @returns {boolean}
      */
-    createHostFile(userId, name, description) {
-        if (this.userHostFilesMap[userId][name]) {
+    async createHostFile(userId, name, description) {
+        if (this.userHostFilesMap[userId] && this.userHostFilesMap[userId][name]) {
             // 文件已经存在不让创建
             return false;
         }
@@ -112,9 +112,11 @@ module.exports = class HostService extends EventEmitter {
             "description": description,
             "content": {}
         };
+        this.userHostFilesMap[userId] = this.userHostFilesMap[userId] || {};
         this.userHostFilesMap[userId][name] = content;
 
-        let hostfileName = this._getHostFilePath(userId,name);
+        let hostfileName = this._getHostFilePath(userId, name);
+        await fileUtil.writeJsonToFile(hostfileName, content);
 
         this.emit("data-change", userId, this.getHostFileList(userId));
         this.emit("host-saved", userId, name, content);
@@ -132,16 +134,24 @@ module.exports = class HostService extends EventEmitter {
         this.emit("host-deleted", userId, name);
     }
 
-    setUseHost(userId, filename) {
+    async setUseHost(userId, filename) {
+        let toSaveFileName = [];
         _.forEach(this.userHostFilesMap[userId], (content, name) => {
-            if (content.name == filename) {
+            if (content.name == filename && content.checked != true) {
                 content.checked = true;
-            } else {
+                toSaveFileName.push(name);
+            } else if(content.name != filename && content.checked != false) {
                 content.checked = false;
+                toSaveFileName.push(name);
             }
 
         });
         // 保存文件
+        for(let name of toSaveFileName){
+            let hostfileName = this._getHostFilePath(userId, name);
+            let content = this.userHostFilesMap[userId][name];
+            await fileUtil.writeJsonToFile(hostfileName, content);
+        }
         delete this._inUsingHostsMapCache[userId];
         this.emit("data-change", userId, this.getHostFileList(userId));
     }
@@ -150,14 +160,16 @@ module.exports = class HostService extends EventEmitter {
         return this.userHostFilesMap[userId][name];
     }
 
-    saveHostFile(userId, name, content) {
+    async saveHostFile(userId, name, content) {
         this.userHostFilesMap[userId][name] = content;
+        let hostfileName = this._getHostFilePath(userId, name);
+        await fileUtil.writeJsonToFile(hostfileName, content);
         this.emit("host-saved", userId, name, content);
     }
 
     _getHostFilePath(userId, hostName) {
         let fileName = `${userId}_${hostName}.json`;
-        let filePath = path.join(this.ruleSaveDir, fileName);
+        let filePath = path.join(this.hostSaveDir, fileName);
         return filePath;
     }
 

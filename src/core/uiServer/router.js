@@ -8,6 +8,7 @@ let HttpTrafficController= require('./controller/httpTrafficController');
 let FilterController= require('./controller/filterController');
 let MockDataController= require('./controller/mockDataController');
 let RuleController = require('./controller/ruleController');
+let UtilsController = require('./controller/utilsController');
 
 module.exports = function getRouter() {
     let router = new Router();
@@ -26,5 +27,6 @@ module.exports = function getRouter() {
     FilterController.getInstance().regist(router);
     MockDataController.getInstance().regist(router);
     RuleController.getInstance().regist(router);
+    UtilsController.getInstance().regist(router);
     return router.routes();
 };

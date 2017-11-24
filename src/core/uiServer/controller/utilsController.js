@@ -9,9 +9,10 @@ module.exports = class TrafficController {
         }
         return instance;
     }
+
     constructor() {
         this.appInfoService = ServiceRegistry.getAppInfoService();
-        this.rootCertService = ServiceRegistry.getCertRepository();
+        this.rootCertService = ServiceRegistry.getCertificationService();
     }
 
     regist(router) {

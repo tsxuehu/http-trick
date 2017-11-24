@@ -12,5 +12,11 @@ export default {
     },
     enableRule(){
         return axios.post(`/profile/setRuleState?rulestate=1`);
+    },
+    disableHost(){
+        return axios.post(`/profile/setHostState`);
+    },
+    enableHost(){
+        return axios.post(`/profile/setHostState?hoststate=1`);
     }
 }
