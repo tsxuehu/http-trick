@@ -43,7 +43,9 @@ module.exports = class HttpHandle {
         // 如果是 ui server请求，则直接转发不做记录
         if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == this.appInfoService.getPcIp())
             && urlObj.port == this.appInfoService.getRealUiPort()) {
-            Action.getBypassAction().run({req, res, urlObj});
+            Action.getBypassAction().run({req, res, urlObj,toClientResponse: {
+                headers: {}
+            }});
             return;
         }
 

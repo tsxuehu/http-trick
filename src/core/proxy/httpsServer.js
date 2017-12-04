@@ -31,11 +31,17 @@ module.exports = class HttpsServer {
         // 事件监听函数的this指针会被改变
         let that = this;
 
-        this.httpsProxyServer.on('request', (req, res)=>{
-            that.httpHandle.handle(req, res);
+        this.httpsProxyServer.on('request', (req, res) => {
+            that.httpHandle.handle(req, res).catch(e => {
+                console.error(e);
+            });
+
         });
-        this.httpsProxyServer.on('upgrade', (req, socket, head)=>{
-            that.wsHandle.handle(req, socket, head);
+        this.httpsProxyServer.on('upgrade', (req, socket, head) => {
+            that.wsHandle.handle(req, socket, head).catch(e => {
+                console.error(e);
+            });
+
         });
         this.httpsProxyServer.on('error', function (err) {
             console.log(err);
@@ -46,7 +52,7 @@ module.exports = class HttpsServer {
 
     SNIPrepareCert(serverName, SNICallback) {
         this.certificationService.getCertificationForHost(serverName)
-            .then(function ({cert, key}) {
+            .then(function ({ cert, key }) {
                 let ctx = createSecureContext({
                     key: key,
                     cert: cert
@@ -54,4 +60,4 @@ module.exports = class HttpsServer {
                 SNICallback(null, ctx);
             });
     }
-}
+};

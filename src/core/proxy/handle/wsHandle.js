@@ -27,7 +27,7 @@ module.exports = class WsHandle {
     }
 
     // websocket请求转发 ws测试服务器ws://echo.websocket.org/
-    handle(req, socket, head) {
+    async handle(req, socket, head) {
         // 分配ws mock终端，没有分配到终端的和远程建立连接，分配到mock终端的和mock终端通信
         let host = req.headers.host.split(':')[0];
         let port = req.headers.host.split(':')[1];
@@ -42,7 +42,7 @@ module.exports = class WsHandle {
             this.proxy.ws(req, socket, head, {
                 target: {
                     protocol: protocal,
-                    hostname: this.hostService.resolveHost(clientIp, host),
+                    hostname: await this.hostService.resolveHost(clientIp, host),
                     port: port || (protocal == 'http' ? 80 : 443)
                 }
             });
@@ -50,16 +50,16 @@ module.exports = class WsHandle {
     }
 
     _registHandleForWSProxy(proxy) {
-        proxy.on('proxyReqWs', function (proxyReq, req, socket, options, head) {
+        proxy.on('proxyReqWs',  (proxyReq, req, socket, options, head) => {
 
         });
-        proxy.on('open', function (proxySocket) {
+        proxy.on('open',  (proxySocket) => {
 
         });
-        proxy.on('close', function (proxyRes, proxySocket, proxyHead) {
+        proxy.on('close',  (proxyRes, proxySocket, proxyHead) => {
 
         });
-        proxy.on('error', function (err, req, socket) {
+        proxy.on('error',  (err, req, socket) => {
             this.logService.error(err);
         });
     }

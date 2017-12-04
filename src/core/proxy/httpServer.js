@@ -28,15 +28,24 @@ module.exports = class HttpServer {
         let that = this;
         // request handle
         this.httpProxyServer.on('request', (req, res) => {
-            that.httpHandle.handle(req, res);
+            that.httpHandle.handle(req, res).catch(e => {
+                console.error(e);
+            });
+
         });
         // handle CONNECT request for https over http
-        this.httpProxyServer.on('connect', (req, res)=>{
-            that.connectHandle.handle(req, res);
+        this.httpProxyServer.on('connect', (req, res) => {
+            that.connectHandle.handle(req, res).catch(e => {
+                console.error(e);
+            });
+
         });
         // websocket 请求处理
-        this.httpProxyServer.on('upgrade', (req, res)=>{
-            that.wsHandle.handle(req, res);
+        this.httpProxyServer.on('upgrade', (req, res) => {
+            that.wsHandle.handle(req, res).catch(e => {
+                console.error(e);
+            });
+
         });
         //start proxy server 捕获端口冲突
 

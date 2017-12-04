@@ -163,7 +163,7 @@ module.exports = class RuleService extends EventEmitter {
         // 计算使用中的规则
         let rulesLocal = [];
         let rulesRemote = [];
-        _.forEach(ruleMap, function (file, name) {
+        _.forEach(ruleMap, function (file, filename) {
             if (!file.checked) return;
             _.forEach(file.content, function (rule) {
                 if (!rule.checked) return;
