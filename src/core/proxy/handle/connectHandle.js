@@ -26,16 +26,17 @@ module.exports = class ConnectHandle {
         this.logService = ServiceRegistry.getLogService();
     }
 
-   async handle(req, socket, head) {
+    async handle(req, socket, head) {
         let proxyHost = "127.0.0.1";
         let proxyPort;
 
         // connect请求时 如何判断连到的目标机器是不是https协议？
         // ws、wss、https协议都会发送connect请求
-        let targetPort = req.url.split(":")[1];
+        let [host, targetPort] = req.url.split(":");
         if (targetPort == 443) {
             proxyPort = this.httpsProxyPort;
         } else { // 非443则放行,连到http服务器上
+            proxyHost = host;// ws协议直接和远程服务器链接
             proxyPort = this.httpProxyPort;
         }
 
@@ -47,9 +48,9 @@ module.exports = class ConnectHandle {
             });
         });
 
-        conn.on("error",  e =>{
+        conn.on("error", e => {
             this.logService.error("err when connect to + " + proxyHost + " : " + proxyPort);
             this.logService.error(e);
         });
     }
-}
+};

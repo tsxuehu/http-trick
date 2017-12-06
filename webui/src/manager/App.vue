@@ -279,7 +279,7 @@
             },
             toggleFullScreen(){
                 if (editor.getOption("fullScreen")) {
-                    // 一处父元素上的transform属性 chroem、firefox transform元素的子元素 fixed属性会变为absolute
+                    // 移除父元素上的transform属性 chrome、firefox transform元素的子元素 fixed属性会变为absolute
                     $("#content-editor").parents(".el-dialog").css("transform", "");
                     //   document.getElementById('content-editor-container').appendChild(document.getElementById("content-editor"));
                 } else {

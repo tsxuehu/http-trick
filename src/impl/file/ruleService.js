@@ -59,6 +59,7 @@ module.exports = class RuleService extends EventEmitter {
         await fileUtil.writeJsonToFile(filePath, ruleFile);
         // 发送消息通知
         this.emit('data-change', userId, this.getRuleFileList(userId));
+        return true;
     }
 
     // 返回用户的规则文件列表
@@ -96,7 +97,8 @@ module.exports = class RuleService extends EventEmitter {
 
         let path = this._getRuleFilePath(userId, name);
         fileUtil.deleteFile(path);
-
+        // 发送消息通知
+        this.emit('data-change', userId, this.getRuleFileList(userId));
         if (rule.checked) {
             // 清空缓存
             delete this.usingRuleCache[userId];
@@ -119,11 +121,11 @@ module.exports = class RuleService extends EventEmitter {
     // 保存规则文件(可能是远程、或者本地)
     saveRuleFile(userId, name, content) {
         let userRuleMap = this.rules[userId] || {};
-        userRuleMap[name] = content;
+        userRuleMap[name].content = content;
         this.rules[userId] = userRuleMap;
         // 写文件
         let filePath = this._getRuleFilePath(userId, name);
-        fileUtil.writeJsonToFile(filePath, content);
+        fileUtil.writeJsonToFile(filePath, userRuleMap[name]);
         // 清空缓存
         delete this.usingRuleCache[userId];
     }

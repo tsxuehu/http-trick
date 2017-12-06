@@ -31,11 +31,10 @@ module.exports = class UiServer {
         koaQs(this.app);
         // body解析
         this.app.use(koaBody({ multipart: true }));
-        // 静态资源服务
-        this.app.use(staticServe(path.join(__dirname, '../../../site')));
         // 路由
         this.app.use(router());
-
+        // 静态资源服务
+        this.app.use(staticServe(path.join(__dirname, '../../../site')));
         // 创建server
         this.server = http.createServer(this.app.callback());
         // socketio
@@ -66,7 +65,7 @@ module.exports = class UiServer {
             this.httpTrafficService.incMonitor(userId);
             this.httpTrafficService.resetRequestId(userId);
 
-            client.on('disconnect', function () {
+            client.on('disconnect',  () => {
                 this.httpTrafficService.decMonitor(userId);
             });
         });

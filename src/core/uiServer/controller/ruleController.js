@@ -23,9 +23,9 @@ module.exports = class RuleController {
         //    name:name,
         //    description:description
         //}
-        router.post('/rule/create', (ctx, next) => {
+        router.post('/rule/create', async(ctx, next) => {
             let userId = ctx.userId;
-            let result = this.ruleService.createRuleFile(userId, ctx.request.body.name
+            let result = await this.ruleService.createRuleFile(userId, ctx.request.body.name
                 , ctx.request.body.description);
             ctx.body = {
                 code: result ? 0 : 1,
@@ -73,9 +73,9 @@ module.exports = class RuleController {
         });
         // 保存规则文件
         // /rule/savefile?name=${name} ,content
-        router.post('/rule/savefile', (ctx, next) => {
+        router.post('/rule/savefile', async (ctx, next) => {
             let userId = ctx.userId;
-            this.ruleService.saveRuleFile(userId, ctx.query.name, ctx.request.body);
+            await this.ruleService.saveRuleFile(userId, ctx.query.name, ctx.request.body.content);
             ctx.body = {
                 code: 0
             };
