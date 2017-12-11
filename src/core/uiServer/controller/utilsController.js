@@ -37,5 +37,27 @@ module.exports = class TrafficController {
             ctx.body = await this.rootCertService.getRootCACertPem(userId);
             ctx.response.header['Content-disposition'] = 'attachment;filename=zproxy.crt';
         });
+
+        router.get('/pac', async (ctx) => {
+            let ip = this.appInfoService.getPcIp();
+            let port = this.appInfoService.getRealUiPort();
+            var pac = "var youzanDomain = /^.*(yzcdn\.cn|youzan\.com|koudaitong\.com)$/;\n\
+                        var direct = 'DIRECT;';\n\
+                        var zProxy = 'PROXY ${ip}:${port}';\n\
+                        var except = ['img.yzcdn.cn', 'uic.youzan.com'];\n\
+                        function FindProxyForURL(url, host) {\n\
+                            if (youzanDomain.test(host)) {\n\
+                                if (except.indexOf(host) > -1 || url.indexOf('/img/') > -1 || url.indexOf('/image/') > -1) {\n\
+                                    return direct;\n\
+                                }\n\
+                                return zProxy;\n\
+                            }\n\
+                            return direct;\n\
+                       }"
+            pac = pac.replace('${ip}', ip);
+            pac = pac.replace('${port}', port);
+            ctx.body = pac;
+            ctx.set('Content-Type', 'application/x-javascript-config');
+        });
     }
 }

@@ -228,14 +228,15 @@
       '$route'(to, from) {
         this.getFile();
       },
-      filecontent: {
+      // 自动保存
+      /*filecontent: {
         handler(newVal, oldVal){
           if (oldVal.content) {
             this.saveFile(true);
           }
         },
         deep: true
-      }
+      }*/
     }
   }
 

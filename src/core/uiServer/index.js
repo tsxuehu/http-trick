@@ -220,7 +220,7 @@ module.exports = class UiServer {
 
     // 通用函数，获取socket连接中的用户id
     _getUserId(socketIOConn) {
-        let cookies = cookieParser.parse(socketIOConn.request.headers.cookie);
+        let cookies = cookieParser.parse(socketIOConn.request.headers.cookie || "");
         return cookies['userId'] || 'root';
     }
 };

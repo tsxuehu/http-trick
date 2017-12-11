@@ -15,7 +15,7 @@ module.exports = function getRouter() {
     // 注册中间件，获取用户身份
     router.use(async (ctx, next) => {
         // 取用户Id
-        let cookies = cookieParser.parse(ctx.request.headers.cookie);
+        let cookies = cookieParser.parse(ctx.request.headers.cookie || "");
         ctx.userId = cookies['userId'] || 'root';
         await next();
     });

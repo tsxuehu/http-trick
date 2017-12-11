@@ -19,26 +19,26 @@
             </div>
         </div>
         <!-- 参数设置- 返回自定义数据 el-select的一个bug，当el-select从界面中消失的时候会解绑事件。。所以用v-show -->
-        <div v-show="action.type == 'data'" class="inline-block right-panel">
+        <div v-show="action.type == 'mockData'" class="inline-block right-panel">
             <div class="action-data">
-          <span>
-            <el-select v-model="action.data.dataId"
-                       style="width: 300px" size="small" filterable placeholder="请选择要返回的数据">
-              <el-option
-                      v-for="dataentry in $dc.dataList"
-                      :label="dataentry.name" :key="dataentry.id"
-                      :value="dataentry.id">
-              </el-option>
-            </el-select>
-          </span>
-                <span v-if="datafileEntry" style="margin-left: 10px;">
-            <el-button type="text" @click="editDataFile(datafileEntry)">
-              编辑数据
-            </el-button>
-          </span>
-                <span style="margin-left: 10px;">
-            <el-button type="text" @click="addDataFile">增加自定义数据</el-button>
-          </span>
+              <span>
+                <el-select v-model="action.data.dataId"
+                           style="width: 300px" size="small" filterable placeholder="请选择要返回的数据">
+                  <el-option
+                          v-for="dataentry in $dc.dataList"
+                          :label="dataentry.name" :key="dataentry.id"
+                          :value="dataentry.id">
+                  </el-option>
+                </el-select>
+              </span>
+              <span v-if="datafileEntry" style="margin-left: 10px;">
+                <el-button type="text" @click="editDataFile(datafileEntry)">
+                  编辑数据
+                </el-button>
+              </span>
+              <span style="margin-left: 10px;">
+                <el-button type="text" @click="addDataFile">增加自定义数据</el-button>
+              </span>
             </div>
         </div>
         <!-- 设置cookie -->
@@ -52,7 +52,7 @@
         <!-- 修改返回内容 -->
         <div v-if="action.type == 'modifyResponse'" class="inline-block right-panel">
             <div class="action-data">
-                <el-select v-model="action.data.modifyResponseBody" style="width: 260px"
+                <el-select v-model="action.data.modifyResponseType" style="width: 260px"
                            size="small" placeholder="请选择修改返回body操作" :disabled="remote">
                     <el-option v-for="item in modifyResponseType" :key="item.value" :label="item.label"
                                :value="item.value">
@@ -65,30 +65,31 @@
                 </span>
             </div>
         </div>
+        <!-- 增加请求头 -->
     </div>
 </template>
 
 <script>
-    import _ from 'lodash'
+    import _ from 'lodash';
     export default {
         name: 'action-detail',
         props: ['action', 'remote'],
         data() {
             return {
                 ruleType: [
-                    {value: 'redirect', label: '转发请求'},
-                    {value: 'mockData', label: '返回自定义数据'},
-                    {value: 'addRequestCookie', label: '修改请求cookie'},
-                    {value: 'addRequestHeader', label: '增加请求头'},
-                    {value: 'modifyResponse', label: '修改响应内容'},
+                    { value: 'redirect', label: '转发请求' },
+                    { value: 'mockData', label: '返回自定义数据' },
+                    { value: 'addRequestCookie', label: '修改请求cookie' },
+                    { value: 'addRequestHeader', label: '增加请求头' },
+                    { value: 'modifyResponse', label: '修改响应内容' }
                 ],
                 modifyResponseType: [
-                    {value: 'addTimestampToJsCss', label: '将html中的js、css请求加上时间戳'},
-                    {value: 'returnDataInJsonpStyle', label: '以JSONP的方式返回数据'},
-                    {value: 'allowCros', label: '增加跨域头部'},
-                    {value: 'return404', label: '返回404'}
+                    { value: 'addTimestampToJsCss', label: '将html中的js、css请求加上时间戳' },
+                    { value: 'returnDataInJsonpStyle', label: '以JSONP的方式返回数据' },
+                    { value: 'allowCros', label: '增加跨域头部' },
+                    { value: 'return404', label: '返回404' }
                 ]
-            }
+            };
         },
         methods: {
             addDataFile(){
@@ -112,7 +113,7 @@
                 }
             }
         }
-    }
+    };
 
 </script>
 <style>

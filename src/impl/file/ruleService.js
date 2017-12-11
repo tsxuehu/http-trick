@@ -2,7 +2,27 @@ const _ = require("lodash");
 const fileUtil = require("../../core/utils/file");
 const path = require('path');
 const EventEmitter = require("events");
-let passRule = {
+const defaultRule =  {
+    "name": "js",
+    "key": "9a489eaa-ca4a-481d-b3fb-75b41dd33cc0",
+    "method": "get",
+    "match": "/v2/wsc/build/js/(.+)_.+.js$",
+    "checked": true,
+    "actionList": [ // 执行的动作列表
+        {
+            "type": "redirect", // 动作类型
+            "data": {
+                "target": "<%=wscproject%>/local/js/$1.js",
+                "dataId": "",
+                "modifyResponseBody": "",
+                "modifyResponseHeader": "",
+                "cookie": "",
+                "callbackName": ""
+            }
+        }
+    ]
+};
+const passRule = {
     "method": "",
     "match": "",
     "actionList": [{
