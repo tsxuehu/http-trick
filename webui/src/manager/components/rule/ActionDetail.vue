@@ -44,8 +44,11 @@
         <!-- 设置cookie -->
         <div v-if="action.type == 'addRequestCookie'" class="inline-block right-panel">
             <div class="action-data">
-                <el-input v-model="action.data.cookie" size="small" :disabled="remote"
-                          placeholder="填写cookie字符串(例:a=1;b=2)">
+                <el-input v-model="action.data.cookieKey" size="small" :disabled="remote"
+                          placeholder="cookie key" style="display: inline-block;width: 120px;">
+                </el-input>
+                <el-input v-model="action.data.cookieValue" size="small" :disabled="remote"
+                          placeholder="cookie value" style="display: inline-block;width: 300px;">
                 </el-input>
             </div>
         </div>
@@ -66,6 +69,16 @@
             </div>
         </div>
         <!-- 增加请求头 -->
+        <div v-if="action.type == 'addRequestHeader'" class="inline-block right-panel">
+            <div class="action-data">
+                <el-input v-model="action.data.headerKey" size="small" :disabled="remote"
+                          placeholder="header key" style="display: inline-block;width: 120px;">
+                </el-input>
+                <el-input v-model="action.data.headerValue" size="small" :disabled="remote"
+                          placeholder="header value" style="display: inline-block;width: 300px;">
+                </el-input>
+            </div>
+        </div>
     </div>
 </template>
 

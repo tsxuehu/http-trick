@@ -36,8 +36,8 @@ module.exports = class AddRequestCookie extends Action {
                   toClientResponse, //响应内容
                   last = true
               }) {
-        let cookies = cookie.parse(req.headers.cookie);
-        let tobeSet = cookie.parse(action.data.cookie);
+        let cookies = cookie.parse(req.headers.cookie || "");
+        let tobeSet = cookie.parse(action.data.cookie || "");
         let added = cookie.parse(extraRequestHeaders.Cookie);
 
         let merged = {};

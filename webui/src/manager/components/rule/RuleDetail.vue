@@ -77,9 +77,11 @@
                         target: "",// 转发目标路径
                         dataId: '', //返回数据文件的id
                         modifyResponseType: '',// 修改响应内容类型
-                        cookie: "", // 设置到请求里的cookie
                         callbackName: "", // jsonp请求参数名
-                        headers: {},
+                        cookieKey: "", // 设置到请求里的cookie key
+                        cookieValue: "", // 设置到请求里的cookie value
+                        headerKey: "",
+                        headerValue: "",
                     }
                 });
             },
