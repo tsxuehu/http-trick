@@ -119,7 +119,7 @@
         },
         computed: {
             datafileEntry(){
-                if (this.action.type == "data") {
+                if (this.action.type == "mockData") {
                     var finded = _.find(this.$dc.dataList, (entry) => {
                         return entry.id == this.action.data.dataId;
                     });

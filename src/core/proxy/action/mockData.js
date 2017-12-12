@@ -53,7 +53,7 @@ module.exports = class MockData extends Action {
               }) {
         // 获取数据文件id
         let dataId = action.data.dataId;
-        let content = await this.mockDataService.getDataContent(userId, dataId);
+        let content = await this.mockDataService.getDataFileContent(userId, dataId);
         let contentType = await this.mockDataService.getDataFileContentType(userId, dataId);
         toClientResponse.headers['fe-proxy-content'] = `mock data ${dataId}`;
         toClientResponse.headers['Content-Type'] = contentType;
