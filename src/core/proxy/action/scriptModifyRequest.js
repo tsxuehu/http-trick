@@ -22,7 +22,7 @@ module.exports = class ScriptModifyRequest extends Action {
     }
 
     willGetContent() {
-        return true;
+        return false;
     }
 
     async run({
@@ -32,15 +32,16 @@ module.exports = class ScriptModifyRequest extends Action {
                   clientIp,
                   rule, // 规则
                   action, // 规则里的一个动作
-                  requestContent, // 请求内容
+                  requestContent, // 原始内容
                   requestHeaders, // 请求头
-                  requestCookies,
+                  requestCookies, // 请求cookie
                   toClientResponse, //响应内容
                   last = true
               }) {
 
 
         // 运行用户脚本, 修改请求内容
+        // urlObj、requestHeaders、toClientResponse、requestContent中的body
 
         // 发送请求，获取内容  或者将远端内容直接返回给浏览器
     }
