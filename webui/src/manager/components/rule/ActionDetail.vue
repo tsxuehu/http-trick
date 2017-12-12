@@ -92,8 +92,8 @@
                 ruleType: [
                     { value: 'redirect', label: '转发请求' },
                     { value: 'mockData', label: '返回自定义数据' },
-                    { value: 'addRequestCookie', label: '修改请求cookie' },
-                    { value: 'addRequestHeader', label: '增加请求头' },
+                    { value: 'addRequestCookie', label: '设置请求cookie' },
+                    { value: 'addRequestHeader', label: '设置请求头' },
                     { value: 'modifyResponse', label: '修改响应内容' }
                 ],
                 modifyResponseType: [

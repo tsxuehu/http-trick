@@ -3,6 +3,7 @@ const Remote = require("../../utils/remote");
 const _ = require("lodash");
 const ServiceRegistry = require("../../service");
 const addHeaderToResponse = require("../../utils/addHeaderToResponse");
+const cookie2Str = require("../../utils/cookie2Str");
 
 let bypass;
 module.exports = class Bypass extends Action {
@@ -43,7 +44,8 @@ module.exports = class Bypass extends Action {
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容
-                  extraRequestHeaders, // 请求头
+                  requestHeaders, // 请求头
+                  requestCookies,
                   toClientResponse, //响应内容
                   last = true
               }) {
@@ -55,19 +57,19 @@ module.exports = class Bypass extends Action {
 
         toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
 
-        let headers = _.assign({}, req.headers, extraRequestHeaders);
+        requestHeaders.cookie = cookie2Str(requestCookies);
 
         if (last) {
             toClientResponse.sendedToClient = true;
             addHeaderToResponse(res, toClientResponse.headers);
             this.remote.pipe({
                 req, res,
-                protocol, hostname, path, port, headers
+                protocol, hostname, path, port, headers: requestHeaders
             });
         } else {
             this.remote.cache({
                 req, res,
-                targetUrl, headers, toClientResponse
+                targetUrl, headers: requestHeaders, toClientResponse
             });
         }
     }

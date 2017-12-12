@@ -6,6 +6,7 @@ const queryString = require("query-string");
 const getClientIp = require("../../utils/getClientIp");
 const Breakpoint = require("../breakpoint");
 const _ = require("lodash");
+const cookie = require("cookie");
 
 // request session id seed
 let httpHandle;
@@ -87,7 +88,7 @@ module.exports = class HttpHandle {
 
         let matchedRule = this.ruleService.getProcessRuleList(userId, req.method, urlObj);
 
-        this._runAtions({req, res, urlObj, clientIp, userId, rule: matchedRule});
+        await this._runAtions({req, res, urlObj, clientIp, userId, rule: matchedRule});
     }
 
     /**
@@ -112,7 +113,11 @@ module.exports = class HttpHandle {
             body: ''
         };
         // 额外发送的头部
-        let extraRequestHeaders = {};
+        let requestHeaders = {};
+        Object.assign(requestHeaders,req.headers);
+        // 额外发送的cookie
+        let requestCookies = cookie.parse(req.headers.cookie || "");
+
         // 要发送给浏览器的内容
         let toClientResponse = {
             hasContent: false,// 是否存在要发送给浏览器的内容
@@ -175,7 +180,8 @@ module.exports = class HttpHandle {
                     rule, // 规则
                     action, // 规则里的一个动作
                     requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
-                    extraRequestHeaders, // 请求头
+                    requestHeaders, // 请求头
+                    requestCookies, // cookie
                     toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
                     last: false
                 });
@@ -196,7 +202,8 @@ module.exports = class HttpHandle {
                 rule, // 规则
                 action, // 规则里的一个动作
                 requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
-                extraRequestHeaders, // 请求头
+                requestHeaders, // 请求头
+                requestCookies, // cookie
                 toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
                 last: i == (willRunActionListLength - 1)
             });

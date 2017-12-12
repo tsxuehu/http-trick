@@ -82,6 +82,8 @@
                         cookieValue: "", // 设置到请求里的cookie value
                         headerKey: "",
                         headerValue: "",
+                        modifyRequestScript: "",
+                        modifyResponseScript: ""
                     }
                 });
             },

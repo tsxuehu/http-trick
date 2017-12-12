@@ -1,11 +1,12 @@
-const Action = require( "./action");
-const _ = require( "lodash");
-const ServiceRegistry = require( "../../service");
-const sendErrorToClient = require( "../sendToClient/error");
-const Local = require( "../../utils/local");
-const url = require( "url");
-const Remote = require( "../../utils/remote");
-const addHeaderToResponse = require( "../../utils/addHeaderToResponse");
+const Action = require("./action");
+const _ = require("lodash");
+const ServiceRegistry = require("../../service");
+const sendErrorToClient = require("../sendToClient/error");
+const Local = require("../../utils/local");
+const url = require("url");
+const Remote = require("../../utils/remote");
+const addHeaderToResponse = require("../../utils/addHeaderToResponse");
+const cookie2Str = require("../../utils/cookie2Str");
 
 /**
  * 重定向 本地 或者 远程
@@ -35,7 +36,6 @@ module.exports = class Redirect extends Action {
         return false;
     }
 
-
     willGetContent() {
         return true;
     }
@@ -52,12 +52,13 @@ module.exports = class Redirect extends Action {
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容
-                  extraRequestHeaders, // 请求头
+                  requestHeaders, // 请求头
+                  requestCookies,
                   toClientResponse, //响应内容
                   last = true
               }) {
         //================== 转发到本地 或远程
-        let {href} = urlObj;
+        let { href } = urlObj;
         // 解析目标
         let target = await this.profileService.calcPath(userId, href, rule.match, action.data.target);
         if (!target) {
@@ -72,7 +73,8 @@ module.exports = class Redirect extends Action {
                 res,
                 clientIp,
                 target,
-                extraRequestHeaders,
+                requestHeaders,
+                requestCookies,
                 toClientResponse,
                 last
             });
@@ -85,15 +87,12 @@ module.exports = class Redirect extends Action {
                 rule,
                 action,
                 requestContent,
-                extraRequestHeaders,
+                requestHeaders,
                 toClientResponse,
                 last
             });
         }
-
-
     }
-
 
     async _toRemote({
                         req,
@@ -101,12 +100,13 @@ module.exports = class Redirect extends Action {
                         clientIp,
                         userId,
                         target,
-                        extraRequestHeaders, // 请求头
+                        requestHeaders, // 请求头
+                        requestCookies,
                         toClientResponse, //响应内容
                         last
                     }) {
         let redirectUrlObj = url.parse(target);
-        let {protocol, hostname, path, port} = redirectUrlObj;
+        let { protocol, hostname, path, port } = redirectUrlObj;
 
         let ipOrHost = await this.hostRepository.resolveHost(userId, hostname);
 
@@ -114,18 +114,20 @@ module.exports = class Redirect extends Action {
 
         let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
         toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
-        let headers = _.assign({}, req.headers, extraRequestHeaders);
+
+        requestHeaders.cookie = cookie2Str(requestCookies);
+
         if (last) {
             toClientResponse.sendedToClient = true;
             addHeaderToResponse(res, toClientResponse.headers);
             this.remote.pipe({
                 req, res,
-                protocol, hostname, path, port, headers
+                protocol, hostname, path, port, headers: requestHeaders
             });
         } else {
             this.remote.cache({
                 req, res,
-                targetUrl, headers, toClientResponse
+                targetUrl, headers: requestHeaders, toClientResponse
             });
         }
     }
@@ -139,7 +141,7 @@ module.exports = class Redirect extends Action {
                        rule, // 规则
                        action, // 规则里的一个动作
                        requestContent, // 请求内容
-                       extraRequestHeaders, // 请求头
+                       requestHeaders, // 请求头
                        toClientResponse, //响应内容
                        last
                    }) {
@@ -162,4 +164,4 @@ module.exports = class Redirect extends Action {
             });
         }
     }
-}
+};

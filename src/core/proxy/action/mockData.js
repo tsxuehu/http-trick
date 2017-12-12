@@ -44,7 +44,8 @@ module.exports = class MockData extends Action {
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容
-                  extraRequestHeaders, // 请求头
+                  requestHeaders, // 请求头
+                  requestCookies,
                   toClientResponse, //响应内容
                   last = true
               }) {
