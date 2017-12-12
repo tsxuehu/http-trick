@@ -37,16 +37,18 @@ module.exports = class AddRequestHeader extends Action {
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容
-                  requestHeaders, // 请求头
-                  requestCookies,
+                  additionalRequestHeaders, // 请求头
+                  actualRequestHeaders,
+                  additionalRequestCookies, // cookie
+                  actualRequestCookies,
                   toClientResponse, //响应内容
                   last = true
               }) {
         if (_.lowerCase(action.data.headerKey) == "cookie") {
             let toAddCookie = cookie.parse(action.data.headerValue || "");
-            Object.assign(requestCookies, toAddCookie);
+            Object.assign(additionalRequestCookies, toAddCookie);
         } else {
-            requestHeaders[action.data.headerKey] = action.data.headerValue;
+            additionalRequestHeaders[action.data.headerKey] = action.data.headerValue;
         }
     }
 };

@@ -34,8 +34,10 @@ module.exports = class Action {
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
-                  requestHeaders, // 请求头
-                  requestCookies,
+                  additionalRequestHeaders, // 请求头
+                  actualRequestHeaders,
+                  additionalRequestCookies, // cookie
+                  actualRequestCookies,
                   toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
                   last = true
               }) {

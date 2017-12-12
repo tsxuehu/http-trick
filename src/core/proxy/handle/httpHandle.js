@@ -47,7 +47,11 @@ module.exports = class HttpHandle {
             Action.getBypassAction().run({
                 req, res, urlObj, toClientResponse: {
                     headers: {}
-                }
+                },
+                requestContent: {},
+                additionalRequestHeaders: {},
+                actualRequestHeaders: {},
+                actualRequestCookies: {}
             });
             return;
         }
@@ -115,10 +119,11 @@ module.exports = class HttpHandle {
             body: ''
         };
         // 额外发送的头部
-        let requestHeaders = {};
-        Object.assign(requestHeaders, req.headers);
+        let additionalRequestHeaders = {};
+        let actualRequestHeaders = {};
         // 额外发送的cookie
-        let requestCookies = cookie.parse(req.headers.cookie || "");
+        let additionalRequestCookies = {};
+        let actualRequestCookies = {};
 
         // 要发送给浏览器的内容
         let toClientResponse = {
@@ -182,8 +187,8 @@ module.exports = class HttpHandle {
                     rule, // 规则
                     action, // 规则里的一个动作
                     requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
-                    requestHeaders, // 请求头
-                    requestCookies, // cookie
+                    additionalRequestHeaders, // 请求头
+                    additionalRequestCookies, // cookie
                     toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
                     last: false
                 });
@@ -204,8 +209,10 @@ module.exports = class HttpHandle {
                 rule, // 规则
                 action, // 规则里的一个动作
                 requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
-                requestHeaders, // 请求头
-                requestCookies, // cookie
+                additionalRequestHeaders, // 请求头
+                actualRequestHeaders,
+                additionalRequestCookies, // cookie
+                actualRequestCookies,
                 toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
                 last: i == (willRunActionListLength - 1)
             });
@@ -227,11 +234,11 @@ module.exports = class HttpHandle {
                     urlObj,
                     clientIp,
                     userId,
-                    rule, // 规则
-                    action, // 规则里的一个动作
                     requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
-                    requestHeaders, // 请求头
-                    requestCookies, // cookie
+                    additionalRequestHeaders, // 请求头
+                    actualRequestHeaders,
+                    additionalRequestCookies, // cookie
+                    actualRequestCookies,
                     toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
                     last: true
                 });
@@ -240,8 +247,8 @@ module.exports = class HttpHandle {
         }
 
         return {
-            requestHeaders,
-            requestCookies,
+            additionalRequestHeaders,
+            additionalRequestCookies,
             toClientResponse
         };
     }

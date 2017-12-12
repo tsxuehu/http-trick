@@ -126,10 +126,12 @@ module.exports = class RuleService extends EventEmitter {
     }
 
     // 设置规则文件的使用状态
-    setRuleFileCheckStatus(userId, name, checked) {
+   async setRuleFileCheckStatus(userId, name, checked) {
         this.rules[userId][name].checked = checked;
         let path = this._getRuleFilePath(userId, name);
-        fileUtil.writeJsonToFile(path, this.rules[userId][name]);
+        await fileUtil.writeJsonToFile(path, this.rules[userId][name]);
+        // 发送消息通知
+        this.emit('data-change', userId, this.getRuleFileList(userId));
         delete this.usingRuleCache[userId];
     }
 

@@ -52,8 +52,10 @@ module.exports = class Redirect extends Action {
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容
-                  requestHeaders, // 请求头
-                  requestCookies,
+                  additionalRequestHeaders, // 请求头
+                  actualRequestHeaders,
+                  additionalRequestCookies, // cookie
+                  actualRequestCookies,
                   toClientResponse, //响应内容
                   last = true
               }) {
@@ -73,8 +75,10 @@ module.exports = class Redirect extends Action {
                 res,
                 clientIp,
                 target,
-                requestHeaders,
-                requestCookies,
+                additionalRequestHeaders, // 请求头
+                actualRequestHeaders,
+                additionalRequestCookies, // cookie
+                actualRequestCookies,
                 toClientResponse,
                 last
             });
@@ -87,7 +91,7 @@ module.exports = class Redirect extends Action {
                 rule,
                 action,
                 requestContent,
-                requestHeaders,
+                additionalRequestHeaders,
                 toClientResponse,
                 last
             });
@@ -100,8 +104,10 @@ module.exports = class Redirect extends Action {
                         clientIp,
                         userId,
                         target,
-                        requestHeaders, // 请求头
-                        requestCookies,
+                        additionalRequestHeaders, // 请求头
+                        actualRequestHeaders,
+                        additionalRequestCookies, // cookie
+                        actualRequestCookies,
                         toClientResponse, //响应内容
                         last
                     }) {
@@ -115,19 +121,23 @@ module.exports = class Redirect extends Action {
         let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
         toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
 
-        requestHeaders.cookie = cookie2Str(requestCookies);
+        actualRequestHeaders['host'] = hostname;
+        Object.assign(actualRequestHeaders, additionalRequestHeaders);
+        Object.assign(actualRequestCookies, additionalRequestCookies);
+        actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
+
 
         if (last) {
             toClientResponse.sendedToClient = true;
             addHeaderToResponse(res, toClientResponse.headers);
             this.remote.pipe({
                 req, res,
-                protocol, hostname, path, port, headers: requestHeaders
+                protocol, hostname: ipOrHost, path, port, headers: actualRequestHeaders
             });
         } else {
             this.remote.cache({
                 req, res,
-                targetUrl, headers: requestHeaders, toClientResponse
+                targetUrl, headers: actualRequestHeaders, toClientResponse
             });
         }
     }
@@ -141,7 +151,7 @@ module.exports = class Redirect extends Action {
                        rule, // 规则
                        action, // 规则里的一个动作
                        requestContent, // 请求内容
-                       requestHeaders, // 请求头
+                       additionalRequestHeaders, // 请求头
                        toClientResponse, //响应内容
                        last
                    }) {

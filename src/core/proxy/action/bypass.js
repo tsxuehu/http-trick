@@ -5,6 +5,7 @@ const ServiceRegistry = require("../../service");
 const addHeaderToResponse = require("../../utils/addHeaderToResponse");
 const cookie2Str = require("../../utils/cookie2Str");
 const sendSpecificToClient = require("../sendToClient/specific");
+const cookie = require("cookie");
 
 let bypass;
 module.exports = class Bypass extends Action {
@@ -45,8 +46,10 @@ module.exports = class Bypass extends Action {
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容
-                  requestHeaders, // 请求头
-                  requestCookies,
+                  additionalRequestHeaders, // 请求头
+                  actualRequestHeaders,
+                  additionalRequestCookies, // cookie
+                  actualRequestCookies,
                   toClientResponse, //响应内容
                   last = true
               }) {
@@ -60,8 +63,10 @@ module.exports = class Bypass extends Action {
                 rule, // 规则
                 action, // 规则里的一个动作
                 requestContent, // 请求内容
-                requestHeaders, // 请求头
-                requestCookies,
+                additionalRequestHeaders, // 请求头
+                actualRequestHeaders,
+                additionalRequestCookies, // cookie
+                actualRequestCookies,
                 toClientResponse, //响应内容
                 last
             });
@@ -75,8 +80,10 @@ module.exports = class Bypass extends Action {
                 rule, // 规则
                 action, // 规则里的一个动作
                 requestContent, // 请求内容
-                requestHeaders, // 请求头
-                requestCookies,
+                additionalRequestHeaders, // 请求头
+                actualRequestHeaders,
+                additionalRequestCookies, // cookie
+                actualRequestCookies,
                 toClientResponse, //响应内容
                 last
             });
@@ -92,8 +99,10 @@ module.exports = class Bypass extends Action {
                      rule, // 规则
                      action, // 规则里的一个动作
                      requestContent, // 请求内容
-                     requestHeaders, // 请求头
-                     requestCookies,
+                     additionalRequestHeaders, // 请求头
+                     actualRequestHeaders,
+                     additionalRequestCookies, // cookie
+                     actualRequestCookies,
                      toClientResponse, //响应内容
                      last = true
                  }) {
@@ -105,19 +114,23 @@ module.exports = class Bypass extends Action {
 
         toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
 
-        requestHeaders.cookie = cookie2Str(requestCookies);
+        // 合并header
+        Object.assign(actualRequestHeaders, req.headers, additionalRequestHeaders);
+        let originCookies = cookie.parse(req.headers.cookie || "");
+        Object.assign(actualRequestCookies, originCookies, additionalRequestCookies);
+        actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
 
         if (last) {
             toClientResponse.sendedToClient = true;
             addHeaderToResponse(res, toClientResponse.headers);
             await this.remote.pipe({
                 req, res,
-                protocol, hostname, path, port, headers: requestHeaders
+                protocol, hostname, path, port, headers: actualRequestHeaders
             });
         } else {
             await this.remote.cache({
                 req, res,
-                targetUrl, headers: requestHeaders, toClientResponse
+                targetUrl, headers: actualRequestHeaders, toClientResponse
             });
         }
 
@@ -132,8 +145,10 @@ module.exports = class Bypass extends Action {
                                        rule, // 规则
                                        action, // 规则里的一个动作
                                        requestContent, // 请求内容
-                                       requestHeaders, // 请求头
-                                       requestCookies,
+                                       additionalRequestHeaders, // 请求头
+                                       actualRequestHeaders,
+                                       additionalRequestCookies, // cookie
+                                       actualRequestCookies,
                                        toClientResponse, //响应内容
                                        last = true
                                    }) {
@@ -145,7 +160,11 @@ module.exports = class Bypass extends Action {
 
         toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
 
-        requestHeaders.cookie = cookie2Str(requestCookies);
+        // 合并header
+        Object.assign(actualRequestHeaders, req.headers, additionalRequestHeaders);
+        let originCookies = cookie.parse(req.headers.cookie || "");
+        Object.assign(actualRequestCookies, originCookies, additionalRequestCookies);
+        actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
 
         await this.remote.cacheFromRequestContent({
             requestContent: {
@@ -154,7 +173,7 @@ module.exports = class Bypass extends Action {
                 hostname: ipOrHost,
                 path,
                 port,
-                headers: requestHeaders,
+                headers: actualRequestHeaders,
                 body
             },
             toClientResponse

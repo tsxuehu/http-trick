@@ -33,15 +33,17 @@ module.exports = class ScriptModifyRequest extends Action {
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 原始内容
-                  requestHeaders, // 请求头
-                  requestCookies, // 请求cookie
+                  additionalRequestHeaders, // 请求头
+                  actualRequestHeaders,
+                  additionalRequestCookies, // cookie
+                  actualRequestCookies,
                   toClientResponse, //响应内容
                   last = true
               }) {
 
 
         // 运行用户脚本, 修改请求内容
-        // urlObj、requestHeaders、toClientResponse、requestContent中的body
+        // additionalRequestHeaders、toClientResponse、requestContent
 
         // 发送请求，获取内容  或者将远端内容直接返回给浏览器
     }
