@@ -26,17 +26,21 @@ module.exports = class ProfileService extends EventEmitter {
 
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
-        this.profileSaveFile = path.join(proxyDataDir, "profile.json");
+        this.profileSaveDir = path.join(proxyDataDir, "profile");
         this.clientIpUserMapSaveFile = path.join(proxyDataDir, "clientIpUserMap.json");
     }
 
     async start() {
-        let savedUserProfileMap = await fileUtil.readJsonFromFile(this.profileSaveFile);
-        this.clientIpUserMap = await fileUtil.readJsonFromFile(this.clientIpUserMapSaveFile);
-        // 数据补全
-        _.forEach(savedUserProfileMap, (profile, userId) => {
-            this.userProfileMap[userId] = _.assign({}, defaultProfile, profile);
+        let profileMap = await fileUtil.getJsonFileContentInDir(this.mockListDir);
+        _.forEach(profileMap, (profile, fileName) => {
+            let userId = fileName.slice(0,-5);
+            // 补全profile数据
+            // this.userProfileMap[userId] = _.assign({}, defaultProfile, profile);;
+            this.userProfileMap[userId] = profile;
+
         });
+        // 加载ip-> userID映射
+        this.clientIpUserMap = await fileUtil.readJsonFromFile(this.clientIpUserMapSaveFile);
     }
 
     getProfile(userId) {
@@ -45,10 +49,12 @@ module.exports = class ProfileService extends EventEmitter {
 
     async setProfile(userId, profile) {
         this.userProfileMap[userId] = profile;
+
+        let filePath = path.join(this.profileSaveDir,`${userId}.json`);
+        // 将数据写入文件
+        await fileUtil.writeJsonToFile(filePath, this.profile);
         // 发送通知
         this.emit('data-change-profile', userId, profile);
-        // 将数据写入文件
-        await fileUtil.writeJsonToFile(this.profileSaveFile, this.userProfileMap);
     }
 
     /**
@@ -86,13 +92,13 @@ module.exports = class ProfileService extends EventEmitter {
     async setEnableRule(userId, enable) {
         let conf = this.userProfileMap[userId];
         conf.enableRule = enable;
-        await this.setProfile(userId, this.userProfileMap[userId]);
+        await this.setProfile(userId, conf);
     }
 
     async setEnableHost(userId, enable) {
         let conf = this.userProfileMap[userId];
         conf.enableHost = enable;
-        await this.setProfile(userId, this.userProfileMap[userId]);
+        await this.setProfile(userId, conf);
     }
 
     /**
