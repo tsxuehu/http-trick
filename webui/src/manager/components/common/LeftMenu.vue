@@ -48,6 +48,11 @@
                         link: 'configure'
                     },
                     {
+                        name: '工程路径配置',
+                        icon: 'icon-xiangmu',
+                        link: 'projectpath'
+                    },
+                    {
                         name: 'Host管理',
                         icon: 'icon-ip',
                         link: 'hostfilelist'
@@ -56,11 +61,6 @@
                         name: 'Http转发',
                         icon: 'icon-zhuanfa',
                         link: 'rulefilelist'
-                    },
-                    {
-                        name: '工程路径配置',
-                        icon: 'icon-xiangmu',
-                        link: 'projectpath'
                     },
                     {
                         name: 'Http过滤器',

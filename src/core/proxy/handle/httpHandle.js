@@ -129,6 +129,7 @@ module.exports = class HttpHandle {
         let toClientResponse = {
             hasContent: false,// 是否存在要发送给浏览器的内容
             sendedToClient: false, // 已经向浏览器发送响应内容
+            code: 200,
             headers: {},// 要发送给浏览器的header
             body: ''// 要发送给浏览器的body
         };
@@ -222,7 +223,7 @@ module.exports = class HttpHandle {
         if (!toClientResponse.sendedToClient) {
             if (toClientResponse.hasContent) {
                 sendSpecificToClient({
-                    res, statusCode: 200, headers: toClientResponse.headers, content: toClientResponse.body
+                    res, statusCode: toClientResponse.code, headers: toClientResponse.headers, content: toClientResponse.body
                 });
 
             } else {
@@ -267,7 +268,7 @@ module.exports = class HttpHandle {
         });
         // 对带body请求 获取body， 其他method返回空字符串
         let type = this._getContentType(req);
-        let method = req.method.lowerCase();
+        let method = req.method.toLowerCase();
         if (type
             && ['application/json', 'application/x-www-form-urlencoded', 'text/plain', 'text/html'].indexOf(type) > -1
             && ['post', 'put', 'patch'].indexOf(method) > -1) {
@@ -311,7 +312,7 @@ module.exports = class HttpHandle {
             protocol, // 请求协议
             hostname, // 请求域名
             method: req.method, // 请求方法
-            pathname, // 路径
+            path: pathname, // 路径
             query, // query对象
             port, // 端口号
             headers: _.assign({}, req.headers), // 请求头

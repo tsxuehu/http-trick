@@ -158,6 +158,7 @@
                 hostFileList: [],
                 // rule文件列表
                 ruleFileList: [],
+                filters: [],
                 dataList: [],
                 // 新增数据文件对话框使用数据
                 addDataFileForm: {
@@ -386,9 +387,15 @@
             socket.on('hostfilelist', (data) => {
                 this.hostFileList = data;
             });
+
             socket.on('rulefilelist', (data) => {
                 this.ruleFileList = data;
             });
+
+            socket.on('filters', (data) => {
+                this.filters = data;
+            });
+
             socket.on('datalist', (data) => {
                 this.dataList = data;
             });

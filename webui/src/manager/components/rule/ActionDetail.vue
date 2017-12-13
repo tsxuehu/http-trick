@@ -95,8 +95,8 @@
                     { value: 'addRequestCookie', label: '设置请求cookie' },
                     { value: 'addRequestHeader', label: '设置请求头' },
                     { value: 'modifyResponse', label: '修改响应内容' },
-                    { value: 'scriptModifyResponse', label: 'js修改请求内容' },
-                    { value: 'scriptModifyRequest', label: 'js修改响应内容' }
+                    { value: 'scriptModifyRequest', label: 'js修改请求内容' },
+                    { value: 'scriptModifyResponse', label: 'js修改响应内容' }
                 ],
                 modifyResponseType: [
                     { value: 'addTimestampToJsCss', label: '将html中的js、css请求加上时间戳' },

@@ -1,16 +1,23 @@
 const EventEmitter = require("events");
 const _ = require("lodash");
+const fileUtil = require("../../core/utils/file");
+const path = require('path');
 
 module.exports = class FilterService extends EventEmitter {
-    constructor({userService}) {
+    constructor({appInfoService}) {
         super();
         // user -> filters 映射
         this.filters = {};
-        this.userService = userService;
+        let proxyDataDir = appInfoService.getProxyDataDir();
+        this.breakpointSaveDir = path.join(proxyDataDir, "filter");
     }
 
-    start() {
-
+    async start() {
+        let filterMap = await fileUtil.getJsonFileContentInDir(this.breakpointSaveDir);
+        _.forEach(filterMap, (filters, fileName) => {
+            let userId = fileName.slice(0,-5);
+            this.filters[userId] = filters;
+        });
     }
 
     async getMatchedRuleList(userId, method, urlObj) {
@@ -25,8 +32,11 @@ module.exports = class FilterService extends EventEmitter {
         return this.filters[userId] || [];
     }
 
-    save(userId, filters) {
+    async save(userId, filters) {
         this.filters[userId] = filters;
+        let filePath = path.join(this.breakpointSaveDir,`${userId}.json`);
+        // 将数据写入文件
+        await fileUtil.writeJsonToFile(filePath, filters);
         this.emit("data-change", userId, filters);
     }
 

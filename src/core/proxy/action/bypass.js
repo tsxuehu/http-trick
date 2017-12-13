@@ -153,7 +153,7 @@ module.exports = class Bypass extends Action {
                                        last = true
                                    }) {
         // 构造url
-        let { protocol, hostname, path, port, method, body } = requestContent;
+        let { protocol, hostname, path, port, query, method, headers, body } = requestContent;
 
         let ipOrHost = await this.hostRepository.resolveHost(userId, hostname);
         let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
@@ -161,8 +161,8 @@ module.exports = class Bypass extends Action {
         toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
 
         // 合并header
-        Object.assign(actualRequestHeaders, req.headers, additionalRequestHeaders);
-        let originCookies = cookie.parse(req.headers.cookie || "");
+        Object.assign(actualRequestHeaders, headers, additionalRequestHeaders);
+        let originCookies = cookie.parse(headers.cookie || "");
         Object.assign(actualRequestCookies, originCookies, additionalRequestCookies);
         actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
 
@@ -172,6 +172,7 @@ module.exports = class Bypass extends Action {
                 method,
                 hostname: ipOrHost,
                 path,
+                query,
                 port,
                 headers: actualRequestHeaders,
                 body
@@ -182,7 +183,10 @@ module.exports = class Bypass extends Action {
         if (last) {
             toClientResponse.sendedToClient = true;
             sendSpecificToClient({
-                res, statusCode: 200, headers: toClientResponse.headers, content: toClientResponse.body
+                res,
+                statusCode: toClientResponse.code,
+                headers: toClientResponse.headers,
+                content: toClientResponse.body
             });
         }
     }
