@@ -31,7 +31,7 @@ module.exports = class ProfileService extends EventEmitter {
     }
 
     async start() {
-        let profileMap = await fileUtil.getJsonFileContentInDir(this.mockListDir);
+        let profileMap = await fileUtil.getJsonFileContentInDir(this.profileSaveDir);
         _.forEach(profileMap, (profile, fileName) => {
             let userId = fileName.slice(0,-5);
             // 补全profile数据
@@ -52,7 +52,7 @@ module.exports = class ProfileService extends EventEmitter {
 
         let filePath = path.join(this.profileSaveDir,`${userId}.json`);
         // 将数据写入文件
-        await fileUtil.writeJsonToFile(filePath, this.profile);
+        await fileUtil.writeJsonToFile(filePath, profile);
         // 发送通知
         this.emit('data-change-profile', userId, profile);
     }

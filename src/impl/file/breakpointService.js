@@ -13,7 +13,7 @@ const Remote = require('../../core/utils/remote');
  */
 module.exports = class BreakpointService extends EventEmitter {
 
-    constructor({userService, appInfoService, logService}) {
+    constructor({ userService, appInfoService, logService }) {
         super();
         this.userService = userService;
         this.appInfoService = appInfoService;
@@ -25,7 +25,7 @@ module.exports = class BreakpointService extends EventEmitter {
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
         // 监控数据缓存目录
-        this.breakpointSaveFile = path.join(proxyDataDir, "breakpoints.json");
+        this.breakpointSaveDir = path.join(proxyDataDir, "breakpoint");
         /**
          * 断点id-> 断点
          * 断点格式如下：
@@ -61,7 +61,11 @@ module.exports = class BreakpointService extends EventEmitter {
     }
 
     async start() {
-        this.breakpoints = await fileUtils.readJsonFromFile(this.breakpointSaveFile);
+        let breakpointMap = await fileUtils.getJsonFileContentInDir(this.breakpointSaveDir);
+        _.forEach(breakpointMap, (content, fileName) => {
+            let userId = fileName.slice(0, -5);
+            this.breakpoints[userId] = content;
+        });
     }
 
     /**
@@ -83,16 +87,18 @@ module.exports = class BreakpointService extends EventEmitter {
             match, // 匹配
             requestBreak, // 请求断点
             responseBreak, // 响应断点
-            userId, // 设置断点的用户id
+            userId // 设置断点的用户id
         };
         let userBreakPoints = this.breakpoints[userId] || {};
         userBreakPoints[id] = breakpoint;
 
         this.breakpoints[userId] = userBreakPoints;
-        this.emit('breakpoint-save', userId, breakpoint);
 
         // 保存断点
-        await fileUtils.writeJsonToFile(this.breakpointSaveFile, this.breakpoints);
+        let filePath = this._getBreakPointSaveFilePath(userId);
+        await fileUtils.writeJsonToFile(filePath, userBreakPoints);
+
+        this.emit('breakpoint-save', userId, breakpoint);
     }
 
     getBreakpoint(clientIp, breakpointId) {
@@ -113,9 +119,12 @@ module.exports = class BreakpointService extends EventEmitter {
         _.forEach(toDeleteInstance, id => {
             delete this.instances[id];
         });
-        this.emit('breakpoint-delete', userId, breakpointId, toDeleteInstance);
+
         // 保存断点
-        await fileUtils.writeJsonToFile(this.breakpointSaveFile, this.breakpoints);
+        let filePath = this._getBreakPointSaveFilePath(userId);
+        await fileUtils.writeJsonToFile(filePath, this.breakpoints[userId]);
+
+        this.emit('breakpoint-delete', userId, breakpointId, toDeleteInstance);
         // 返回删除的instance id
         return toDeleteInstance;
     }
@@ -130,7 +139,7 @@ module.exports = class BreakpointService extends EventEmitter {
     }
 
     // 断点实例
-    addInstance({breakpointId, clientIp, href, method}) {
+    addInstance({ breakpointId, clientIp, href, method }) {
 
         let userId = this.userService.getClientIpMappedUserId(clientIp);
         // 分配断点实例id
@@ -172,7 +181,7 @@ module.exports = class BreakpointService extends EventEmitter {
     /**
      * 将请求数据发送给服务端,获取服务器返回内容
      */
-    async getServerResponse(instanceId){
+    async getServerResponse(instanceId) {
         let requestContent = this.getInstanceRequestContent(instanceId);
         let responseContent = {};
         await this.remote.cacheFromRequestContent({
@@ -198,13 +207,13 @@ module.exports = class BreakpointService extends EventEmitter {
         }
     }
 
-    sendToClient(instanceId){
+    sendToClient(instanceId) {
         let instance = this.instances[instanceId];
         instance.sendedToClient = true;
         this.emit('send-instance-to-client', instanceId);
     }
 
-    deleteInstanceSlient(instanceId){
+    deleteInstanceSlient(instanceId) {
         delete this.instances[instanceId];
     }
 
@@ -215,7 +224,6 @@ module.exports = class BreakpointService extends EventEmitter {
     getInstanceResponseContent(instanceId) {
         return this.instances[instanceId].responseContent;
     }
-
 
     /**
      * 为用户分配一个连接id
@@ -250,5 +258,9 @@ module.exports = class BreakpointService extends EventEmitter {
      */
     getUserConnectionCount(userId) {
         return (this.userConnectionMap[userId] || []).length;
+    }
+
+    _getBreakPointSaveFilePath(userId) {
+        return path.join(this.breakpointSaveDir, `${userId}.json`);
     }
 };
