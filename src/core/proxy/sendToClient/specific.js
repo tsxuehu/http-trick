@@ -9,7 +9,6 @@ module.exports = function ({res, statusCode, headers, content}) {
     let buffer = Buffer.from(content, 'utf-8');
 
     headers['Content-Length'] = buffer.length;
-    headers['Access-Control-Allow-Origin'] = '*';
     _.forEach(headers, function (value, key) {
         res.setHeader(key, value);
     });

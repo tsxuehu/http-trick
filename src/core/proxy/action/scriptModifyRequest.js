@@ -1,4 +1,5 @@
 const Action = require("./action");
+const vm = require('vm');
 /**
  * 自定义js脚本修改请求内容
  */
@@ -40,11 +41,18 @@ module.exports = class ScriptModifyRequest extends Action {
                   toClientResponse, //响应内容
                   last = true
               }) {
+        const sandbox = {
+            requestContent, // 请求内容
+            additionalRequestHeaders,// 请求附加头
+            additionalRequestCookies,// 请求附加cookie
+            toClientResponse, // 记录返回给浏览器的信息
+            console
+        };
+        try {
+            vm.runInNewContext(action.data.modifyRequestScript, sandbox);
+        } catch (e) {
+            toClientResponse.headers['fe-proxy-error'] = encodeURI(e.message);
+        }
 
-
-        // 运行用户脚本, 修改请求内容
-        // additionalRequestHeaders、toClientResponse、requestContent
-
-        // 发送请求，获取内容  或者将远端内容直接返回给浏览器
     }
-}
+};

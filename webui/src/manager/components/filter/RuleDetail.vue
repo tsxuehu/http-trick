@@ -51,7 +51,7 @@
     import ActionDetail from './ActionDetail.vue'
     Vue.component(ActionDetail.name, ActionDetail);
     export default {
-        name: 'rule-detail',
+        name: 'rule-filter-detail',
         props: ['rule', 'remote'],
         data() {
             return {

@@ -1,4 +1,6 @@
 const Action = require("./action");
+const vm = require('vm');
+
 /**
  * 自定义js脚本修改响应内容
  */
@@ -41,7 +43,12 @@ module.exports = class ScriptModifyResponse extends Action {
                   last = true
               }) {
         // 运行用户脚本
-
+        const sandbox = { toClientResponse ,console};
         // 发送请求，返回内容
+        try {
+            vm.runInNewContext(action.data.modifyResponseScript, sandbox);
+        } catch (e) {
+            toClientResponse.headers['fe-proxy-error'] = encodeURI(e.message);
+        }
     }
-}
+};

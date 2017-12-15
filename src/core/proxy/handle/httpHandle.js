@@ -51,6 +51,7 @@ module.exports = class HttpHandle {
                 requestContent: {},
                 additionalRequestHeaders: {},
                 actualRequestHeaders: {},
+                additionalRequestCookies: {},
                 actualRequestCookies: {}
             });
             return;
@@ -129,7 +130,8 @@ module.exports = class HttpHandle {
         let toClientResponse = {
             hasContent: false,// 是否存在要发送给浏览器的内容
             sendedToClient: false, // 已经向浏览器发送响应内容
-            code: 200,
+            stopRunAction: false, // 停止运行action
+            statusCode: 200,
             headers: {},// 要发送给浏览器的header
             body: ''// 要发送给浏览器的body
         };
@@ -154,7 +156,7 @@ module.exports = class HttpHandle {
         for (let i = 0; i < willRunActionListLength; i++) {
 
             // 已经向浏览器发送响应，则停止规则处理
-            if (toClientResponse.sendedToClient) {
+            if (toClientResponse.sendedToClient || toClientResponse.stopRunAction) {
                 break;
             }
             // 取出将要运行的动作描述信息
@@ -189,7 +191,9 @@ module.exports = class HttpHandle {
                     action, // 规则里的一个动作
                     requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
                     additionalRequestHeaders, // 请求头
+                    actualRequestHeaders,
                     additionalRequestCookies, // cookie
+                    actualRequestCookies,
                     toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
                     last: false
                 });
@@ -223,7 +227,10 @@ module.exports = class HttpHandle {
         if (!toClientResponse.sendedToClient) {
             if (toClientResponse.hasContent) {
                 sendSpecificToClient({
-                    res, statusCode: toClientResponse.code, headers: toClientResponse.headers, content: toClientResponse.body
+                    res,
+                    statusCode: toClientResponse.statusCode,
+                    headers: toClientResponse.headers,
+                    content: toClientResponse.body
                 });
 
             } else {

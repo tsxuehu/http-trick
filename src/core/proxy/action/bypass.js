@@ -125,12 +125,13 @@ module.exports = class Bypass extends Action {
             addHeaderToResponse(res, toClientResponse.headers);
             await this.remote.pipe({
                 req, res,
-                protocol, hostname, path, port, headers: actualRequestHeaders
+                protocol, hostname: ipOrHost, path, port, headers: actualRequestHeaders, toClientResponse
             });
         } else {
             await this.remote.cache({
                 req, res,
-                targetUrl, headers: actualRequestHeaders, toClientResponse
+                protocol, hostname: ipOrHost, path, port,
+                 headers: actualRequestHeaders, toClientResponse
             });
         }
 
@@ -182,9 +183,9 @@ module.exports = class Bypass extends Action {
 
         if (last) {
             toClientResponse.sendedToClient = true;
-            sendSpecificToClient({
+            await sendSpecificToClient({
                 res,
-                statusCode: toClientResponse.code,
+                statusCode: toClientResponse.statusCode,
                 headers: toClientResponse.headers,
                 content: toClientResponse.body
             });

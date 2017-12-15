@@ -1,10 +1,11 @@
 const axios = require("axios");
-const HttpProxy = require("http-proxy");
-const { defaultHttpAgent, defaultHttpsAgent } = require("./agent");
 const queryString = require("query-string");
 const resovleIp = require("./dns");
 const log = require("./log");
 const _ = require("lodash");
+const http = require('http');
+const https = require('https');
+const util = require('util');
 /**
  * 从远程服务器上获取响应内容
  */
@@ -20,64 +21,100 @@ module.exports = class Remote {
     }
 
     constructor() {
-        this.proxy = HttpProxy.createProxyServer({
-            secure: false // http-proxy api  在request的option里设置 rejectUnauthorized = false
-        });
-
-        this._registHandleForHttpProxy(this.proxy);
     }
 
     /**
      * 将请求远程的响应内容直接返回给浏览器
      */
-    async pipe({ req, res, protocol, hostname, path, port, headers, timeout }) {
+    async pipe({ req, res, protocol, hostname, path, port, headers, timeout = 10000, toClientResponse }) {
         let isHttps = protocol.indexOf('https') > -1;
         // http.request 解析dns时，偶尔会出错
         let ip = await resovleIp(hostname);
-        this.proxy.web(req, res, {
-            target: {
-                protocol,
-                hostname: ip,
-                path,
-                port
-            },
-            headers,
-            ignorePath: true,
-            proxyTimeout: timeout,
-            agent: isHttps ? defaultHttpsAgent : defaultHttpAgent
-        });
+        let href = `${protocol}//${ip}:${port}${path}`;
+        // 使用axios获取远程数据
+        let remoteResponse;
+        try {
+            remoteResponse = await axios({
+                method: req.method,
+                url: href,
+                headers: headers,
+                maxRedirects: 0,
+                responseType: 'arraybuffer',
+                data: req,
+                // 禁止自动转换body
+                transformResponse: [function transformResponse(data) {
+                    return data;
+                }],
+                timeout,
+                validateStatus: _.stubTrue
+            });
+            toClientResponse.sendedToClient = true;
+            toClientResponse.hasContent = true;
+            Object.assign(toClientResponse.headers, remoteResponse.headers, { 'content-length': Buffer.byteLength(remoteResponse.data) });
+            toClientResponse.statusCode = remoteResponse.status;
+            // 返回结果
+            res.writeHead(toClientResponse.statusCode, toClientResponse.headers);
+            res.end(remoteResponse.data);
+        } catch (e) {
+            toClientResponse.statusCode = 600;
+            toClientResponse.hasContent = true;
+            toClientResponse.stopRunAction = true;
+            toClientResponse.sendedToClient = false;
+            toClientResponse.body = util.inspect(e);
+            log.error(hostname, href, e);
+        }
     }
 
     /**
      * 将请求远程的响应内容
      */
-    async cache({ req, res, targetUrl, headers, toClientResponse, timeout }) {
+    async cache({
+                    req, res,
+                    protocol, hostname, path, port,
+                    headers, toClientResponse, timeout = 10000
+                }) {
+        let ip = await resovleIp(hostname);
+        let href = `${protocol}//${ip}:${port}${path}`;
         // 设置超时时间，节约socket资源
         let response;
         try {
             response = await axios({
                 method: req.method,
-                url: targetUrl,
+                url: href,
                 headers: headers,
                 maxRedirects: 0,
                 responseType: 'text',
-                data: req
+                data: req,
+                // 禁止自动转换body
+                transformResponse: [function transformResponse(data) {
+                    return data;
+                }],
+                timeout,
+                validateStatus: _.stubTrue
             });
+            toClientResponse.sendedToClient = false;
+            toClientResponse.hasContent = true;
+            toClientResponse.headers = _.assign({}, response.headers, toClientResponse.headers);
+            toClientResponse.body = response.data;
+            toClientResponse.statusCode = response.status;
         } catch (e) {
-            response = e.response;
+            toClientResponse.statusCode = 600;
+            toClientResponse.hasContent = true;
+            toClientResponse.stopRunAction = true;
+            toClientResponse.sendedToClient = false;
+            toClientResponse.body = util.inspect(e);
+            log.error(hostname, href, e);
         }
-        toClientResponse.hasContent = true;
-        toClientResponse.headers = _.assign({}, response.headers, toClientResponse.headers);
-        toClientResponse.body = response.data;
-        toClientResponse.code = response.status;
+
     }
 
     /**
      * 根据RequestContent
      */
-    async cacheFromRequestContent({ requestContent, toClientResponse, timeout }) {
+    async cacheFromRequestContent({ requestContent, toClientResponse, timeout = 10000 }) {
         let { protocol, hostname, path, port, query, method, headers, body } = requestContent;
-        let href = `${protocol}//${hostname}:${port}${path}?${queryString.stringify(query)}`;
+        let ip = await resovleIp(hostname);
+        let href = `${protocol}//${ip}:${port}${path}?${queryString.stringify(query)}`;
         let response;
         try {
             response = await axios({
@@ -86,67 +123,28 @@ module.exports = class Remote {
                 headers,
                 maxRedirects: 0,
                 responseType: 'text',
-                data: body
+                data: body,
+                validateStatus: null,
+                // 禁止自动转换body
+                transformResponse: [function transformResponse(data) {
+                    return data;
+                }],
+                timeout,
+                validateStatus: _.stubTrue
             });
+            toClientResponse.sendedToClient = false;
+            toClientResponse.hasContent = true;
+            toClientResponse.headers = _.assign({}, response.headers, toClientResponse.headers);
+            toClientResponse.body = response.data;
+            toClientResponse.statusCode = response.status;
         } catch (e) {
-            response = e.response;
+            toClientResponse.statusCode = 600;
+            toClientResponse.hasContent = true;
+            toClientResponse.stopRunAction = true;
+            toClientResponse.sendedToClient = false;
+            toClientResponse.body = util.inspect(e);
+            log.error(hostname, href, e);
         }
-        toClientResponse.hasContent = true;
-        toClientResponse.headers = _.assign({}, response.headers, toClientResponse.headers);
-        toClientResponse.body = response.data;
-        toClientResponse.code = response.status;
-        return toClientResponse;
-    }
 
-    /**
-     * 为http proxy注册事件响应函数
-     */
-    _registHandleForHttpProxy(proxy) {
-        // 准备处理转发请求的事件
-        proxy.on('start', function (req, res, url) {
-
-        });
-
-        // 代理和远程服务器简历socket链接
-        proxy.on('proxyReq', function (proxyReq, req, res, options) {
-
-        });
-
-        // 远程服务器开始有响应事件
-        proxy.on('proxyRes', function (proxyRes, req, res) {
-
-        });
-
-        // 远程服务器响应结束
-        proxy.on('end', function (req, res, proxyRes) {
-
-        });
-
-        //  req.on('error', proxyError);
-        //  proxyReq.on('error', proxyError);
-        // 一般性异常，  req和 httpclient抛出的异常
-        // 异常时 打印vm的运行状态
-        proxy.on('error', function (err, req, res, url) {
-            log.error(err, url);
-            if (res.headersSent) return;
-            res.statusCode = 500;
-            res.setHeader('Content-Length', 0);
-            res.setHeader('Code', err.code);
-            //  res.setHeader('Reason', err.message);
-            res.end();
-        });
-
-        //  req.on('error', proxyError);
-        //  proxyReq.on('error', proxyError);
-        //  特殊异常： req.socket.destroyed && err.code === 'ECONNRESET'
-        proxy.on('econnreset', function (err, req, res, url) {
-            log.error(err, url);
-            if (res.headersSent) return;
-            res.statusCode = 500;
-            res.setHeader('Content-Length', 0);
-            res.setHeader('Code', err.code);
-            //  res.setHeader('Reason', err.message);
-            res.end();
-        });
     }
 };

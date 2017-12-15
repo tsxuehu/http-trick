@@ -1,11 +1,11 @@
 // 读取本地文件返回给客户端
 
-const mime = require( "mime");
-const fs = require( "fs");
-const sendErrorToClient = require( "../proxy/sendToClient/error");
+const mime = require("mime");
+const fs = require("fs");
+const sendErrorToClient = require("../proxy/sendToClient/error");
 
 let local;
-module.exports =  class Local {
+module.exports = class Local {
     static getInstance() {
         if (!local) {
             local = new Local();
@@ -16,7 +16,7 @@ module.exports =  class Local {
     /**
      * 将请求远程的响应内容直接返回给浏览器
      */
-    pipe({req, res, path, contentType}) {
+    pipe({ req, res, path, contentType, toClientResponse }) {
 
         contentType = contentType || mime.lookup(path);
         // 本地文件
@@ -38,7 +38,7 @@ module.exports =  class Local {
     /**
      * 将请求远程的响应内容
      */
-    cache({req, res, path, contentType, toClientResponse}) {
+    cache({ req, res, path, contentType, toClientResponse }) {
         return new Promise((resolve, reject) => {
 
             contentType = contentType || mime.lookup(path);
@@ -59,4 +59,4 @@ module.exports =  class Local {
             });
         });
     }
-}
+};

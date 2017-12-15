@@ -121,23 +121,24 @@ module.exports = class Redirect extends Action {
         let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
         toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
 
+        Object.assign(actualRequestHeaders, req.headers);
         actualRequestHeaders['host'] = hostname;
         Object.assign(actualRequestHeaders, additionalRequestHeaders);
         Object.assign(actualRequestCookies, additionalRequestCookies);
         actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
 
-
         if (last) {
-            toClientResponse.sendedToClient = true;
             addHeaderToResponse(res, toClientResponse.headers);
-            this.remote.pipe({
+           await this.remote.pipe({
                 req, res,
-                protocol, hostname: ipOrHost, path, port, headers: actualRequestHeaders
+                protocol, hostname: ipOrHost, path, port,
+                headers: actualRequestHeaders, toClientResponse
             });
         } else {
-            this.remote.cache({
+           await this.remote.cache({
                 req, res,
-                targetUrl, headers: actualRequestHeaders, toClientResponse
+                protocol, hostname: ipOrHost, path, port,
+                headers: actualRequestHeaders, toClientResponse
             });
         }
     }
@@ -160,13 +161,14 @@ module.exports = class Redirect extends Action {
         if (last) {
             toClientResponse.sendedToClient = true;
             addHeaderToResponse(res, toClientResponse.headers);
-            this.local.pipe({
+            await this.local.pipe({
                 req,
                 res,
-                path: target
+                path: target,
+                toClientResponse
             });
         } else {
-            await this.local.pipe({
+            await this.local.cache({
                 req,
                 res,
                 path: target,

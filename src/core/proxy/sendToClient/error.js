@@ -7,6 +7,5 @@ module.exports = function (req, res, statusCode, reason) {
     res.statusCode = statusCode || 500;
     res.setHeader('Content-Length', 0);
     res.setHeader('fe-proxy-reason', encodeURI(reason));
-    res.setHeader('Access-Control-Allow-Origin', '*');
     res.end();
 };

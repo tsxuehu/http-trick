@@ -79,6 +79,16 @@
                 </el-input>
             </div>
         </div>
+        <!-- 脚本修改请求 -->
+        <div v-if="action.type == 'scriptModifyRequest'" class="inline-block right-panel">
+            <textarea style="width: 500px;height: 90px" v-model="action.data.modifyRequestScript">
+            </textarea>
+        </div>
+        <!-- 脚本修改响应 -->
+        <div v-if="action.type == 'scriptModifyResponse'" class="inline-block right-panel">
+            <textarea  style="width: 500px;height: 90px" v-model="action.data.modifyResponseScript">
+            </textarea>
+        </div>
     </div>
 </template>
 

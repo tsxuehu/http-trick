@@ -93,9 +93,9 @@
         <!-- 编辑数据文件对话框 -->
         <el-dialog title="编辑Mock数据文件" ref="editDataFileDialog" :close-on-press-escape="false"
                    v-model="editDataFileForm.visible">
-      <span slot="title">
-        编辑数据文件 {{editDataFileForm.entry.name}} [Content-Type: {{editDataFileForm.entry.contenttype}}]
-      </span>
+              <span slot="title">
+                编辑数据文件 {{editDataFileForm.entry.name}} [Content-Type: {{editDataFileForm.entry.contenttype}}]
+              </span>
             <div id="content-editor-container" style="height: 305px;">
                 <div id="content-editor">
 
