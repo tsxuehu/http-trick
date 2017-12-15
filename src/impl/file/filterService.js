@@ -23,7 +23,7 @@ module.exports = class FilterService extends EventEmitter {
     async getMatchedRuleList(userId, method, urlObj) {
         let ruleLists = await this.getFilterRuleList(userId);
         return _.filter(ruleLists, rule => {
-            return this._isMethodMatch(method, rule.method)
+            return rule.checked && this._isMethodMatch(method, rule.method)
                 && this._isUrlMatch(urlObj.href, rule.match)
         })
     }

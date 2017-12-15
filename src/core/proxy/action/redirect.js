@@ -129,13 +129,13 @@ module.exports = class Redirect extends Action {
 
         if (last) {
             addHeaderToResponse(res, toClientResponse.headers);
-           await this.remote.pipe({
+            await this.remote.pipe({
                 req, res,
                 protocol, hostname: ipOrHost, path, port,
                 headers: actualRequestHeaders, toClientResponse
             });
         } else {
-           await this.remote.cache({
+            await this.remote.cache({
                 req, res,
                 protocol, hostname: ipOrHost, path, port,
                 headers: actualRequestHeaders, toClientResponse
