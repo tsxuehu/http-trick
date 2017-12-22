@@ -3,6 +3,7 @@ const _ = require("lodash");
 const ServiceRegistry = require("../../service");
 const sendErrorToClient = require("../sendToClient/error");
 const Local = require("../../utils/local");
+const toClientResponseUtils = require("../../utils/toClientResponseUtils");
 const url = require("url");
 const Remote = require("../../utils/remote");
 const addHeaderToResponse = require("../../utils/addHeaderToResponse");
@@ -61,11 +62,15 @@ module.exports = class Redirect extends Action {
               }) {
         //================== 转发到本地 或远程
         let { href } = urlObj;
+        let target = '';
         // 解析目标
-        let target = await this.profileService.calcPath(userId, href, rule.match, action.data.target);
-        if (!target) {
-            toClientResponse.sendedToClient = true;
-            sendErrorToClient(req, res, 500, 'target parse error' + action.data.target);
+        try {
+            target = this.profileService.calcPath(userId, href, rule.match, action.data.target);
+            if (!target) {
+                throw new Error("target parse empty ");
+            }
+        } catch (e) {
+            toClientResponseUtils.setError(toClientResponse, action.data.target, e);
             return;
         }
         // 远程

@@ -5,7 +5,7 @@
         </div>
         <el-form label-width="100px" class="demo-ruleForm"
                  style="margin:20px;width:80%;min-width:800px;">
-            <template v-for="(obj ,index) in $dc.profile.projectPath">
+            <template v-for="(obj ,index) in $dc.projectPathArray">
                 <el-form-item :label="'工程'+(index+1)" :key="index">
                     <div style="padding-left: 5px">
                         <el-row :gutter="10">
@@ -52,11 +52,15 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$dc.profile.projectPath.splice(index, 1);
+                    this.$dc.projectPathArray.splice(index, 1);
                 });
             },
             async saveFile() {
-                // 由host数组组装文件
+                var projectPathMap = {};
+                forEach(this.$dc.projectPathArray, (obj) => {
+                    projectPathMap[obj.key] = obj.value;
+                });
+                this.$dc.profile.projectPath = projectPathMap;
                 let response = await profileApi.saveFile(this.$dc.profile);
                 let serverData = response.data;
                 if (serverData.code == 0) {
@@ -69,7 +73,7 @@
                 }
             },
             addParam() {
-                this.$dc.profile.projectPath.push({
+                this.$dc.projectPathArray.push({
                     key: "",
                     value: ""
                 });

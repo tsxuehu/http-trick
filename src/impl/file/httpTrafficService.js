@@ -68,7 +68,7 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 获取监控窗口的数量，没有监控窗口 则不做记录
-    async hasMonitor(userId) {
+    hasMonitor(userId) {
         let cnt = this.userMonitorCount[userId] || 0;
         return cnt > 0;
     }

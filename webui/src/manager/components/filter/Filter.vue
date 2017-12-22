@@ -19,7 +19,7 @@
             </el-table-column>
             <el-table-column label="规则设置" align="center">
                 <template scope='scope'>
-                    <rule-detail :rule="scope.row" ></rule-detail>
+                    <rule-filter-detail :rule="scope.row" ></rule-filter-detail>
                 </template>
             </el-table-column>
             <el-table-column label="操作" :width="100" align="center" :context="_self">

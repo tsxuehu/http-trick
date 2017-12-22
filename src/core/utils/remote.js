@@ -5,7 +5,7 @@ const log = require("./log");
 const _ = require("lodash");
 const http = require('http');
 const https = require('https');
-const util = require('util');
+const toClientResponseUtils = require('./toClientResponseUtils');
 /**
  * 从远程服务器上获取响应内容
  */
@@ -29,12 +29,11 @@ module.exports = class Remote {
     async pipe({ req, res, protocol, hostname, path, port, headers, timeout = 10000, toClientResponse }) {
         let isHttps = protocol.indexOf('https') > -1;
         // http.request 解析dns时，偶尔会出错
-        let ip = await resovleIp(hostname);
-        let href = `${protocol}//${ip}:${port}${path}`;
         // 使用axios获取远程数据
-        let remoteResponse;
         try {
-            remoteResponse = await axios({
+            let ip = await resovleIp(hostname);
+            let href = `${protocol}//${ip}:${port}${path}`;
+            let remoteResponse = await axios({
                 method: req.method,
                 url: href,
                 headers: headers,
@@ -56,11 +55,7 @@ module.exports = class Remote {
             res.writeHead(toClientResponse.statusCode, toClientResponse.headers);
             res.end(remoteResponse.data);
         } catch (e) {
-            toClientResponse.statusCode = 600;
-            toClientResponse.hasContent = true;
-            toClientResponse.stopRunAction = true;
-            toClientResponse.sendedToClient = false;
-            toClientResponse.body = util.inspect(e);
+            toClientResponseUtils.setError(toClientResponse, `${protocol}//${hostname}:${port}${path}`, e);
             log.error(hostname, href, e);
         }
     }
@@ -73,12 +68,12 @@ module.exports = class Remote {
                     protocol, hostname, path, port,
                     headers, toClientResponse, timeout = 10000
                 }) {
-        let ip = await resovleIp(hostname);
-        let href = `${protocol}//${ip}:${port}${path}`;
-        // 设置超时时间，节约socket资源
-        let response;
+
         try {
-            response = await axios({
+            let ip = await resovleIp(hostname);
+            let href = `${protocol}//${ip}:${port}${path}`;
+            // 设置超时时间，节约socket资源
+            let response = await axios({
                 method: req.method,
                 url: href,
                 headers: headers,
@@ -98,14 +93,9 @@ module.exports = class Remote {
             toClientResponse.body = response.data;
             toClientResponse.statusCode = response.status;
         } catch (e) {
-            toClientResponse.statusCode = 600;
-            toClientResponse.hasContent = true;
-            toClientResponse.stopRunAction = true;
-            toClientResponse.sendedToClient = false;
-            toClientResponse.body = util.inspect(e);
+            toClientResponseUtils.setError(toClientResponse, `${protocol}//${hostname}:${port}${path}`, e);
             log.error(hostname, href, e);
         }
-
     }
 
     /**
@@ -113,11 +103,10 @@ module.exports = class Remote {
      */
     async cacheFromRequestContent({ requestContent, toClientResponse, timeout = 10000 }) {
         let { protocol, hostname, path, port, query, method, headers, body } = requestContent;
-        let ip = await resovleIp(hostname);
-        let href = `${protocol}//${ip}:${port}${path}?${queryString.stringify(query)}`;
-        let response;
         try {
-            response = await axios({
+            let ip = await resovleIp(hostname);
+            let href = `${protocol}//${ip}:${port}${path}?${queryString.stringify(query)}`;
+            let response = await axios({
                 method,
                 url: href,
                 headers,
@@ -138,11 +127,7 @@ module.exports = class Remote {
             toClientResponse.body = response.data;
             toClientResponse.statusCode = response.status;
         } catch (e) {
-            toClientResponse.statusCode = 600;
-            toClientResponse.hasContent = true;
-            toClientResponse.stopRunAction = true;
-            toClientResponse.sendedToClient = false;
-            toClientResponse.body = util.inspect(e);
+            toClientResponseUtils.setError(toClientResponse, `${protocol}//${ip}:${port}${path}?${queryString.stringify(query)}`, e);
             log.error(hostname, href, e);
         }
 

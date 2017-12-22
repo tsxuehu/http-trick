@@ -19,6 +19,7 @@ module.exports = class Bypass extends Action {
     constructor() {
         super();
         this.hostRepository = ServiceRegistry.getHostService();
+        this.httpTrafficService = ServiceRegistry.getHttpTrafficService();
         this.remote = Remote.getInstance();
     }
 
@@ -53,6 +54,9 @@ module.exports = class Bypass extends Action {
                   toClientResponse, //响应内容
                   last = true
               }) {
+        // 查找当前用户是否有流量监控窗
+        // 若有监控窗，则将返回浏览器的内容放入 toClientResponse
+        let hasTrafficMonitor = this.httpTrafficService.hasMonitor();
         if (requestContent.hasContent) {
             await this.bypassWithRequestContent({
                 req,

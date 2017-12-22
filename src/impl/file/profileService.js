@@ -5,7 +5,7 @@ const path = require('path');
 
 const defaultProfile = {
     // 工程路径配置
-    "projectPath": [],
+    "projectPath": {},
     // 是否禁用转发规则
     "enableRule": true,
     // 是否禁用host解析
@@ -17,13 +17,12 @@ const defaultProfile = {
  * Created by tsxuehu on 8/3/17.
  */
 module.exports = class ProfileService extends EventEmitter {
-    constructor({ appInfoService}) {
+    constructor({ appInfoService }) {
         super();
         // userId -> profile
         this.userProfileMap = {};
         // clientIp -> userId
         this.clientIpUserMap = {};
-
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
         this.profileSaveDir = path.join(proxyDataDir, "profile");
@@ -33,7 +32,7 @@ module.exports = class ProfileService extends EventEmitter {
     async start() {
         let profileMap = await fileUtil.getJsonFileContentInDir(this.profileSaveDir);
         _.forEach(profileMap, (profile, fileName) => {
-            let userId = fileName.slice(0,-5);
+            let userId = fileName.slice(0, -5);
             // 补全profile数据
             // this.userProfileMap[userId] = _.assign({}, defaultProfile, profile);;
             this.userProfileMap[userId] = profile;
@@ -50,7 +49,7 @@ module.exports = class ProfileService extends EventEmitter {
     async setProfile(userId, profile) {
         this.userProfileMap[userId] = profile;
 
-        let filePath = path.join(this.profileSaveDir,`${userId}.json`);
+        let filePath = path.join(this.profileSaveDir, `${userId}.json`);
         // 将数据写入文件
         await fileUtil.writeJsonToFile(filePath, profile);
         // 发送通知
@@ -67,20 +66,17 @@ module.exports = class ProfileService extends EventEmitter {
      */
     calcPath(userId, href, match, target) {
         if (match) {
-            try {
-                let matchList = href.match(new RegExp(match));
-                _.forEach(matchList, function (value, index) {
-                    if (index == 0) return;
-                    var reg = new RegExp('\\$' + index, 'g');
-                    if (value === undefined) value = '';
-                    target = target.replace(reg, value);
-                });
-                let compiled = _.template(target);
-                let projectPath = this.getProfile(userId).projectPath;
-                // 解析应用的变量
-                return compiled(projectPath);
-            } catch (e) {
-            }
+            let matchList = href.match(new RegExp(match));
+            _.forEach(matchList, function (value, index) {
+                if (index == 0) return;
+                var reg = new RegExp('\\$' + index, 'g');
+                if (value === undefined) value = '';
+                target = target.replace(reg, value);
+            });
+            let compiled = _.template(target);
+            let projectPath = this.getProfile(userId).projectPath;
+            // 解析应用的变量
+            return compiled(projectPath);
         }
     }
 

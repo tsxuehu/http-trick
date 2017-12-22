@@ -58,15 +58,10 @@ module.exports = class MockData extends Action {
         toClientResponse.headers['fe-proxy-content'] = `mock data ${dataId}`;
         toClientResponse.headers['Content-Type'] = contentType;
         if (last) {
-            toClientResponse.sendedToClient = true;
-            addHeaderToResponse(res, toClientResponse.headers);
-            sendSpecificToClient({
-                res,
-                statusCode: 200,
-                headers: toClientResponse.headers,
-                content
-            });
+            toClientResponse.hasContent = true;
+            toClientResponse.body = content;
         } else {
+            toClientResponse.hasContent = true;
             toClientResponse.body = content;
         }
 

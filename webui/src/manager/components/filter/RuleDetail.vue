@@ -33,8 +33,8 @@
         <div>
             <div v-for="action,index in rule.actionList" :key="index" class="dashed-border">
         <span style="width: 85%;display: inline-block">
-          <action-detail :action="action"
-                         :remote="remote"></action-detail>
+          <action-filter-detail :action="action"
+                         :remote="remote"></action-filter-detail>
         </span>
                 <span style="width: 10%;display: inline-block;vertical-align: bottom;line-height: 107px;height: 107px;">
           <el-button type="text" :disabled="remote" @click="deleteAction(index)">删除动作</el-button>

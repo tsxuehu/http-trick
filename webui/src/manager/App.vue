@@ -150,6 +150,8 @@
                     projectPath: [],
                     enableRule: false
                 },
+                // 将工程路径配置转换为数组格式 方便编辑
+                projectPathArray: [],
                 // 关联的ip
                 mappedClientIps: [],
                 // 生效的规则
@@ -378,6 +380,14 @@
 
             socket.on('profile', (profile) => {
                 this.profile = profile;
+                let result = [];
+                _.forEach(profile.projectPath, (value, key) => {
+                    result.push({
+                        key,
+                        value
+                    });
+                });
+                this.projectPathArray = result;
             });
 
             socket.on('mappedClientIps', (ips) => {

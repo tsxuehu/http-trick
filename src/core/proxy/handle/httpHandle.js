@@ -42,8 +42,7 @@ module.exports = class HttpHandle {
         let userId = this.profileService.getClientIpMappedUserId(clientIp);
 
         // 如果是 ui server请求，则直接转发不做记录
-        if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == this.appInfoService.getPcIp())
-            && urlObj.port == this.appInfoService.getRealUiPort()) {
+        if (this.appInfoService.isWebUiRequest(urlObj.hostname, urlObj.port)) {
             Action.getBypassAction().run({
                 req, res, urlObj, toClientResponse: {
                     headers: {}
@@ -56,21 +55,17 @@ module.exports = class HttpHandle {
             });
             return;
         }
-
+        let hasMonitor = this.httpTrafficService.hasMonitor(userId);
+        let requestId = -1;
         // 如果有客户端监听请求内容，则做记录
-        if (this.httpTrafficService.hasMonitor(userId)) {
+        if (hasMonitor) {
             // 记录请求
-            let id = this.httpTrafficService.getRequestId(userId);
-            if (id > -1) {
-                this.httpTrafficService.requestBegin({ userId, clientIp, id, req, res, urlObj });
-
+            let requestId = this.httpTrafficService.getRequestId(userId);
+            if (requestId > -1) {
+                this.httpTrafficService.requestBegin({ userId, clientIp, id: requestId, req, res, urlObj });
                 // 日记记录body
                 this._getRequestBody().then(body => {
-                    this.httpTrafficService.requestBody({ userId, id, req, res, body });
-                });
-
-                this._getResponseToClient(res).then(responseContent => {
-                    this.httpTrafficService.requestReturn({ userId, id, req, res, responseContent });
+                    this.httpTrafficService.requestBody({ userId, id: requestId, req, res, body });
                 });
             }
         }
@@ -95,7 +90,17 @@ module.exports = class HttpHandle {
         let matchedRule = this.ruleService.getProcessRuleList(userId, req.method, urlObj);
 
         let result = await this._runAtions({ req, res, urlObj, clientIp, userId, rule: matchedRule });
+
         // 处理结束 记录额外的请求日志(附加的请求头、cookie、body)
+        // 请求已经发送给浏览器
+        if (hasMonitor && requestId > 0) {
+            let {
+                additionalRequestHeaders,
+                additionalRequestCookies,
+                toClientResponse
+            } = result;
+            this.httpTrafficService.requestReturn({ userId, id: requestId, req, res, responseContent });
+        }
     }
 
     /**
@@ -112,9 +117,11 @@ module.exports = class HttpHandle {
         // 原始的请求头部
         let requestContent = {
             hasContent: false,
+            method: '',
             protocol: '',
             hostname: '',
             path: '',
+            query: {}, // query对象
             port: '',
             headers: {},
             body: ''
@@ -317,8 +324,8 @@ module.exports = class HttpHandle {
         return {
             hasContent: true,
             protocol, // 请求协议
-            hostname, // 请求域名
             method: req.method, // 请求方法
+            hostname, // 请求域名
             path: pathname, // 路径
             query, // query对象
             port, // 端口号
