@@ -1,18 +1,10 @@
+const http = require("http");
+const fs = require("fs");
 const util = require('util');
-const vm = require('vm');
 
-global.globalVar = 3;
-
-const sandbox = { globalVar: 1 ,channel: {}};
-vm.createContext(sandbox);
-try{
-    vm.runInContext('globalVar *= 2;channel.a =!s2', sandbox);
-
-}catch (e){
-    console.log(e.message)
-}
-
-
-console.log(util.inspect(sandbox)); // { globalVar: 2 }
-
-console.log(util.inspect(globalVar)); // 3
+const proxy = http.createServer((req, res) => {
+    let file = fs.createWriteStream("test.pipe");
+    req.pipe(file);
+    console.log(util.inspect(req.headers));
+});
+proxy.listen(8001)

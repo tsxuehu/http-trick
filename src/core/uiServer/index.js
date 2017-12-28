@@ -65,7 +65,7 @@ module.exports = class UiServer {
             this.httpTrafficService.incMonitor(userId);
             this.httpTrafficService.resetRequestId(userId);
 
-            client.on('disconnect',  () => {
+            client.on('disconnect', () => {
                 this.httpTrafficService.decMonitor(userId);
             });
         });
@@ -109,14 +109,14 @@ module.exports = class UiServer {
             client.emit('filters', filters);
         });
         // proxy配置信息
-        this.configureService.on("data-change", (userId,configure) => {
+        this.configureService.on("data-change", (userId, configure) => {
             this.managerNS.to(userId).emit('configure', configure);
         });
         // 个人配置信息
-        this.profileService.on("data-change-profile",( userId, profile)=>{
+        this.profileService.on("data-change-profile", (userId, profile) => {
             this.managerNS.to(userId).emit('profile', profile);
         });
-        this.profileService.on("data-change-clientIpUserMap",( userId, clientIpList)=>{
+        this.profileService.on("data-change-clientIpUserMap", (userId, clientIpList) => {
             this.managerNS.to(userId).emit('mappedClientIps', clientIpList);
         });
         // host文件变化
@@ -198,23 +198,29 @@ module.exports = class UiServer {
             client.emit('breakpoints', this.breakpointService.getUserBreakPoints(userId));
         });
 
-        this.breakpointService.on('instance-add', (userId, instance) => {
-            this.breakpointNS.to(userId).emit('instance-add', instance);
-        });
-        this.breakpointService.on('set-instance-request-content', (userId, instanceId, content) => {
-            this.breakpointNS.to(userId).emit('client-request', instanceId, content);
-        });
-        this.breakpointService.on('set-instance-server-response', (userId, instanceId, content) => {
-            this.breakpointNS.to(userId).emit('server-response', instanceId, content);
-        });
-        this.breakpointService.on('send-instance-to-client', (userId, instanceId) => {
-            this.breakpointNS.to(userId).emit('instance-end', instanceId);
-        });
         this.breakpointService.on('breakpoint-save', (userId, breakpoint) => {
             this.breakpointNS.to(userId).emit('breakpoint-save', breakpoint);
         });
         this.breakpointService.on('breakpoint-delete', (userId, breakpointId) => {
             this.breakpointNS.to(userId).emit('breakpoint-delete', breakpointId);
+        });
+
+        this.breakpointService.on('instance-add', (userId, breakpointId, instance) => {
+            this.breakpointNS.to(userId).emit('instance-add', breakpointId, instance);
+        });
+
+        this.breakpointService.on('instance-delete', (userId, breakpointId, instance) => {
+            this.breakpointNS.to(userId).emit('instance-delete', breakpointId, instance);
+        });
+
+        this.breakpointService.on('instance-set-request-content', (userId, breakpointId, instanceId, content) => {
+            this.breakpointNS.to(userId).emit('client-request', breakpointId, instanceId, content);
+        });
+        this.breakpointService.on('instance-set-server-response', (userId, breakpointId, instanceId, content) => {
+            this.breakpointNS.to(userId).emit('server-response', breakpointId, instanceId, content);
+        });
+        this.breakpointService.on('instance-sended-to-client', (userId, breakpointId, instanceId) => {
+            this.breakpointNS.to(userId).emit('instance-end', breakpointId, instanceId);
         });
     }
 

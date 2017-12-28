@@ -72,7 +72,7 @@ module.exports = class HttpHandle {
 
         // =========================================
         // 断点
-        let breakpointId = await this.breakpoint
+        let breakpointId = await this.breakpointService
             .getBreakpointId(userId, req.method, urlObj);
         if (breakpointId > 0) {
             let requestContent = await this._getRequestContent(
