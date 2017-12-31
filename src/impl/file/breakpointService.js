@@ -194,21 +194,19 @@ module.exports = class BreakpointService extends EventEmitter {
     }
 
     // 将相应内容发送给浏览器，时间监听这具体执行发送操作
-    sendToClient(instanceId) {
+    sendedToClient(instanceId) {
         let instance = this.instances[instanceId];
         instance.sendedToClient = true;
-        this.emit('instance-sended-to-client', instanceId);
-    }
-
-    // 删除实例
-    deleteInstanceSlient(instanceId) {
-        let instance = this.instances[instanceId];
-        delete this.instances[instanceId];
-        // 记录断点实例数量
+        // 记录活跃断点实例数量
         let instanceCnt = this.breakpointInsCnt[instance.breakpointId] || 0;
         instanceCnt--;
         this.breakpointInsCnt[instance.breakpointId] = instanceCnt;
-        return instance;
+
+        this.emit('instance-sended-to-client', instanceId);
+    }
+
+    sendInstanceToClient(instanceId) {
+        this.emit('send-instance-to-client', instanceId);
     }
 
     /**
@@ -216,8 +214,9 @@ module.exports = class BreakpointService extends EventEmitter {
      * @param instanceId
      */
     deleteInstance(instanceId) {
-        let delIns = this.deleteInstanceSlient(instanceId);
-        this.emit('instance-delete', delIns.userId, delIns.breakpointId, instanceId);
+        let instance = this.instances[instanceId];
+        delete this.instances[instanceId];
+        this.emit('instance-delete', instance.userId, instance.breakpointId, instanceId);
     }
 
     /**

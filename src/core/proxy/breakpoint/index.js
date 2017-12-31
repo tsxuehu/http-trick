@@ -34,7 +34,7 @@ module.exports = class Breakpoint {
             this.endRequest([instanceId]);
         });
         // 将请求发送给客户端
-        this.breakpointService.on('instance-sended-to-client', (instanceId) => {
+        this.breakpointService.on('send-instance-to-client', (instanceId) => {
             this.sendToClient(instanceId);
         });
     }
@@ -63,10 +63,14 @@ module.exports = class Breakpoint {
         this.breakpointService.setInstanceServerResponseContent(instanceId, responseContent);
         // 是否有响应断点，若有则放入repository，函数返回
         if (breakpoint.responseBreak) return;
+        // 向客户端发送请求
+
+
         // 响应浏览器（一个空断点会执行到这一步）
         await this.sendToClient(instanceId);
-        // 删除记录信息
-        this.breakpointService.deleteInstanceSlient(instanceId);
+
+        // 通知请求运行结束记录信息
+        this.breakpointService.sendedToClient(instanceId);
 
     }
 
