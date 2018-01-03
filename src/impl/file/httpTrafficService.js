@@ -16,7 +16,7 @@ const EventEmitter = require("events");
  */
 module.exports = class HttpTrafficService extends EventEmitter {
 
-    constructor({userService, appInfoService}) {
+    constructor({ userService, appInfoService }) {
         super();
         this.userService = userService;
         this.appInfoService = appInfoService;
@@ -43,15 +43,14 @@ module.exports = class HttpTrafficService extends EventEmitter {
 
     // 将缓存数据发送给用户
     sendCachedData() {
-        _.forEach(this.cache, async (rows, userId) => {
+        _.forEach(this.cache, (rows, userId) => {
             this.emit("traffic", userId, rows);
         });
         this.cache = {};
     }
 
-
     // 为请求分配id
-    async getRequestId(userId) {
+    getRequestId(userId) {
 
         // 获取当前ip
         let id = this.userRequestPointer[userId] || 0;
@@ -88,8 +87,8 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 记录请求
-    async requestBegin({userId, clientIp, id, req, res, urlObj}) {
-        let {protocol, host, pathname, port} = urlObj;
+    async requestBegin({ userId, clientIp, id, req, res, urlObj }) {
+        let { protocol, host, path, pathname, port } = urlObj;
 
         let queue = this.cache[userId] || [];
         queue.push({
@@ -113,7 +112,7 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 记录请求body
-    async requestBody({userId,  id, req, res, body}) {
+    async requestBody({ userId, id, req, res, body }) {
         // 将body写文件
 
         let bodyPath = this.getRequestBodyPath(userId, id);
@@ -121,11 +120,11 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 记录响应
-    async requestReturn({userId, id, req, res, responseContent}) {
-
+    async requestReturn({ userId, id, req, res, toClientResponse }) {
         let queue = this.cache[userId] || [];
 
         let expires = res.getHeader('expires');
+        let body = toClientResponse.body;
         queue.push({
             id: id,
             result: res.statusCode,
@@ -137,9 +136,10 @@ module.exports = class HttpTrafficService extends EventEmitter {
         });
 
         this.cache[userId] = queue;
-
-        let bodyPath = this.getResponseBodyPath(userId, id);
-        await fileUtil.writeFile(bodyPath, responseContent);
+        if (body) {
+            let bodyPath = this.getResponseBodyPath(userId, id);
+            await fileUtil.writeFile(bodyPath, body);
+        }
     }
 
     // 启动的时候先清空请求记录目录
@@ -177,4 +177,4 @@ module.exports = class HttpTrafficService extends EventEmitter {
     getResponseBodyPath(userId, requestId) {
         return path.join(this.trafficDir, userId + '_' + requestId + '_res_body');
     }
-}
+};

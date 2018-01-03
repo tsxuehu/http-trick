@@ -29,6 +29,7 @@ module.exports = class Action {
     async run({
                   req,
                   res,
+                  recordResponse,
                   urlObj,
                   clientIp,
                   rule, // 规则

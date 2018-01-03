@@ -60,15 +60,22 @@ module.exports = class HttpHandle {
         // 如果有客户端监听请求内容，则做记录
         if (hasMonitor) {
             // 记录请求
-            let requestId = this.httpTrafficService.getRequestId(userId);
+            requestId = this.httpTrafficService.getRequestId(userId);
             if (requestId > -1) {
                 this.httpTrafficService.requestBegin({ userId, clientIp, id: requestId, req, res, urlObj });
                 // 日记记录body
-                this._getRequestBody().then(body => {
-                    this.httpTrafficService.requestBody({ userId, id: requestId, req, res, body });
+                this._getRequestBody(req).then(body => {
+                    this.httpTrafficService.requestBody({
+                        userId,
+                        id: requestId,
+                        req, res, body
+                    });
                 });
             }
         }
+
+        // 是否需要记录请求日志
+        let recordResponse = hasMonitor && requestId > -1;
 
         // =========================================
         // 断点
@@ -89,17 +96,26 @@ module.exports = class HttpHandle {
 
         let matchedRule = this.ruleService.getProcessRuleList(userId, req.method, urlObj);
 
-        let result = await this._runAtions({ req, res, urlObj, clientIp, userId, rule: matchedRule });
+        let result = await this._runAtions({
+            req, res, recordResponse,
+            urlObj, clientIp, userId, rule: matchedRule
+        });
 
         // 处理结束 记录额外的请求日志(附加的请求头、cookie、body)
         // 请求已经发送给浏览器
-        if (hasMonitor && requestId > 0) {
+        if (recordResponse) {
             let {
                 additionalRequestHeaders,
                 additionalRequestCookies,
                 toClientResponse
             } = result;
-            this.httpTrafficService.requestReturn({ userId, id: requestId, req, res, responseContent });
+            this.httpTrafficService.requestReturn({
+                userId,
+                id: requestId, req, res,
+                additionalRequestHeaders,
+                additionalRequestCookies,
+                toClientResponse: toClientResponse
+            });
         }
     }
 
@@ -113,7 +129,10 @@ module.exports = class HttpHandle {
      * @returns {Promise.<void>}
      * @private
      */
-    async _runAtions({ req, res, urlObj, rule, clientIp, userId }) {
+    async _runAtions({
+                         req, res, recordResponse,
+                         urlObj, rule, clientIp, userId
+                     }) {
         // 原始的请求头部
         let requestContent = {
             hasContent: false,
@@ -191,6 +210,7 @@ module.exports = class HttpHandle {
                 await Action.getBypassAction().run({
                     req,
                     res,
+                    recordResponse,
                     urlObj,
                     clientIp,
                     userId,
@@ -215,6 +235,7 @@ module.exports = class HttpHandle {
             await actionHandler.run({
                 req,
                 res,
+                recordResponse,
                 urlObj,
                 clientIp,
                 userId,
@@ -246,6 +267,7 @@ module.exports = class HttpHandle {
                 await Action.getBypassAction().run({
                     req,
                     res,
+                    recordResponse,
                     urlObj,
                     clientIp,
                     userId,

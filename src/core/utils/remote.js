@@ -26,13 +26,17 @@ module.exports = class Remote {
     /**
      * 将请求远程的响应内容直接返回给浏览器
      */
-    async pipe({ req, res, protocol, hostname, path, port, headers, timeout = 10000, toClientResponse }) {
+    async pipe({
+                   req, res, recordResponse,
+                   protocol, hostname, path, port, headers, timeout = 10000, toClientResponse
+               }) {
         let isHttps = protocol.indexOf('https') > -1;
         // http.request 解析dns时，偶尔会出错
         // 使用axios获取远程数据
+        let href = '';
         try {
             let ip = await resovleIp(hostname);
-            let href = `${protocol}//${ip}:${port}${path}`;
+            href = `${protocol}//${ip}:${port}${path}`;
             let remoteResponse = await axios({
                 method: req.method,
                 url: href,
@@ -68,10 +72,10 @@ module.exports = class Remote {
                     protocol, hostname, path, port,
                     headers, toClientResponse, timeout = 10000
                 }) {
-
+        let href = '';
         try {
             let ip = await resovleIp(hostname);
-            let href = `${protocol}//${ip}:${port}${path}`;
+            href = `${protocol}//${ip}:${port}${path}`;
             // 设置超时时间，节约socket资源
             let response = await axios({
                 method: req.method,

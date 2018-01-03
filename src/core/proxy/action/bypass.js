@@ -41,6 +41,7 @@ module.exports = class Bypass extends Action {
     async run({
                   req,
                   res,
+                  recordResponse,
                   urlObj,
                   clientIp,
                   userId,
@@ -61,6 +62,7 @@ module.exports = class Bypass extends Action {
             await this.bypassWithRequestContent({
                 req,
                 res,
+                recordResponse,
                 urlObj,
                 clientIp,
                 userId,
@@ -78,6 +80,7 @@ module.exports = class Bypass extends Action {
             await this.bypass({
                 req,
                 res,
+                recordResponse,
                 urlObj,
                 clientIp,
                 userId,
@@ -97,6 +100,7 @@ module.exports = class Bypass extends Action {
     async bypass({
                      req,
                      res,
+                     recordResponse,
                      urlObj,
                      clientIp,
                      userId,
@@ -124,18 +128,18 @@ module.exports = class Bypass extends Action {
         Object.assign(actualRequestCookies, originCookies, additionalRequestCookies);
         actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
 
-        if (last) {
-            toClientResponse.sendedToClient = true;
-            addHeaderToResponse(res, toClientResponse.headers);
-            await this.remote.pipe({
-                req, res,
-                protocol, hostname: ipOrHost, path, port, headers: actualRequestHeaders, toClientResponse
-            });
-        } else {
+        if (!last) {
             await this.remote.cache({
                 req, res,
                 protocol, hostname: ipOrHost, path, port,
-                 headers: actualRequestHeaders, toClientResponse
+                headers: actualRequestHeaders, toClientResponse
+            });
+        } else {
+            toClientResponse.sendedToClient = true;
+            addHeaderToResponse(res, toClientResponse.headers);
+            await this.remote.pipe({
+                req, res, recordResponse,
+                protocol, hostname: ipOrHost, path, port, headers: actualRequestHeaders, toClientResponse
             });
         }
 
@@ -144,6 +148,7 @@ module.exports = class Bypass extends Action {
     async bypassWithRequestContent({
                                        req,
                                        res,
+                                       recordResponse,
                                        urlObj,
                                        clientIp,
                                        userId,

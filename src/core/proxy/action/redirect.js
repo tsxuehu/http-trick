@@ -47,6 +47,7 @@ module.exports = class Redirect extends Action {
     async run({
                   req,
                   res,
+                  recordResponse,
                   urlObj,
                   clientIp,
                   userId,
@@ -106,6 +107,7 @@ module.exports = class Redirect extends Action {
     async _toRemote({
                         req,
                         res,
+                        recordResponse,
                         clientIp,
                         userId,
                         target,
@@ -151,6 +153,7 @@ module.exports = class Redirect extends Action {
     async _toLocal({
                        req,
                        res,
+                       recordResponse,
                        urlObj,
                        clientIp,
                        target,
