@@ -107,10 +107,11 @@ module.exports = class HttpHandle {
         // 处理结束 记录额外的请求日志(附加的请求头、cookie、body)
         // 请求已经发送给浏览器
         if (recordResponse) {
-            this.httpTrafficService.requestBody({
+            toClientResponse.requestEndTime = new Date().getTime();
+            this.httpTrafficService.actualRequest({
                 userId,
                 id: requestId,
-                body: toClientResponse.requestData.body
+                requestData: toClientResponse.requestData,
             });
             this.httpTrafficService.serverReturn({
                 userId,
@@ -166,12 +167,14 @@ module.exports = class HttpHandle {
                 headers: {},
                 body: ''
             },
+            originRequestBody: '',
             remoteIp: '',// 远程服务器器ip
             receiveRequestTime: new Date().getTime(), // 接收到请求的时间
             dnsResolveBeginTime: 0,// dns解析开始时间
-            requestBeginTime: 0,// 请求开始时间
-            serverResponseTime: 0,// 服务器响应时间
-            requestEndTime: 0,// 请求结束时间
+            remoteRequestBeginTime: 0,// 请求开始时间
+            remoteResponseStartTime: 0,// 服务器响应开始时间
+            remoteResponseEndTime: 0,// 服务器响应结束时间
+            requestEndTime: 0,// 响应结束时间
             statusCode: 200,
             headers: {},// 要发送给浏览器的header
             body: ''// 要发送给浏览器的body
@@ -242,9 +245,13 @@ module.exports = class HttpHandle {
             }
             // 动作需要请求内容，但是当前却没有请求内容
             if (actionHandler.needRequestContent() && !requestContent.hasContent) {
-                requestContent = await this._getRequestContent(
+                requestContent = await requestResponseUtils.getClientRequestContent(
                     req,
                     urlObj);
+                // 原始请求body
+               /* if (recordResponse) {
+                    toClientResponse.originRequestBody = Buffer.from(requestContent.body);
+                }*/
             }
             // 运行action
             await actionHandler.run({

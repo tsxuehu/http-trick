@@ -14,7 +14,7 @@ module.exports = function ({ res, statusCode, headers, content }) {
         buffer = Buffer.from(content, 'utf-8');
     }
 
-    headers['Content-Length'] = buffer.length;
+    headers['content-length'] = buffer.length;
     _.forEach(headers, function (value, key) {
         res.setHeader(key, value);
     });

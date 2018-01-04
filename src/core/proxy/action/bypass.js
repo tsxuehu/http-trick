@@ -167,7 +167,7 @@ module.exports = class Bypass extends Action {
         let { protocol, hostname, pathname, port, query, method, headers, body } = requestContent;
 
         let ipOrHost = await this.hostRepository.resolveHost(userId, hostname);
-        let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
+        let targetUrl = protocol + '//' + ipOrHost + ':' + port + pathname;
 
         toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
 

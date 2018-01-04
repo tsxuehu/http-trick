@@ -104,23 +104,40 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 记录请求body
-    async requestBody({ userId, id, body }) {
+    async actualRequest({ userId, id, requestData, originBody }) {
         // 将body写文件
+
+        let body = requestData.body;
+        delete requestData.body;
+
+        let queue = this.cache[userId] || [];
+        queue.push({
+            id: id,
+            requestData
+        });
+        this.cache[userId] = queue;
+
         if (body) {
             let bodyPath = this.getRequestBodyPath(userId, id);
             await fileUtil.writeFile(bodyPath, body);
+        }
+        if (originBody) {
+            let bodyPath = this.getOriginRequestBodyPath(userId, id);
+            await fileUtil.writeFile(bodyPath, originBody);
         }
     }
 
     // 记录响应
     async serverReturn({ userId, id, toClientResponse }) {
         let queue = this.cache[userId] || [];
-        let {statusCode,
+        let {
+            statusCode,
             headers,
             receiveRequestTime,
             dnsResolveBeginTime,
-            requestBeginTime,
-            serverResponseTime,
+            remoteRequestBeginTime,
+            remoteResponseStartTime,
+            remoteResponseEndTime,
             requestEndTime,
             remoteIp,
             body
@@ -132,11 +149,12 @@ module.exports = class HttpTrafficService extends EventEmitter {
                 headers,
                 receiveRequestTime,
                 dnsResolveBeginTime,
-                requestBeginTime,
-                serverResponseTime,
+                remoteRequestBeginTime,
+                remoteResponseStartTime,
+                remoteResponseEndTime,
                 requestEndTime,
-                remoteIp,
-            },
+                remoteIp
+            }
         });
 
         this.cache[userId] = queue;
@@ -176,6 +194,10 @@ module.exports = class HttpTrafficService extends EventEmitter {
     // 获取请求记录path
     getRequestBodyPath(userId, requestId) {
         return path.join(this.trafficDir, userId + '_' + requestId + '_req_body');
+    }
+
+    getOriginRequestBodyPath() {
+        return path.join(this.trafficDir, userId + '_' + requestId + '_req_body_origin');
     }
 
     // 获取响应记录path

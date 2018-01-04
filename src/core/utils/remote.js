@@ -43,7 +43,7 @@ module.exports = class Remote {
             toClientResponse.headers['remote-ip'] = ip;
             if (recordResponse) {
                 toClientResponse.remoteIp = ip;
-                toClientResponse.requestBeginTime = new Date().getTime();
+                toClientResponse.remoteRequestBeginTime = new Date().getTime();
             }
 
             let proxyResponsePromise = this._requestServer({
@@ -64,11 +64,11 @@ module.exports = class Remote {
             toClientResponse.sendedToClient = true;
 
             if (recordResponse) {
-                toClientResponse.serverResponseTime = new Date().getTime();
+                toClientResponse.remoteResponseStartTime = new Date().getTime();
                 toClientResponse.statusCode = proxyResponse.statusCode;
                 let reqData = await clientRequestPromise;
                 let resData = await requestResponseUtils.getServerResponseBody(proxyResponse);
-                toClientResponse.requestEndTime = new Date().getTime();
+                toClientResponse.remoteResponseEndTime = new Date().getTime();
                 toClientResponse.body = resData;
                 toClientResponse.hasContent = true;
                 toClientResponse.requestData = {
@@ -103,7 +103,7 @@ module.exports = class Remote {
             toClientResponse.headers['remote-ip'] = ip;
 
             toClientResponse.remoteIp = ip;
-            toClientResponse.requestBeginTime = new Date().getTime();
+            toClientResponse.remoteRequestBeginTime = new Date().getTime();
 
             let proxyResponsePromise = await this._requestServer({
                 req,
@@ -120,11 +120,13 @@ module.exports = class Remote {
             let proxyResponse = await proxyResponsePromise;
 
             toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
+            delete toClientResponse.headers['content-encoding'];
+            delete toClientResponse.headers['transfer-encoding'];
 
-            toClientResponse.serverResponseTime = new Date().getTime();
+            toClientResponse.remoteResponseStartTime = new Date().getTime();
             toClientResponse.statusCode = proxyResponse.statusCode;
             let resData = await requestResponseUtils.getServerResponseBody(proxyResponse);
-            toClientResponse.requestEndTime = new Date().getTime();
+            toClientResponse.remoteResponseEndTime = new Date().getTime();
             toClientResponse.body = resData;
             toClientResponse.hasContent = true;
 
@@ -159,7 +161,7 @@ module.exports = class Remote {
             toClientResponse.headers['remote-ip'] = ip;
 
             toClientResponse.remoteIp = ip;
-            toClientResponse.requestBeginTime = new Date().getTime();
+            toClientResponse.remoteRequestBeginTime = new Date().getTime();
             let path = `${pathname}?${queryString.stringify(query)}`;
             let proxyResponse = await this._requestServer({
                 body: requestContent.body,
@@ -168,12 +170,14 @@ module.exports = class Remote {
             });
 
             toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
+            delete toClientResponse.headers['content-encoding'];
+            delete toClientResponse.headers['transfer-encoding'];
 
-            toClientResponse.serverResponseTime = new Date().getTime();
+            toClientResponse.remoteResponseStartTime = new Date().getTime();
 
             toClientResponse.statusCode = proxyResponse.statusCode;
             let resData = await requestResponseUtils.getServerResponseBody(proxyResponse);
-            toClientResponse.requestEndTime = new Date().getTime();
+            toClientResponse.remoteResponseEndTime = new Date().getTime();
             toClientResponse.body = resData;
             toClientResponse.hasContent = true;
             if (recordResponse) {
