@@ -79,6 +79,7 @@ module.exports = class Redirect extends Action {
             await this._toRemote({
                 req,
                 res,
+                recordResponse,
                 clientIp,
                 target,
                 additionalRequestHeaders, // 请求头
@@ -137,13 +138,15 @@ module.exports = class Redirect extends Action {
         if (last) {
             addHeaderToResponse(res, toClientResponse.headers);
             await this.remote.pipe({
-                req, res,
+                req, res, recordResponse,
+                method: req.method,
                 protocol, hostname: ipOrHost, path, port,
                 headers: actualRequestHeaders, toClientResponse
             });
         } else {
             await this.remote.cache({
                 req, res,
+                method: req.method,
                 protocol, hostname: ipOrHost, path, port,
                 headers: actualRequestHeaders, toClientResponse
             });

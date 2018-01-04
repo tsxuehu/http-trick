@@ -79,7 +79,15 @@ module.exports = class HttpHandle {
             // 记录请求
             requestId = this.httpTrafficService.getRequestId(userId);
             if (requestId > -1) {
-                this.httpTrafficService.requestBegin({ userId, clientIp, id: requestId, req, urlObj });
+                this.httpTrafficService.requestBegin({
+                    userId,
+                    clientIp,
+                    id: requestId,
+                    urlObj,
+                    method: req.method,
+                    httpVersion: req.httpVersion,
+                    headers: req.headers
+                });
             }
         }
 
@@ -104,7 +112,7 @@ module.exports = class HttpHandle {
                 id: requestId,
                 body: toClientResponse.requestData.body
             });
-            this.httpTrafficService.requestReturn({
+            this.httpTrafficService.serverReturn({
                 userId,
                 id: requestId,
                 toClientResponse: toClientResponse
@@ -153,12 +161,12 @@ module.exports = class HttpHandle {
             requestData: {// 发送请崎岖时使用的数据
                 method: '',
                 protocol: '',
-                remoteIp: '',// 远程服务器器ip
                 port: '',
                 path: '',
                 headers: {},
                 body: ''
             },
+            remoteIp: '',// 远程服务器器ip
             receiveRequestTime: new Date().getTime(), // 接收到请求的时间
             dnsResolveBeginTime: 0,// dns解析开始时间
             requestBeginTime: 0,// 请求开始时间

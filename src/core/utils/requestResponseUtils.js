@@ -59,11 +59,11 @@ function getContentType(request) {
 // 从_getRequestBody返回的 body 组装请求内容
 async function getClientRequestContent(req, urlObj) {
     let bodyBuffer = await getClientRequestBody(req);
-    let body = '';
-    let type = getContentType(req);
+    let body = bodyBuffer;
+   /* let type = getContentType(req);
     if (type && ['application/json', 'application/x-www-form-urlencoded', 'text/plain', 'text/html'].indexOf(type) > -1) {
         body = bodyBuffer.toString('utf8');
-    }
+    }*/
     let { protocol, hostname, href, pathname, port } = urlObj;
     let query = queryString.parse(urlObj.search);
     return {
@@ -71,7 +71,7 @@ async function getClientRequestContent(req, urlObj) {
         protocol, // 请求协议
         method: req.method, // 请求方法
         hostname, // 请求域名
-        path: pathname, // 路径
+        pathname: pathname, // 路径
         query, // query对象
         port, // 端口号
         headers: _.assign({}, req.headers), // 请求头

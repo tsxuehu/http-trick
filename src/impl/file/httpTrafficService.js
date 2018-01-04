@@ -87,26 +87,17 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 记录请求
-    async requestBegin({ userId, clientIp, id, req, urlObj }) {
-        let { protocol, host, path, pathname, port } = urlObj;
-
+    async requestBegin({ id, userId, clientIp, method, httpVersion, urlObj, headers }) {
         let queue = this.cache[userId] || [];
         // 原始请求信息
         queue.push({
             id: id,
-            start: true, // 请求开始的标记
-            result: '-', // 状态码
-            clientIp,
-            protocol: protocol.toUpperCase(),
-            host: host,
-            url: req.url,
-            port,
-            path: path,
-            pathname: pathname,
-            method: req.method,
-            httpVersion: req.httpVersion,
-            reqHeaders: req.headers,
-            reqTime: +new Date()
+            originRequest: Object.assign({
+                clientIp,
+                method,
+                httpVersion,
+                headers
+            }, urlObj)
         });
 
         this.cache[userId] = queue;
@@ -122,22 +113,34 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 记录响应
-    async requestReturn({ userId, id, toClientResponse }) {
+    async serverReturn({ userId, id, toClientResponse }) {
         let queue = this.cache[userId] || [];
-
-        let expires = res.getHeader('expires');
-        let body = toClientResponse.body;
+        let {statusCode,
+            headers,
+            receiveRequestTime,
+            dnsResolveBeginTime,
+            requestBeginTime,
+            serverResponseTime,
+            requestEndTime,
+            remoteIp,
+            body
+        } = toClientResponse;
         queue.push({
             id: id,
-            result: res.statusCode,
-            body: res.getHeader('content-length') || (body && body.length) || 0,
-            caching: (res.getHeader('cache-control') || '') + (expires ? '; expires:' + expires : ''),
-            contentType: res.getHeader('content-type') || '',
-            resHeaders: res._headers,
-            resTime: +new Date()
+            response: {
+                statusCode,
+                headers,
+                receiveRequestTime,
+                dnsResolveBeginTime,
+                requestBeginTime,
+                serverResponseTime,
+                requestEndTime,
+                remoteIp,
+            },
         });
 
         this.cache[userId] = queue;
+
         if (body) {
             let bodyPath = this.getResponseBodyPath(userId, id);
             await fileUtil.writeFile(bodyPath, body);

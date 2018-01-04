@@ -4,5 +4,5 @@ exports.setError = function setError(toClientResponse, msg = "", error) {
     toClientResponse.hasContent = true;
     toClientResponse.stopRunAction = true;
     toClientResponse.sendedToClient = false;
-    toClientResponse.body = msg + "\n\n" + (error && error.message || "") + "\n\n" + error && util.inspect(error);
+    toClientResponse.body = msg + "\n\n" + util.inspect(toClientResponse.headers) + "\n\n" + (error && error.message || "") + "\n\n" + error && util.inspect(error);
 };

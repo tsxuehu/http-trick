@@ -6,6 +6,7 @@ const _ = require("lodash");
 const http = require('http');
 const https = require('https');
 const toClientResponseUtils = require('./toClientResponseUtils');
+const requestResponseUtils = require('./requestResponseUtils');
 /**
  * 从远程服务器上获取响应内容
  */
@@ -28,50 +29,60 @@ module.exports = class Remote {
      */
     async pipe({
                    req, res, recordResponse,
-                   protocol, hostname, path, port, headers, timeout = 10000, toClientResponse
+                   method, protocol, hostname, path, port, headers, timeout, toClientResponse
                }) {
-        let isHttps = protocol.indexOf('https') > -1;
         // http.request 解析dns时，偶尔会出错
-        // 使用axios获取远程数据
         // pipe流 获取远程数据 并做记录
-        let href = '';
+
         let ip = '';
         try {
             if (recordResponse) {
                 toClientResponse.dnsResolveBeginTime = new Date().getTime();
             }
             ip = await resovleIp(hostname);
-            href = `${protocol}//${ip}:${port}${path}`;
-
+            toClientResponse.headers['remote-ip'] = ip;
             if (recordResponse) {
                 toClientResponse.remoteIp = ip;
                 toClientResponse.requestBeginTime = new Date().getTime();
-
             }
-            let remoteResponse = await axios({
-                method: req.method,
-                url: href,
-                headers: headers,
-                maxRedirects: 0,
-                responseType: 'arraybuffer',
-                data: req,
-                // 禁止自动转换body
-                transformResponse: [function transformResponse(data) {
-                    return data;
-                }],
-                timeout,
-                validateStatus: _.stubTrue
-            });
-            toClientResponse.sendedToClient = true;
-            toClientResponse.hasContent = true;
-            Object.assign(toClientResponse.headers, remoteResponse.headers, { 'content-length': Buffer.byteLength(remoteResponse.data) });
-            toClientResponse.statusCode = remoteResponse.status;
-            // 返回结果
-            res.writeHead(toClientResponse.statusCode, toClientResponse.headers);
-            res.end(remoteResponse.data);
 
+            let proxyResponsePromise = this._requestServer({
+                req,
+                protocol, method, port, path,
+                ip, headers, timeout
+            });
+            // 记录日志
+            let clientRequestPromise;
+            if (recordResponse) {
+                clientRequestPromise = requestResponseUtils.getClientRequestBody(req);
+            }
+            let proxyResponse = await proxyResponsePromise;
+            toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
+
+            res.writeHead(proxyResponse.statusCode, toClientResponse.headers);
+            proxyResponse.pipe(res);
+            toClientResponse.sendedToClient = true;
+
+            if (recordResponse) {
+                toClientResponse.serverResponseTime = new Date().getTime();
+                toClientResponse.statusCode = proxyResponse.statusCode;
+                let reqData = await clientRequestPromise;
+                let resData = await requestResponseUtils.getServerResponseBody(proxyResponse);
+                toClientResponse.requestEndTime = new Date().getTime();
+                toClientResponse.body = resData;
+                toClientResponse.hasContent = true;
+                toClientResponse.requestData = {
+                    method,
+                    protocol,
+                    port,
+                    path,
+                    headers,
+                    body: reqData
+                };
+            }
         } catch (e) {
-            toClientResponseUtils.setError(toClientResponse, `${protocol}//${hostname}:${port}${path}`, e);
+            let href = `${protocol}//${hostname}:${port}${path}`;
+            toClientResponseUtils.setError(toClientResponse, href, e);
             log.error(hostname, href, e);
         }
     }
@@ -80,36 +91,58 @@ module.exports = class Remote {
      * 将请求远程的响应内容
      */
     async cache({
-                    req, res,
+                    req, res, recordResponse, method,
                     protocol, hostname, path, port,
-                    headers, toClientResponse, timeout = 10000
+                    headers, toClientResponse, timeout
                 }) {
-        let href = '';
+
         try {
+            toClientResponse.dnsResolveBeginTime = new Date().getTime();
+
             let ip = await resovleIp(hostname);
-            href = `${protocol}//${ip}:${port}${path}`;
-            // 设置超时时间，节约socket资源
-            let response = await axios({
-                method: req.method,
-                url: href,
-                headers: headers,
-                maxRedirects: 0,
-                responseType: 'text',
-                data: req,
-                // 禁止自动转换body
-                transformResponse: [function transformResponse(data) {
-                    return data;
-                }],
-                timeout,
-                validateStatus: _.stubTrue
+            toClientResponse.headers['remote-ip'] = ip;
+
+            toClientResponse.remoteIp = ip;
+            toClientResponse.requestBeginTime = new Date().getTime();
+
+            let proxyResponsePromise = await this._requestServer({
+                req,
+                protocol, method, port, path,
+                ip, headers, timeout
             });
-            toClientResponse.sendedToClient = false;
+
+            // 记录日志
+            let clientRequestPromise;
+            if (recordResponse) {
+                clientRequestPromise = requestResponseUtils.getClientRequestBody(req);
+            }
+
+            let proxyResponse = await proxyResponsePromise;
+
+            toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
+
+            toClientResponse.serverResponseTime = new Date().getTime();
+            toClientResponse.statusCode = proxyResponse.statusCode;
+            let resData = await requestResponseUtils.getServerResponseBody(proxyResponse);
+            toClientResponse.requestEndTime = new Date().getTime();
+            toClientResponse.body = resData;
             toClientResponse.hasContent = true;
-            toClientResponse.headers = _.assign({}, response.headers, toClientResponse.headers);
-            toClientResponse.body = response.data;
-            toClientResponse.statusCode = response.status;
+
+            if (recordResponse) {
+                let reqData = await clientRequestPromise;
+                toClientResponse.requestData = {
+                    method,
+                    protocol,
+                    port,
+                    path,
+                    headers,
+                    body: reqData
+                };
+            }
+
         } catch (e) {
-            toClientResponseUtils.setError(toClientResponse, `${protocol}//${hostname}:${port}${path}`, e);
+            let href = `${protocol}//${hostname}:${port}${path}`;
+            toClientResponseUtils.setError(toClientResponse, href, e);
             log.error(hostname, href, e);
         }
     }
@@ -117,35 +150,74 @@ module.exports = class Remote {
     /**
      * 根据RequestContent
      */
-    async cacheFromRequestContent({ requestContent, toClientResponse, timeout = 10000 }) {
-        let { protocol, hostname, path, port, query, method, headers, body } = requestContent;
+    async cacheFromRequestContent({ requestContent, recordResponse, toClientResponse, timeout }) {
+        let { protocol, hostname, pathname, port, query, method, headers, body } = requestContent;
         try {
+            toClientResponse.dnsResolveBeginTime = new Date().getTime();
+
             let ip = await resovleIp(hostname);
-            let href = `${protocol}//${ip}:${port}${path}?${queryString.stringify(query)}`;
-            let response = await axios({
-                method,
-                url: href,
-                headers,
-                maxRedirects: 0,
-                responseType: 'text',
-                data: body,
-                validateStatus: null,
-                // 禁止自动转换body
-                transformResponse: [function transformResponse(data) {
-                    return data;
-                }],
-                timeout,
-                validateStatus: _.stubTrue
+            toClientResponse.headers['remote-ip'] = ip;
+
+            toClientResponse.remoteIp = ip;
+            toClientResponse.requestBeginTime = new Date().getTime();
+            let path = `${pathname}?${queryString.stringify(query)}`;
+            let proxyResponse = await this._requestServer({
+                body: requestContent.body,
+                protocol, method, port, path,
+                ip, headers, timeout
             });
-            toClientResponse.sendedToClient = false;
+
+            toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
+
+            toClientResponse.serverResponseTime = new Date().getTime();
+
+            toClientResponse.statusCode = proxyResponse.statusCode;
+            let resData = await requestResponseUtils.getServerResponseBody(proxyResponse);
+            toClientResponse.requestEndTime = new Date().getTime();
+            toClientResponse.body = resData;
             toClientResponse.hasContent = true;
-            toClientResponse.headers = _.assign({}, response.headers, toClientResponse.headers);
-            toClientResponse.body = response.data;
-            toClientResponse.statusCode = response.status;
+            if (recordResponse) {
+                toClientResponse.requestData = {
+                    method,
+                    protocol,
+                    port,
+                    path,
+                    headers,
+                    body: requestContent.body
+                };
+            }
         } catch (e) {
-            toClientResponseUtils.setError(toClientResponse, `${protocol}//${ip}:${port}${path}?${queryString.stringify(query)}`, e);
+            let href = `${protocol}//${hostname}:${port}${pathname}?${queryString.stringify(query)}`;
+            toClientResponseUtils.setError(toClientResponse, href, e);
             log.error(hostname, href, e);
         }
+    }
 
+    _requestServer({ req, body, protocol, method, port, path, ip, headers, timeout = 10000 }) {
+        let proxyRequestPromise = new Promise((resolve, reject) => {
+            let client = protocol === 'https:' ? https : http;
+            let proxyRequest = client.request({
+                protocol,
+                method,
+                port,
+                path,
+                hostname: ip,
+                headers,
+                timeout,
+                rejectUnauthorized: false
+            }, (proxyResponse) => {
+                // 有响应时返回promise
+                resolve(proxyResponse);
+            });
+            proxyRequest.on('error', (e) => {
+                reject(e);
+            });
+            if (req) {
+                req.pipe(proxyRequest);
+            } else {
+                proxyRequest.end(body);
+            }
+        });
+        return proxyRequestPromise;
     }
 };

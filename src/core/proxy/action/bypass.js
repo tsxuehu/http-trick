@@ -57,7 +57,6 @@ module.exports = class Bypass extends Action {
               }) {
         // 查找当前用户是否有流量监控窗
         // 若有监控窗，则将返回浏览器的内容放入 toClientResponse
-        let hasTrafficMonitor = this.httpTrafficService.hasMonitor();
         if (requestContent.hasContent) {
             await this.bypassWithRequestContent({
                 req,
@@ -130,7 +129,8 @@ module.exports = class Bypass extends Action {
 
         if (!last) {
             await this.remote.cache({
-                req, res,
+                req, res,recordResponse,
+                method: req.method,
                 protocol, hostname: ipOrHost, path, port,
                 headers: actualRequestHeaders, toClientResponse
             });
@@ -139,6 +139,7 @@ module.exports = class Bypass extends Action {
             addHeaderToResponse(res, toClientResponse.headers);
             await this.remote.pipe({
                 req, res, recordResponse,
+                method: req.method,
                 protocol, hostname: ipOrHost, path, port, headers: actualRequestHeaders, toClientResponse
             });
         }
@@ -163,7 +164,7 @@ module.exports = class Bypass extends Action {
                                        last = true
                                    }) {
         // 构造url
-        let { protocol, hostname, path, port, query, method, headers, body } = requestContent;
+        let { protocol, hostname, pathname, port, query, method, headers, body } = requestContent;
 
         let ipOrHost = await this.hostRepository.resolveHost(userId, hostname);
         let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
@@ -181,12 +182,13 @@ module.exports = class Bypass extends Action {
                 protocol,
                 method,
                 hostname: ipOrHost,
-                path,
+                pathname,
                 query,
                 port,
                 headers: actualRequestHeaders,
                 body
             },
+            recordResponse,
             toClientResponse
         });
 
