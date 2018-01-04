@@ -1,8 +1,8 @@
 const zlib = require("zlib");
 const parseUrl = require("../../utils/parseUrl");
+const requestResponseUtils = require("../../utils/requestResponseUtils");
 const ServiceRegistry = require("../../service");
 const Action = require("../action/index");
-const queryString = require("query-string");
 const getClientIp = require("../../utils/getClientIp");
 const Breakpoint = require("../breakpoint");
 const _ = require("lodash");
@@ -45,7 +45,8 @@ module.exports = class HttpHandle {
         if (this.appInfoService.isWebUiRequest(urlObj.hostname, urlObj.port)) {
             Action.getBypassAction().run({
                 req, res, urlObj, toClientResponse: {
-                    headers: {}
+                    headers: {},
+                    requestData: {}
                 },
                 requestContent: {},
                 additionalRequestHeaders: {},
@@ -55,27 +56,6 @@ module.exports = class HttpHandle {
             });
             return;
         }
-        let hasMonitor = this.httpTrafficService.hasMonitor(userId);
-        let requestId = -1;
-        // 如果有客户端监听请求内容，则做记录
-        if (hasMonitor) {
-            // 记录请求
-            requestId = this.httpTrafficService.getRequestId(userId);
-            if (requestId > -1) {
-                this.httpTrafficService.requestBegin({ userId, clientIp, id: requestId, req, res, urlObj });
-                // 日记记录body
-                this._getRequestBody(req).then(body => {
-                    this.httpTrafficService.requestBody({
-                        userId,
-                        id: requestId,
-                        req, res, body
-                    });
-                });
-            }
-        }
-
-        // 是否需要记录请求日志
-        let recordResponse = hasMonitor && requestId > -1;
 
         // =========================================
         // 断点
@@ -91,29 +71,42 @@ module.exports = class HttpHandle {
             return;
         }
 
+        // 规则处理
+        let hasMonitor = this.httpTrafficService.hasMonitor(userId);
+        let requestId = -1;
+        // 如果有客户端监听请求内容，则做记录
+        if (hasMonitor) {
+            // 记录请求
+            requestId = this.httpTrafficService.getRequestId(userId);
+            if (requestId > -1) {
+                this.httpTrafficService.requestBegin({ userId, clientIp, id: requestId, req, urlObj });
+            }
+        }
+
+        // 是否需要记录请求日志
+        let recordResponse = hasMonitor && requestId > -1;
+
         // =====================================================
         // 限流 https://github.com/tjgq/node-stream-throttle
 
         let matchedRule = this.ruleService.getProcessRuleList(userId, req.method, urlObj);
 
-        let result = await this._runAtions({
-            req, res, recordResponse,
+        let toClientResponse = await this._runAtions({
+            req, res, recordResponse, requestId,
             urlObj, clientIp, userId, rule: matchedRule
         });
 
         // 处理结束 记录额外的请求日志(附加的请求头、cookie、body)
         // 请求已经发送给浏览器
         if (recordResponse) {
-            let {
-                additionalRequestHeaders,
-                additionalRequestCookies,
-                toClientResponse
-            } = result;
+            this.httpTrafficService.requestBody({
+                userId,
+                id: requestId,
+                body: toClientResponse.requestData.body
+            });
             this.httpTrafficService.requestReturn({
                 userId,
-                id: requestId, req, res,
-                additionalRequestHeaders,
-                additionalRequestCookies,
+                id: requestId,
                 toClientResponse: toClientResponse
             });
         }
@@ -130,7 +123,7 @@ module.exports = class HttpHandle {
      * @private
      */
     async _runAtions({
-                         req, res, recordResponse,
+                         req, res, recordResponse, requestId,
                          urlObj, rule, clientIp, userId
                      }) {
         // 原始的请求头部
@@ -157,6 +150,20 @@ module.exports = class HttpHandle {
             hasContent: false,// 是否存在要发送给浏览器的内容
             sendedToClient: false, // 已经向浏览器发送响应内容
             stopRunAction: false, // 停止运行action
+            requestData: {// 发送请崎岖时使用的数据
+                method: '',
+                protocol: '',
+                remoteIp: '',// 远程服务器器ip
+                port: '',
+                path: '',
+                headers: {},
+                body: ''
+            },
+            receiveRequestTime: new Date().getTime(), // 接收到请求的时间
+            dnsResolveBeginTime: 0,// dns解析开始时间
+            requestBeginTime: 0,// 请求开始时间
+            serverResponseTime: 0,// 服务器响应时间
+            requestEndTime: 0,// 请求结束时间
             statusCode: 200,
             headers: {},// 要发送给浏览器的header
             body: ''// 要发送给浏览器的body
@@ -283,119 +290,7 @@ module.exports = class HttpHandle {
 
         }
 
-        return {
-            additionalRequestHeaders,
-            additionalRequestCookies,
-            toClientResponse
-        };
-    }
-
-    // 获取请求body
-    // 同一个请求，返回同一个Promise
-    _getRequestBody(req) {
-
-        if (req.fetchDataPromise) {
-            return req.fetchDataPromise;
-        }
-
-        let resolve = _.noop;
-        let promise = new Promise(_ => {
-            resolve = _;
-        });
-        // 对带body请求 获取body， 其他method返回空字符串
-        let type = this._getContentType(req);
-        let method = req.method.toLowerCase();
-        if (type
-            && ['application/json', 'application/x-www-form-urlencoded', 'text/plain', 'text/html'].indexOf(type) > -1
-            && ['post', 'put', 'patch'].indexOf(method) > -1) {
-            let body = '';
-            // 图片类型的body需要进行特殊处理
-            req.on('data', function (data) {
-                body += data;
-            });
-            req.on('end', function () {
-                resolve(body);
-            });
-        } else {
-            resolve("");
-        }
-        req.fetchDataPromise = promise;
-        return req.fetchDataPromise;
-    }
-
-    // 获取请求的content type
-    _getContentType(request) {
-        let headers = request.headers;
-        let contentType = headers['content-type'];
-        if (!contentType) {
-            return;
-        }
-        if (Array.isArray(contentType)) {
-            contentType = contentType[0];
-        }
-        const index = contentType.indexOf(';');
-        return index > -1 ? contentType.substr(0, index) : contentType;
-    }
-
-    // 获取请求内容
-    // 从_getRequestBody返回的 body 组装请求内容
-    async _getRequestContent(req, urlObj) {
-        let body = await this._getRequestBody(req);
-        let { protocol, hostname, href, pathname, port } = urlObj;
-        let query = queryString.parse(urlObj.search);
-        return {
-            hasContent: true,
-            protocol, // 请求协议
-            method: req.method, // 请求方法
-            hostname, // 请求域名
-            path: pathname, // 路径
-            query, // query对象
-            port, // 端口号
-            headers: _.assign({}, req.headers), // 请求头
-            body // 请求body
-        };
-    }
-
-    // 获取返回给client的内容
-    // 原理：两个流pipe时有pipe事件，监听输入流上的数据
-    _getResponseToClient(res) {
-        if (res.responseToClientPromise) {
-            return req.responseToClientPromise;
-        }
-
-        let resolve = _.noop;
-        let promise = new Promise(_ => {
-            resolve = _;
-        });
-
-        // 对服务器端的响应流做记录
-        res.on('pipe', function (readStream) {
-            var chunks = [];
-            readStream.on('data', function (chunk) {
-                chunks.push(chunk);
-                //  res.write(chunk);
-            });
-            readStream.on('end', function () {
-                var headers = readStream.headers || [];
-                var buffer = Buffer.concat(chunks);
-                var encoding = headers['content-encoding'];
-                // handler gzip & defalte transport
-                if (encoding == 'gzip') {
-                    zlib.gunzip(buffer, function (err, decoded) {
-                        resolve(decoded && decoded.toString('binary'));
-                    });
-                } else if (encoding == 'deflate') {
-                    zlib.inflate(buffer, function (err, decoded) {
-                        resolve(decoded && decoded.toString('binary'));
-                    });
-                } else {
-                    resolve(buffer.toString('binary'));
-                }
-            });
-        });
-
-        res.responseToClientPromise = promise;
-        return res.responseToClientPromise;
+        return toClientResponse;
     }
 
     /**

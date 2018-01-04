@@ -87,10 +87,11 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 记录请求
-    async requestBegin({ userId, clientIp, id, req, res, urlObj }) {
+    async requestBegin({ userId, clientIp, id, req, urlObj }) {
         let { protocol, host, path, pathname, port } = urlObj;
 
         let queue = this.cache[userId] || [];
+        // 原始请求信息
         queue.push({
             id: id,
             start: true, // 请求开始的标记
@@ -112,15 +113,16 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 记录请求body
-    async requestBody({ userId, id, req, res, body }) {
+    async requestBody({ userId, id, body }) {
         // 将body写文件
-
-        let bodyPath = this.getRequestBodyPath(userId, id);
-        await fileUtil.writeFile(bodyPath, body);
+        if (body) {
+            let bodyPath = this.getRequestBodyPath(userId, id);
+            await fileUtil.writeFile(bodyPath, body);
+        }
     }
 
     // 记录响应
-    async requestReturn({ userId, id, req, res, toClientResponse }) {
+    async requestReturn({ userId, id, toClientResponse }) {
         let queue = this.cache[userId] || [];
 
         let expires = res.getHeader('expires');

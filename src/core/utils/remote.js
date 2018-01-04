@@ -33,10 +33,21 @@ module.exports = class Remote {
         let isHttps = protocol.indexOf('https') > -1;
         // http.request 解析dns时，偶尔会出错
         // 使用axios获取远程数据
+        // pipe流 获取远程数据 并做记录
         let href = '';
+        let ip = '';
         try {
-            let ip = await resovleIp(hostname);
+            if (recordResponse) {
+                toClientResponse.dnsResolveBeginTime = new Date().getTime();
+            }
+            ip = await resovleIp(hostname);
             href = `${protocol}//${ip}:${port}${path}`;
+
+            if (recordResponse) {
+                toClientResponse.remoteIp = ip;
+                toClientResponse.requestBeginTime = new Date().getTime();
+
+            }
             let remoteResponse = await axios({
                 method: req.method,
                 url: href,
@@ -58,6 +69,7 @@ module.exports = class Remote {
             // 返回结果
             res.writeHead(toClientResponse.statusCode, toClientResponse.headers);
             res.end(remoteResponse.data);
+
         } catch (e) {
             toClientResponseUtils.setError(toClientResponse, `${protocol}//${hostname}:${port}${path}`, e);
             log.error(hostname, href, e);

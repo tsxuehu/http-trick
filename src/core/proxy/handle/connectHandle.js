@@ -37,7 +37,7 @@ module.exports = class ConnectHandle {
             proxyPort = this.httpsProxyPort;
         } else { // 非443则放行,连到http服务器上
             proxyHost = host;// ws协议直接和远程服务器链接
-            proxyPort = this.httpProxyPort;
+            proxyPort = targetPort;
         }
 
         // 和远程建立链接 并告诉客户端
