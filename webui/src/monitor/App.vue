@@ -1,17 +1,22 @@
 <template>
     <div id="app" style="height: 100%;">
-        <http-traffic :height="height" :width="width"></http-traffic>
-        <div style="height:300px;" class="detail">
-            <detail></detail>
+        <div class="op-bar">
+
+        </div>
+        <div>
+            <http-traffic :height="height" :width="width"></http-traffic>
+            <div class="detail">
+                <detail></detail>
+            </div>
         </div>
     </div>
 </template>
 <script>
     import $ from 'jquery';
     import _ from 'lodash';
-    import HttpTraffic from './components/HttpTraffic.vue'
-    import Detail from './components/Detail.vue'
-    import * as monitorApi from '../api/monitor'
+    import HttpTraffic from './components/HttpTraffic.vue';
+    import Detail from './components/Detail.vue';
+    import * as monitorApi from '../api/monitor';
     var socket = null;
     export default {
         components: {
@@ -23,14 +28,17 @@
                 // 当前选择的记录
                 width: 0,
                 height: 0,
-                rows: {},
+                rows: [],
+                currentRowCount: 0,
+                // 记录id 和 row中索引的映射关系
+                idIndexMap: {},
                 smallId: 3000,
                 bigId: 0,
                 rightClickRow: {},
                 selectId: '',
                 currentRequestBody: '',
-                currentResponseBody: '',
-            }
+                currentResponseBody: ''
+            };
         },
         methods: {
             calcSize(){
@@ -40,12 +48,15 @@
             // 处理接受到的请求处理数据
             receiveTraffic(rows){
                 _.forEach(rows, (row) => {
-                    if (this.smallId > row.id) this.smallId = row.id;
-                    if (this.bigId < row.id) this.bigId = row.id;
-                    if (row.start) {
-                        this.rows[row.id] = row;
+                    let id = row.id;
+                    let index = this.idIndexMap[id];
+                    if (index == undefined) {
+                        this.idIndexMap[id] = this.currentRowCount;
+                        this.rows.push[row];
+                        this.currentRowCount++;
                     } else {
-                        this.rows[row.id] = _.assign({}, this.rows[row.id], row);
+                        let merged = Object.assign({}, this.rows[this.currentRowCount], row);
+                        this.$set(this.rows, index, merged);
                     }
                 });
             },
@@ -119,34 +130,9 @@
             $(window).resize(_.debounce(this.calcSize, 200));
 
             if (!window.io) return;
-            var socket = io('/httptrafic');
+            let socket = io('/httptrafic');
             socket.on('rows', this.receiveTraffic);
-        },
-    }
+        }
+    };
 </script>
 
-
-<style lang="postcss">
-    .el-tabs--border-card {
-        height: 100%;
-    }
-
-    .el-tabs__content {
-        height: calc(100% - 42px);
-    }
-
-    .detail .el-tabs--border-card .el-tabs__content {
-        padding: 0;
-
-    .el-tab-pane {
-        height: 100%;
-    }
-
-    }
-    .text-area {
-        width: 100%;
-        background: none 0px 0px repeat scroll rgb(254, 254, 254);
-        height: 100%;
-        border: none;
-    }
-</style>

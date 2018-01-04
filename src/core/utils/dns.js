@@ -7,6 +7,7 @@ const log = require("./log");
  */
 module.exports = function resovleIp(host) {
     // todo https://github.com/avwo/whistle/blob/master/lib/rules/dns.js
+    // dns解析加缓存
     return new Promise((resolve, reject) => {
         var re = /((?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d))/;
         if (re.test(host)) {
@@ -15,7 +16,7 @@ module.exports = function resovleIp(host) {
             dns.lookup(host, (err, ip) => {
                 if (err) {
                     log.error("dns解析出错", err);
-                    resolve(host);
+                    reject(err);
                 } else {
                     resolve(ip);
                 }

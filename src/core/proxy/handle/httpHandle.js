@@ -1,5 +1,6 @@
 const zlib = require("zlib");
 const parseUrl = require("../../utils/parseUrl");
+const log = require("../../utils/log");
 const requestResponseUtils = require("../../utils/requestResponseUtils");
 const ServiceRegistry = require("../../service");
 const Action = require("../action/index");
@@ -90,35 +91,39 @@ module.exports = class HttpHandle {
                 });
             }
         }
+        try {
+            // 是否需要记录请求日志
+            let recordResponse = hasMonitor && requestId > -1;
 
-        // 是否需要记录请求日志
-        let recordResponse = hasMonitor && requestId > -1;
+            // =====================================================
+            // 限流 https://github.com/tjgq/node-stream-throttle
 
-        // =====================================================
-        // 限流 https://github.com/tjgq/node-stream-throttle
+            let matchedRule = this.ruleService.getProcessRuleList(userId, req.method, urlObj);
 
-        let matchedRule = this.ruleService.getProcessRuleList(userId, req.method, urlObj);
-
-        let toClientResponse = await this._runAtions({
-            req, res, recordResponse, requestId,
-            urlObj, clientIp, userId, rule: matchedRule
-        });
-
-        // 处理结束 记录额外的请求日志(附加的请求头、cookie、body)
-        // 请求已经发送给浏览器
-        if (recordResponse) {
-            toClientResponse.requestEndTime = new Date().getTime();
-            this.httpTrafficService.actualRequest({
-                userId,
-                id: requestId,
-                requestData: toClientResponse.requestData,
+            let toClientResponse = await this._runAtions({
+                req, res, recordResponse, requestId,
+                urlObj, clientIp, userId, rule: matchedRule
             });
-            this.httpTrafficService.serverReturn({
-                userId,
-                id: requestId,
-                toClientResponse: toClientResponse
-            });
+
+            // 处理结束 记录额外的请求日志(附加的请求头、cookie、body)
+            // 请求已经发送给浏览器
+            if (recordResponse) {
+                toClientResponse.requestEndTime = new Date().getTime();
+                this.httpTrafficService.actualRequest({
+                    userId,
+                    id: requestId,
+                    requestData: toClientResponse.requestData
+                });
+                this.httpTrafficService.serverReturn({
+                    userId,
+                    id: requestId,
+                    toClientResponse: toClientResponse
+                });
+            }
+        } catch (e) {
+            console.error(e, urlObj);
         }
+
     }
 
     /**
@@ -167,7 +172,6 @@ module.exports = class HttpHandle {
                 headers: {},
                 body: ''
             },
-            originRequestBody: '',
             remoteIp: '',// 远程服务器器ip
             receiveRequestTime: new Date().getTime(), // 接收到请求的时间
             dnsResolveBeginTime: 0,// dns解析开始时间
@@ -248,10 +252,6 @@ module.exports = class HttpHandle {
                 requestContent = await requestResponseUtils.getClientRequestContent(
                     req,
                     urlObj);
-                // 原始请求body
-               /* if (recordResponse) {
-                    toClientResponse.originRequestBody = Buffer.from(requestContent.body);
-                }*/
             }
             // 运行action
             await actionHandler.run({
