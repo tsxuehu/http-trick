@@ -17,7 +17,7 @@
     import HttpTraffic from './components/HttpTraffic.vue';
     import Detail from './components/Detail.vue';
     import * as monitorApi from '../api/monitor';
-    var socket = null;
+    let socket = null;
     export default {
         components: {
             HttpTraffic, Detail

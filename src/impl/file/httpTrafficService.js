@@ -30,6 +30,9 @@ module.exports = class HttpTrafficService extends EventEmitter {
         let proxyDataDir = this.appInfoService.getProxyDataDir();
         // 监控数据缓存目录
         this.trafficDir = path.join(proxyDataDir, "traffic");
+        this.filterMap = {};
+        this.stopRecord = {};
+
         // 创建定时任务，推送日志记录
         setInterval(_ => {
             this.sendCachedData();
@@ -41,6 +44,34 @@ module.exports = class HttpTrafficService extends EventEmitter {
 
     }
 
+    getFilter(userId) {
+        return this.filterMap[userId] || { host: '', path: '' };
+    }
+
+    setFilter(userId, filter) {
+        this.filterMap[userId] = filter;
+        this.emit("filter", userId, filter);
+    }
+
+    getStatus(userId) {
+        return {
+            stopRecord: this.stopRecord[userId],
+            overflow: this.userRequestPointer[userId] > logCountPerUser
+        };
+    }
+
+    setStopRecord(userId, stop) {
+        this.stopRecord[userId] = stop;
+        // 发送通知
+        this.emit("state-change", userId);
+    }
+
+    clear(userId) {
+        this.userRequestPointer[userId] = 0;
+        // 发送通知
+        this.emit("clear", userId);
+    }
+
     // 将缓存数据发送给用户
     sendCachedData() {
         _.forEach(this.cache, (rows, userId) => {
@@ -50,16 +81,30 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 为请求分配id
-    getRequestId(userId) {
+    getRequestId(userId, urlObj) {
+        // 处于停止记录状态 则不返回id
+        if (this.stopRecord[userId]) return -1;
 
         // 获取当前ip
         let id = this.userRequestPointer[userId] || 0;
+        // 第一个超出的请求，发送状态通知
+        if (id == logCountPerUser) {
+            id++;
+            // 向监控窗推送通知
+            this.emit("state-change", userId);
+        }
         // 超过500个请求则不再记录
-        if (id > logCountPerUser) return -1;
-
-        id++;
-        this.userRequestPointer[userId] = id;
-        return id;
+        if (id > logCountPerUser) {
+            return -1;
+        }
+        let filter = this.getFilter(userId);
+        let { path, host } = urlObj;
+        if (path.indexOf(filter.path) > -1 && host.indexOf(filter.host) > -1) {
+            id++;
+            this.userRequestPointer[userId] = id;
+            return id;
+        }
+        return -1;
     }
 
     resetRequestId(userId) {
@@ -75,6 +120,9 @@ module.exports = class HttpTrafficService extends EventEmitter {
     // 用户监控窗数加1
     incMonitor(userId) {
         let cnt = this.userMonitorCount[userId] || 0;
+        if (cnt == 0) {
+            this.resetRequestId(userId);
+        }
         cnt++;
         this.userMonitorCount[userId] = cnt;
     }

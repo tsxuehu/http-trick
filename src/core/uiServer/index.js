@@ -63,7 +63,11 @@ module.exports = class UiServer {
             });
 
             this.httpTrafficService.incMonitor(userId);
-            this.httpTrafficService.resetRequestId(userId);
+            // 推送过滤器，状态
+            let state = this.httpTrafficService.getStatus(userId);
+            client.emit('state', state);
+            let filter = this.httpTrafficService.getFilter(userId);
+            client.emit('filter', filter);
 
             client.on('disconnect', () => {
                 this.httpTrafficService.decMonitor(userId);
@@ -73,6 +77,21 @@ module.exports = class UiServer {
         // 监听logRespository事件
         this.httpTrafficService.on('traffic', (userId, rows) => {
             this.httpTraficMonitorNS.to(userId).emit('rows', rows);
+        });
+        // 过滤器改变
+        this.httpTrafficService.on('filter', (userId, filter) => {
+            this.httpTraficMonitorNS.to(userId).emit('filter', filter);
+        });
+        // 状态改变
+        this.httpTrafficService.on('state-change', (userId, rows) => {
+            let state = this.httpTrafficService.getStatus(userId);
+            this.httpTraficMonitorNS.to(userId).emit('state', state);
+        });
+        // 清空
+        this.httpTrafficService.on('clear', (userId) => {
+            this.httpTraficMonitorNS.to(userId).emit('clear');
+            let state = this.httpTrafficService.getStatus(userId);
+            this.httpTraficMonitorNS.to(userId).emit('state', state);
         });
     }
 
