@@ -1,7 +1,7 @@
 <template>
     <div id="app" style="height: 100%;">
         <div class="op-bar">
-
+            记录已满，请清除历史记录
         </div>
         <div>
             <http-traffic :height="height" :width="width"></http-traffic>
@@ -28,19 +28,35 @@
                 // 当前选择的记录
                 width: 0,
                 height: 0,
-                rows: [],
-                currentRowCount: 0,
+                hostFilter: '',
+                pathFilter: '',
                 // 记录id 和 row中索引的映射关系
-                idIndexMap: {},
-                smallId: 3000,
+                recordMap: {}, // 当前所有记录
+                originRecordArray: [],// 原始记录数组 存放记录id
+                filterdRecordArray: [], // 过滤后的数组 存放记录id
+                rightClickRow: {},// 当前右击的记录
+                selectId: '',//当前选择的记录
+                currentRequestBody: '',// 选择记录的请求body
+                currentResponseBody: '',// 选择记录的响应body
+                smallId: 0,
                 bigId: 0,
-                rightClickRow: {},
-                selectId: '',
-                currentRequestBody: '',
-                currentResponseBody: ''
+                rows: [],
+                currentRowCount: 0
             };
         },
         methods: {
+            filterRecords(){
+                let filtered = [];
+                this.originRecordArray.forEach(r => {
+                    let originRequest = r.originRequest;
+                    if (originRequest
+                        && originRequest.host.indexOf(this.hostFilter) > -1
+                        && originRequest.path.indexOf(this.pathFilter) > -1) {
+                        filtered.push(r.id);
+                    }
+                });
+                this.filterdRecordArray = filtered;
+            },
             calcSize(){
                 this.width = $(window).width();
                 this.height = $(window).height() - 300;
@@ -49,14 +65,21 @@
             receiveTraffic(rows){
                 _.forEach(rows, (row) => {
                     let id = row.id;
-                    let index = this.idIndexMap[id];
-                    if (index == undefined) {
-                        this.idIndexMap[id] = this.currentRowCount;
-                        this.rows.push[row];
-                        this.currentRowCount++;
-                    } else {
-                        let merged = Object.assign({}, this.rows[this.currentRowCount], row);
-                        this.$set(this.rows, index, merged);
+                    let hasRecieved = !!this.recordMap[id];
+                    let record = this.recordMap[id] || {};
+                    Object.assign(record, row);
+
+                    this.$set(this.recordMap, id, record);
+
+                    if (!hasRecieved) {
+                        this.originRecordArray.push(id);
+                    }
+                    // 根据host、path进行过滤
+                    let originRequest = row.originRequest;
+                    if (originRequest
+                        && originRequest.host.indexOf(this.hostFilter) > -1
+                        && originRequest.path.indexOf(this.pathFilter) > -1) {
+                        this.filterdRecordArray.push(id);
                     }
                 });
             },
@@ -76,11 +99,11 @@
         },
         computed: {
             total(){
-                return this.bigId - this.smallId + 1;
+                return this.filterdRecordArray.length;
             },
 
             currentRow(){
-                return this.rows[this.selectId] || {};
+                return this.recordMap[this.selectId] || {};
             },
             // 当前请求的header键值对
             requestHeader(){
