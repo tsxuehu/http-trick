@@ -46,9 +46,9 @@
 </template>
 
 <script>
-    import _ from 'lodash'
+    import _ from 'lodash';
     import Vue from 'vue';
-    import ActionDetail from './ActionDetail.vue'
+    import ActionDetail from './ActionDetail.vue';
     Vue.component(ActionDetail.name, ActionDetail);
     export default {
         name: 'rule-detail',
@@ -56,14 +56,14 @@
         data() {
             return {
                 methodlist: [
-                    {value: '', label: '所有'},
-                    {value: 'get', label: 'GET'},
-                    {value: 'post', label: 'POST'},
-                    {value: 'put', label: 'PUT'},
-                    {value: 'patch', label: 'PATCH'},
-                    {value: 'delete', label: 'DELETE'}
+                    { value: '', label: '所有' },
+                    { value: 'get', label: 'GET' },
+                    { value: 'post', label: 'POST' },
+                    { value: 'put', label: 'PUT' },
+                    { value: 'patch', label: 'PATCH' },
+                    { value: 'delete', label: 'DELETE' }
                 ]
-            }
+            };
         },
         methods: {
 
@@ -91,7 +91,7 @@
                 this.rule.actionList.splice(index, 1);
             }
         }
-    }
+    };
 
 </script>
 <style>
