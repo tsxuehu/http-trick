@@ -1,7 +1,6 @@
 <template>
-    <div :style="{'overflow-y': 'scroll','height': height + 'px'}"
-         @scroll="handleScroll">
-        <div :style="{'height': contentHeight + 'px'}" ref="container">
+    <div :style="{'overflow-y': 'scroll','height': height + 'px'}" ref="container" @scroll.prevent="handleScroll">
+        <div :style="{'height': contentHeight + 'px'}" >
             <div :style="{'transform': 'translate3d(0,'+top + 'px,0)'}">
                 <slot :ids="ids"></slot>
             </div>
@@ -59,8 +58,8 @@
         },
         methods: {
             handleScroll: _.debounce(function () {
-                this.scrollTop = this.$refs.container.scrollTop;
-                let itemPass = Math.floor(this.scrollTop / this.rowHeight);
+                let scrollTop = this.$refs.container.scrollTop;
+                let itemPass = Math.floor(scrollTop / this.rowHeight);
                 this.start = itemPass;
             }, 100)
         }
