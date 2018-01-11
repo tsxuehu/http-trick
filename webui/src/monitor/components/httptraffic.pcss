@@ -1,0 +1,63 @@
+.traffic {
+  .header {
+    line-height: 28px;
+    height: 28px;
+    font-size: 14px;
+    font-weight: bolder;
+  }
+
+  .row {
+    display: flex;
+    .cell-index {
+      width: 50px;
+    }
+    .cell-statu {
+      width: 60px;
+    }
+    .cell-method {
+      width: 72px;
+    }
+    .cell-protocol {
+      width: 75px;
+    }
+    .cell-host {
+      width: 136px;
+    }
+    .cell-path {
+      flex-grow: 1;
+    }
+    .cell-type {
+      width: 100px;
+    }
+    .cell-time {
+      width: 70px;
+    }
+  }
+
+  .cell {
+    flex-grow: 0;
+    flex-shrink: 0;
+    text-align: center;
+  }
+
+  .record {
+    line-height: 23px;
+    height: 23px;
+    border-bottom: 1px solid #ddd;
+    .cell {
+      font-size: 12px;
+    }
+    .cell-host, .cell-path, .cell-type {
+      text-align: left;
+      padding-left: 2px;
+    }
+  }
+
+  record:hover {
+    background-color: #eef1f6
+  }
+
+  .selected {
+    background-color: #eef1f6
+  }
+}

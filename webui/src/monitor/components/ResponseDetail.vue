@@ -1,26 +1,40 @@
 <template>
-    <el-tabs type="border-card">
-        <el-tab-pane label="Response Header">
-            <key-value-list :data="$dc.responseHeader"></key-value-list>
-        </el-tab-pane>
-        <el-tab-pane label="Response Set Cookie">
-            <div class="cookie-row" v-for="row in $dc.setCookies">
-                {{row}}
+    <div class="response">
+        <div class="response__header">
+            <div class="response__tab" :class="{'active':activeName == 'Header'}" @click="tabClick('Header')">Header</div>
+            <div class="response__tab" :class="{'active':activeName == 'Set Cookies'}" @click="tabClick('Set Cookies')">Set Cookies</div>
+            <div class="response__tab" :class="{'active':activeName == 'Body'}" @click="tabClick('Body')">Body</div>
+        </div>
+        <div class="response__body">
+            <div>
+                <key-value-list :data="$dc.responseHeader"></key-value-list>
             </div>
-        </el-tab-pane>
-        <el-tab-pane label="Response Raw Header">
-            <textarea class="text-area">{{$dc.responseRawHeader}}</textarea>
-        </el-tab-pane>
-        <el-tab-pane label="Response Body">
-            <textarea class="text-area">{{$dc.currentResponseBody}}</textarea>
-        </el-tab-pane>
-    </el-tabs>
+            <div>
+                <div class="cookie-row" v-for="row in $dc.setCookies">
+                    {{row}}
+                </div>
+            </div>
+            <div class="text-area">{{$dc.currentResponseBody}}</div>
+        </div>
+    </div>
+
 </template>
 
 <script>
     import KeyValueList from './KeyValueList.vue';
+    import './responsedetail.pcss'
     export default {
-        components: { KeyValueList }
+        components: { KeyValueList },
+        data(){
+            return {
+                activeName: 'Header'
+            };
+        },
+        methods: {
+            tabClick(tab){
+                this.activeName = tab;
+            }
+        }
     };
 </script>
 

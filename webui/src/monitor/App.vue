@@ -1,13 +1,11 @@
 <template>
-    <div id="app" style="height: 100%;">
+    <div id="app" class="app">
         <div class="op-bar">
-            记录已满，请清除历史记录
+            暂停（开始） | 清空 | 记录已满，请清除历史记录 | filter （） （） 搜索
         </div>
-        <div>
-            <http-traffic :height="height" :width="width"></http-traffic>
-            <div class="detail">
-                <detail></detail>
-            </div>
+        <div class="monitor">
+            <http-traffic :height="height"></http-traffic>
+            <detail></detail>
         </div>
     </div>
 </template>
@@ -59,7 +57,7 @@
             },
             calcSize(){
                 this.width = $(window).width();
-                this.height = $(window).height() - 300;
+                this.height = $(window).height() - 20;
             },
             // 处理接受到的请求处理数据
             receiveTraffic(rows){
