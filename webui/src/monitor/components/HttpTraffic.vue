@@ -16,7 +16,7 @@
               :height="height - 28"
               :rowHeight="24">
             <template scope="props">
-                <record v-for="index in props.ids" :idx="index"
+                <record v-for="index in props.ids" :idx="index" :key="index"
                         @right-clicked="rightClicked"></record>
             </template>
         </list>
