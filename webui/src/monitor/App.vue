@@ -32,14 +32,10 @@
                 recordMap: {}, // 当前所有记录
                 originRecordArray: [],// 原始记录数组 存放记录id
                 filterdRecordArray: [], // 过滤后的数组 存放记录id
-                rightClickRow: {},// 当前右击的记录
                 selectId: '',//当前选择的记录
+                rightClickId: '',// 右击的id
                 currentRequestBody: '',// 选择记录的请求body
                 currentResponseBody: '',// 选择记录的响应body
-                smallId: 0,
-                bigId: 0,
-                rows: [],
-                currentRowCount: 0
             };
         },
         methods: {
@@ -81,18 +77,24 @@
                     }
                 });
             },
-            async setCurrentRowIndex(index){
-                if (this.selectId == index) return;
-                this.selectId = index;
+            async setCurrentRowIndex(id){
+                if (this.selectId == id) return;
+                this.selectId = id;
                 this.currentRequestBody = '';
                 this.currentResponseBody = '';
-                if (/(json)|(x-www-form-urlencoded)/i.test(this.currentRow.reqHeaders['content-type'])) {
-                    this.currentRequestBody = this.currentRow.reqBody;
+                let currentRow = this.recordMap[id];
+                if (/(json)|(x-www-form-urlencoded)/i.test(currentRow.originRequest.headers['content-type'])) {
+                    // 请求后端 拿数据
+                    this.currentRequestBody = currentRow.reqBody;
                 }
                 // 如果是html json数据 向后端请求拿数据
-                if (/(text)|(javascript)|(json)/i.test(this.currentRow.contentType)) {
+                if (/(text)|(javascript)|(json)/i.test(currentRow.contentType)) {
+                    // 请求后端 拿数据
                     this.currentResponseBody = await monitorApi.getRequestBody(index);
                 }
+            },
+            setRightClickedRecordId(id){
+                this.rightClickId = id;
             }
         },
         computed: {
@@ -102,6 +104,9 @@
 
             currentRow(){
                 return this.recordMap[this.selectId] || {};
+            },
+            rightClickRow(){
+                return this.recordMap[this.rightClickId];
             },
             // 当前请求的header键值对
             requestHeader(){
@@ -150,9 +155,114 @@
 
             $(window).resize(_.debounce(this.calcSize, 200));
 
+            // 数据mock
+            this.receiveTraffic([{
+                id: 1,
+                originRequest: {
+                    clientIp: '111',
+                    method: 'get',
+                    httpVersion: '1.1',
+                    headers: {a:1},
+                    host: 'www.baidu.com',
+                    path: '/'
+                }
+            },{
+                id: 2,
+                originRequest: {
+                    clientIp: '111',
+                    method: 'get',
+                    httpVersion: '1.1',
+                    headers: {a:1},
+                    host: 'www.baidu.com',
+                    path: '/'
+                }
+            },{
+                id: 3,
+                originRequest: {
+                    clientIp: '111',
+                    method: 'get',
+                    httpVersion: '1.1',
+                    headers: {a:1},
+                    host: 'www.baidu.com',
+                    path: '/'
+                }
+            },{
+                id: 4,
+                originRequest: {
+                    clientIp: '111',
+                    method: 'get',
+                    httpVersion: '1.1',
+                    headers: {a:1},
+                    host: 'www.baidu.com',
+                    path: '/'
+                }
+            },{
+                id: 5,
+                originRequest: {
+                    clientIp: '111',
+                    method: 'get',
+                    httpVersion: '1.1',
+                    headers: {a:1},
+                    host: 'www.baidu.com',
+                    path: '/'
+                }
+            },{
+                id: 6,
+                originRequest: {
+                    clientIp: '111',
+                    method: 'get',
+                    httpVersion: '1.1',
+                    headers: {a:1},
+                    host: 'www.baidu.com',
+                    path: '/'
+                }
+            },{
+                id: 7,
+                originRequest: {
+                    clientIp: '111',
+                    method: 'get',
+                    httpVersion: '1.1',
+                    headers: {a:1},
+                    host: 'www.baidu.com',
+                    path: '/'
+                }
+            },{
+                id: 8,
+                originRequest: {
+                    clientIp: '111',
+                    method: 'get',
+                    httpVersion: '1.1',
+                    headers: {a:1},
+                    host: 'www.baidu.com',
+                    path: '/'
+                }
+            },{
+                id: 20,
+                originRequest: {
+                    clientIp: '111',
+                    method: 'get',
+                    httpVersion: '1.1',
+                    headers: {a:1},
+                    host: 'www.baidu.com',
+                    path: '/'
+                }
+            },{
+                id: 9,
+                originRequest: {
+                    clientIp: '111',
+                    method: 'get',
+                    httpVersion: '1.1',
+                    headers: {a:1},
+                    host: 'www.baidu.com',
+                    path: '/'
+                }
+            }]);
+            // end
+
             if (!window.io) return;
             let socket = io('/httptrafic');
             socket.on('rows', this.receiveTraffic);
+
         }
     };
 </script>

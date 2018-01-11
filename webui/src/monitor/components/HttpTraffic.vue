@@ -11,30 +11,15 @@
             <div class="cell cell-type">Type</div>
             <div class="cell cell-time">Time</div>
         </div>
-        <!-- 列表区域 -->
-        <div class="el-table__body-wrapper">
-            <!-- 优化后的列表展示组件，只展示显示区域 -->
-            <list :total="$dc.total+20"
-                  :height="height - 22"
-                  :rowHeight="24">
-                <template scope="props">
-                    <div v-for="id in props.ids"
-                         @click="clickRow(id)"
-                         :class="{'selected': $dc.selectId == id}"
-                         @contextmenu.prevent="$refs.ctx.open($event, id)"
-                         class="record row">
-                        <div class="cell cell-index">{{id+1}}</div>
-                        <div class="cell cell-status">Status</div>
-                        <div class="cell cell-method">Method</div>
-                        <div class="cell cell-protocol">Protocol</div>
-                        <div class="cell cell-host">Host</div>
-                        <div class="cell cell-path">Path</div>
-                        <div class="cell cell-type">Type</div>
-                        <div class="cell cell-time">Time</div>
-                    </div>
-                </template>
-            </list>
-        </div>
+        <!-- 列表区域 优化后的列表展示组件，只展示显示区域 -->
+        <list :total="$dc.total"
+              :height="height - 28"
+              :rowHeight="24">
+            <template scope="props">
+                <record v-for="index in props.ids" :idx="index"
+                        @right-clicked="rightClicked"></record>
+            </template>
+        </list>
         <context-menu id="testingctx" ref="ctx"
                       :ctxOpen="onCtxOpen"
                       :ctxCancel="resetCtxLocals"
@@ -51,9 +36,10 @@
     import ContextMenu from '../../context-menu';
     import dataApi from '../../api/data';
     import './httptraffic.pcss';
+    import Record from './record.vue';
     export default {
         props: ['height'],
-        components: { List, ContextMenu },
+        components: { List, ContextMenu, Record },
         data(){
             return {};
         },
@@ -90,21 +76,22 @@
                 copyToClipboard(`${this.$dc.rightClickRow.protocol}://${this.$dc.rightClickRow.host}${this.$dc.rightClickRow.path}`);
                 this.$message('已将url复制到剪切板');
             },
-            // 点击行
-            clickRow(id){
-                this.$dc.setCurrentRowIndex(id);
-            },
+
             // -------------------------------右击菜单显示
             // 打开菜单
-            onCtxOpen(id) {
-                this.$dc.rightClickRow = this.$dc.rows[id];
+            onCtxOpen(recordId) {
+                console.log(recordId);
+                this.$dc.setRightClickedRecordId(recordId);
+            },
+            rightClicked(event,recordId){
+                this.$refs.ctx.open(event, recordId)
             },
             // 点击菜单选项
             onCtxClose(locals) {
             },
             // 点击空白地方
             resetCtxLocals() {
-                this.$dc.rightClickRow = {};
+                this.$dc.setRightClickedRecordId('');
             }
         }
     };
