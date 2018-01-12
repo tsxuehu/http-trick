@@ -6,7 +6,7 @@ const path = require("path");
 const rimraf = require("rimraf");
 const _ = require("lodash");
 const fileUtil = require("../../core/utils/file");
-const logCountPerUser = 500;
+const logCountPerUser = 10;
 const EventEmitter = require("events");
 /**
  * 缓存监控数据、发送给监控窗
@@ -36,16 +36,18 @@ module.exports = class HttpTrafficService extends EventEmitter {
         // 创建定时任务，推送日志记录
         setInterval(_ => {
             this.sendCachedData();
-        }, 2500);
+        }, 2000);
     }
 
     start() {
         // 删除缓存
-
+       /* rimraf.sync(this.trafficDir);
+        fs.mkdirSync(this.trafficDir);*/
     }
 
     getFilter(userId) {
-        return this.filterMap[userId] || { host: '', path: '' };
+        let filters = this.filterMap[userId] || { host: '', path: '' };
+        return  filters;
     }
 
     setFilter(userId, filter) {
@@ -55,7 +57,7 @@ module.exports = class HttpTrafficService extends EventEmitter {
 
     getStatus(userId) {
         return {
-            stopRecord: this.stopRecord[userId],
+            stopRecord: this.stopRecord[userId] || false,
             overflow: this.userRequestPointer[userId] > logCountPerUser
         };
     }
@@ -63,7 +65,7 @@ module.exports = class HttpTrafficService extends EventEmitter {
     setStopRecord(userId, stop) {
         this.stopRecord[userId] = stop;
         // 发送通知
-        this.emit("state-change", userId);
+        this.emit("state-change", userId, this.getStatus(userId));
     }
 
     clear(userId) {
@@ -87,21 +89,22 @@ module.exports = class HttpTrafficService extends EventEmitter {
 
         // 获取当前ip
         let id = this.userRequestPointer[userId] || 0;
-        // 第一个超出的请求，发送状态通知
-        if (id == logCountPerUser) {
-            id++;
-            // 向监控窗推送通知
-            this.emit("state-change", userId);
-        }
+
         // 超过500个请求则不再记录
         if (id > logCountPerUser) {
             return -1;
         }
+
         let filter = this.getFilter(userId);
         let { path, host } = urlObj;
         if (path.indexOf(filter.path) > -1 && host.indexOf(filter.host) > -1) {
             id++;
             this.userRequestPointer[userId] = id;
+            if (id > logCountPerUser) {
+                let state = this.getStatus(userId);
+                // 向监控窗推送通知
+                this.emit("state-change", userId, state);
+            }
             return id;
         }
         return -1;
@@ -211,12 +214,6 @@ module.exports = class HttpTrafficService extends EventEmitter {
             let bodyPath = this.getResponseBodyPath(userId, id);
             await fileUtil.writeFile(bodyPath, body);
         }
-    }
-
-    // 启动的时候先清空请求记录目录
-    clearTraffic() {
-        rimraf.sync(this.trafficDir);
-        fs.mkdirSync(this.trafficDir);
     }
 
     /**

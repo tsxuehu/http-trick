@@ -78,7 +78,7 @@ module.exports = class HttpHandle {
         // 如果有客户端监听请求内容，则做记录
         if (hasMonitor) {
             // 记录请求
-            requestId = this.httpTrafficService.getRequestId(userId);
+            requestId = this.httpTrafficService.getRequestId(userId, urlObj);
             if (requestId > -1) {
                 this.httpTrafficService.requestBegin({
                     userId,
@@ -276,13 +276,18 @@ module.exports = class HttpHandle {
         // 动作运行完还没响应浏览器、则响应浏览器
         if (!toClientResponse.sendedToClient) {
             if (toClientResponse.hasContent) {
-                sendSpecificToClient({
-                    res,
-                    statusCode: toClientResponse.statusCode,
-                    headers: toClientResponse.headers,
-                    content: toClientResponse.body
-                });
-
+                try{
+                    sendSpecificToClient({
+                        res,
+                        statusCode: toClientResponse.statusCode,
+                        headers: toClientResponse.headers,
+                        content: toClientResponse.body
+                    });
+                }catch (e){
+                    console.error(e);
+                    console.log(toClientResponse)
+                    console.log(urlObj)
+                }
             } else {
                 // 自定请求
                 toClientResponse.headers['fe-proxy-rule-add'] = 'bypass';

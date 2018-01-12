@@ -16,7 +16,7 @@
               :height="height - 28"
               :rowHeight="24">
             <template scope="props">
-                <record v-for="index in props.ids" :idx="index" :key="index"
+                <record v-for="index in props.ids" :index="index" :id="$dc.filterdRecordArray[index]" :key="index"
                         @right-clicked="rightClicked"></record>
             </template>
         </list>
@@ -80,7 +80,6 @@
             // -------------------------------右击菜单显示
             // 打开菜单
             onCtxOpen(recordId) {
-                console.log(recordId);
                 this.$dc.setRightClickedRecordId(recordId);
             },
             rightClicked(event,recordId){

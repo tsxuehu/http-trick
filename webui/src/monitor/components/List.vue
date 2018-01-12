@@ -1,6 +1,6 @@
 <template>
     <div :style="{'overflow-y': 'scroll','height': height + 'px'}" ref="container" @scroll.prevent="handleScroll">
-        <div :style="{'height': contentHeight + 'px'}" >
+        <div :style="{'height': contentHeight + 'px'}">
             <div :style="{'transform': 'translate3d(0,'+top + 'px,0)'}">
                 <slot :ids="ids"></slot>
             </div>
@@ -9,6 +9,8 @@
 </template>
 <script>
     import _ from 'lodash';
+    const TopPreserve = 20;
+    const BottomPreserve = 20;
     export default  {
         props: {
             total: {
@@ -45,7 +47,10 @@
                 return Math.ceil(this.height / this.rowHeight) + 2;
             },
             end(){
-                let endIndex = this.start + this.keeps - 1;
+                // 20是头部隐藏的20条记录
+                let endIndex = this.start + TopPreserve +this.keeps - 1;
+                // 底部多展示20条，防止未渲染区域滚动出现
+                endIndex = endIndex + BottomPreserve;
                 if (endIndex > this.total) {
                     return this.total;
                 } else {
@@ -60,7 +65,13 @@
             handleScroll: _.debounce(function () {
                 let scrollTop = this.$refs.container.scrollTop;
                 let itemPass = Math.floor(scrollTop / this.rowHeight);
-                this.start = itemPass;
+                if (itemPass < TopPreserve) {
+                    this.start = 0;
+                } else {
+                    // 额外展示20条，防止未渲染区域滚动出现
+                    this.start = itemPass - TopPreserve;
+                }
+
             }, 100)
         }
     };

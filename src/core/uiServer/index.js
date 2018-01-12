@@ -68,7 +68,7 @@ module.exports = class UiServer {
             client.emit('state', state);
             let filter = this.httpTrafficService.getFilter(userId);
             client.emit('filter', filter);
-
+            client.emit('clear');
             client.on('disconnect', () => {
                 this.httpTrafficService.decMonitor(userId);
             });
@@ -83,8 +83,7 @@ module.exports = class UiServer {
             this.httpTraficMonitorNS.to(userId).emit('filter', filter);
         });
         // 状态改变
-        this.httpTrafficService.on('state-change', (userId, rows) => {
-            let state = this.httpTrafficService.getStatus(userId);
+        this.httpTrafficService.on('state-change', (userId, state) => {
             this.httpTraficMonitorNS.to(userId).emit('state', state);
         });
         // 清空

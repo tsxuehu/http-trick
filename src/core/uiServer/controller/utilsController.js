@@ -34,8 +34,8 @@ module.exports = class TrafficController {
         // 下载证书
         router.get('/utils/rootCA.crt', async (ctx, next) => {
             let userId = ctx.userId;
+            ctx.set('Content-disposition', 'attachment;filename=zproxy.crt');
             ctx.body = await this.rootCertService.getRootCACertPem(userId);
-            ctx.response.header['Content-disposition'] = 'attachment;filename=zproxy.crt';
         });
 
         router.get('/pac', async (ctx) => {
@@ -53,11 +53,11 @@ module.exports = class TrafficController {
                                 return zProxy;\n\
                             }\n\
                             return direct;\n\
-                       }"
+                       }";
             pac = pac.replace('${ip}', ip);
             pac = pac.replace('${port}', port);
-            ctx.body = pac;
             ctx.set('Content-Type', 'application/x-javascript-config');
+            ctx.body = pac;
         });
     }
-}
+};
