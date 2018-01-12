@@ -4,7 +4,7 @@
             <span class="icon-btn" :class="{'overflow':state.overflow}"
                   @click="requestToggleRecordState">
                 <i class="iconfont icon-zanting" v-if="!state.stopRecord"></i>
-                <i class="iconfont icon-bofang"  v-else></i>
+                <i class="iconfont icon-bofang" v-else></i>
             </span>
             <i class="iconfont icon-qingchu icon-btn" @click="requestClear"></i>
             <span class="tips " :style="{visibility: state.overflow? 'initial' : 'hidden'}">记录已满，请清除历史记录</span>
@@ -26,7 +26,6 @@
     import HttpTraffic from './components/HttpTraffic.vue';
     import Detail from './components/Detail.vue';
     import * as trafficApi from '../api/traffic';
-    let socket = null;
     export default {
         components: {
             HttpTraffic, Detail
@@ -67,36 +66,51 @@
             rightClickRow(){
                 return this.recordMap[this.rightClickId];
             },
+            overviews(){
+                return {
+                    'host':'',
+                    'port':'',
+                    'path':'',
+                };
+            },
             // 当前请求的header键值对
             requestHeader(){
-                var headers = _.assign({}, this.currentRow.reqHeaders);
-                delete headers['cookie'];
-                return headers;
+                try {
+                    return this.currentRow.requestData.headers;
+                } catch (e) {
+                    return {};
+                }
             },
             requestCookie(){
-                if (!this.currentRow.reqHeaders) return {};
-                return trafficApi.parseCookie(this.currentRow.reqHeaders.cookie || '');
+                try {
+                    return trafficApi.parseCookie(this.currentRow.requestData.headers.cookie || '');
+                } catch (e) {
+                    return {};
+                }
             },
             requestQueryParams(){
-                return trafficApi.parseQuery(this.currentRow.path);
+                try {
+                    return trafficApi.parseQuery(this.currentRow.requestData.path);
+                } catch (e) {
+                    return {};
+                }
             },
-            requestRawHeader(){
-                let row = this.currentRow;
-                let headers = this.currentRow.resHeaders;
-                if (!headers) return '';
-                let lines = `${row.method} ${row.protocol}/${row.httpVersion} ${row.path}\n`;
-                _.forEach(this.requestHeader, (v, k) => {
-                    lines += `${k}    ${v}\n`;
-                });
-                return lines;
-            },
+
             responseHeader(){
-                var headers = _.assign({}, this.currentRow.resHeaders);
-                delete headers['set-cookie'];
-                return headers;
+                try {
+                    let headers = Object.assign({}, this.currentRow.response.headers);
+                    delete headers['set-cookie'];
+                    return headers;
+                } catch (e) {
+                    return {};
+                }
             },
             setCookies(){
-                return this.currentRow.resHeaders ? this.currentRow.resHeaders['set-cookie'] : [];
+                try {
+                    return this.currentRow.response.headers['set-cookie'] || [];
+                } catch (e) {
+                    return [];
+                }
             },
             responseRawHeader(){
                 let row = this.currentRow;
@@ -171,12 +185,17 @@
                 let currentRow = this.recordMap[id];
                 if (/(json)|(x-www-form-urlencoded)/i.test(currentRow.originRequest.headers['content-type'])) {
                     // 请求后端 拿数据
-                    this.currentRequestBody = currentRow.reqBody;
+                    this.currentRequestBody = await trafficApi.getRequestBody(id);
                 }
+                console.log('aa')
                 // 如果是html json数据 向后端请求拿数据
-                if (/(text)|(javascript)|(json)/i.test(currentRow.contentType)) {
-                    // 请求后端 拿数据
-                    this.currentResponseBody = await trafficApi.getRequestBody(index);
+                try {
+                    if (/(text)|(javascript)|(json)/i.test(currentRow.response.headers['content-type'])) {
+                        // 请求后端 拿数据
+                        this.currentResponseBody = await trafficApi.getResponseBody(id);
+                    }
+                } catch (e) {
+                    console.log(e);
                 }
             },
             setRightClickedRecordId(id){

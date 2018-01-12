@@ -6,18 +6,17 @@
             <div class="response__tab" :class="{'active':activeName == 'Body'}" @click="tabClick('Body')">Body</div>
         </div>
         <div class="response__body">
-            <div>
+            <div v-if="activeName == 'Header'">
                 <key-value-list :data="$dc.responseHeader"></key-value-list>
             </div>
-            <div>
+            <div v-if="activeName == 'Set Cookies'">
                 <div class="cookie-row" v-for="row in $dc.setCookies">
                     {{row}}
                 </div>
             </div>
-            <div class="text-area">{{$dc.currentResponseBody}}</div>
+            <div v-if="activeName == 'Body'" class="text-area">{{$dc.currentResponseBody}}</div>
         </div>
     </div>
-
 </template>
 
 <script>

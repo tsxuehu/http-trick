@@ -1,6 +1,6 @@
 <template>
     <div class="overview">
-        <key-value-list :data="overviews"></key-value-list>
+        <key-value-list :data="$dc.overviews"></key-value-list>
     </div>
 </template>
 
@@ -9,14 +9,5 @@
     import KeyValueList from './KeyValueList.vue';
     export default {
         components: { KeyValueList },
-        computed: {
-            overviews(){
-                return {
-                    'URL1': 'AAAadfasfasdfasdfasdAAAadfasfasdfasdfasdAAAadfasfasdfasdfasdAAAadfasfasdfasdfasd',
-                    'URL2': 'aa',
-                    'URL3': 'aa'
-                };
-            }
-        }
     };
 </script>

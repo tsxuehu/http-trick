@@ -6,7 +6,7 @@ const path = require("path");
 const rimraf = require("rimraf");
 const _ = require("lodash");
 const fileUtil = require("../../core/utils/file");
-const logCountPerUser = 10;
+const logCountPerUser = 500;
 const EventEmitter = require("events");
 /**
  * 缓存监控数据、发送给监控窗

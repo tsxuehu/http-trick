@@ -7,16 +7,16 @@
             <div class="request__tab" :class="{'active':activeName == 'Body'}" @click="tabClick('Body')">Body</div>
         </div>
         <div class="request__body">
-            <div>
+            <div v-if="activeName == 'Header'">
                 <key-value-list :data="$dc.requestHeader"></key-value-list>
             </div>
-            <div>
+            <div v-if="activeName == 'Cookie'">
                 <key-value-list :data="$dc.requestCookie"></key-value-list>
             </div>
-            <div>
+            <div v-if="activeName == 'Query Params'">
                 <key-value-list :data="$dc.requestQueryParams"></key-value-list>
             </div>
-            <div class="text-area">{{$dc.currentRequestBody}}</div>
+            <div v-if="activeName == 'Body'" class="text-area">{{$dc.currentRequestBody}}</div>
         </div>
     </div>
 </template>

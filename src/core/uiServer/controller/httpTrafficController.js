@@ -18,7 +18,14 @@ module.exports = class TrafficController {
         router.get('/traffic/getResponseBody', async (ctx, next) => {
             let userId = ctx.userId;
             let id = ctx.query.id;
-            await this.httpTrafficService.getResponseBody(userId, id);
+            let content = await this.httpTrafficService.getResponseBody(userId, id);
+            ctx.body = content;
+        });
+
+        router.get('/traffic/getRequestBody', async (ctx, next) => {
+            let userId = ctx.userId;
+            let id = ctx.query.id;
+            let content = await this.httpTrafficService.getRequestBody(userId, id);
             ctx.body = content;
         });
 
