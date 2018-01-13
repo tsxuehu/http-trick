@@ -46,7 +46,7 @@
         methods: {
             // -------------------------------菜单操作
             saveData(){
-                if (!this.$dc.rightClickRow.resTime) {
+                if (!this.$dc.rightClickRow.response) {
                     this.$message({
                         message: '服务器还没有响应',
                         type: 'warning'
@@ -73,7 +73,8 @@
             },
             // 复制url
             copyUrl(){
-                copyToClipboard(`${this.$dc.rightClickRow.protocol}://${this.$dc.rightClickRow.host}${this.$dc.rightClickRow.path}`);
+                let requset = this.$dc.rightClickRow.originRequest;
+                copyToClipboard(`${requset.protocol}//${requset.host}:${requset.port}${requset.path}`);
                 this.$message('已将url复制到剪切板');
             },
 

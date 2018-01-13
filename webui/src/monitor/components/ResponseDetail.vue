@@ -9,7 +9,7 @@
             <div v-if="activeName == 'Header'">
                 <key-value-list :data="$dc.responseHeader"></key-value-list>
             </div>
-            <div v-if="activeName == 'Set Cookies'">
+            <div class="set-cookies" v-if="activeName == 'Set Cookies'">
                 <div class="cookie-row" v-for="row in $dc.setCookies">
                     {{row}}
                 </div>
@@ -36,11 +36,3 @@
         }
     };
 </script>
-
-<style lang="postcss">
-    .cookie-row {
-        border-bottom: solid 1px #dfe6ec;
-        font-size: 12px;
-        padding-left: 5px;
-    }
-</style>

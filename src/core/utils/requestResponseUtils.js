@@ -60,10 +60,10 @@ function getContentType(request) {
 async function getClientRequestContent(req, urlObj) {
     let bodyBuffer = await getClientRequestBody(req);
     let body = bodyBuffer;
-   /* let type = getContentType(req);
-    if (type && ['application/json', 'application/x-www-form-urlencoded', 'text/plain', 'text/html'].indexOf(type) > -1) {
-        body = bodyBuffer.toString('utf8');
-    }*/
+    /* let type = getContentType(req);
+     if (type && ['application/json', 'application/x-www-form-urlencoded', 'text/plain', 'text/html'].indexOf(type) > -1) {
+     body = bodyBuffer.toString('utf8');
+     }*/
     let { protocol, hostname, href, pathname, port } = urlObj;
     let query = queryString.parse(urlObj.search);
     return {
@@ -85,7 +85,7 @@ function getServerResponseBody(res) {
     if (res.proxyServerContentPromise) {
         return res.proxyServerContentPromise;
     }
-
+    // todo 换一种方式实现，集中获取，然后解压
     let resolve = _.noop;
     let reject = _.noop;
     let promise = new Promise((res, rej) => {
@@ -108,6 +108,7 @@ function getServerResponseBody(res) {
     });
 
     stream.on('error', function handleStreamError(err) {
+        console.log('stream err', err);
         reject(err);
     });
 

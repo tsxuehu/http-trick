@@ -6,5 +6,5 @@ module.exports = function (cookies) {
         arr.push(`${key}=${encodeURIComponent(value)}`)
     });
 
-    return arr.join(";");
+    return arr.join("; ");
 }

@@ -135,7 +135,6 @@ module.exports = class Bypass extends Action {
                 headers: actualRequestHeaders, toClientResponse
             });
         } else {
-            toClientResponse.sendedToClient = true;
             await this.remote.pipe({
                 req, res, recordResponse,
                 method: req.method,

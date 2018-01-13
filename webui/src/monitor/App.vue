@@ -16,7 +16,7 @@
         </div>
         <div class="monitor">
             <http-traffic :height="height"></http-traffic>
-            <detail></detail>
+            <detail :height="height"></detail>
         </div>
     </div>
 </template>
@@ -66,12 +66,27 @@
             rightClickRow(){
                 return this.recordMap[this.rightClickId];
             },
-            overviews(){
-                return {
-                    'host':'',
-                    'port':'',
-                    'path':'',
-                };
+            // 原始请求的header键值对
+            originRequestHeader(){
+                try {
+                    return this.currentRow.originRequest.headers;
+                } catch (e) {
+                    return {};
+                }
+            },
+            originRequestCookie(){
+                try {
+                    return trafficApi.parseCookie(this.currentRow.originRequest.headers.cookie || '');
+                } catch (e) {
+                    return {};
+                }
+            },
+            originRequestQueryParams(){
+                try {
+                    return trafficApi.parseQuery(this.currentRow.originRequest.path);
+                } catch (e) {
+                    return {};
+                }
             },
             // 当前请求的header键值对
             requestHeader(){
