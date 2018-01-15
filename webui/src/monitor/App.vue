@@ -236,7 +236,7 @@
                     // 过滤
                     this.filterRecords();
                     trafficApi.setFilter(this.filter);
-                }, 1500),
+                }, 1000),
                 deep: true
             }
         },

@@ -62,7 +62,7 @@
             }
         },
         methods: {
-            handleScroll: _.debounce(function () {
+            handleScroll: _.throttle(function () {
                 let scrollTop = this.$refs.container.scrollTop;
                 let itemPass = Math.floor(scrollTop / this.rowHeight);
                 if (itemPass < TopPreserve) {
@@ -71,7 +71,6 @@
                     // 额外展示20条，防止未渲染区域滚动出现
                     this.start = itemPass - TopPreserve;
                 }
-
             }, 100)
         }
     };

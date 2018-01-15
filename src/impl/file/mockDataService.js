@@ -120,7 +120,7 @@ module.exports = class MockDataService extends EventEmitter {
      * 用户从监控窗保存一个数据文件
      */
     async saveDataEntryFromTraffic(userId, dataFileId, fileName, contentType, content) {
-        let dataList = this.mockDataList[userId];
+        let dataList = this.mockDataList[userId] || [];
         dataList.push({
             id: dataFileId,
             name: fileName,
@@ -128,7 +128,7 @@ module.exports = class MockDataService extends EventEmitter {
         });
         // 保存mock数据文件列表
         let listFilePath = this._getMockEntryPath(userId);
-        fileUtil.writeJsonToFile(listFilePath, content);
+        fileUtil.writeJsonToFile(listFilePath, dataList);
         // 保存数据文件
         let dataFilePath = this._getDataFilePath(userId, dataFileId);
         await fileUtil.writeFile(dataFilePath, content);
