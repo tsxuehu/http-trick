@@ -57,8 +57,8 @@
                     confirmButtonText: '确定',
                     cancelButtonText: '取消'
                 }).then(({ value }) => {
-                    dataApi.saveDataEntryFromTraffic(this.$dc.rightClickRow.idx, value
-                        , this.$dc.rightClickRow.contentType.split(';')[0]).then((res) => {
+                    dataApi.saveDataEntryFromTraffic(this.$dc.rightClickId, value
+                        , this.$dc.rightClickRow.response.headers['content-type'].split(';')[0]).then((res) => {
                         var serverData = res.data;
                         if (serverData.code == 0) {
                             this.$message({

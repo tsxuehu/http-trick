@@ -79,6 +79,17 @@
                 </el-input>
             </div>
         </div>
+        <!-- 增加响应头 -->
+        <div v-if="action.type == 'addResponseHeader'" class="inline-block right-panel">
+            <div class="action-data">
+                <el-input v-model="action.data.headerKey" size="small" :disabled="remote"
+                          placeholder="header key" style="display: inline-block;width: 120px;">
+                </el-input>
+                <el-input v-model="action.data.headerValue" size="small" :disabled="remote"
+                          placeholder="header value" style="display: inline-block;width: 300px;">
+                </el-input>
+            </div>
+        </div>
         <!-- 脚本修改请求 -->
         <div v-if="action.type == 'scriptModifyRequest'" class="inline-block right-panel">
             <textarea style="width: 500px;height: 90px" v-model="action.data.modifyRequestScript">
@@ -102,9 +113,10 @@
                 ruleType: [
                     //  { value: 'redirect', label: '转发请求' },
                     //  { value: 'mockData', label: '返回自定义数据' },
-                    { value: 'addRequestCookie', label: '设置请求cookie' },
-                    { value: 'addRequestHeader', label: '设置请求头' },
+                    { value: 'addRequestHeader', label: '增加请求头' },
+                    { value: 'addResponseHeader', label: '增加响应头' },
                     //  { value: 'modifyResponse', label: '修改响应内容' },
+                    { value: 'addRequestCookie', label: '设置请求cookie' },
                     { value: 'scriptModifyRequest', label: 'js修改请求内容' },
                     { value: 'scriptModifyResponse', label: 'js修改响应内容' }
                 ],

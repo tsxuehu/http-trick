@@ -60,7 +60,7 @@ module.exports = class MockDataController {
         router.post('/data/savedatafromtraffic', async (ctx, next) => {
             let userId = ctx.userId;
 
-            let content = await httpTrafficService.getResponseBody(userId, ctx.request.body.reqid);
+            let content = await this.httpTrafficService.getResponseBody(userId, ctx.request.body.reqid);
             // 获取数据文件内容 在保存
             await this.mockDataService.saveDataEntryFromTraffic(userId,
                 ctx.request.body.id,

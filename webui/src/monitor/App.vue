@@ -127,15 +127,11 @@
                     return [];
                 }
             },
-            responseRawHeader(){
-                let row = this.currentRow;
-                let headers = this.currentRow.resHeaders;
-                if (!headers) return '';
-                let lines = `${row.protocol}/${row.httpVersion} ${row.result}\n`;
-                _.forEach(this.responseHeader, (v, k) => {
-                    lines += `${k}    ${v}\n`;
-                });
-                return lines;
+
+            timeline(){
+                return {
+                    '请求': ''
+                }
             }
         },
         methods: {
