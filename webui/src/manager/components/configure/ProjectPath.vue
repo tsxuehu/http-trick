@@ -1,8 +1,6 @@
 <template>
     <div>
-        <div class='bread'>
-            <strong>工程路径管理</strong>
-        </div>
+        <div class="main-content__title">工程路径管理</div>
         <el-form label-width="100px" class="demo-ruleForm"
                  style="margin:20px;width:80%;min-width:800px;">
             <template v-for="(obj ,index) in $dc.projectPathArray">

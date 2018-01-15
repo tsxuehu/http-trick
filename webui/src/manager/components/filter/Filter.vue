@@ -1,8 +1,6 @@
 <template>
     <div>
-        <div class='bread'>
-            <strong>过滤器</strong>
-        </div>
+        <div class="main-content__title">过滤器</div>
         <el-row :gutter="20" style="margin-bottom: 10px;text-align: right;">
             <el-col :span="6" :offset="18">
                 <el-button size="small" @click='addRule'>新增过滤器</el-button>

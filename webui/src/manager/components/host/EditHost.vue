@@ -1,8 +1,6 @@
 <template>
     <div>
-        <div class='bread'>
-            <strong>编辑Host文件{{loaded ? ': '+filecontent.name: ''}}</strong>
-        </div>
+        <div class="main-content__title">编辑Host文件{{ loaded ? ': ' + filecontent.name : '' }}</div>
         <el-row :gutter="20" style="margin-bottom: 10px">
             <el-col :span="6" :offset="18">
                 <el-button size="small" @click='addRow'>新增Host Entry</el-button>

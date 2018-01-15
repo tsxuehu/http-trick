@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div class='bread'>
-      <strong>Host文件列表</strong>
-    </div>
+    <div class="main-content__title">Host文件列表</div>
     <el-row :gutter="20" style="margin-bottom: 10px">
       <el-col :span="6" :offset="18" class="addhost-btn-wrap">
         <el-button size="small" @click='addNewHostFile'>新增Host文件</el-button>
