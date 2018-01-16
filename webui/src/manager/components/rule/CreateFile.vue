@@ -1,8 +1,6 @@
 <template>
     <div>
-        <div class='bread'>
-            <strong>创建规则集</strong>
-        </div>
+        <div class="main-content__title">创建规则集</div>
         <el-form :model="createFileForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" style="margin:20px;width:60%;min-width:600px;">
             <el-form-item label="规则集名字" prop="name">
                 <el-input v-model="createFileForm.name"></el-input>

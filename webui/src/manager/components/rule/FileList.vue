@@ -1,8 +1,6 @@
 <template>
     <div>
-        <div class='bread'>
-            <strong>规则集列表</strong>
-        </div>
+        <div class="main-content__title">规则集列表</div>
         <el-row :gutter="20" style="margin-bottom: 10px">
             <el-col :span="10" :offset="14" class="addrule-btn-wrap">
                 <input type="file" @change="fileUpload" class="importfile"/>
