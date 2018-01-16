@@ -1,5 +1,5 @@
 const ServiceRegistry = require("../../service");
-const sendSpecificToClient = require("../sendToClient/specific");
+const sendSpecificToClient = require("../../utils/sendSpecificToClient");
 const _ = require("lodash");
 /**
  * 断点处理

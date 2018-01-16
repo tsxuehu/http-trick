@@ -1,6 +1,5 @@
 const Action = require( "./action");
 const queryString = require( "query-string");
-const sendErrorToClient = require( "../sendToClient/error");
 const _ = require( "lodash");
 
 let modifyResponse;
@@ -70,8 +69,9 @@ module.exports = class ModifyResponse extends Action {
 
         } else if (action.data.modifyResponseType == "return404") {
 
-            toClientResponse.sendedToClient = true;
-            sendErrorToClient(req, res, 404, 'user want');
+            toClientResponse.hasContent = true;
+            toClientResponse.statusCode = 404;
+            toClientResponse.body = 'user want';
 
         }
     }

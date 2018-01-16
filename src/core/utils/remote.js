@@ -67,6 +67,7 @@ module.exports = class Remote {
                 toClientResponse.remoteResponseStartTime = new Date().getTime();
                 toClientResponse.statusCode = proxyResponse.statusCode;
                 let reqData = await clientRequestPromise;
+                // http://cpro.baidustatic.com:80/cpro/ui/c.js 这个资源获取返回内容会出错
                 let resData = await requestResponseUtils.getServerResponseBody(proxyResponse);
                 toClientResponse.remoteResponseEndTime = new Date().getTime();
                 toClientResponse.body = resData;

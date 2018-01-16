@@ -3,7 +3,7 @@
  */
 const Action = require("./action");
 const ServiceRegistry = require("../../service");
-const sendSpecificToClient = require("../sendToClient/specific");
+const sendSpecificToClient = require("../../utils/sendSpecificToClient");
 const addHeaderToResponse = require("../../utils/addHeaderToResponse");
 
 let mockData;

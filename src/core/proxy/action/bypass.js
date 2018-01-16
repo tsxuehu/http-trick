@@ -4,7 +4,7 @@ const _ = require("lodash");
 const ServiceRegistry = require("../../service");
 const addHeaderToResponse = require("../../utils/addHeaderToResponse");
 const cookie2Str = require("../../utils/cookie2Str");
-const sendSpecificToClient = require("../sendToClient/specific");
+const sendSpecificToClient = require("../../utils/sendSpecificToClient");
 const cookie = require("cookie");
 
 let bypass;

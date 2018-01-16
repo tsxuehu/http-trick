@@ -1,7 +1,6 @@
 const Action = require("./action");
 const _ = require("lodash");
 const ServiceRegistry = require("../../service");
-const sendErrorToClient = require("../sendToClient/error");
 const Local = require("../../utils/local");
 const toClientResponseUtils = require("../../utils/toClientResponseUtils");
 const url = require("url");

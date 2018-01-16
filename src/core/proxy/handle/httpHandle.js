@@ -8,7 +8,7 @@ const getClientIp = require("../../utils/getClientIp");
 const Breakpoint = require("../breakpoint");
 const _ = require("lodash");
 const cookie = require("cookie");
-const sendSpecificToClient = require("../sendToClient/specific");
+const sendSpecificToClient = require("../../utils/sendSpecificToClient");
 
 // request session id seed
 let httpHandle;

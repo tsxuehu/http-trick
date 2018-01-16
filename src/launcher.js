@@ -36,10 +36,12 @@ module.exports = class Launcher {
      */
     async start() {
         await this._initService();
-        await this._startServer();
+        await this._startProxyServer();
+        await this._startWebUiServer();
+        await this._startServiceMockServer();
     }
 
-    // 初始化各种服务
+    // 初始化各种服务 并注册
     async _initService() {
         let appInfoService;
         let breakpointService;
@@ -115,8 +117,8 @@ module.exports = class Launcher {
         });
     }
 
-    // 初始化服务器
-    async _startServer() {
+    // 启动代理服务器(http 代理、https代理)
+    async _startProxyServer() {
         this.appInfoService = ServiceRegistry.getAppInfoService();
         this.configureService = ServiceRegistry.getConfigureService();
         this.profileService = ServiceRegistry.getProfileService();
@@ -137,7 +139,10 @@ module.exports = class Launcher {
 
         // 启动https转发服务器
         await new HttpsServer(httpsPort).start();
+    }
 
+    // 启动管理界面服务器
+    async _startWebUiServer() {
         let webUiPort = await getPort(40001);
 
         // 设置运行时的用户界面端口
@@ -147,5 +152,10 @@ module.exports = class Launcher {
         await new WebUiServer(webUiPort).start();
 
         this.appInfoService.printRuntimeInfo();
+    }
+
+    // 启动service mock服务器
+    async _startServiceMockServer(){
+
     }
 }
