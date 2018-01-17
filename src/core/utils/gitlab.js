@@ -1,10 +1,6 @@
-/**
- * Created by tsxuehu on 4/11/17.
- */
-
 const axios = require('axios');
-module.exports.getEtag = function getEtag(url, gitlabToken, callback) {
 
+function getEtag(url, gitlabToken, callback) {
     axios({
         method: 'Head',
         url: url,
@@ -18,7 +14,12 @@ module.exports.getEtag = function getEtag(url, gitlabToken, callback) {
     });
 };
 
-module.exports.getContent = function getContent(url, gitlabToken) {
+/**
+ * 获取单个文件的内容
+ * @param url
+ * @param gitlabToken
+ */
+function getContent(url, gitlabToken) {
     return axios({
         method: 'Get',
         url: url,
@@ -27,6 +28,13 @@ module.exports.getContent = function getContent(url, gitlabToken) {
         }
     });
 };
+
+/**
+ * 读取gitlab仓库里的所有json文件
+ */
+function getAllJsonFileInRepository() {
+
+}
 /**
  * 调用gitlab的接口
  * @param url
@@ -35,7 +43,7 @@ module.exports.getContent = function getContent(url, gitlabToken) {
  * @param gitlabToken
  * @returns {AxiosPromise}
  */
-module.exports.api = function api(url, method, data, gitlabToken) {
+function api(url, method, data, gitlabToken) {
     return axios({
         method: method || 'Get',
         url: url,
@@ -45,3 +53,10 @@ module.exports.api = function api(url, method, data, gitlabToken) {
         data: data || {}
     })
 }
+
+module.exports = {
+    getContent,
+    getAllJsonFileInRepository,
+    api,
+    getEtag
+};
