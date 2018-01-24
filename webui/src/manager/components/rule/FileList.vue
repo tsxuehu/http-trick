@@ -6,6 +6,7 @@
                 <input type="file" @change="fileUpload" class="importfile"/>
                 <el-button size="small">导入规则集</el-button>
                 <el-button size="small" type="primary" @click='importRemoteRule'>导入远程规则</el-button>
+                <el-button size="small" type="primary" @click='importRemoteRule'>批量导入远程规则</el-button>
                 <el-button size="small" type="primary" @click='addRuleCollection'>新增规则集</el-button>
             </el-col>
         </el-row>
@@ -47,13 +48,13 @@
             </el-button>
           </span>
                     <span>
-            <el-tooltip class="item" effect="dark" content="同步远程文件" placement="top-start">
-              <el-button type="success" icon='information' size="mini"
-                         v-if="scope.row.meta.remote && scope.row.meta.remoteETag && (scope.row.meta.ETag !== scope.row.meta.remoteETag)"
-                         @click='onUpdateFile(scope.row,scope.$index)'>
-              </el-button>
-            </el-tooltip>
-          </span>
+                        <el-tooltip class="item" effect="dark" content="同步远程文件" placement="top-start">
+                          <el-button type="success" icon='information' size="mini"
+                                     v-if="scope.row.meta.remote && scope.row.meta.remoteETag && (scope.row.meta.ETag !== scope.row.meta.remoteETag)"
+                                     @click='onUpdateFile(scope.row,scope.$index)'>
+                          </el-button>
+                        </el-tooltip>
+                    </span>
                 </template>
             </el-table-column>
         </el-table>
@@ -133,6 +134,7 @@
                     });
                 });
             },
+            // 导入远程文件
             async importRemoteRule(){
                 let result = await this.$prompt('请输入远程规则文件的url', '导入远程规则', {
                     confirmButtonText: '确定',
@@ -143,8 +145,8 @@
                 console.log(url);
                 let response = await utilsApi.getRemoteRuleFile(url);
 
-                var remoteFileResponse = response.data;
-                var content = remoteFileResponse.data;
+                let remoteFileResponse = response.data;
+                let content = remoteFileResponse.data;
                 content.meta = {
                     "remote": true,
                     "url": url,
@@ -154,8 +156,8 @@
                 content.name = content.name + '-remote';
                 // 导入
                 // 查找引用的变量
-                var varNameList = ruleApi.getReferenceVar(content);
-                var infoStr;
+                let varNameList = ruleApi.getReferenceVar(content);
+                let infoStr;
                 if (varNameList.length > 0) {
                     infoStr = `导入规则文件名为${content.name},引用变量【${varNameList.join('; ') }】请确保变量已经在工程路径配种中设置过`;
                 } else {

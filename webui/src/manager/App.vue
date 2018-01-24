@@ -23,8 +23,8 @@
                 <el-switch
                         :value="profile.enableHost"
                         @input="switchHost"
-                        :active-text="关闭host"
-                        :inactive-text="启用host">
+                        active-text="关闭host"
+                        inactive-text="启用host">
                 </el-switch>
             </span>
 
@@ -49,8 +49,8 @@
                 <el-switch
                         :value="profile.enableRule"
                         @input="switchRule"
-                        :active-text="关闭rule"
-                        :inactive-text="启用rule">
+                        active-text="关闭rule"
+                        inactive-text="启用rule">
                 </el-switch>
             </span>
         </header>

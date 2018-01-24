@@ -198,7 +198,6 @@
                     // 请求后端 拿数据
                     this.currentRequestBody = await trafficApi.getRequestBody(id);
                 }
-                console.log('aa')
                 // 如果是html json数据 向后端请求拿数据
                 try {
                     if (/(text)|(javascript)|(json)/i.test(currentRow.response.headers['content-type'])) {
@@ -227,6 +226,8 @@
                 this.recordMap = {};
                 this.originRecordArray = [];
                 this.filterdRecordArray = [];
+                this.currentRequestBody = '';
+                this.currentResponseBody = '';
             }
         },
         watch: {

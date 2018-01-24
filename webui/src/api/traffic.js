@@ -11,7 +11,7 @@ export async function getResponseBody(id) {
 }
 export async function getRequestBody(id) {
   try{
-    let result = await axios.get(`/traffic/getResponseBody?id=${id}`);
+    let result = await axios.get(`/traffic/getRequestBody?id=${id}`);
     return result.data;
   }catch (e){
     return '';

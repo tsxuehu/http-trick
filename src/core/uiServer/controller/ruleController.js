@@ -23,7 +23,7 @@ module.exports = class RuleController {
         //    name:name,
         //    description:description
         //}
-        router.post('/rule/create', async(ctx, next) => {
+        router.post('/rule/create', async (ctx, next) => {
             let userId = ctx.userId;
             let result = await this.ruleService.createRuleFile(userId, ctx.request.body.name
                 , ctx.request.body.description);
@@ -75,6 +75,17 @@ module.exports = class RuleController {
         // /rule/savefile?name=${name} ,content
         router.post('/rule/savefile', async (ctx, next) => {
             let userId = ctx.userId;
+            await this.ruleService.saveRuleFile(userId, ctx.query.name, ctx.request.body.content);
+            ctx.body = {
+                code: 0
+            };
+        });
+
+        // 导入gitlab仓库中的文件
+        router.post('/rule/importrepository', async (ctx, next) => {
+            let userId = ctx.userId;
+            let { gitlabUrl, token = '' } = ctx.request.body;
+            // 下载gitlab中的文件
             await this.ruleService.saveRuleFile(userId, ctx.query.name, ctx.request.body.content);
             ctx.body = {
                 code: 0

@@ -31,8 +31,9 @@ function getContent(url, gitlabToken) {
 
 /**
  * 读取gitlab仓库里的所有json文件
+ * 返回
  */
-function getAllJsonFileInRepository() {
+function getAllJsonFileInRepository(gitlabUrl,repository,token) {
 
 }
 /**
