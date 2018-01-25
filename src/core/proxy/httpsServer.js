@@ -22,7 +22,7 @@ module.exports = class HttpsServer {
     async start() {
         let certification =
             await this.certificationService.getCertificationForHost('internal_https_server');
-
+        // https://support.comodo.com/index.php?/Knowledgebase/Article/View/1120/38/what-is-sni-and-how-it-works
         this.httpsProxyServer = https.createServer({
             SNICallback: this.SNIPrepareCert.bind(this),
             key: certification.key,

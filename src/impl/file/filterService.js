@@ -44,14 +44,14 @@ module.exports = class FilterService extends EventEmitter {
     _isMethodMatch(reqMethod, ruleMethod) {
         let loweredReqMethod = _.lowerCase(reqMethod);
         let loweredRuleMethod = _.lowerCase(ruleMethod);
-        return loweredReqMethod == loweredRuleMethod
-            || !ruleMethod
+        return !ruleMethod
+            || loweredReqMethod == loweredRuleMethod
             || loweredReqMethod == 'option';
     }
 
     // 请求的url是否匹配规则
     _isUrlMatch(reqUrl, ruleMatchStr) {
-        return ruleMatchStr && (reqUrl.indexOf(ruleMatchStr) >= 0
-            || (new RegExp(ruleMatchStr)).test(reqUrl));
+        return !ruleMatchStr || reqUrl.indexOf(ruleMatchStr) >= 0
+            || (new RegExp(ruleMatchStr)).test(reqUrl);
     }
 }
