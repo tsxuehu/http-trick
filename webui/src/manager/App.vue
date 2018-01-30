@@ -55,6 +55,7 @@
             </span>
             <!-- 过滤器 -->
             <span>
+                过滤器开关
                 <el-switch
                         :value="profile.enableFilter"
                         @input="switchFilter"
@@ -223,9 +224,9 @@
 
             async switchFilter(value) {
                 if (this.profile.enableFilter) {
-                    profileApi.disableRule();
+                    profileApi.disableFilter();
                 } else {
-                    profileApi.enableRule();
+                    profileApi.enableFilter();
                 }
             },
 

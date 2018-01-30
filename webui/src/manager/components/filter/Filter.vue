@@ -11,7 +11,7 @@
             <el-table-column prop="checked" label="启用" align="center" width="80">
                 <template scope='scope'>
                     <el-tooltip class="item" effect="dark" content="勾选后启动这条规则" placement="left">
-                        <el-checkbox v-model="scope.row.checked"></el-checkbox>
+                        <el-checkbox v-model="scope.row.checked" :disabled="!$dc.filterState"></el-checkbox>
                     </el-tooltip>
                 </template>
             </el-table-column>
