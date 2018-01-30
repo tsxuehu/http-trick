@@ -6,10 +6,12 @@ const path = require('path');
 const defaultProfile = {
     // 工程路径配置
     "projectPath": {},
-    // 是否禁用转发规则
+    // 是否启用转发规则
     "enableRule": true,
-    // 是否禁用host解析
-    "enableHost": true
+    // 是否启用host解析
+    "enableHost": true,
+    // 是否启用filter
+    "enableFilter": true
 };
 /**
  * 代理运转需要的规则数据
@@ -97,12 +99,27 @@ module.exports = class ProfileService extends EventEmitter {
         await this.setProfile(userId, conf);
     }
 
+    async setEnableFilter(userId, enable) {
+        let conf = this.userProfileMap[userId];
+        conf.enableFilter = enable;
+        await this.setProfile(userId, conf);
+    }
+
+
     /**
      * 获取转发规则启用开关
      * @param clientIp
      */
     enableRule(userId) {
         return this.getProfile(userId).enableRule;
+    }
+
+    enableHost(userId) {
+        return this.getProfile(userId).enableHost;
+    }
+
+    enableFilter(userId) {
+        return this.getProfile(userId).enableFilter;
     }
 
     // 获取clientIp对应的user id
