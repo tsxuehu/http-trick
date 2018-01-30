@@ -40,6 +40,14 @@ module.exports = class ConfigController {
             };
         });
 
+        router.post('/profile/setFilterState', async (ctx, next) => {
+            let userId = ctx.userId;
+            await this.profileService.setEnableFilter(userId, !!ctx.query.filterstate);
+            ctx.body = {
+                code: 0
+            };
+        });
+
     }
 
 }

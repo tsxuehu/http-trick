@@ -4,12 +4,14 @@ const fileUtil = require("../../core/utils/file");
 const path = require('path');
 
 module.exports = class FilterService extends EventEmitter {
-    constructor({appInfoService}) {
+    constructor({profileService, appInfoService}) {
         super();
         // user -> filters 映射
         this.filters = {};
         let proxyDataDir = appInfoService.getProxyDataDir();
         this.breakpointSaveDir = path.join(proxyDataDir, "filter");
+
+        this.profileService = profileService;
     }
 
     async start() {
@@ -21,6 +23,9 @@ module.exports = class FilterService extends EventEmitter {
     }
 
     async getMatchedRuleList(userId, method, urlObj) {
+        if (!this.profileService.enableFilter(userId)) {
+            return [];
+        }
         let ruleLists = await this.getFilterRuleList(userId);
         return _.filter(ruleLists, rule => {
             return rule.checked && this._isMethodMatch(method, rule.method)

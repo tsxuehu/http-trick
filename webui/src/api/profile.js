@@ -18,5 +18,11 @@ export default {
     },
     enableHost(){
         return axios.post(`/profile/setHostState?hoststate=1`);
-    }
+    },
+    disableFilter(){
+        return axios.post(`/profile/setFilterState`);
+    },
+    enableFilter(){
+        return axios.post(`/profile/setFilterState?filterstate=1`);
+    },
 }

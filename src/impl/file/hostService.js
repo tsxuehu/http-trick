@@ -6,7 +6,7 @@ const fileUtil = require("../../core/utils/file");
  * Created by tsxuehu on 8/3/17.
  */
 module.exports = class HostService extends EventEmitter {
-    constructor({ appInfoService }) {
+    constructor({ profileService, appInfoService }) {
         super();
         // userId -> { filename -> content}
         this.userHostFilesMap = {};
@@ -15,6 +15,8 @@ module.exports = class HostService extends EventEmitter {
         this._inUsingHostsMapCache = {};
         let proxyDataDir = appInfoService.getProxyDataDir();
         this.hostSaveDir = path.join(proxyDataDir, "host");
+
+        this.profileService = profileService;
     }
 
     async start() {
@@ -30,6 +32,11 @@ module.exports = class HostService extends EventEmitter {
 
     async resolveHost(userId, hostname) {
         if (!hostname) return hostname;
+
+        if (!this.profileService.enableHost(userId)) {
+            return hostname;
+        }
+
         let inUsingHosts = this.getInUsingHosts(userId);
 
         let ip = inUsingHosts.hostMap[hostname];
@@ -140,14 +147,14 @@ module.exports = class HostService extends EventEmitter {
             if (content.name == filename && content.checked != true) {
                 content.checked = true;
                 toSaveFileName.push(name);
-            } else if(content.name != filename && content.checked != false) {
+            } else if (content.name != filename && content.checked != false) {
                 content.checked = false;
                 toSaveFileName.push(name);
             }
 
         });
         // 保存文件
-        for(let name of toSaveFileName){
+        for (let name of toSaveFileName) {
             let hostfileName = this._getHostFilePath(userId, name);
             let content = this.userHostFilesMap[userId][name];
             await fileUtil.writeJsonToFile(hostfileName, content);

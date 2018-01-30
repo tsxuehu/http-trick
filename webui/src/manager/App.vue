@@ -53,6 +53,15 @@
                         inactive-text="启用rule">
                 </el-switch>
             </span>
+            <!-- 过滤器 -->
+            <span>
+                <el-switch
+                        :value="profile.enableFilter"
+                        @input="switchFilter"
+                        active-text="关闭filter"
+                        inactive-text="启用filter">
+                </el-switch>
+            </span>
         </header>
 
         <!-- 正文 -->
@@ -183,6 +192,9 @@
             },
             hostState() {
                 return this.profile.enableHost || false;
+            },
+            filterState() {
+                return this.profile.enableFilter || false;
             }
         },
         methods: {
@@ -207,6 +219,14 @@
                         this.$message.error(`出错了,请刷新页面，${serverData.msg}`);
                     }
                 });
+            },
+
+            async switchFilter(value) {
+                if (this.profile.enableFilter) {
+                    profileApi.disableRule();
+                } else {
+                    profileApi.enableRule();
+                }
             },
 
             async switchRule(value) {
