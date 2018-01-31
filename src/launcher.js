@@ -77,8 +77,8 @@ module.exports = class Launcher {
             certificationService = new FileCertificationService(baseService);
 
             profileService = new FileProfileService(baseService);
-            filterService = new FileFilterService(baseService);
-            hostService = new FileHostService(baseService);
+            filterService = new FileFilterService({profileService, ...baseService});
+            hostService = new FileHostService({profileService, ...baseService});
             httpTrafficService = new FileHttpTrafficService(baseService);
             mockDataService = new FileMockDataService(baseService);
             ruleService = new FileRuleService({profileService, ...baseService});
