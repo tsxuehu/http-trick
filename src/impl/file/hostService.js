@@ -36,7 +36,7 @@ module.exports = class HostService extends EventEmitter {
         if (!this.profileService.enableHost(userId)) {
             return hostname;
         }
-
+        // 解析host
         let inUsingHosts = this.getInUsingHosts(userId);
 
         let ip = inUsingHosts.hostMap[hostname];
@@ -45,7 +45,10 @@ module.exports = class HostService extends EventEmitter {
         ip = _.find(inUsingHosts.globHostMap, (value, host) => {
             return hostname.endsWith(host);
         });
-        return ip || hostname;
+        if (ip) return ip;
+        // 调用dns解析
+
+        return hostname;
     }
 
     /**
@@ -169,6 +172,12 @@ module.exports = class HostService extends EventEmitter {
 
     async saveHostFile(userId, name, content) {
         this.userHostFilesMap[userId][name] = content;
+
+        // 如果正在使用，则删除
+        if (content.checked) {
+            delete this._inUsingHostsMapCache[userId];
+        }
+
         let hostfileName = this._getHostFilePath(userId, name);
         await fileUtil.writeJsonToFile(hostfileName, content);
         this.emit("host-saved", userId, name, content);
