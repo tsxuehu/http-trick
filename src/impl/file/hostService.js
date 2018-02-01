@@ -2,6 +2,9 @@ const EventEmitter = require("events");
 const _ = require("lodash");
 const path = require("path");
 const fileUtil = require("../../core/utils/file");
+
+const ipReg = /((?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d))/;
+
 /**
  * Created by tsxuehu on 8/3/17.
  */
@@ -36,6 +39,11 @@ module.exports = class HostService extends EventEmitter {
         if (!this.profileService.enableHost(userId)) {
             return hostname;
         }
+
+        if (ipReg.test(hostname)) {
+            return hostname;
+        }
+
         // 解析host
         let inUsingHosts = this.getInUsingHosts(userId);
 
