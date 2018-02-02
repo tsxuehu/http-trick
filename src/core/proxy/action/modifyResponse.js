@@ -84,7 +84,7 @@ var srcReg = /src=['"].*?['"]/gi;
 function addTimestampToJsCss(body) {
     //<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic">
     //<script async="async" crossorigin="anonymous"  src="https://assets-cdn.github.com/assets/60.js">
-    var timestamp = new Date().getTime();
+    var timestamp = Date.now();
     body = body.replace(/<script .*?>|<link .*?>/gi, element => {
         // 对script src属性进行处理
         var isLink = element.startsWith('<link');

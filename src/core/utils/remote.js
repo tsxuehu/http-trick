@@ -1,6 +1,5 @@
 const axios = require("axios");
 const queryString = require("query-string");
-const DnsResolver = require("./dns");
 const log = require("./log");
 const _ = require("lodash");
 const http = require('http');
@@ -22,7 +21,6 @@ module.exports = class Remote {
     }
 
     constructor() {
-        this.dns = new DnsResolver({});
     }
 
     /**
@@ -34,23 +32,15 @@ module.exports = class Remote {
                }) {
         // http.request 解析dns时，偶尔会出错
         // pipe流 获取远程数据 并做记录
-
-        let ip = '';
         try {
             if (recordResponse) {
-                toClientResponse.dnsResolveBeginTime = new Date().getTime();
-            }
-            ip = await this.dns.resovleIp(hostname);
-            toClientResponse.headers['remote-ip'] = ip;
-            if (recordResponse) {
-                toClientResponse.remoteIp = ip;
-                toClientResponse.remoteRequestBeginTime = new Date().getTime();
+                toClientResponse.remoteRequestBeginTime = Date.now();
             }
 
             let proxyResponsePromise = this._requestServer({
-                req,
+                req, hostname,
                 protocol, method, port, path,
-                ip, headers, timeout
+                headers, timeout
             });
             // 记录日志
             let clientRequestPromise;
@@ -61,16 +51,17 @@ module.exports = class Remote {
             toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
 
             res.writeHead(proxyResponse.statusCode, toClientResponse.headers);
+            // 向服务器返回发送给浏览器
             proxyResponse.pipe(res);
             toClientResponse.sendedToClient = true;
 
             if (recordResponse) {
-                toClientResponse.remoteResponseStartTime = new Date().getTime();
+                toClientResponse.remoteResponseStartTime = Date.now();
                 toClientResponse.statusCode = proxyResponse.statusCode;
                 let reqData = await clientRequestPromise;
                 // http://cpro.baidustatic.com:80/cpro/ui/c.js 这个资源获取返回内容会出错
                 let resData = await requestResponseUtils.getServerResponseBody(proxyResponse);
-                toClientResponse.remoteResponseEndTime = new Date().getTime();
+                toClientResponse.remoteResponseEndTime = Date.now();
                 toClientResponse.body = resData;
                 toClientResponse.hasContent = true;
                 toClientResponse.requestData = {
@@ -99,18 +90,12 @@ module.exports = class Remote {
                 }) {
 
         try {
-            toClientResponse.dnsResolveBeginTime = new Date().getTime();
-
-            let ip = await this.dns.resovleIp(hostname);
-            toClientResponse.headers['remote-ip'] = ip;
-
-            toClientResponse.remoteIp = ip;
-            toClientResponse.remoteRequestBeginTime = new Date().getTime();
+            toClientResponse.remoteRequestBeginTime = Date.now();
 
             let proxyResponsePromise = await this._requestServer({
-                req,
+                req, hostname,
                 protocol, method, port, path,
-                ip, headers, timeout
+                headers, timeout
             });
 
             // 记录日志
@@ -125,10 +110,10 @@ module.exports = class Remote {
             delete toClientResponse.headers['content-encoding'];
             delete toClientResponse.headers['transfer-encoding'];
 
-            toClientResponse.remoteResponseStartTime = new Date().getTime();
+            toClientResponse.remoteResponseStartTime = Date.now();
             toClientResponse.statusCode = proxyResponse.statusCode;
             let resData = await requestResponseUtils.getServerResponseBody(proxyResponse);
-            toClientResponse.remoteResponseEndTime = new Date().getTime();
+            toClientResponse.remoteResponseEndTime = Date.now();
             toClientResponse.body = resData;
             toClientResponse.hasContent = true;
 
@@ -157,29 +142,23 @@ module.exports = class Remote {
     async cacheFromRequestContent({ requestContent, recordResponse, toClientResponse, timeout }) {
         let { protocol, hostname, pathname, port, query, method, headers, body } = requestContent;
         try {
-            toClientResponse.dnsResolveBeginTime = new Date().getTime();
-
-            let ip = await resovleIp(hostname);
-            toClientResponse.headers['remote-ip'] = ip;
-
-            toClientResponse.remoteIp = ip;
-            toClientResponse.remoteRequestBeginTime = new Date().getTime();
+            toClientResponse.remoteRequestBeginTime = Date.now();
             let path = `${pathname}?${queryString.stringify(query)}`;
             let proxyResponse = await this._requestServer({
                 body: requestContent.body,
                 protocol, method, port, path,
-                ip, headers, timeout
+                hostname, headers, timeout
             });
 
             toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
             delete toClientResponse.headers['content-encoding'];
             delete toClientResponse.headers['transfer-encoding'];
 
-            toClientResponse.remoteResponseStartTime = new Date().getTime();
+            toClientResponse.remoteResponseStartTime = Date.now();
 
             toClientResponse.statusCode = proxyResponse.statusCode;
             let resData = await requestResponseUtils.getServerResponseBody(proxyResponse);
-            toClientResponse.remoteResponseEndTime = new Date().getTime();
+            toClientResponse.remoteResponseEndTime = Date.now();
             toClientResponse.body = resData;
             toClientResponse.hasContent = true;
             if (recordResponse) {
@@ -199,7 +178,8 @@ module.exports = class Remote {
         }
     }
 
-    _requestServer({ req, body, protocol, method, port, path, ip, headers, timeout = 10000 }) {
+    // 请求远程服务器，并将响应流通过promise的方式返回
+    _requestServer({ req, body, protocol, method, hostname, port, path, headers, timeout = 10000 }) {
         let proxyRequestPromise = new Promise((resolve, reject) => {
             let client = protocol === 'https:' ? https : http;
             let proxyRequest = client.request({
@@ -207,7 +187,7 @@ module.exports = class Remote {
                 method,
                 port,
                 path,
-                hostname: ip,
+                hostname,
                 headers,
                 timeout,
                 rejectUnauthorized: false

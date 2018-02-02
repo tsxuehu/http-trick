@@ -2,6 +2,7 @@ const EventEmitter = require("events");
 const _ = require("lodash");
 const path = require("path");
 const fileUtil = require("../../core/utils/file");
+const DnsResolver = require("../../core/utils/dns");
 
 const ipReg = /((?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d))/;
 
@@ -20,6 +21,8 @@ module.exports = class HostService extends EventEmitter {
         this.hostSaveDir = path.join(proxyDataDir, "host");
 
         this.profileService = profileService;
+        // dns解析服务
+        this.dns = new DnsResolver({});
     }
 
     async start() {
@@ -36,27 +39,27 @@ module.exports = class HostService extends EventEmitter {
     async resolveHost(userId, hostname) {
         if (!hostname) return hostname;
 
-        if (!this.profileService.enableHost(userId)) {
-            return hostname;
-        }
-
         if (ipReg.test(hostname)) {
             return hostname;
         }
+        let ip;
+        if (this.profileService.enableHost(userId)) {
+            // 解析host
+            let inUsingHosts = this.getInUsingHosts(userId);
 
-        // 解析host
-        let inUsingHosts = this.getInUsingHosts(userId);
+            ip = inUsingHosts.hostMap[hostname];
+            if (ip) return ip;
+            // 配置 *开头的host  计算属性globHostMap已经将*去除
+            ip = _.find(inUsingHosts.globHostMap, (value, host) => {
+                return hostname.endsWith(host);
+            });
+            if (ip) return ip;
+        }
 
-        let ip = inUsingHosts.hostMap[hostname];
-        if (ip) return ip;
-        // 配置 *开头的host  计算属性globHostMap已经将*去除
-        ip = _.find(inUsingHosts.globHostMap, (value, host) => {
-            return hostname.endsWith(host);
-        });
-        if (ip) return ip;
         // 调用dns解析
+        ip = await this.dns.resovleIp(hostname);
 
-        return hostname;
+        return ip;
     }
 
     /**

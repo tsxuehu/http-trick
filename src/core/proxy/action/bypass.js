@@ -18,7 +18,7 @@ module.exports = class Bypass extends Action {
 
     constructor() {
         super();
-        this.hostRepository = ServiceRegistry.getHostService();
+        this.hostService = ServiceRegistry.getHostService();
         this.httpTrafficService = ServiceRegistry.getHttpTrafficService();
         this.remote = Remote.getInstance();
     }
@@ -57,6 +57,7 @@ module.exports = class Bypass extends Action {
               }) {
         // 查找当前用户是否有流量监控窗
         // 若有监控窗，则将返回浏览器的内容放入 toClientResponse
+
         if (requestContent.hasContent) {
             await this.bypassWithRequestContent({
                 req,
@@ -116,9 +117,14 @@ module.exports = class Bypass extends Action {
         // 构造url
         let { protocol, hostname, path, port } = urlObj;
 
-        let ipOrHost = await this.hostRepository.resolveHost(userId, hostname);
-        let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
+        // dns解析
+        toClientResponse.dnsResolveBeginTime = Date.now();
+        let ip = await this.hostService.resolveHost(userId, hostname);
+        toClientResponse.headers['remote-ip'] = ip;
+        toClientResponse.remoteIp = ip;
 
+        // 日志
+        let targetUrl = protocol + '//' + hostname + ':' + port + path;
         toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
 
         // 合并header
@@ -129,16 +135,29 @@ module.exports = class Bypass extends Action {
 
         if (!last) {
             await this.remote.cache({
-                req, res,recordResponse,
+                req,
+                res,
+                recordResponse,
                 method: req.method,
-                protocol, hostname: ipOrHost, path, port,
-                headers: actualRequestHeaders, toClientResponse
+                protocol,
+                hostname: ip,
+                path,
+                port,
+                headers: actualRequestHeaders,
+                toClientResponse
             });
         } else {
             await this.remote.pipe({
-                req, res, recordResponse,
+                req,
+                res,
+                protocol,
+                path,
+                port,
+                toClientResponse,
+                recordResponse,
                 method: req.method,
-                protocol, hostname: ipOrHost, path, port, headers: actualRequestHeaders, toClientResponse
+                hostname: ip,
+                headers: actualRequestHeaders
             });
         }
 
@@ -164,9 +183,14 @@ module.exports = class Bypass extends Action {
         // 构造url
         let { protocol, hostname, pathname, port, query, method, headers, body } = requestContent;
 
-        let ipOrHost = await this.hostRepository.resolveHost(userId, hostname);
-        let targetUrl = protocol + '//' + ipOrHost + ':' + port + pathname;
+        // dns解析
+        toClientResponse.dnsResolveBeginTime = Date.now();
+        let ip = await this.hostService.resolveHost(userId, hostname);
+        toClientResponse.headers['remote-ip'] = ip;
+        toClientResponse.remoteIp = ip;
 
+        // 日志记录请求地址
+        let targetUrl = protocol + '//' + ip + ':' + port + pathname;
         toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
 
         // 合并header
@@ -179,7 +203,7 @@ module.exports = class Bypass extends Action {
             requestContent: {
                 protocol,
                 method,
-                hostname: ipOrHost,
+                hostname: ip,
                 pathname,
                 query,
                 port,

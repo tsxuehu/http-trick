@@ -87,7 +87,7 @@ module.exports = class BreakpointService extends EventEmitter {
                          }) {
         let id = breakpointId;
         if (!id) {
-            id = new Date().getTime();
+            id = Date.now();
         }
         let breakpoint = {
             id,

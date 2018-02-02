@@ -121,11 +121,15 @@ module.exports = class Redirect extends Action {
         let redirectUrlObj = url.parse(target);
         let { protocol, hostname, path, port } = redirectUrlObj;
 
-        let ipOrHost = await this.hostRepository.resolveHost(userId, hostname);
+        // dns解析
+        toClientResponse.dnsResolveBeginTime = Date.now();
+        let ip = await this.hostService.resolveHost(userId, hostname);
+        toClientResponse.headers['remote-ip'] = ip;
+        toClientResponse.remoteIp = ip;
 
         port = port || ('https:' == protocol ? 443 : 80);
 
-        let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
+        let targetUrl = protocol + '//' + ip + ':' + port + path;
         toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
 
         Object.assign(actualRequestHeaders, req.headers);
@@ -139,14 +143,14 @@ module.exports = class Redirect extends Action {
             await this.remote.pipe({
                 req, res, recordResponse,
                 method: req.method,
-                protocol, hostname: ipOrHost, path, port,
+                protocol, hostname: ip, path, port,
                 headers: actualRequestHeaders, toClientResponse
             });
         } else {
             await this.remote.cache({
                 req, res,
                 method: req.method,
-                protocol, hostname: ipOrHost, path, port,
+                protocol, hostname: ip, path, port,
                 headers: actualRequestHeaders, toClientResponse
             });
         }

@@ -108,7 +108,7 @@ module.exports = class HttpHandle {
             // 处理结束 记录额外的请求日志(附加的请求头、cookie、body)
             // 请求已经发送给浏览器
             if (recordResponse) {
-                toClientResponse.requestEndTime = new Date().getTime();
+                toClientResponse.requestEndTime = Date.now();
                 this.httpTrafficService.actualRequest({
                     userId,
                     id: requestId,
@@ -173,7 +173,7 @@ module.exports = class HttpHandle {
                 body: ''
             },
             remoteIp: '',// 远程服务器器ip
-            receiveRequestTime: new Date().getTime(), // 接收到请求的时间
+            receiveRequestTime: Date.now(), // 接收到请求的时间
             dnsResolveBeginTime: 0,// dns解析开始时间
             remoteRequestBeginTime: 0,// 请求开始时间
             remoteResponseStartTime: 0,// 服务器响应开始时间
