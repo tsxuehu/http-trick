@@ -1,6 +1,6 @@
 const axios = require("axios");
 const queryString = require("query-string");
-const resovleIp = require("./dns");
+const DnsResolver = require("./dns");
 const log = require("./log");
 const _ = require("lodash");
 const http = require('http');
@@ -22,6 +22,7 @@ module.exports = class Remote {
     }
 
     constructor() {
+        this.dns = new DnsResolver({});
     }
 
     /**
@@ -39,7 +40,7 @@ module.exports = class Remote {
             if (recordResponse) {
                 toClientResponse.dnsResolveBeginTime = new Date().getTime();
             }
-            ip = await resovleIp(hostname);
+            ip = await this.dns.resovleIp(hostname);
             toClientResponse.headers['remote-ip'] = ip;
             if (recordResponse) {
                 toClientResponse.remoteIp = ip;
@@ -100,7 +101,7 @@ module.exports = class Remote {
         try {
             toClientResponse.dnsResolveBeginTime = new Date().getTime();
 
-            let ip = await resovleIp(hostname);
+            let ip = await this.dns.resovleIp(hostname);
             toClientResponse.headers['remote-ip'] = ip;
 
             toClientResponse.remoteIp = ip;

@@ -24,7 +24,7 @@ module.exports = class DnsResolver {
         let host = allowDnsCache ? this.dnsCache[hostname] : null;
         let cacheTime = 0;
         if (host) {
-            cacheTime = Date.now().getTime() - host.time;
+            cacheTime = Date.now() - host.time;
         }
         if (host && cacheTime < this.MAX_CACHE_TIME) {
             if (cacheTime > this.CACHE_TIME) {
@@ -46,7 +46,7 @@ module.exports = class DnsResolver {
                     done = true;
                     reject(new Error(`dns resolve: ${hostname} timeout`));
                 }, this.TIMEOUT);
-                dns.lookup(hostname, function (err, ip, type) {
+                dns.lookup(hostname,  (err, ip, type) => {
                     clearTimeout(timer);
                     if (done) return;
                     done = true;
@@ -56,7 +56,7 @@ module.exports = class DnsResolver {
                         let result = {
                             ip: ip,
                             hostname: hostname,
-                            time: Date.now().getTime()
+                            time: Date.now()
                         };
                         this.dnsCache[hostname] = result;
                         resolve(result);
