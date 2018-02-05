@@ -6,6 +6,8 @@ const addHeaderToResponse = require("../../utils/addHeaderToResponse");
 const cookie2Str = require("../../utils/cookie2Str");
 const sendSpecificToClient = require("../../utils/sendSpecificToClient");
 const cookie = require("cookie");
+const toClientResponseUtils = require("../../utils/toClientResponseUtils");
+const queryString = require("query-string");
 
 let bypass;
 module.exports = class Bypass extends Action {
@@ -119,7 +121,14 @@ module.exports = class Bypass extends Action {
 
         // dns解析
         toClientResponse.dnsResolveBeginTime = Date.now();
-        let ip = await this.hostService.resolveHost(userId, hostname);
+        let ip = '';
+        try {
+            ip = await this.hostService.resolveHost(userId, hostname);
+        } catch (e) {
+            let href = `${protocol}//${hostname}:${port}${path}`;
+            toClientResponseUtils.setError(toClientResponse, href, e);
+            return;
+        }
         toClientResponse.headers['remote-ip'] = ip;
         toClientResponse.remoteIp = ip;
 
@@ -185,7 +194,14 @@ module.exports = class Bypass extends Action {
 
         // dns解析
         toClientResponse.dnsResolveBeginTime = Date.now();
-        let ip = await this.hostService.resolveHost(userId, hostname);
+        let ip = '';
+        try {
+            ip = await this.hostService.resolveHost(userId, hostname);
+        } catch (e) {
+            let href = `${protocol}//${hostname}:${port}${pathname}?${queryString.stringify(query)}`;
+            toClientResponseUtils.setError(toClientResponse, href, e);
+            return;
+        }
         toClientResponse.headers['remote-ip'] = ip;
         toClientResponse.remoteIp = ip;
 

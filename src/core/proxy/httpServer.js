@@ -16,9 +16,11 @@ module.exports = class HttpServer {
     constructor(httpPort, httpsPort) {
         this.httpPort = httpPort;
         this.httpsPort = httpsPort;
-        this.httpHandle = HttpHandle.getInstance();
         this.connectHandle = ConnectHandle.getInstance(this.httpPort, this.httpsPort);
+        this.httpHandle = HttpHandle.getInstance();
         this.wsHandle = WsHandle.getInstance();
+
+
     }
 
     start() {

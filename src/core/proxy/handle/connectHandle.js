@@ -1,6 +1,11 @@
 const net = require("net");
 const ServiceRegistry = require("../../service");
 
+// 对于https协议，client connect请求proxy proxy和https server建立链接
+// 此字段记录proxy 请求内部https server链接 和 client的ip 之间的映射关系
+// 方便 https server 处理请求时，能够找出对应的client ip
+connectionClientIpMap = {};
+
 let connectHandle = null;
 // https ws wss 都会发送connect请求
 // 代理服务器的目的只要抓取http https请求
@@ -24,6 +29,7 @@ module.exports = class ConnectHandle {
         this.httpProxyPort = httpProxyPort;
         this.httpsProxyPort = httpsProxyPort;
         this.logService = ServiceRegistry.getLogService();
+
     }
 
     async handle(req, socket, head) {
@@ -39,9 +45,13 @@ module.exports = class ConnectHandle {
             proxyHost = host;// ws协议直接和远程服务器链接
             proxyPort = targetPort;
         }
-
+        let requestPort = '';
         // 和远程建立链接 并告诉客户端
-        let conn = net.connect(proxyPort, proxyHost, function () {
+        let conn = net.connect(proxyPort, proxyHost, () => {
+            // 记录发出请求端口 和 远程ip的映射关系
+            let { port } = conn.address();
+            requestPort = port;
+            connectionClientIpMap[port] = socket.remoteAddress;
             socket.write('HTTP/' + req.httpVersion + ' 200 OK\r\n\r\n', 'UTF-8', function () {
                 conn.pipe(socket);
                 socket.pipe(conn);
@@ -51,6 +61,14 @@ module.exports = class ConnectHandle {
         conn.on("error", e => {
             this.logService.error("err when connect to + " + proxyHost + " : " + proxyPort);
             this.logService.error(e);
+            delete connectionClientIpMap[requestPort];
         });
+        conn.on("close", e => {
+            delete connectionClientIpMap[requestPort];
+        });
+    }
+
+    static getProxyRequestPortMapedClientIp(requestPort) {
+        return connectionClientIpMap[requestPort];
     }
 };

@@ -123,7 +123,14 @@ module.exports = class Redirect extends Action {
 
         // dns解析
         toClientResponse.dnsResolveBeginTime = Date.now();
-        let ip = await this.hostService.resolveHost(userId, hostname);
+        let ip = '';
+        try {
+            ip = await this.hostService.resolveHost(userId, hostname);
+        } catch (e) {
+            let href = `${protocol}//${hostname}:${port}${path}`;
+            toClientResponseUtils.setError(toClientResponse, href, e);
+            return;
+        }
         toClientResponse.headers['remote-ip'] = ip;
         toClientResponse.remoteIp = ip;
 
