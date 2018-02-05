@@ -44,7 +44,7 @@ module.exports = class DnsResolver {
                 let timer = setTimeout(() => {
                     if (done) return;
                     done = true;
-                    reject(new Error(`dns resolve: ${hostname} timeout`));
+                    reject(`dns resolve: ${hostname} timeout`);
                 }, this.TIMEOUT);
                 dns.lookup(hostname,  (err, ip, type) => {
                     clearTimeout(timer);
