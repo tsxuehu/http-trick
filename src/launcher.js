@@ -24,10 +24,11 @@ module.exports = class Launcher {
      * @param serviceType 使用的服务类型
      * @param isSingle 是否是单用户模式
      */
-    constructor(port, serviceType = "file", userMode = "single") {
+    constructor(port = 8001, webUIPort = 40001, serviceType = "file", userMode = "single") {
         this.serviceType = serviceType;
         this.single = userMode != "multi";
         this.port = port;
+        this.webUIPort = webUIPort;
     }
 
     /**
@@ -143,7 +144,7 @@ module.exports = class Launcher {
 
     // 启动管理界面服务器
     async _startWebUiServer() {
-        let webUiPort = await getPort(40001);
+        let webUiPort = await getPort(this.webUIPort);
 
         // 设置运行时的用户界面端口
         this.appInfoService.setRealUiPort(webUiPort);
