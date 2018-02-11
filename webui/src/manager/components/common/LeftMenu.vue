@@ -79,18 +79,18 @@ const menuList = [
     link: '/monitor.html',
     targetBlank: true
   },
-  {
-    name: '断点',
-    icon: 'icon-remind',
-    link: '/breakpoint.html',
-    targetBlank: true
-  },
-  {
-    name: 'WebSocket Mock',
-    icon: 'icon-hot',
-    link: '/wsmock.html',
-    targetBlank: true
-  },
+  // {
+  //   name: '断点',
+  //   icon: 'icon-remind',
+  //   link: '/breakpoint.html',
+  //   targetBlank: true
+  // },
+  // {
+  //   name: 'WebSocket Mock',
+  //   icon: 'icon-hot',
+  //   link: '/wsmock.html',
+  //   targetBlank: true
+  // },
   {
     name: '帮助中心',
     icon: 'icon-security',

@@ -55,10 +55,6 @@ export default {
 
 <style>
 .view-configure {
-  .el-input__inner {
-    width: 600px;
-  }
-
   .el-button {
     margin-top: 15px;
     padding: 10px 28px;

@@ -22,7 +22,7 @@ body {
   right: 0;
   left: 230px;
   z-index: 999;
-  color: #fff;
+  color: #20a0ff;
   height: 72px;
   line-height: 72px;
   padding-left: 35px;
@@ -59,6 +59,7 @@ body {
   }
 
   .el-input__inner {
+    width: 60%;
     border-color: rgba(176, 183, 223, .5);
 
     &:hover {
@@ -67,6 +68,47 @@ body {
 
     &:focus {
       border-color: rgba(176, 183, 223, 1);
+    }
+  }
+
+  .el-table {
+    border: none;
+    background-color: transparent;
+
+    &__body-wrapper {
+      table {
+        border-spacing: 0 8px;
+      }
+    }
+
+    & &__row {
+      color: #455a64;
+
+      &:hover {
+        > td {
+          background-color: #fff;
+        }
+      }
+    }
+
+    &_1_column_1 {
+      color: #4b5265;
+      font-weight: bold;
+    }
+
+    &::before,
+    &::after {
+      display: none;
+    }
+
+    th.is-leaf,
+    td {
+      border: none;
+    }
+
+    .cell {
+      padding-top: 5px;
+      padding-bottom: 5px;
     }
   }
 }
