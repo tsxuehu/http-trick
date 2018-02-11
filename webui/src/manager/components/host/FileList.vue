@@ -1,35 +1,32 @@
 <template>
-  <div>
-    <div class="main-content__title">Host文件列表</div>
+  <div class="host-view">
+    <div class="main-content__title">Host 文件列表</div>
     <el-row :gutter="20" style="margin-bottom: 10px">
       <el-col :span="6" :offset="18" class="addhost-btn-wrap">
-        <el-button size="small" @click='addNewHostFile'>新增Host文件</el-button>
+        <el-button size="small" @click='addNewHostFile'>新增 Host 文件</el-button>
       </el-col>
     </el-row>
     <el-table border align='center' :data="$dc.hostFileList">
-      <el-table-column prop="checked" label="启用" align="center" width="70">
-        <template scope='scope'>
-          <input type="radio" :value="scope.row.name" :disabled="!$dc.hostState" v-model="selectedFileName"/>
-        </template>
+      <el-table-column prop="name" label="名字" width="150">
       </el-table-column>
-      <el-table-column prop="name" label="名字" align="center" width="150" :sortable="true">
-      </el-table-column>
-      <el-table-column prop="description" label="描述" align="center">
-      </el-table-column>
-      <el-table-column label="类型" :width="100" align="center">
-        <template>
-          本地
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" :width="136" align="center" :context="_self">
+      <el-table-column prop="description" label="描述" />
+      <el-table-column label="操作" :width="136" :context="_self">
         <template scope='scope'>
           <a :href="'#/edithost?name='+scope.row.name">
             <el-button type="info" icon='edit' size="mini">
             </el-button>
           </a>
-          <el-button type="danger" icon='delete' size="mini"
-                     @click='onDeleteFile(scope.row,scope.$index,user_list)'>
-          </el-button>
+          <el-button
+            type="danger"
+            icon='delete'
+            size="mini"
+            @click="onDeleteFile(scope.row,scope.$index,user_list)"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column prop="checked" label="启用" width="85">
+        <template scope='scope'>
+          <el-radio v-model="selectedFileName" :label="scope.row.name" :disabled="!$dc.hostState" />
         </template>
       </el-table-column>
     </el-table>
@@ -105,8 +102,14 @@
   }
 
 </script>
-<style>
+<style lang="postcss">
+.host-view {
   .addhost-btn-wrap {
-    text-align: right;
+   text-align: right;
   }
+
+  .el-radio__label {
+    display: none;
+  }
+}
 </style>

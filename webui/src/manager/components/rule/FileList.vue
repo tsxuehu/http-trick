@@ -11,16 +11,12 @@
       </el-col>
     </el-row>
     <el-table border :data="$dc.ruleFileList">
-      <el-table-column prop="name" label="名字" width="150">
-        <template scope='scope'>
+      <el-table-column prop="name" label="名字" width="200">
+        <template scope="scope">
           {{ scope.row.name }}
+          <el-tag type="danger" v-if="scope.row.meta.remote" close-transition>远程规则</el-tag>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="远程规则	" width="120">
-        <template scope='scope'>
-          {{ scope.row.meta.remote ? '是' : '-' }}
-        </template>
-      </el-table-column> -->
       <el-table-column prop="description" label="描述" />
       <el-table-column label="操作" :width="150" :context="_self">
         <template scope="scope">
