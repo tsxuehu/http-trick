@@ -44,6 +44,11 @@
 <script>
 const menuList = [
   {
+    name: '使用说明',
+    icon: 'icon-search',
+    link: 'helpinstall'
+  },
+  {
     name: '基础配置',
     icon: 'icon-set',
     link: 'configure'
@@ -80,34 +85,23 @@ const menuList = [
     targetBlank: true
   },
   {
-    name: '断点',
-    icon: 'icon-remind',
-    link: '/breakpoint.html',
-    targetBlank: true
-  },
-  {
-    name: 'WebSocket Mock',
-    icon: 'icon-hot',
-    link: '/wsmock.html',
-    targetBlank: true
-  },
-  {
     name: '帮助中心',
     icon: 'icon-security',
-    children: [
-      {
-        name: '使用说明',
-        icon: 'icon-search',
-        link: 'helpinstall'
-      },
-      {
-        name: '更多帮助',
-        icon: 'icon-tools',
-        link: '/help/index.html',
-        targetBlank: true
-      }
-    ]
+    link: '/help/index.html',
+    targetBlank: true
   }
+  // {
+  //   name: '断点',
+  //   icon: 'icon-remind',
+  //   link: '/breakpoint.html',
+  //   targetBlank: true
+  // },
+  // {
+  //   name: 'WebSocket Mock',
+  //   icon: 'icon-hot',
+  //   link: '/wsmock.html',
+  //   targetBlank: true
+  // },
 ];
 
 export default {
