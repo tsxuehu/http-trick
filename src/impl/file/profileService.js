@@ -88,19 +88,19 @@ module.exports = class ProfileService extends EventEmitter {
      * @param enable
      */
     async setEnableRule(userId, enable) {
-        let conf = this.userProfileMap[userId];
+        let conf = this.getProfile(userId);
         conf.enableRule = enable;
         await this.setProfile(userId, conf);
     }
 
     async setEnableHost(userId, enable) {
-        let conf = this.userProfileMap[userId];
+        let conf = this.getProfile(userId);
         conf.enableHost = enable;
         await this.setProfile(userId, conf);
     }
 
     async setEnableFilter(userId, enable) {
-        let conf = this.userProfileMap[userId];
+        let conf = this.getProfile(userId);
         conf.enableFilter = enable;
         await this.setProfile(userId, conf);
     }
