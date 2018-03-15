@@ -1,9 +1,15 @@
 {
-  "name": "zan-proxy",
-  "version": "v3.1.6",
-  "description": "前端代理",
+  "name": "http-trick",
+  "version": "v0.0.1",
+  "description": "Http Trick - 拦截http(s)请求请过一系列处理并返回",
   "scripts": {
+    "clean": "",
+    "dev": "node bin.js",
+    "build": "babel src -d dist",
     "postinstall": "node ./resetDataFile.js"
+  },
+  "bin": {
+    "http-trick": "./bin.js"
   },
   "dependencies": {
     "axios": "^0.16.1",
@@ -46,14 +52,6 @@
   "repository": {
     "type": "git",
     "url": ""
-  },
-  "scripts": {
-    "clean": "",
-    "dev": "node bin.js",
-    "build": "babel src -d dist"
-  },
-  "bin": {
-    "zan-proxy": "./dist/bin.js"
   },
   "author": ""
 }
