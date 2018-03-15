@@ -13,12 +13,12 @@
       <el-table-column label="操作" :width="136" :context="_self">
         <template scope='scope'>
           <a :href="'#/edithost?name='+scope.row.name">
-            <el-button type="info" icon='edit' size="mini">
+            <el-button type="info" icon='el-icon-edit' size="mini">
             </el-button>
           </a>
           <el-button
             type="danger"
-            icon='delete'
+            icon='el-icon-delete'
             size="mini"
             @click="onDeleteFile(scope.row,scope.$index,user_list)"
           />

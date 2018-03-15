@@ -3,7 +3,6 @@
         <h2>Http Trick</h2>
         <el-menu
                 class="el-menu-vertical-demo"
-                theme="dark"
                 :default-active="defaultActive"
                 @select="handleSelect"
         >

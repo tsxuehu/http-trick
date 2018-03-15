@@ -24,19 +24,19 @@
         <template scope='scope'>
           <div v-if="!filecontent.meta.remote">
             <el-tooltip class="item" effect="dark" content="复制" placement="left">
-              <el-button icon='document' size="mini"
+              <el-button icon='el-icon-document' size="mini"
                          @click='onDuplicateRow(scope.row,scope.$index,filecontent.content)'>
               </el-button>
             </el-tooltip>
             <el-tooltip class="item" effect="dark" content="删除" placement="top">
-              <el-button type="danger" icon='delete' size="mini"
+              <el-button type="danger" icon='el-icon-delete' size="mini"
                          @click='onDeleteRow(scope.row,scope.$index,filecontent.content)'>
               </el-button>
             </el-tooltip>
           </div>
           <div style="    text-align: left; padding-left: 2px;margin-top: 5px;">
             <el-tooltip class="item" effect="dark" content="测试规则" placement="left">
-              <el-button type="blue" icon='search' size="mini"
+              <el-button type="blue" icon='el-icon-search' size="mini"
                          @click='testMatchRuleRequest(scope.row)'>
               </el-button>
             </el-tooltip>

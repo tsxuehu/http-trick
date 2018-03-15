@@ -24,12 +24,12 @@
                 <template scope='scope'>
                     <div>
                         <el-tooltip class="item" effect="dark" content="复制" placement="left">
-                            <el-button icon='document' size="mini"
+                            <el-button icon='el-icon-document' size="mini"
                                        @click='onDuplicateRow(scope.row,scope.$index)'>
                             </el-button>
                         </el-tooltip>
                         <el-tooltip class="item" effect="dark" content="删除" placement="top">
-                            <el-button type="danger" icon='delete' size="mini"
+                            <el-button type="danger" icon='el-icon-delete' size="mini"
                                        @click='onDeleteRow(scope.row,scope.$index)'>
                             </el-button>
                         </el-tooltip>

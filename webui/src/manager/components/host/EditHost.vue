@@ -22,7 +22,7 @@
             </el-table-column>
             <el-table-column label="操作" :width="80" align="center" :context="_self">
                 <template scope='scope'>
-                    <el-button type="danger" icon='delete' size="mini"
+                    <el-button type="danger" icon='el-icon-delete' size="mini"
                                @click='onDeleteRow(scope.row,scope.$index,filecontent.content)'>
                     </el-button>
                 </template>

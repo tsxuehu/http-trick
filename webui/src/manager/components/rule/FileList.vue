@@ -18,25 +18,25 @@
         </template>
       </el-table-column>
       <el-table-column prop="description" label="描述" />
-      <el-table-column label="操作" :width="150" :context="_self">
+      <el-table-column label="操作" :width="200" :context="_self">
         <template scope="scope">
           <a :href="'#/editrule?name='+scope.row.name">
             <el-tooltip class="item" effect="dark" content="编辑规则" placement="top-start">
-              <el-button type="info" icon='edit' size="mini">
+              <el-button type="info" icon='el-icon-edit' size="mini">
               </el-button>
             </el-tooltip>
           </a>
           <el-tooltip class="item" effect="dark" content="导出规则" placement="top-start">
-            <el-button  type="info" icon='share' size="mini" @click='onShareFile(scope.row,scope.$index)' />
+            <el-button  type="info" icon='el-icon-share' size="mini" @click='onShareFile(scope.row,scope.$index)' />
           </el-tooltip>
           <span>
-            <el-button type="danger" icon='delete' size="mini" @click='onDeleteFile(scope.row,scope.$index)' />
+            <el-button type="danger" icon='el-icon-delete' size="mini" @click='onDeleteFile(scope.row,scope.$index)' />
           </span>
           <span>
             <el-tooltip class="item" effect="dark" content="同步远程文件" placement="top-start">
               <el-button
                 type="success"
-                icon="information"
+                icon="el-icon-information"
                 size="mini"
                 v-if="scope.row.meta.remote && scope.row.meta.remoteETag && (scope.row.meta.ETag !== scope.row.meta.remoteETag)"
                 @click="onUpdateFile(scope.row,scope.$index)"

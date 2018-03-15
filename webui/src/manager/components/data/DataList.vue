@@ -13,10 +13,10 @@
       </el-table-column>
       <el-table-column label="操作" :width="136" align="center" :context="_self">
         <template scope='scope'>
-          <el-button type="info" icon='edit' size="mini"
+          <el-button type="info" icon='el-icon-edit' size="mini"
                      @click='$dc.requestEditDataFile(scope.row)'>
           </el-button>
-          <el-button type="danger" icon='delete' size="mini"
+          <el-button type="danger" icon='el-icon-delete' size="mini"
                      @click='$dc.deleteDataFile(scope.row, scope.$index )'>
           </el-button>
         </template>
@@ -29,7 +29,7 @@
 
 
   export default {
-    name: 'datalist',
+    name: 'mockdatalist',
   }
 
 </script>
