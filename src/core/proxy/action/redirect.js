@@ -137,7 +137,7 @@ module.exports = class Redirect extends Action {
         port = port || ('https:' == protocol ? 443 : 80);
 
         let targetUrl = protocol + '//' + ip + ':' + port + path;
-        toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
+        toClientResponse.headers['proxy-content'] = encodeURI(targetUrl);
 
         Object.assign(actualRequestHeaders, req.headers);
         actualRequestHeaders['host'] = hostname;
@@ -178,7 +178,7 @@ module.exports = class Redirect extends Action {
                        last
                    }) {
 
-        toClientResponse.headers['fe-proxy-content'] = encodeURI(target);
+        toClientResponse.headers['proxy-content'] = encodeURI(target);
         if (last) {
             toClientResponse.sendedToClient = true;
             addHeaderToResponse(res, toClientResponse.headers);

@@ -186,10 +186,10 @@ module.exports = class HttpHandle {
 
         // 转发规则处理
         if (!this.profileService.enableRule(userId)) {// 判断转发规则有没有开启
-            toClientResponse.headers['fe-proxy-rule-disabled'] = "true";
+            toClientResponse.headers['proxy-rule-disabled'] = "true";
         }
         // 记录请求对应的用户id
-        toClientResponse.headers['fe-proxy-userId'] = userId;
+        toClientResponse.headers['proxy-userId'] = userId;
 
         // 查找匹配到的过滤规则
         let filterRuleList = await this.filterService.getMatchedRuleList(userId, req.method, urlObj);
@@ -216,16 +216,16 @@ module.exports = class HttpHandle {
 
             // 若action handle不存在，则处理下一个
             if (!actionHandler) {
-                toClientResponse.headers[`fe-proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-notfound`);
+                toClientResponse.headers[`proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-notfound`);
                 continue;
             }
             // 已经有response, 则不运行获取response的action
             if (actionHandler.willGetContent() && toClientResponse.hasContent) {
-                toClientResponse.headers[`fe-proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-notrun`);
+                toClientResponse.headers[`proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-notrun`);
                 continue;
             }
             // 响应头里面记录运行的动作
-            toClientResponse.headers[`fe-proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-run`);
+            toClientResponse.headers[`proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-run`);
 
             // 动作需要返回内容，但是当前却没有返回内容
             if (actionHandler.needResponse() && !toClientResponse.hasContent) {
@@ -290,7 +290,7 @@ module.exports = class HttpHandle {
                 }
             } else {
                 // 自定请求
-                toClientResponse.headers['fe-proxy-rule-add'] = 'bypass';
+                toClientResponse.headers['proxy-rule-add'] = 'bypass';
                 await Action.getBypassAction().run({
                     req,
                     res,

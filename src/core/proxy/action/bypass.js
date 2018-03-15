@@ -134,7 +134,7 @@ module.exports = class Bypass extends Action {
 
         // 日志
         let targetUrl = protocol + '//' + hostname + ':' + port + path;
-        toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
+        toClientResponse.headers['proxy-content'] = encodeURI(targetUrl);
 
         // 合并header
         Object.assign(actualRequestHeaders, req.headers, additionalRequestHeaders);
@@ -207,7 +207,7 @@ module.exports = class Bypass extends Action {
 
         // 日志记录请求地址
         let targetUrl = protocol + '//' + ip + ':' + port + pathname;
-        toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
+        toClientResponse.headers['proxy-content'] = encodeURI(targetUrl);
 
         // 合并header
         Object.assign(actualRequestHeaders, headers, additionalRequestHeaders);

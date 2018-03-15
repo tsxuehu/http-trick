@@ -3,9 +3,7 @@
   "version": "v0.0.2",
   "description": "Http Trick - 拦截http(s)请求拦截，修改请求数据，修改响应内容",
   "scripts": {
-    "clean": "",
-    "dev": "node bin.js",
-    "build": "babel src -d dist",
+    "start": "node bin.js",
     "postinstall": "node ./resetDataFile.js"
   },
   "bin": {

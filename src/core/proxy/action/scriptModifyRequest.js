@@ -52,7 +52,7 @@ module.exports = class ScriptModifyRequest extends Action {
         try {
             vm.runInNewContext(action.data.modifyRequestScript, sandbox);
         } catch (e) {
-            toClientResponse.headers['fe-proxy-error'] = encodeURI(e.message);
+            toClientResponse.headers['proxy-error'] = encodeURI(e.message);
         }
 
     }

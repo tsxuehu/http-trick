@@ -55,7 +55,7 @@ module.exports = class MockData extends Action {
         let dataId = action.data.dataId;
         let content = await this.mockDataService.getDataFileContent(userId, dataId);
         let contentType = await this.mockDataService.getDataFileContentType(userId, dataId);
-        toClientResponse.headers['fe-proxy-content'] = `mock data ${dataId}`;
+        toClientResponse.headers['proxy-content'] = `mock data ${dataId}`;
         toClientResponse.headers['Content-Type'] = contentType;
         if (last) {
             toClientResponse.hasContent = true;
