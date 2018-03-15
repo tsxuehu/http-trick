@@ -55,6 +55,7 @@ export default {
 
 <style>
 .view-configure {
+  max-width: 500px;
   .el-button {
     margin-top: 15px;
     padding: 10px 28px;

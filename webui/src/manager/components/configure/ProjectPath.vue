@@ -1,24 +1,27 @@
 <template>
-  <div>
+  <div class="project-wraper">
     <div class="main-content__title">工程路径管理</div>
     <el-form label-width="100px">
       <template v-for="(obj ,index) in $dc.projectPathArray">
-        <el-form-item label="工程名">
-          <el-input v-model="obj.key" placeholder="工程名" />
-        </el-form-item>
-        <el-form-item label="路径">
-          <el-input v-model="obj.value" placeholder="工程在本地的绝对路径" />
-        </el-form-item>
-        <el-row :gutter="10" style="margin-top: 5px;">
-          <el-col :span="2">
+        <div class="project-path">
+          <div class="left">
+            <el-form-item label="工程名">
+              <el-input v-model="obj.key" placeholder="工程名" />
+            </el-form-item>
+            <el-form-item label="路径">
+              <el-input v-model="obj.value" placeholder="工程在本地的绝对路径" />
+            </el-form-item>
+          </div>
+          <div class="right">
             <el-button
-              type="danger"
-              icon='delete'
-              size="mini"
-              @click='deleteParam(obj,index,projectPathArray)'
+                    class="delete-btn"
+                    type="danger"
+                    icon='el-icon-delete'
+                    size="mini"
+                    @click='deleteParam(obj,index,projectPathArray)'
             />
-          </el-col>
-        </el-row>
+          </div>
+        </div>
       </template>
       
       <el-form-item>
@@ -31,6 +34,7 @@
 
 <script>
 import profileApi from '../../../api/profile';
+import './project.pcss'
 import forEach from 'lodash/forEach';
 
 export default {
