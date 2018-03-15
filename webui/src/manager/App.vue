@@ -15,7 +15,7 @@
         </el-container>
 
         <!-- 新增自定义mock数据文件对话框 -->
-        <el-dialog title="新建Mock数据文件" v-model="addDataFileForm.visible">
+        <el-dialog title="新建Mock数据文件" :visible.sync="addDataFileForm.visible">
             <el-form :model="addDataFileForm" label-width="80px">
                 <el-form-item label="名称">
                     <el-input v-model="addDataFileForm.name"></el-input>
@@ -39,7 +39,7 @@
                 ref="editDataFileDialog"
                 title="编辑Mock数据文件"
                 :close-on-press-escape="false"
-                v-model="editDataFileForm.visible">
+                :visible.sync="editDataFileForm.visible">
             <span slot="title">
                 编辑数据文件 {{editDataFileForm.entry.name}} [Content-Type: {{editDataFileForm.entry.contenttype}}]
             </span>
