@@ -5,6 +5,6 @@
   "author": "taiyong <taiyong@youzan.com>",
   "scripts": {
     "dev": "gitbook serve",
-    "build": "gitbook build . ../static/help"
+    "build": "gitbook build . ../site/help"
   }
 }

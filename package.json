@@ -51,5 +51,8 @@
     "type": "git",
     "url": ""
   },
-  "author": ""
+  "author": "",
+  "engines": {
+    "node": ">= 8.0.0"
+  }
 }

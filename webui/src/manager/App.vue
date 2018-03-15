@@ -63,6 +63,13 @@
                         inactive-text="启用filter">
                 </el-switch>
             </span>
+
+            <a href="/monitor.html" target="_blank">
+                监控窗
+            </a>
+            <a href="/help/index.html" target="_blank">
+                帮助中心
+            </a>
         </header>
 
         <!-- 正文 -->

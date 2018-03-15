@@ -14,12 +14,12 @@
           placeholder="远程服务器响应超时，proxy会终止请求"
         />
       </el-form-item>
-      <el-form-item label="Gitlab Token">
+      <!--<el-form-item label="Gitlab Token">
         <el-input 
           v-model="$dc.configure.gitlabToken"
           placeholder="请填写你在 Gitlab 上的 token (proxy 访问 Gitlab 上的文件需要 token)"
         />
-      </el-form-item>
+      </el-form-item>-->
       <el-form-item>
         <el-button type="primary" @click="saveFile">保存</el-button>
       </el-form-item>

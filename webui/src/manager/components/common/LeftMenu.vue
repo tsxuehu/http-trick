@@ -1,6 +1,6 @@
 <template>
   <div class="left-menu">
-    <h2>Zan Proxy</h2>
+    <h2>Http Trick</h2>
     <el-menu
       class="el-menu-vertical-demo"
       theme="dark"
@@ -78,7 +78,7 @@ const menuList = [
     icon: 'icon-suoding',
     link: 'datalist'
   },
-  {
+  /*{
     name: '请求监控',
     icon: 'icon-bargraph',
     link: '/monitor.html',
@@ -89,7 +89,7 @@ const menuList = [
     icon: 'icon-security',
     link: '/help/index.html',
     targetBlank: true
-  }
+  }*/
   // {
   //   name: '断点',
   //   icon: 'icon-remind',
