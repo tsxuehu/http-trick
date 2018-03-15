@@ -1,12 +1,12 @@
 <template>
   <div class="install-body">
-    <h1>Zan Proxy</h1>
+    <h1>Http Trick</h1>
     <h2 id="toc_0">一、说明</h2>
 
-    <p>由于<code>zanProxy</code>默认不修改系统代理设置，所以在 chrome 上使用代理功能时需要依赖第三方 chrome 插件。</p>
-    <p><code>zanProxy</code>依赖 openssl 生成证书，使用 proxy 前请先安装 openssl (版本建议在 0.9.8 以上)。</p>
+    <p>http trick是http协议代理工具，需要设置浏览器代理或者系统代理才能使用本工具。</p>
+    <p>另http trick外依赖 openssl 生成证书，请先安装 openssl (版本建议在 0.9.8 以上)。</p>
 
-    <h2 id="toc_1">二、chrome 插件安装</h2>
+    <h2 id="toc_1">二、chrome 代理插件安装(用于设置浏览器代理)</h2>
 
     <p>推荐安装 SwitchyOmega <a
       href="https://chrome.google.com/webstore/detail/proxy-switchyomega/padekgcemlokbadohgkifijomclgjgif?hl=en-US"
@@ -15,7 +15,7 @@
     <h4 id="toc_2">插件使用说明</h4>
 
     <ol>
-      <li>安装完插件后请设置插件代理地址为<code>127.0.0.1</code>，代理协议: http，端口为<code>zanProxy</code>代理端口(默认8001)。</li>
+      <li>安装完插件后请设置插件代理地址为<code>127.0.0.1</code>，代理协议: http，端口为<code>http trick</code>代理端口(默认8001)。</li>
       <li>如不清楚如何配置 SwitchyOmega，请参考 <a href="/help/chrome/" target="_blank">chrome 代理设置指南</a></li>
     </ol>
 
@@ -23,7 +23,7 @@
 
     <h4 id="toc_4">1. 为什么需要安装证书</h4>
 
-    <p>由于<code>zanProxy</code>需要转发 /mock https 的请求，所以需要本地安装<code>ZanMock-proxy</code>https 证书。</p>
+    <p>由于<code>http trick</code>会代理 https 的请求，所以需要本地安装<code>http trick</code>的https 证书。</p>
 
     <h4 id="toc_5">2. 证书下载</h4>
 

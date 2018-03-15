@@ -1,8 +1,22 @@
 .head-nav {
-  z-index: 999;
+  display: flex;
   color: #20a0ff;
-  height: 72px;
-  line-height: 72px;
+  height: 52px;
+  line-height: 52px;
+
+  .menu-slot {
+    padding-right: 20px;
+    padding-left: 20px;
+    border-right: 1px dashed #999;
+  }
+  .link-blank {
+    border-right: none;
+    flex-grow: 1;
+    text-align: right;
+  }
+  .link-blank a {
+    margin-left: 20px;
+  }
 
   .el-dropdown {
     margin-right: 15px;
