@@ -90,6 +90,8 @@
         data() {
             return {
                 isDataCenter: true,
+                // 运行时信息
+                appInfo: {},
                 // 基本配置信息
                 configure: {},
                 // 个人配置
@@ -343,10 +345,14 @@
 
         created() {
             if (!window.io) return;
-            var socket = io('/manager');
+            let socket = io('/manager');
 
             socket.on('configure', data => {
                 this.configure = data;
+            });
+
+            socket.on('appinfo', data => {
+                this.appInfo = data;
             });
 
             socket.on('profile', profile => {

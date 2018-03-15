@@ -24,7 +24,7 @@ module.exports = class UiServer {
         this.filterService = ServiceRegistry.getFilterService();
         this.wsMockService = ServiceRegistry.getWsMockService();
         this.breakpointService = ServiceRegistry.getBreakpointService();
-
+        this.appInfoService = ServiceRegistry.getAppInfoService();
         // 初始化koa
         this.app = new koa();
         // query string
@@ -105,6 +105,9 @@ module.exports = class UiServer {
             client.join(userId, err => {
             });
             // 推送最新数据
+            // 运行信息
+            let appInfo =this.appInfoService.getAppInfo();
+            client.emit('appinfo', appInfo);
             // proxy配置
             let config = await this.configureService.getConfigure();
             client.emit('configure', config);

@@ -131,6 +131,10 @@ module.exports = class AppInfoService extends EventEmitter {
         return this.appInfo.pcIp;
     }
 
+    getAppInfo() {
+        return this.appInfo;
+    }
+
     // 是否是webui请求
     isWebUiRequest(hostname, port) {
         return (hostname == '127.0.0.1' || hostname == this.appInfo.pcIp)

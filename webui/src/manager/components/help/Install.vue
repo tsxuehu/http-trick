@@ -40,18 +40,29 @@
 import qrcode from 'qrcode-js';
 
 export default {
-  name: 'app',
-  data() {
-    var certUrl =
-      'http://' +
-      location.hostname +
-      ':' +
-      (location.port || 80) +
-      '/utils/rootCA.crt';
-    return {
-      url: certUrl,
-      imgUrl: qrcode.toDataURL(certUrl, 4)
-    };
+    name: 'help-info',
+    data() {
+      return {};
+    },
+    computed: {
+      url(){
+          let certUrl =
+              'http://' +
+              this.$dc.appInfo.pcIp +
+              ':' +
+              this.$dc.appInfo.realUiPort +
+              '/utils/rootCA.crt';
+          return certUrl;
+      },
+      imgUrl() {
+          let certUrl =
+              'http://' +
+              this.$dc.appInfo.pcIp +
+              ':' +
+              this.$dc.appInfo.realUiPort +
+              '/utils/rootCA.crt';
+          return qrcode.toDataURL(certUrl, 4);
+      }
   }
 };
 </script>
