@@ -8,8 +8,8 @@ program
     .version(packageInfo.version)
     .option('-p, --proxyPort [value]', '指定代理端口')
     .option('-u, --uiPort [value]', '指定UI端口')
-    .option('-u, --userMode [value]', '用户模式')
-    .option('-s, --serviceType [value]', '启动类型，默认desktop')
+   // .option('-m, --userMode [value]', '用户模式')
+   // .option('-s, --serviceType [value]', '启动类型，默认desktop')
     .parse(process.argv);
 
 // 启动开发代理服务器

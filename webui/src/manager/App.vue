@@ -1,89 +1,18 @@
 <template>
     <div class="main-wrapper">
-        <!-- 顶部导航 -->
-        <header class="head-nav">
-            <el-dropdown menu-align="start" :hide-on-click="false" @command="selectHostFile">
-                <el-button type="primary" size="small">
-                    Host 切换<i class="el-icon-caret-bottom el-icon--right"/>
-                </el-button>
-                <el-dropdown-menu slot="dropdown">
-                    <!-- host文件 -->
-                    <el-dropdown-item
-                            v-for="hostfile in hostFileList"
-                            :command="hostfile.name"
-                            :disabled="!profile.enableHost"
-                    >
-                        {{ hostfile.name }}
-                        <i class="el-icon-check" v-if="hostfile.checked"/>
-                    </el-dropdown-item>
-                </el-dropdown-menu>
-            </el-dropdown>
-            <!-- host开关 -->
-            <span>
-                <el-switch
-                        :value="profile.enableHost"
-                        @input="switchHost"
-                        active-text="关闭host"
-                        inactive-text="启用host">
-                </el-switch>
-            </span>
-
-            <el-dropdown :hide-on-click="false" menu-align="start" @command="selectRuleFile">
-                <el-button type="primary" size="small">
-                    Rule 设置<i class="el-icon-caret-bottom el-icon--right"/>
-                </el-button>
-                <el-dropdown-menu slot="dropdown">
-                    <!-- rule文件 -->
-                    <el-dropdown-item
-                            v-for="rulefile in ruleFileList"
-                            :command="rulefile.name + '-%-' + rulefile.checked"
-                            :disabled="!profile.enableRule"
-                    >
-                        {{ rulefile.name }}
-                        <i class="el-icon-check" v-if="rulefile.checked"/>
-                    </el-dropdown-item>
-                </el-dropdown-menu>
-            </el-dropdown>
-            <!-- 规则开关 -->
-            <span>
-                <el-switch
-                        :value="profile.enableRule"
-                        @input="switchRule"
-                        active-text="关闭rule"
-                        inactive-text="启用rule">
-                </el-switch>
-            </span>
-            <!-- 过滤器 -->
-            <span>
-                过滤器开关
-                <el-switch
-                        :value="profile.enableFilter"
-                        @input="switchFilter"
-                        active-text="关闭filter"
-                        inactive-text="启用filter">
-                </el-switch>
-            </span>
-
-            <a href="/monitor.html" target="_blank">
-                监控窗
-            </a>
-            <a href="/help/index.html" target="_blank">
-                帮助中心
-            </a>
-        </header>
-
-        <!-- 正文 -->
-        <div class="left-fixed-right-auto">
-            <div class="left">
+        <el-container>
+            <el-aside width="200px">
                 <left-menu/>
-            </div>
-            <div class="right">
-                <div class="main-content">
+            </el-aside>
+            <el-container>
+                <el-header height="72px">
+                    <manager-header></manager-header>
+                </el-header>
+                <el-main>
                     <router-view/>
-                </div>
-            </div>
-        </div>
-
+                </el-main>
+            </el-container>
+        </el-container>
 
         <!-- 新增自定义mock数据文件对话框 -->
         <el-dialog title="新建Mock数据文件" v-model="addDataFileForm.visible">
@@ -135,6 +64,7 @@
 
 <script>
     import LeftMenu from './components/common/LeftMenu';
+    import Header from './components/common/Header.vue';
     import hostApi from '../api/host';
     import ruleApi from '../api/rule';
     import confApi from '../api/conf';
@@ -154,6 +84,7 @@
     import 'codemirror/mode/htmlmixed/htmlmixed';
     let editor = null;
     Vue.component(LeftMenu.name, LeftMenu);
+    Vue.component(Header.name, Header);
     export default {
         name: 'app',
         data() {
