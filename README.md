@@ -2,7 +2,7 @@
 批量导入gitlab中的规则
 Service mock
 
-# Zan Proxy
+# Http Trick
 
 页面开发一般分为三个阶段
 
@@ -20,7 +20,7 @@ Service mock
 
 所以我们开发了一个操作简单的proxy，点一点鼠标就能满足debug、新功能的需要；项目的请求处理规则可以在团队之间共享。
 
-## Proxy特点
+## 特点
 
 1. 以项目为单位请求处理规则共享
 2. host配置
