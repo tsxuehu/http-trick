@@ -390,6 +390,7 @@
 
         mounted() {
             // 强制dialog渲染body部分, 对ele dialog hack的初始化方式，原始的dialog不提供mouted后的事件
+            // 编辑器editor初始化的时候需要用到editDataFileDialog里的元素content-editor
             this.$refs.editDataFileDialog.rendered = true;
         }
     };
