@@ -52,6 +52,8 @@ module.exports = class Bypass extends Action {
                   requestContent, // 请求内容
                   additionalRequestHeaders, // 请求头
                   actualRequestHeaders,
+                  additionalRequestQuery, // query
+                  actualRequestQuery,
                   additionalRequestCookies, // cookie
                   actualRequestCookies,
                   toClientResponse, //响应内容
@@ -73,6 +75,8 @@ module.exports = class Bypass extends Action {
                 requestContent, // 请求内容
                 additionalRequestHeaders, // 请求头
                 actualRequestHeaders,
+                additionalRequestQuery, // query
+                actualRequestQuery,
                 additionalRequestCookies, // cookie
                 actualRequestCookies,
                 toClientResponse, //响应内容
@@ -91,6 +95,8 @@ module.exports = class Bypass extends Action {
                 requestContent, // 请求内容
                 additionalRequestHeaders, // 请求头
                 actualRequestHeaders,
+                additionalRequestQuery, // query
+                actualRequestQuery,
                 additionalRequestCookies, // cookie
                 actualRequestCookies,
                 toClientResponse, //响应内容
@@ -111,13 +117,26 @@ module.exports = class Bypass extends Action {
                      requestContent, // 请求内容
                      additionalRequestHeaders, // 请求头
                      actualRequestHeaders,
+                     additionalRequestQuery, // query
+                     actualRequestQuery,
                      additionalRequestCookies, // cookie
                      actualRequestCookies,
                      toClientResponse, //响应内容
                      last = true
                  }) {
         // 构造url
-        let { protocol, hostname, path, port } = urlObj;
+        let { protocol, hostname, path, pathname, port, query } = urlObj;
+
+        // 构造path
+        try {
+            let originQuery = queryString.parse(query);
+            Object.assign(actualRequestQuery, originQuery);
+            if (Object.keys(additionalRequestQuery).length > 0) {
+                Object.assign(actualRequestQuery, additionalRequestQuery);
+                path = `${pathname}?${queryString.stringify(actualRequestQuery)}`;
+            }
+        } catch (e) {}
+
 
         // dns解析
         toClientResponse.dnsResolveBeginTime = Date.now();
@@ -184,6 +203,8 @@ module.exports = class Bypass extends Action {
                                        requestContent, // 请求内容
                                        additionalRequestHeaders, // 请求头
                                        actualRequestHeaders,
+                                       additionalRequestQuery, // query
+                                       actualRequestQuery,
                                        additionalRequestCookies, // cookie
                                        actualRequestCookies,
                                        toClientResponse, //响应内容
@@ -192,13 +213,15 @@ module.exports = class Bypass extends Action {
         // 构造url
         let { protocol, hostname, pathname, port, query, method, headers, body } = requestContent;
 
+        Object.assign(actualRequestQuery, query, additionalRequestQuery);
+
         // dns解析
         toClientResponse.dnsResolveBeginTime = Date.now();
         let ip = '';
         try {
             ip = await this.hostService.resolveHost(userId, hostname);
         } catch (e) {
-            let href = `${protocol}//${hostname}:${port}${pathname}?${queryString.stringify(query)}`;
+            let href = `${protocol}//${hostname}:${port}${pathname}?${queryString.stringify(actualRequestQuery)}`;
             toClientResponseUtils.setError(toClientResponse, href, e);
             return;
         }
@@ -221,7 +244,7 @@ module.exports = class Bypass extends Action {
                 method,
                 hostname: ip,
                 pathname,
-                query,
+                actualRequestQuery,
                 port,
                 headers: actualRequestHeaders,
                 body

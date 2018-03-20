@@ -79,6 +79,17 @@
                 </el-input>
             </div>
         </div>
+        <!-- 增加请求Query -->
+        <div v-if="action.type == 'addQuery'" class="inline-block right-panel">
+            <div class="action-data">
+                <el-input v-model="action.data.queryKey" size="small" :disabled="remote"
+                          placeholder="query key" style="display: inline-block;width: 120px;">
+                </el-input>
+                <el-input v-model="action.data.queryValue" size="small" :disabled="remote"
+                          placeholder="query value" style="display: inline-block;width: 300px;">
+                </el-input>
+            </div>
+        </div>
         <!-- 增加响应头 -->
         <div v-if="action.type == 'addResponseHeader'" class="inline-block right-panel">
             <div class="action-data">
@@ -114,6 +125,7 @@
                     //  { value: 'redirect', label: '转发请求' },
                     //  { value: 'mockData', label: '返回自定义数据' },
                     { value: 'addRequestHeader', label: '增加请求头' },
+                    { value: 'addQuery', label: '增加Query' },
                     { value: 'addResponseHeader', label: '增加响应头' },
                     //  { value: 'modifyResponse', label: '修改响应内容' },
                     { value: 'addRequestCookie', label: '设置请求cookie' },

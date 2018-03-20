@@ -4,6 +4,7 @@ const AddResponseHeader = require("./addResponseHeader");
 const Bypass = require("./bypass");
 const MockData = require("./mockData");
 const ModifyResponse = require("./modifyResponse");
+const AddQuery = require("./addQuery");
 const Redirect = require("./redirect");
 const ScriptModifyResponse = require("./scriptModifyResponse");
 const ScriptModifyRequest = require("./scriptModifyRequest");
@@ -27,6 +28,7 @@ module.exports = class Action {
                 addRequestHeader: AddRequestHeader.getInstance(),
                 addResponseHeader: AddResponseHeader.getInstance(),
                 modifyResponse: ModifyResponse.getInstance(),
+                addQuery: AddQuery.getInstance(),
                 bypass: Bypass.getInstance(),
                 redirect: Redirect.getInstance(),
                 scriptModifyResponse: ScriptModifyResponse.getInstance(),

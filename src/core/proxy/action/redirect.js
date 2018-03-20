@@ -7,6 +7,7 @@ const url = require("url");
 const Remote = require("../../utils/remote");
 const addHeaderToResponse = require("../../utils/addHeaderToResponse");
 const cookie2Str = require("../../utils/cookie2Str");
+const queryString = require("query-string");
 
 /**
  * 重定向 本地 或者 远程
@@ -55,6 +56,8 @@ module.exports = class Redirect extends Action {
                   requestContent, // 请求内容
                   additionalRequestHeaders, // 请求头
                   actualRequestHeaders,
+                  additionalRequestQuery, // query
+                  actualRequestQuery,
                   additionalRequestCookies, // cookie
                   actualRequestCookies,
                   toClientResponse, //响应内容
@@ -83,6 +86,8 @@ module.exports = class Redirect extends Action {
                 target,
                 additionalRequestHeaders, // 请求头
                 actualRequestHeaders,
+                additionalRequestQuery, // query
+                actualRequestQuery,
                 additionalRequestCookies, // cookie
                 actualRequestCookies,
                 toClientResponse,
@@ -113,13 +118,25 @@ module.exports = class Redirect extends Action {
                         target,
                         additionalRequestHeaders, // 请求头
                         actualRequestHeaders,
+                        additionalRequestQuery, // query
+                        actualRequestQuery,
                         additionalRequestCookies, // cookie
                         actualRequestCookies,
                         toClientResponse, //响应内容
                         last
                     }) {
         let redirectUrlObj = url.parse(target);
-        let { protocol, hostname, path, port } = redirectUrlObj;
+        let { protocol, hostname, path, port,query } = redirectUrlObj;
+
+        // 构造path
+        try {
+            let originQuery = queryString.parse(query);
+            Object.assign(actualRequestQuery, originQuery);
+            if (Object.keys(additionalRequestQuery).length > 0) {
+                Object.assign(actualRequestQuery, additionalRequestQuery);
+                path = `${pathname}?${queryString.stringify(actualRequestQuery)}`;
+            }
+        }catch (e) {}
 
         // dns解析
         toClientResponse.dnsResolveBeginTime = Date.now();

@@ -36,6 +36,8 @@ module.exports = class ScriptModifyRequest extends Action {
                   requestContent, // 原始内容
                   additionalRequestHeaders, // 请求头
                   actualRequestHeaders,
+                  additionalRequestQuery, // query
+                  actualRequestQuery,
                   additionalRequestCookies, // cookie
                   actualRequestCookies,
                   toClientResponse, //响应内容
@@ -45,6 +47,7 @@ module.exports = class ScriptModifyRequest extends Action {
             clientIp,
             requestContent, // 请求内容
             additionalRequestHeaders,// 请求附加头
+            additionalRequestQuery,
             additionalRequestCookies,// 请求附加cookie
             toClientResponse, // 记录返回给浏览器的信息
             console

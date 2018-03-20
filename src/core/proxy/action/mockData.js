@@ -46,6 +46,8 @@ module.exports = class MockData extends Action {
                   requestContent, // 请求内容
                   additionalRequestHeaders, // 请求头
                   actualRequestHeaders,
+                  additionalRequestQuery, // query
+                  actualRequestQuery,
                   additionalRequestCookies, // cookie
                   actualRequestCookies,
                   toClientResponse, //响应内容
