@@ -73,16 +73,22 @@ module.exports = class HostService extends EventEmitter {
             // 读文件加载host
             let hostMap = {};
             let globHostMap = {};
+
             let findedUsingHost = _.find(this.userHostFilesMap[userId], (content) => {
                 return content.checked;
             });
             if (findedUsingHost) {
-                _.forEach(findedUsingHost.content, (ip, host) => {
-                    if (host.startsWith('*')) {
-                        globHostMap[host.substr(1, host.length)] = ip;
-                    } else {
-                        hostMap[host] = ip;
-                    }
+                // 解析host
+                let parsed = this._parseHost(findedUsingHost.content);
+
+                _.forEach(parsed, ( hosts, ip ) => {
+                    hosts.forEach(host=>{
+                        if (host.startsWith('*')) {
+                            globHostMap[host.substr(1, host.length)] = ip;
+                        } else {
+                            hostMap[host] = ip;
+                        }
+                    })
                 });
             }
             hosts = {
@@ -194,6 +200,8 @@ module.exports = class HostService extends EventEmitter {
         this.emit("host-saved", userId, name, content);
     }
 
+
+
     _getHostFilePath(userId, hostName) {
         let fileName = `${userId}_${hostName}.json`;
         let filePath = path.join(this.hostSaveDir, fileName);
@@ -202,5 +210,18 @@ module.exports = class HostService extends EventEmitter {
 
     _getUserIdLength(ruleFileName, hostName) {
         return ruleFileName.length - hostName.length - 6;
+    }
+
+    _parseHost(content) {
+        let result = {};
+        let lines = content.replace(/#.*/g, '').split(/[\r\n]/);
+        for (let i = 0, len = lines.length; i < len; i++) {
+            let line = lines[i];
+            let md = /(\d+\.\d+\.\d+\.\d+)\s+(.+)/.exec(line);
+            if (md) {
+                result[md[1]] = _.union(result[md[1]] || [], md[2].trim().split(/\s+/));
+            }
+        }
+        return result;
     }
 };
