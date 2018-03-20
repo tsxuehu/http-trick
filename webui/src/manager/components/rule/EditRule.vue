@@ -186,10 +186,14 @@
                 callbackName: "", // jsonp请求参数名
                 cookieKey: "", // 设置到请求里的cookie key
                 cookieValue: "", // 设置到请求里的cookie value
-                headerKey: "",
-                headerValue: "",
-                modifyRequestScript: "",
-                modifyResponseScript: ""
+                reqHeaderKey: "", // 请求header
+                reqHeaderValue: "",
+                resHeaderKey: "", // 响应header
+                resHeaderValue: "",
+                queryKey: "", // 请求query
+                queryValue: "",
+                modifyRequestScript: "", // 脚本修改请求
+                modifyResponseScript: "" // 脚本修改响应
             }
           }]
         })

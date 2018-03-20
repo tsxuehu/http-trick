@@ -12,12 +12,20 @@ const defaultRule =  {
         {
             "type": "redirect", // 动作类型
             "data": {
-                "target": "<%=wscproject%>/local/js/$1.js",
-                "dataId": "",
-                "modifyResponseBody": "",
-                "modifyResponseHeader": "",
-                "cookie": "",
-                "callbackName": ""
+                target: "",// 转发目标路径
+                dataId: '', //返回数据文件的id
+                modifyResponseType: '',// 修改响应内容类型
+                callbackName: "", // jsonp请求参数名
+                cookieKey: "", // 设置到请求里的cookie key
+                cookieValue: "", // 设置到请求里的cookie value
+                reqHeaderKey: "", // 请求header
+                reqHeaderValue: "",
+                resHeaderKey: "", // 响应header
+                resHeaderValue: "",
+                queryKey: "", // 请求query
+                queryValue: "",
+                modifyRequestScript: "", // 脚本修改请求
+                modifyResponseScript: "" // 脚本修改响应
             }
         }
     ]

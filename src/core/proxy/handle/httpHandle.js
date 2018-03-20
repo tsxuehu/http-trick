@@ -24,6 +24,7 @@ module.exports = class HttpHandle {
     constructor() {
         this.breakpoint = Breakpoint.getBreakpoint();
         this.ruleService = ServiceRegistry.getRuleService();
+        this.logService = ServiceRegistry.getLogService();
         this.profileService = ServiceRegistry.getProfileService();
         this.appInfoService = ServiceRegistry.getAppInfoService();
         this.breakpointService = ServiceRegistry.getBreakpointService();
@@ -52,6 +53,8 @@ module.exports = class HttpHandle {
                 requestContent: {},
                 additionalRequestHeaders: {},
                 actualRequestHeaders: {},
+                additionalRequestQuery: {},
+                actualRequestQuery: {},
                 additionalRequestCookies: {},
                 actualRequestCookies: {}
             });
@@ -154,10 +157,13 @@ module.exports = class HttpHandle {
         };
         // 额外发送的头部
         let additionalRequestHeaders = {};
-        let actualRequestHeaders = {};
+        let actualRequestHeaders = {}; // 实际发出的请求的header
+        // 额外发送的query
+        let additionalRequestQuery = {};
+        let actualRequestQuery = {}; // 实际发出的请求的query
         // 额外发送的cookie
         let additionalRequestCookies = {};
-        let actualRequestCookies = {};
+        let actualRequestCookies = {}; // 实际发出的请求的cookies
 
         // 要发送给浏览器的内容
         let toClientResponse = {
@@ -241,6 +247,8 @@ module.exports = class HttpHandle {
                     requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
                     additionalRequestHeaders, // 请求头
                     actualRequestHeaders,
+                    additionalRequestQuery,
+                    actualRequestQuery,
                     additionalRequestCookies, // cookie
                     actualRequestCookies,
                     toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
@@ -266,6 +274,8 @@ module.exports = class HttpHandle {
                 requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
                 additionalRequestHeaders, // 请求头
                 actualRequestHeaders,
+                additionalRequestQuery,
+                actualRequestQuery,
                 additionalRequestCookies, // cookie
                 actualRequestCookies,
                 toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
@@ -284,9 +294,9 @@ module.exports = class HttpHandle {
                         content: toClientResponse.body
                     });
                 }catch (e){
-                    console.error(e);
-                    console.log(toClientResponse)
-                    console.log(urlObj)
+                    this.logService.error(e);
+                    this.logService.log(toClientResponse)
+                    this.logService.log(urlObj)
                 }
             } else {
                 // 自定请求
@@ -301,6 +311,8 @@ module.exports = class HttpHandle {
                     requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
                     additionalRequestHeaders, // 请求头
                     actualRequestHeaders,
+                    additionalRequestQuery,
+                    actualRequestQuery,
                     additionalRequestCookies, // cookie
                     actualRequestCookies,
                     toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true

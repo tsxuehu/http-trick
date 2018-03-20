@@ -44,6 +44,6 @@ module.exports = class AddResponseHeader extends Action {
                   toClientResponse, //响应内容
                   last = true
               }) {
-        toClientResponse.headers[action.data.headerKey] = action.data.headerValue;
+        toClientResponse.headers[action.data.resHeaderKey] = action.data.resHeaderValue;
     }
 };

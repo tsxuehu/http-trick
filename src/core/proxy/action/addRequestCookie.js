@@ -40,7 +40,5 @@ module.exports = class AddRequestCookie extends Action {
                   last = true
               }) {
         additionalRequestHeaders[action.data.cookieKey] = action.data.cookieValue;
-
-
     }
 }

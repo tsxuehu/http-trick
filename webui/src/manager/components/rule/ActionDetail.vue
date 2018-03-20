@@ -71,10 +71,10 @@
         <!-- 增加请求头 -->
         <div v-if="action.type == 'addRequestHeader'" class="inline-block right-panel">
             <div class="action-data">
-                <el-input v-model="action.data.headerKey" size="small" :disabled="remote"
+                <el-input v-model="action.data.reqHeaderKey" size="small" :disabled="remote"
                           placeholder="header key" style="display: inline-block;width: 120px;">
                 </el-input>
-                <el-input v-model="action.data.headerValue" size="small" :disabled="remote"
+                <el-input v-model="action.data.reqHeaderValue" size="small" :disabled="remote"
                           placeholder="header value" style="display: inline-block;width: 300px;">
                 </el-input>
             </div>
@@ -82,10 +82,10 @@
         <!-- 增加响应头 -->
         <div v-if="action.type == 'addResponseHeader'" class="inline-block right-panel">
             <div class="action-data">
-                <el-input v-model="action.data.headerKey" size="small" :disabled="remote"
+                <el-input v-model="action.data.resHeaderKey" size="small" :disabled="remote"
                           placeholder="header key" style="display: inline-block;width: 120px;">
                 </el-input>
-                <el-input v-model="action.data.headerValue" size="small" :disabled="remote"
+                <el-input v-model="action.data.resHeaderValue" size="small" :disabled="remote"
                           placeholder="header value" style="display: inline-block;width: 300px;">
                 </el-input>
             </div>

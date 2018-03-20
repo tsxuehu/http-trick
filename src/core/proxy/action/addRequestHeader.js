@@ -45,10 +45,10 @@ module.exports = class AddRequestHeader extends Action {
                   last = true
               }) {
         if (_.lowerCase(action.data.headerKey) == "cookie") {
-            let toAddCookie = cookie.parse(action.data.headerValue || "");
+            let toAddCookie = cookie.parse(action.data.reqHeaderValue || "");
             Object.assign(additionalRequestCookies, toAddCookie);
         } else {
-            additionalRequestHeaders[action.data.headerKey] = action.data.headerValue;
+            additionalRequestHeaders[action.data.reqHeaderKey] = action.data.reqHeaderValue;
         }
     }
 };
