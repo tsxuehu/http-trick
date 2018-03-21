@@ -60,11 +60,12 @@ module.exports = class ConfigController {
         });
 
         // 重载用户id
-        router.get('/profile/resetUserId', async (ctx,next) =>{
+        router.get('/profile/setUserId', async (ctx,next) =>{
             let userId = ctx.query.userId;
             if (!userId) {
                 userId = ctx.request.ip;
             }
+            this.profileService.bindClientIp(userId, ip);
             ctx.cookies.set('userId', userId, { maxAge: 1000 * 60 * 60 * 24 * 365 });
             ctx.body = {
                 code: 0,

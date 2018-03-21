@@ -14,7 +14,7 @@
         <div v-if="action.type == 'redirect'" class="inline-block right-panel">
             <div class="action-data">
                 <el-input v-model="action.data.target" size="small" :disabled="remote"
-                          placeholder="填写转发路径(远程地址、或者本地地址。远程地址需要以http/https开头)">
+                          :placeholder="redireactPlaceholder">
                 </el-input>
             </div>
         </div>
@@ -159,6 +159,13 @@
                     });
                     if (!finded) this.action.data.dataId = '';
                     return finded;
+                }
+            },
+            redireactPlaceholder(){
+                if (this.$dc.userId == 'root'){
+                    return '填写转发路径(远程地址、或者本地地址。远程地址需要以http/https开头)'
+                } else {
+                    return '填写转发路径(必须以http/https开头)'
                 }
             }
         }

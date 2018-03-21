@@ -43,41 +43,6 @@
 <script>
     import './left-menu.pcss';
     const menuList = [
-        {
-            name: '使用说明',
-            icon: 'icon-search',
-            link: 'helpinstall'
-        },
-        {
-            name: '基础配置',
-            icon: 'icon-set',
-            link: 'configure'
-        },
-        {
-            name: '工程路径配置',
-            icon: 'icon-layers',
-            link: 'projectpath'
-        },
-        {
-            name: 'Host 管理',
-            icon: 'icon-box',
-            link: 'hostfilelist'
-        },
-        {
-            name: 'Http 过滤器',
-            icon: 'icon-beaker',
-            link: 'filter'
-        },
-        {
-            name: 'Http 转发',
-            icon: 'icon-skip',
-            link: 'rulefilelist'
-        },
-        {
-            name: '自定义 mock 数据',
-            icon: 'icon-suoding',
-            link: 'datalist'
-        }
         /*{
          name: '请求监控',
          icon: 'icon-bargraph',
@@ -109,16 +74,58 @@
 
         data() {
             return {
-                defaultActive: this.getDefaultActive(),
-                menuList
             };
         },
+        computed: {
+            menuList() {
+                let menu = [{
+                    name: '使用说明',
+                    icon: 'icon-search',
+                    link: 'helpinstall'
+                }];
+                if (this.$dc.userId == 'root') {
+                    menu = menu.concat([
+                        {
+                            name: '基础配置',
+                            icon: 'icon-set',
+                            link: 'configure'
+                        },
+                        {
+                            name: '工程路径配置',
+                            icon: 'icon-layers',
+                            link: 'projectpath'
+                        }
+                    ]);
+                }
+                menu = menu.concat([
+                    {
+                        name: 'Host 管理',
+                        icon: 'icon-box',
+                        link: 'hostfilelist'
+                    },
+                    {
+                        name: 'Http 过滤器',
+                        icon: 'icon-beaker',
+                        link: 'filter'
+                    },
+                    {
+                        name: 'Http 转发',
+                        icon: 'icon-skip',
+                        link: 'rulefilelist'
+                    },
+                    {
+                        name: '自定义 mock 数据',
+                        icon: 'icon-suoding',
+                        link: 'datalist'
+                    }
+                ]);
+                return menu;
+            },
 
-        methods: {
-            getDefaultActive() {
+            defaultActive() {
                 const { hash } = location;
                 let defaultActive = '0';
-                menuList.forEach((item, index1) => {
+                this.menuList.forEach((item, index1) => {
                     if (Array.isArray(item)) {
 
                     } else if (hash.indexOf(item.link) !== -1) {
@@ -127,8 +134,10 @@
                 });
 
                 return defaultActive;
-            },
+            }
+        },
 
+        methods: {
             handleSelect(key, keyPath) {
                 let item = {};
                 if (keyPath.length == 2) {

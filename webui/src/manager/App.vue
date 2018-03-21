@@ -90,6 +90,8 @@
         data() {
             return {
                 isDataCenter: true,
+                // 运行用户
+                userId: 'guest',
                 // 运行时信息
                 appInfo: {},
                 // 基本配置信息
@@ -343,7 +345,11 @@
             }
         },
 
-        created() {
+        async created() {
+            // 获取用户id
+            let result = await profileApi.getUserId();
+            this.userId = result.data.data.userId;
+
             if (!window.io) return;
             let socket = io('/manager');
 

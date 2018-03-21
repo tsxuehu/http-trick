@@ -184,7 +184,7 @@ module.exports = class HostService extends EventEmitter {
     }
 
     getHostFile(userId, name) {
-        return this.userHostFilesMap[userId][name];
+        return (this.userHostFilesMap[userId]||{})[name];
     }
 
     async saveHostFile(userId, name, content) {

@@ -25,4 +25,10 @@ export default {
     enableFilter(){
         return axios.post(`/profile/setFilterState?filterstate=1`);
     },
+    getUserId(){
+        return axios.get(`/profile/getUserId`);
+    },
+    setUserId(userId){
+        return axios.get(`/profile/setUserId?userId=${userId}`);
+    }
 }

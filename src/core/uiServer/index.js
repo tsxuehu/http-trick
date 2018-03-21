@@ -39,7 +39,13 @@ module.exports = class UiServer {
                     userId = 'root';
                 } else {
                     // 多用户模式 则把用户的ip当做id
-                    userId = ctx.request.ip;
+                    let ip = ctx.ip;
+                    if (ip.substr(0, 7) == "::ffff:") {
+                        ip = ip.substr(7)
+                    }
+                    userId = ip;
+                    // 当前机器的ip和用户id绑定. 当机器为ip的机器发代理请求时，会使用userId用户的规则
+                    this.profileService.bindClientIp(userId, ip);
                 }
                 ctx.cookies.set('userId', userId, { maxAge: 1000 * 60 * 60 * 24 * 365 });
             }
