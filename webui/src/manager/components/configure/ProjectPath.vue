@@ -1,6 +1,7 @@
 <template>
   <div class="project-wraper">
     <div class="main-content__title">工程路径管理</div>
+    <div class="project-path-info">http请求转发到本地文件时可以引用这里的路径。例如：将http请求转发到<%= helloworld %>/dist/hello.js，<%= helloworld %>会被替换为工程名为helloworld对应的路径。</div>
     <el-form label-width="100px">
       <template v-for="(obj ,index) in $dc.projectPathArray">
         <div class="project-path">

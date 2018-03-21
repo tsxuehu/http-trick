@@ -6,7 +6,7 @@
                 <el-button size="small" type="primary" @click='saveFile'>保存文件</el-button>
             </el-col>
         </el-row>
-        <textarea class="host-editor" v-model="filecontent.content"></textarea>
+        <textarea class="host-editor" :placeholder="hostExample" v-model="filecontent.content"></textarea>
     </div>
 </template>
 
@@ -23,6 +23,15 @@
                 }
             };
         },
+        computed: {
+            hostExample() {
+                return `#示例
+8.8.8.8    www.google.com
+4.4.4.4    *.taobao.com #所有后缀为.taobao.com的域名都被解析为4.4.4.4
+6.6.6.6    www.youzan.com h5.youzan.com`
+            }
+        },
+
         methods: {
             getFile() {
                 this.loaded = false;
