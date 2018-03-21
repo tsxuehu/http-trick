@@ -16,7 +16,15 @@ module.exports = function getRouter() {
     router.use(async (ctx, next) => {
         // 取用户Id
         let cookies = cookieParser.parse(ctx.request.headers.cookie || "");
-        ctx.userId = cookies['userId'] || 'root';
+        let userId = cookies['userId'];
+        if (!userId) {
+            // 如果没有用户id
+            // 单用户模式 则把root当做id
+            // 多用户模式 则把用户的ip当做id
+            userId = '';
+            ctx.set('userId', userId);
+        }
+        ctx.userId = userId;
         await next();
     });
     BreakpointController.getInstance().regist(router);
