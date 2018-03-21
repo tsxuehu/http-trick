@@ -38,6 +38,7 @@ module.exports = class TrafficController {
             ctx.body = await this.rootCertService.getRootCACertPem(userId);
         });
 
+        // pac文件
         router.get('/pac', async (ctx) => {
             let ip = this.appInfoService.getPcIp();
             let port = this.appInfoService.getRealUiPort();

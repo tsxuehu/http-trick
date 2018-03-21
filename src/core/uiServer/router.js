@@ -13,20 +13,6 @@ let UtilsController = require('./controller/utilsController');
 module.exports = function getRouter() {
     let router = new Router();
     // 注册中间件，获取用户身份
-    router.use(async (ctx, next) => {
-        // 取用户Id
-        let cookies = cookieParser.parse(ctx.request.headers.cookie || "");
-        let userId = cookies['userId'];
-        if (!userId) {
-            // 如果没有用户id
-            // 单用户模式 则把root当做id
-            // 多用户模式 则把用户的ip当做id
-            userId = '';
-            ctx.set('userId', userId);
-        }
-        ctx.userId = userId;
-        await next();
-    });
     BreakpointController.getInstance().regist(router);
     ConfigController.getInstance().regist(router);
     ProfileController.getInstance().regist(router);

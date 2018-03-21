@@ -27,6 +27,25 @@ module.exports = class UiServer {
         this.appInfoService = ServiceRegistry.getAppInfoService();
         // 初始化koa
         this.app = new koa();
+        // 身份识别
+        this.app.use(async (ctx, next) => {
+            // 取用户Id
+            let cookies = cookieParser.parse(ctx.request.headers.cookie || "");
+            let userId = cookies['userId'];
+            if (!userId) {
+                // 如果没有用户id
+                if (this.appInfoService.isSingle()) {
+                    // 单用户模式 则把root当做id
+                    userId = 'root';
+                } else {
+                    // 多用户模式 则把用户的ip当做id
+                    userId = ctx.request.ip;
+                }
+                ctx.cookies.set('userId', userId, { maxAge: 1000 * 60 * 60 * 24 * 365 });
+            }
+            ctx.userId = userId;
+            await next();
+        });
         // query string
         koaQs(this.app);
         // body解析
@@ -106,7 +125,7 @@ module.exports = class UiServer {
             });
             // 推送最新数据
             // 运行信息
-            let appInfo =this.appInfoService.getAppInfo();
+            let appInfo = this.appInfoService.getAppInfo();
             client.emit('appinfo', appInfo);
             // proxy配置
             let config = await this.configureService.getConfigure();

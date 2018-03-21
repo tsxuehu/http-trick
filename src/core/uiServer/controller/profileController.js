@@ -12,7 +12,7 @@ module.exports = class ConfigController {
     }
     constructor() {
         this.profileService = ServiceRegistry.getProfileService();
-
+        this.appInfoService = ServiceRegistry.getAppInfoService();
     }
 
     regist(router) {
@@ -48,6 +48,32 @@ module.exports = class ConfigController {
             };
         });
 
+        // 获取用户id
+        router.get('/profile/getUserId', async (ctx,next) =>{
+            let userId = ctx.userId;
+            ctx.body = {
+                code: 0,
+                data: {
+                    userId
+                }
+            };
+        });
+
+        // 重载用户id
+        router.get('/profile/resetUserId', async (ctx,next) =>{
+            let userId = ctx.query.userId;
+            if (!userId) {
+                userId = ctx.request.ip;
+            }
+            ctx.cookies.set('userId', userId, { maxAge: 1000 * 60 * 60 * 24 * 365 });
+            ctx.body = {
+                code: 0,
+                data: {
+                    userId
+                }
+            };
+        });
+
     }
 
-}
+};
