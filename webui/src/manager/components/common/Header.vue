@@ -2,7 +2,7 @@
     <div class="head-nav">
         <!-- host -->
         <div class="menu-slot">
-            <el-dropdown :hide-on-click="false" @command="$dc.selectHostFile">
+            <el-dropdown :hide-on-click="false" placement="bottom-start" @command="$dc.selectHostFile">
                 <el-button type="primary" size="small" :disabled="!$dc.profile.enableHost">
                     Host 切换<i class="el-icon-caret-bottom el-icon--right"/>
                 </el-button>

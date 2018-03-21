@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="main-content__title">过滤器</div>
-        <div class="project-path-info">一个http请求会可以执行多个匹配的过滤器；过滤器可以用于向http请求里植入登录态。</div>
+        <div class="project-path-info">一个http请求会可以执行多个匹配的过滤器；过滤器可以用于向http请求里植入登录态。可以控制单个过滤器是否启用</div>
         <el-row :gutter="20" style="margin-bottom: 10px;text-align: right;">
             <el-col :span="6" :offset="18">
                 <el-button size="small" @click='addRule'>新增过滤器</el-button>

@@ -1,6 +1,7 @@
 <template>
     <div>
         <div class="main-content__title">编辑规则集{{ loaded ? ': ' + filecontent.name: '' }}</div>
+        <div class="project-path-info">可以控制单个规则是否启用，当规则所在规则集没有启用时，规则不管是否启用，都不会生效。</div>
         <el-row :gutter="20" style="margin-bottom: 10px;text-align: right;">
             <el-col :span="6" :offset="18">
                 <el-button size="small" @click='addRule' :disabled='filecontent.meta.remote'>新增规则</el-button>

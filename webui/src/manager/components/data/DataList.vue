@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="main-content__title">自定义数据文件列表</div>
+    <div class="project-path-info">在http转发规则里面，可以配置将这里的mock数据返回给浏览器</div>
     <el-row :gutter="20" style="margin-bottom: 10px">
       <el-col :span="6" :offset="18" class="addhost-btn-wrap">
         <el-button size="small" @click='$dc.requestAddDataFile()'>新增数据文件</el-button>

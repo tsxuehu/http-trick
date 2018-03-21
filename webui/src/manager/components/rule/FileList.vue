@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="main-content__title">规则集列表</div>
+    <div class="project-path-info">http转发规则以规则集的方式组织，可以控制单个规则集是否启用。</div>
     <div class="rule-list-op">
       <div class="op">
         <input type="file" @change="fileUpload" class="importfile"/>

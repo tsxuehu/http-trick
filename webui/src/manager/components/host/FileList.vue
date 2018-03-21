@@ -1,6 +1,7 @@
 <template>
   <div class="host-view">
     <div class="main-content__title">Host 文件列表</div>
+    <div class="project-path-info">只允许一个host文件生效。</div>
     <el-row :gutter="20" style="margin-bottom: 10px">
       <el-col :span="6" :offset="18" class="addhost-btn-wrap">
         <el-button size="small" @click='addNewHostFile'>新增 Host 文件</el-button>
