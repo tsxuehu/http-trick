@@ -1,15 +1,22 @@
 <template>
   <div>
     <div class="main-content__title">规则集列表</div>
-    <el-row :gutter="20" style="margin-bottom: 10px">
-      <el-col :span="10" :offset="14" class="addrule-btn-wrap">
+    <div class="rule-list-op">
+      <div class="op">
         <input type="file" @change="fileUpload" class="importfile"/>
         <el-button size="small">导入规则集</el-button>
+      </div>
+      <div class="op">
         <el-button size="small" type="primary" @click='importRemoteRule'>导入远程规则</el-button>
+      </div>
+      <div class="op">
         <el-button size="small" type="primary" @click='importRemoteRule'>批量导入远程规则</el-button>
+      </div>
+      <div class="op">
         <el-button size="small" type="primary" @click='addRuleCollection'>新增规则集</el-button>
-      </el-col>
-    </el-row>
+      </div>
+    </div>
+
     <el-table border :data="$dc.ruleFileList">
       <el-table-column prop="name" label="名字" width="200">
         <template scope="scope">
@@ -61,6 +68,7 @@
 import ruleApi from '../../../api/rule';
 import utilsApi from '../../../api/utils';
 import _ from 'lodash';
+import './file-list.pcss';
 export default {
   name: 'rulefilelist',
   methods: {
@@ -262,15 +270,5 @@ export default {
   text-align: right;
 }
 
-.importfile {
-  position: absolute;
-  width: 80px;
-  height: 28px;
-  opacity: 0;
-  cursor: pointer;
-}
 
-.importfile::-webkit-file-upload-button {
-  cursor: pointer;
-}
 </style>

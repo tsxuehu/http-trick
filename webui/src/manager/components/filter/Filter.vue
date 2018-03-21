@@ -1,6 +1,7 @@
 <template>
     <div>
         <div class="main-content__title">过滤器</div>
+        <div class="project-path-info">一个http请求会可以执行多个匹配的过滤器；过滤器可以用于向http请求里植入登录态。</div>
         <el-row :gutter="20" style="margin-bottom: 10px;text-align: right;">
             <el-col :span="6" :offset="18">
                 <el-button size="small" @click='addRule'>新增过滤器</el-button>
@@ -17,22 +18,26 @@
             </el-table-column>
             <el-table-column label="规则设置" align="center">
                 <template scope='scope'>
-                    <rule-filter-detail :rule="scope.row" ></rule-filter-detail>
+                    <rule-filter-detail :rule="scope.row"></rule-filter-detail>
                 </template>
             </el-table-column>
             <el-table-column label="操作" :width="100" align="center" :context="_self">
                 <template scope='scope'>
-                    <div>
-                        <el-tooltip class="item" effect="dark" content="复制" placement="left">
-                            <el-button icon='el-icon-document' size="mini"
-                                       @click='onDuplicateRow(scope.row,scope.$index)'>
-                            </el-button>
-                        </el-tooltip>
-                        <el-tooltip class="item" effect="dark" content="删除" placement="top">
-                            <el-button type="danger" icon='el-icon-delete' size="mini"
-                                       @click='onDeleteRow(scope.row,scope.$index)'>
-                            </el-button>
-                        </el-tooltip>
+                    <div class="action-panel">
+                        <div class="btn-panel">
+                            <el-tooltip class="item" effect="dark" content="复制" placement="left">
+                                <el-button icon='el-icon-document' size="mini"
+                                           @click='onDuplicateRow(scope.row,scope.$index)'>
+                                </el-button>
+                            </el-tooltip>
+                        </div>
+                        <div class="btn-panel">
+                            <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                <el-button type="danger" icon='el-icon-delete' size="mini"
+                                           @click='onDeleteRow(scope.row,scope.$index)'>
+                                </el-button>
+                            </el-tooltip>
+                        </div>
                     </div>
                 </template>
             </el-table-column>
@@ -68,8 +73,8 @@
              * 立刻保存
              */
             async saveFileRightNow(){
-                debugger
-               let result = await filtersApi.saveFilters(this.$dc.filters);
+                debugger;
+                let result = await filtersApi.saveFilters(this.$dc.filters);
                 if (result.code == 0) {
                     this.$message({
                         type: 'success',
@@ -104,8 +109,16 @@
                         }
                     }]
                 });
-            },
+            }
         }
     };
 
 </script>
+<style>
+    .action-panel .btn-panel {
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 10px;
+    }
+
+</style>

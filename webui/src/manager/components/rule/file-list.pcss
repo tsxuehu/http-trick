@@ -1,0 +1,20 @@
+.rule-list-op {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+  .op {
+    position: relative;
+    margin-left: 10px;
+    .importfile {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .importfile::-webkit-file-upload-button {
+      cursor: pointer;
+    }
+  }
+}

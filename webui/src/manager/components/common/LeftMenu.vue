@@ -64,14 +64,14 @@
             link: 'hostfilelist'
         },
         {
-            name: 'Http 转发',
-            icon: 'icon-skip',
-            link: 'rulefilelist'
-        },
-        {
             name: 'Http 过滤器',
             icon: 'icon-beaker',
             link: 'filter'
+        },
+        {
+            name: 'Http 转发',
+            icon: 'icon-skip',
+            link: 'rulefilelist'
         },
         {
             name: '自定义 mock 数据',
