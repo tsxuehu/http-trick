@@ -43,4 +43,6 @@ async function createDir(path) {
     }
 }
 
+// sudo npm i -g http-trick安装时，执行postinstall脚本的用户的身份是啥？
+
 module.exports = resetData;

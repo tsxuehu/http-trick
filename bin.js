@@ -25,7 +25,7 @@ async function start() {
      */
     let appInfoService = new AppInfoService();
     let proxyDataDir = appInfoService.getProxyDataDir();
-    if (fs.existsSync(proxyDataDir)) {
+    if (!fs.existsSync(proxyDataDir)) {
         await resetDataFile();
     }
 
