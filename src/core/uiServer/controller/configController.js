@@ -11,14 +11,14 @@ module.exports = class ConfigController {
         return instance;
     }
     constructor() {
-        this.confService = ServiceRegistry.getProfileService();
+        this.confService = ServiceRegistry.getConfigureService();
 
     }
 
     regist(router) {
-        router.post('/configure/savefile', (ctx, next) => {
+        router.post('/configure/savefile', async (ctx, next) => {
             let userId = ctx.userId;
-            this.confService.setConf(userId, ctx.request.body);
+            await this.confService.setConfigure(userId,ctx.request.body);
             ctx.body = {
                 code: 0
             };

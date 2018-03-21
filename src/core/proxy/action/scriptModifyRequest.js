@@ -1,4 +1,5 @@
 const Action = require("./action");
+const vm = require('vm');
 /**
  * 自定义js脚本修改请求内容
  */
@@ -22,7 +23,7 @@ module.exports = class ScriptModifyRequest extends Action {
     }
 
     willGetContent() {
-        return true;
+        return false;
     }
 
     async run({
@@ -32,15 +33,30 @@ module.exports = class ScriptModifyRequest extends Action {
                   clientIp,
                   rule, // 规则
                   action, // 规则里的一个动作
-                  requestContent, // 请求内容
-                  extraRequestHeaders, // 请求头
+                  requestContent, // 原始内容
+                  additionalRequestHeaders, // 请求头
+                  actualRequestHeaders,
+                  additionalRequestQuery, // query
+                  actualRequestQuery,
+                  additionalRequestCookies, // cookie
+                  actualRequestCookies,
                   toClientResponse, //响应内容
                   last = true
               }) {
+        const sandbox = {
+            clientIp,
+            requestContent, // 请求内容
+            additionalRequestHeaders,// 请求附加头
+            additionalRequestQuery,
+            additionalRequestCookies,// 请求附加cookie
+            toClientResponse, // 记录返回给浏览器的信息
+            console
+        };
+        try {
+            vm.runInNewContext(action.data.modifyRequestScript, sandbox);
+        } catch (e) {
+            toClientResponse.headers['proxy-error'] = encodeURI(e.message);
+        }
 
-
-        // 运行用户脚本, 修改请求内容
-
-        // 发送请求，获取内容  或者将远端内容直接返回给浏览器
     }
-}
+};

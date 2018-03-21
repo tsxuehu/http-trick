@@ -1,5 +1,6 @@
 const Action = require("./action");
 const _ = require("lodash");
+const cookie = require("cookie");
 
 let addRequestHeader;
 /**
@@ -36,10 +37,18 @@ module.exports = class AddRequestHeader extends Action {
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容
-                  extraRequestHeaders, // 请求头
+                  additionalRequestHeaders, // 请求头
+                  actualRequestHeaders,
+                  additionalRequestCookies, // cookie
+                  actualRequestCookies,
                   toClientResponse, //响应内容
                   last = true
               }) {
-        _.assign(extraRequestHeaders, action.data.headers);
+        if (_.lowerCase(action.data.headerKey) == "cookie") {
+            let toAddCookie = cookie.parse(action.data.reqHeaderValue || "");
+            Object.assign(additionalRequestCookies, toAddCookie);
+        } else {
+            additionalRequestHeaders[action.data.reqHeaderKey] = action.data.reqHeaderValue;
+        }
     }
-}
+};

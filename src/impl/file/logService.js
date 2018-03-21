@@ -10,4 +10,8 @@ module.exports = class LogService {
     error(msg) {
         console.log(msg)
     }
+
+    log() {
+        console.log(msg)
+    }
 }

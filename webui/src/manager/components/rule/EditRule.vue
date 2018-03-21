@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div class='bread'>
-      <strong>编辑规则集{{loaded ? ': '+filecontent.name: ''}}</strong>
-    </div>
+    <div class="main-content__title">编辑规则集{{ loaded ? ': ' + filecontent.name: '' }}</div>
     <el-row :gutter="20" style="margin-bottom: 10px;text-align: right;">
       <el-col :span="6" :offset="18">
         <el-button size="small" @click='addRule' :disabled='filecontent.meta.remote'>新增规则</el-button>
@@ -26,19 +24,19 @@
         <template scope='scope'>
           <div v-if="!filecontent.meta.remote">
             <el-tooltip class="item" effect="dark" content="复制" placement="left">
-              <el-button icon='document' size="mini"
+              <el-button icon='el-icon-document' size="mini"
                          @click='onDuplicateRow(scope.row,scope.$index,filecontent.content)'>
               </el-button>
             </el-tooltip>
             <el-tooltip class="item" effect="dark" content="删除" placement="top">
-              <el-button type="danger" icon='delete' size="mini"
+              <el-button type="danger" icon='el-icon-delete' size="mini"
                          @click='onDeleteRow(scope.row,scope.$index,filecontent.content)'>
               </el-button>
             </el-tooltip>
           </div>
           <div style="    text-align: left; padding-left: 2px;margin-top: 5px;">
             <el-tooltip class="item" effect="dark" content="测试规则" placement="left">
-              <el-button type="blue" icon='search' size="mini"
+              <el-button type="blue" icon='el-icon-search' size="mini"
                          @click='testMatchRuleRequest(scope.row)'>
               </el-button>
             </el-tooltip>
@@ -185,9 +183,17 @@
                 target: "",// 转发目标路径
                 dataId: '', //返回数据文件的id
                 modifyResponseType: '',// 修改响应内容类型
-                cookie: "", // 设置到请求里的cookie
                 callbackName: "", // jsonp请求参数名
-                headers: {},
+                cookieKey: "", // 设置到请求里的cookie key
+                cookieValue: "", // 设置到请求里的cookie value
+                reqHeaderKey: "", // 请求header
+                reqHeaderValue: "",
+                resHeaderKey: "", // 响应header
+                resHeaderValue: "",
+                queryKey: "", // 请求query
+                queryValue: "",
+                modifyRequestScript: "", // 脚本修改请求
+                modifyResponseScript: "" // 脚本修改响应
             }
           }]
         })
@@ -228,14 +234,15 @@
       '$route'(to, from) {
         this.getFile();
       },
-      filecontent: {
+      // 自动保存
+      /*filecontent: {
         handler(newVal, oldVal){
           if (oldVal.content) {
             this.saveFile(true);
           }
         },
         deep: true
-      }
+      }*/
     }
   }
 

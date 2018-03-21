@@ -1,11 +1,14 @@
 const zlib = require("zlib");
 const parseUrl = require("../../utils/parseUrl");
+const log = require("../../utils/log");
+const requestResponseUtils = require("../../utils/requestResponseUtils");
 const ServiceRegistry = require("../../service");
 const Action = require("../action/index");
-const queryString = require("query-string");
 const getClientIp = require("../../utils/getClientIp");
 const Breakpoint = require("../breakpoint");
 const _ = require("lodash");
+const cookie = require("cookie");
+const sendSpecificToClient = require("../../utils/sendSpecificToClient");
 
 // request session id seed
 let httpHandle;
@@ -21,6 +24,7 @@ module.exports = class HttpHandle {
     constructor() {
         this.breakpoint = Breakpoint.getBreakpoint();
         this.ruleService = ServiceRegistry.getRuleService();
+        this.logService = ServiceRegistry.getLogService();
         this.profileService = ServiceRegistry.getProfileService();
         this.appInfoService = ServiceRegistry.getAppInfoService();
         this.breakpointService = ServiceRegistry.getBreakpointService();
@@ -39,35 +43,27 @@ module.exports = class HttpHandle {
         let clientIp = getClientIp(req);
         let userId = this.profileService.getClientIpMappedUserId(clientIp);
 
-
         // 如果是 ui server请求，则直接转发不做记录
-        if ((urlObj.hostname == '127.0.0.1' || urlObj.hostname == this.appInfoService.getPcIp())
-            && urlObj.port == this.appInfoService.getRealUiPort()) {
-            Action.getBypassAction().run({req, res, urlObj});
+        if (this.appInfoService.isWebUiRequest(urlObj.hostname, urlObj.port)) {
+            Action.getBypassAction().run({
+                req, res, urlObj, toClientResponse: {
+                    headers: {},
+                    requestData: {}
+                },
+                requestContent: {},
+                additionalRequestHeaders: {},
+                actualRequestHeaders: {},
+                additionalRequestQuery: {},
+                actualRequestQuery: {},
+                additionalRequestCookies: {},
+                actualRequestCookies: {}
+            });
             return;
-        }
-
-        // 如果有客户端监听请求内容，则做记录
-        if (this.httpTrafficService.hasMonitor(userId)) {
-            // 记录请求
-            let id = this.httpTrafficService.getRequestId(userId);
-            if (id > -1) {
-                this.httpTrafficService.requestBegin({userId, clientIp, id, req, res, urlObj});
-
-                // 日记记录body
-                this._getRequestBody().then(body => {
-                    this.httpTrafficService.requestBody({userId, id, req, res, body});
-                });
-
-                this._getResponseToClient(res).then(responseContent => {
-                    this.httpTrafficService.requestReturn({userId, id, req, res, responseContent});
-                });
-            }
         }
 
         // =========================================
         // 断点
-        let breakpointId = await this.breakpoint
+        let breakpointId = await this.breakpointService
             .getBreakpointId(userId, req.method, urlObj);
         if (breakpointId > 0) {
             let requestContent = await this._getRequestContent(
@@ -79,13 +75,58 @@ module.exports = class HttpHandle {
             return;
         }
 
-        // =====================================================
-        // 限流 https://github.com/tjgq/node-stream-throttle
+        // 规则处理
+        let hasMonitor = this.httpTrafficService.hasMonitor(userId);
+        let requestId = -1;
+        // 如果有客户端监听请求内容，则做记录
+        if (hasMonitor) {
+            // 记录请求
+            requestId = this.httpTrafficService.getRequestId(userId, urlObj);
+            if (requestId > -1) {
+                this.httpTrafficService.requestBegin({
+                    userId,
+                    clientIp,
+                    id: requestId,
+                    urlObj,
+                    method: req.method,
+                    httpVersion: req.httpVersion,
+                    headers: req.headers
+                });
+            }
+        }
+        try {
+            // 是否需要记录请求日志
+            let recordResponse = hasMonitor && requestId > -1;
 
+            // =====================================================
+            // 限流 https://github.com/tjgq/node-stream-throttle
 
-        let matchedRule = this.ruleService.getProcessRuleList(userId, req.method, urlObj);
+            let matchedRule = this.ruleService.getProcessRuleList(userId, req.method, urlObj);
 
-        this._runAtions({req, res, urlObj, clientIp, userId, rule: matchedRule});
+            let toClientResponse = await this._runAtions({
+                req, res, recordResponse, requestId,
+                urlObj, clientIp, userId, rule: matchedRule
+            });
+
+            // 处理结束 记录额外的请求日志(附加的请求头、cookie、body)
+            // 请求已经发送给浏览器
+            if (recordResponse) {
+                toClientResponse.requestEndTime = Date.now();
+                this.httpTrafficService.actualRequest({
+                    userId,
+                    id: requestId,
+                    requestData: toClientResponse.requestData
+                });
+                this.httpTrafficService.serverReturn({
+                    userId,
+                    id: requestId,
+                    toClientResponse: toClientResponse
+                });
+            }
+        } catch (e) {
+            console.error(e, urlObj);
+        }
+
     }
 
     /**
@@ -98,33 +139,63 @@ module.exports = class HttpHandle {
      * @returns {Promise.<void>}
      * @private
      */
-    async _runAtions({req, res, urlObj, rule, clientIp, userId}) {
+    async _runAtions({
+                         req, res, recordResponse, requestId,
+                         urlObj, rule, clientIp, userId
+                     }) {
         // 原始的请求头部
         let requestContent = {
             hasContent: false,
+            method: '',
             protocol: '',
             hostname: '',
             path: '',
+            query: {}, // query对象
             port: '',
             headers: {},
             body: ''
         };
         // 额外发送的头部
-        let extraRequestHeaders = {};
+        let additionalRequestHeaders = {};
+        let actualRequestHeaders = {}; // 实际发出的请求的header
+        // 额外发送的query
+        let additionalRequestQuery = {};
+        let actualRequestQuery = {}; // 实际发出的请求的query
+        // 额外发送的cookie
+        let additionalRequestCookies = {};
+        let actualRequestCookies = {}; // 实际发出的请求的cookies
+
         // 要发送给浏览器的内容
         let toClientResponse = {
             hasContent: false,// 是否存在要发送给浏览器的内容
             sendedToClient: false, // 已经向浏览器发送响应内容
+            stopRunAction: false, // 停止运行action
+            requestData: {// 发送请崎岖时使用的数据
+                method: '',
+                protocol: '',
+                port: '',
+                path: '',
+                headers: {},
+                body: ''
+            },
+            remoteIp: '',// 远程服务器器ip
+            receiveRequestTime: Date.now(), // 接收到请求的时间
+            dnsResolveBeginTime: 0,// dns解析开始时间
+            remoteRequestBeginTime: 0,// 请求开始时间
+            remoteResponseStartTime: 0,// 服务器响应开始时间
+            remoteResponseEndTime: 0,// 服务器响应结束时间
+            requestEndTime: 0,// 响应结束时间
+            statusCode: 200,
             headers: {},// 要发送给浏览器的header
             body: ''// 要发送给浏览器的body
         };
 
         // 转发规则处理
         if (!this.profileService.enableRule(userId)) {// 判断转发规则有没有开启
-            toClientResponse.headers['fe-proxy-rule-disabled'] = "true";
+            toClientResponse.headers['proxy-rule-disabled'] = "true";
         }
         // 记录请求对应的用户id
-        toClientResponse.headers['fe-proxy-userId'] = userId;
+        toClientResponse.headers['proxy-userId'] = userId;
 
         // 查找匹配到的过滤规则
         let filterRuleList = await this.filterService.getMatchedRuleList(userId, req.method, urlObj);
@@ -139,7 +210,7 @@ module.exports = class HttpHandle {
         for (let i = 0; i < willRunActionListLength; i++) {
 
             // 已经向浏览器发送响应，则停止规则处理
-            if (toClientResponse.sendedToClient) {
+            if (toClientResponse.sendedToClient || toClientResponse.stopRunAction) {
                 break;
             }
             // 取出将要运行的动作描述信息
@@ -151,36 +222,42 @@ module.exports = class HttpHandle {
 
             // 若action handle不存在，则处理下一个
             if (!actionHandler) {
-                toClientResponse.headers[`fe-proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-notfound`);
+                toClientResponse.headers[`proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-notfound`);
                 continue;
             }
             // 已经有response, 则不运行获取response的action
             if (actionHandler.willGetContent() && toClientResponse.hasContent) {
-                toClientResponse.headers[`fe-proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-notrun`);
+                toClientResponse.headers[`proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-notrun`);
                 continue;
             }
             // 响应头里面记录运行的动作
-            toClientResponse.headers[`fe-proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-run`);
+            toClientResponse.headers[`proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-run`);
 
             // 动作需要返回内容，但是当前却没有返回内容
             if (actionHandler.needResponse() && !toClientResponse.hasContent) {
                 await Action.getBypassAction().run({
                     req,
                     res,
+                    recordResponse,
                     urlObj,
                     clientIp,
                     userId,
                     rule, // 规则
                     action, // 规则里的一个动作
                     requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
-                    extraRequestHeaders, // 请求头
+                    additionalRequestHeaders, // 请求头
+                    actualRequestHeaders,
+                    additionalRequestQuery,
+                    actualRequestQuery,
+                    additionalRequestCookies, // cookie
+                    actualRequestCookies,
                     toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
                     last: false
                 });
             }
             // 动作需要请求内容，但是当前却没有请求内容
             if (actionHandler.needRequestContent() && !requestContent.hasContent) {
-                requestContent = await this._getRequestContent(
+                requestContent = await requestResponseUtils.getClientRequestContent(
                     req,
                     urlObj);
             }
@@ -188,125 +265,64 @@ module.exports = class HttpHandle {
             await actionHandler.run({
                 req,
                 res,
+                recordResponse,
                 urlObj,
                 clientIp,
                 userId,
                 rule, // 规则
                 action, // 规则里的一个动作
                 requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
-                extraRequestHeaders, // 请求头
+                additionalRequestHeaders, // 请求头
+                actualRequestHeaders,
+                additionalRequestQuery,
+                actualRequestQuery,
+                additionalRequestCookies, // cookie
+                actualRequestCookies,
                 toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
                 last: i == (willRunActionListLength - 1)
             });
         }
-    }
 
-    // 获取请求body
-    // 同一个请求，返回同一个Promise
-    _getRequestBody(req) {
-
-        if (req.fetchDataPromise) {
-            return req.fetchDataPromise;
-        }
-
-        let resolve = _.noop;
-        let promise = new Promise(_ => {
-            resolve = _;
-        });
-        // 对带body请求 获取body， 其他method返回空字符串
-        let type = this._getContentType(req);
-        let method = req.method.lowerCase();
-        if (type
-            && ['application/json', 'application/x-www-form-urlencoded', 'text/plain', 'text/html'].indexOf(type) > -1
-            && ['post', 'put', 'patch'].indexOf(method) > -1) {
-            let body = '';
-            // 图片类型的body需要进行特殊处理
-            req.on('data', function (data) {
-                body += data;
-            });
-            req.on('end', function () {
-                resolve(body);
-            });
-        } else {
-            resolve("");
-        }
-        req.fetchDataPromise = promise;
-        return req.fetchDataPromise;
-    }
-
-    // 获取请求的content type
-    _getContentType(request) {
-        let headers = request.headers;
-        let contentType = headers['content-type'];
-        if (!contentType) {
-            return;
-        }
-        if (Array.isArray(contentType)) {
-            contentType = contentType[0];
-        }
-        const index = contentType.indexOf(';');
-        return index > -1 ? contentType.substr(0, index) : contentType;
-    }
-
-    // 获取请求内容
-    // 从_getRequestBody返回的 body 组装请求内容
-    async _getRequestContent(req, urlObj) {
-        let body = await this._getRequestBody(req);
-        let {protocol, hostname, href, pathname, port} = urlObj;
-        let query = queryString.parse(urlObj.search);
-        return {
-            hasContent: true,
-            protocol, // 请求协议
-            hostname, // 请求域名
-            method: req.method, // 请求方法
-            pathname, // 路径
-            query, // query对象
-            port, // 端口号
-            headers: _.assign({}, req.headers), // 请求头
-            body // 请求body
-        };
-    }
-
-    // 获取返回给client的内容
-    // 原理：两个流pipe时有pipe事件，监听输入流上的数据
-    _getResponseToClient(res) {
-        if (res.responseToClientPromise) {
-            return req.responseToClientPromise;
-        }
-
-        let resolve = _.noop;
-        let promise = new Promise(_ => {
-            resolve = _;
-        });
-
-        // 对服务器端的响应流做记录
-        res.on('pipe', function (readStream) {
-            var chunks = [];
-            readStream.on('data', function (chunk) {
-                chunks.push(chunk);
-                //  res.write(chunk);
-            });
-            readStream.on('end', function () {
-                var headers = readStream.headers || [];
-                var buffer = Buffer.concat(chunks);
-                var encoding = headers['content-encoding'];
-                // handler gzip & defalte transport
-                if (encoding == 'gzip') {
-                    zlib.gunzip(buffer, function (err, decoded) {
-                        resolve(decoded && decoded.toString('binary'));
+        // 动作运行完还没响应浏览器、则响应浏览器
+        if (!toClientResponse.sendedToClient) {
+            if (toClientResponse.hasContent) {
+                try{
+                    sendSpecificToClient({
+                        res,
+                        statusCode: toClientResponse.statusCode,
+                        headers: toClientResponse.headers,
+                        content: toClientResponse.body
                     });
-                } else if (encoding == 'deflate') {
-                    zlib.inflate(buffer, function (err, decoded) {
-                        resolve(decoded && decoded.toString('binary'));
-                    });
-                } else {
-                    resolve(buffer.toString('binary'));
+                }catch (e){
+                    this.logService.error(e);
+                    this.logService.log(toClientResponse)
+                    this.logService.log(urlObj)
                 }
-            });
-        });
+            } else {
+                // 自定请求
+                toClientResponse.headers['proxy-rule-add'] = 'bypass';
+                await Action.getBypassAction().run({
+                    req,
+                    res,
+                    recordResponse,
+                    urlObj,
+                    clientIp,
+                    userId,
+                    requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
+                    additionalRequestHeaders, // 请求头
+                    actualRequestHeaders,
+                    additionalRequestQuery,
+                    actualRequestQuery,
+                    additionalRequestCookies, // cookie
+                    actualRequestCookies,
+                    toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
+                    last: true
+                });
+            }
 
-        res.responseToClientPromise = promise;
-        return res.responseToClientPromise;
+        }
+
+        return toClientResponse;
     }
 
     /**
@@ -327,24 +343,23 @@ module.exports = class HttpHandle {
                     afterFilterActionsInfo.push({
                         action: action, // 动作
                         rule: rule // 动作关联的规则
-                    })
+                    });
                 } else {
                     beforeFilterActionsInfo.push({
                         action: action,
                         rule: rule
-                    })
+                    });
                 }
             });
         });
-
 
         let ruleActionsInfo = [];
         _.forEach(processRule.actionList, action => {
             ruleActionsInfo.push({
                 action: action,
                 rule: processRule
-            })
+            });
         });
         return beforeFilterActionsInfo.concat(ruleActionsInfo).concat(afterFilterActionsInfo);
     }
-}
+};

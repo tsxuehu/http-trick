@@ -1,13 +1,13 @@
-const http = require( "http");
-const koa = require( "koa");
-const path = require( "path");
-const koaBody = require( "koa-body");
-const koaQs = require( "koa-qs");
-const staticServe = require( "koa-static");
-const router = require( "./router");
-const SocketIO = require( "socket.io");
-const cookieParser = require( "cookie");
-const ServiceRegistry = require( "../service");
+const http = require("http");
+const koa = require("koa");
+const path = require("path");
+const koaBody = require("koa-body");
+const koaQs = require("koa-qs");
+const staticServe = require("koa-static");
+const router = require("./router");
+const SocketIO = require("socket.io");
+const cookieParser = require("cookie");
+const ServiceRegistry = require("../service");
 
 module.exports = class UiServer {
 
@@ -16,25 +16,25 @@ module.exports = class UiServer {
 
         // 引用服务
         this.httpTrafficService = ServiceRegistry.getHttpTrafficService();
-        this.confService = ServiceRegistry.getProfileService();
+        this.configureService = ServiceRegistry.getConfigureService();
+        this.profileService = ServiceRegistry.getProfileService();
         this.hostService = ServiceRegistry.getHostService();
         this.mockDataService = ServiceRegistry.getMockDataService();
         this.ruleService = ServiceRegistry.getRuleService();
         this.filterService = ServiceRegistry.getFilterService();
         this.wsMockService = ServiceRegistry.getWsMockService();
         this.breakpointService = ServiceRegistry.getBreakpointService();
-
+        this.appInfoService = ServiceRegistry.getAppInfoService();
         // 初始化koa
         this.app = new koa();
         // query string
         koaQs(this.app);
         // body解析
-        this.app.use(koaBody({multipart: true}));
-        // 静态资源服务
-        this.app.use(staticServe(path.join(__dirname, '../../../static')));
+        this.app.use(koaBody({ multipart: true }));
         // 路由
         this.app.use(router());
-
+        // 静态资源服务
+        this.app.use(staticServe(path.join(__dirname, '../../../site')));
         // 创建server
         this.server = http.createServer(this.app.callback());
         // socketio
@@ -63,9 +63,13 @@ module.exports = class UiServer {
             });
 
             this.httpTrafficService.incMonitor(userId);
-            this.httpTrafficService.resetRequestId(userId);
-
-            client.on('disconnect', function () {
+            // 推送过滤器，状态
+            let state = this.httpTrafficService.getStatus(userId);
+            client.emit('state', state);
+            let filter = this.httpTrafficService.getFilter(userId);
+            client.emit('filter', filter);
+            client.emit('clear');
+            client.on('disconnect', () => {
                 this.httpTrafficService.decMonitor(userId);
             });
         });
@@ -73,6 +77,20 @@ module.exports = class UiServer {
         // 监听logRespository事件
         this.httpTrafficService.on('traffic', (userId, rows) => {
             this.httpTraficMonitorNS.to(userId).emit('rows', rows);
+        });
+        // 过滤器改变
+        this.httpTrafficService.on('filter', (userId, filter) => {
+            this.httpTraficMonitorNS.to(userId).emit('filter', filter);
+        });
+        // 状态改变
+        this.httpTrafficService.on('state-change', (userId, state) => {
+            this.httpTraficMonitorNS.to(userId).emit('state', state);
+        });
+        // 清空
+        this.httpTrafficService.on('clear', (userId) => {
+            this.httpTraficMonitorNS.to(userId).emit('clear');
+            let state = this.httpTrafficService.getStatus(userId);
+            this.httpTraficMonitorNS.to(userId).emit('state', state);
         });
     }
 
@@ -87,30 +105,54 @@ module.exports = class UiServer {
             client.join(userId, err => {
             });
             // 推送最新数据
-            let config = await this.confService.getConf(userId);
-            client.emit('conf', config);
+            // 运行信息
+            let appInfo =this.appInfoService.getAppInfo();
+            client.emit('appinfo', appInfo);
+            // proxy配置
+            let config = await this.configureService.getConfigure();
+            client.emit('configure', config);
+            // 个人配置
+            let profile = await this.profileService.getProfile(userId);
+            client.emit('profile', profile);
+            let mappedClientIps = await this.profileService.getClientIpsMappedToUserId(userId);
+            client.emit('mappedClientIps', mappedClientIps);
+            // host文件列表
             let hostFileList = await this.hostService.getHostFileList(userId);
             client.emit('hostfilelist', hostFileList);
+            // 规则列表
             let ruleFileList = await this.ruleService.getRuleFileList(userId);
             client.emit('rulefilelist', ruleFileList);
+            // 数据文件列表
             let dataList = await this.mockDataService.getMockDataList(userId);
             client.emit('datalist', dataList);
+            // 过滤器
             let filters = await this.filterService.getFilterRuleList(userId);
             client.emit('filters', filters);
         });
-
-        this.confService.on("data-change", (userId, conf) => {
-            this.managerNS.to(userId).emit('conf', conf);
+        // proxy配置信息
+        this.configureService.on("data-change", (userId, configure) => {
+            this.managerNS.to(userId).emit('configure', configure);
         });
+        // 个人配置信息
+        this.profileService.on("data-change-profile", (userId, profile) => {
+            this.managerNS.to(userId).emit('profile', profile);
+        });
+        this.profileService.on("data-change-clientIpUserMap", (userId, clientIpList) => {
+            this.managerNS.to(userId).emit('mappedClientIps', clientIpList);
+        });
+        // host文件变化
         this.hostService.on("data-change", (userId, hostFilelist) => {
             this.managerNS.to(userId).emit('hostfilelist', hostFilelist);
         });
+        // 规则文件列表
         this.ruleService.on("data-change", (userId, ruleFilelist) => {
             this.managerNS.to(userId).emit('rulefilelist', ruleFilelist);
         });
+        // mock文件列表
         this.mockDataService.on("data-change", (userId, dataFilelist) => {
             this.managerNS.to(userId).emit('datalist', dataFilelist);
         });
+        // 过滤器
         this.filterService.on("data-change", (userId, filters) => {
             this.managerNS.to(userId).emit('filters', filters);
         });
@@ -177,29 +219,35 @@ module.exports = class UiServer {
             client.emit('breakpoints', this.breakpointService.getUserBreakPoints(userId));
         });
 
-        this.breakpointService.on('instance-add', (userId, instance) => {
-            this.breakpointNS.to(userId).emit('instance-add', instance);
-        });
-        this.breakpointService.on('set-instance-request-content', (userId, instanceId, content) => {
-            this.breakpointNS.to(userId).emit('client-request', instanceId, content);
-        });
-        this.breakpointService.on('set-instance-server-response', (userId, instanceId, content) => {
-            this.breakpointNS.to(userId).emit('server-response', instanceId, content);
-        });
-        this.breakpointService.on('send-instance-to-client', (userId, instanceId) => {
-            this.breakpointNS.to(userId).emit('instance-end', instanceId);
-        });
         this.breakpointService.on('breakpoint-save', (userId, breakpoint) => {
             this.breakpointNS.to(userId).emit('breakpoint-save', breakpoint);
         });
         this.breakpointService.on('breakpoint-delete', (userId, breakpointId) => {
             this.breakpointNS.to(userId).emit('breakpoint-delete', breakpointId);
         });
+
+        this.breakpointService.on('instance-add', (userId, breakpointId, instance) => {
+            this.breakpointNS.to(userId).emit('instance-add', breakpointId, instance);
+        });
+
+        this.breakpointService.on('instance-delete', (userId, breakpointId, instance) => {
+            this.breakpointNS.to(userId).emit('instance-delete', breakpointId, instance);
+        });
+
+        this.breakpointService.on('instance-set-request-content', (userId, breakpointId, instanceId, content) => {
+            this.breakpointNS.to(userId).emit('client-request', breakpointId, instanceId, content);
+        });
+        this.breakpointService.on('instance-set-server-response', (userId, breakpointId, instanceId, content) => {
+            this.breakpointNS.to(userId).emit('server-response', breakpointId, instanceId, content);
+        });
+        this.breakpointService.on('instance-sended-to-client', (userId, breakpointId, instanceId) => {
+            this.breakpointNS.to(userId).emit('instance-end', breakpointId, instanceId);
+        });
     }
 
-    // 通用函数，获取socket连接中的用户id
+    // 通用函数，获取web socket连接中的用户id
     _getUserId(socketIOConn) {
-        let cookies = cookieParser.parse(socketIOConn.request.headers.cookie);
-        return cookies['userId'] || '0';
+        let cookies = cookieParser.parse(socketIOConn.request.headers.cookie || "");
+        return cookies['userId'] || 'root';
     }
-}
+};

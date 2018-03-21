@@ -29,12 +29,16 @@ module.exports = class Action {
     async run({
                   req,
                   res,
+                  recordResponse,
                   urlObj,
                   clientIp,
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
-                  extraRequestHeaders, // 请求头
+                  additionalRequestHeaders, // 请求头
+                  actualRequestHeaders,
+                  additionalRequestCookies, // cookie
+                  actualRequestCookies,
                   toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
                   last = true
               }) {

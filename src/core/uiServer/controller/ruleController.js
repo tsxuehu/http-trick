@@ -1,16 +1,17 @@
 /**
  * Created by tsxuehu on 4/11/17.
  */
-const ServiceRegistry = require( "../../service");
+const ServiceRegistry = require("../../service");
 
 let instance;
-module.exports =  class RuleController {
+module.exports = class RuleController {
     static getInstance() {
         if (!instance) {
             instance = new RuleController();
         }
         return instance;
     }
+
     constructor() {
         this.ruleService = ServiceRegistry.getRuleService();
         this.configService = ServiceRegistry.getProfileService();
@@ -22,11 +23,11 @@ module.exports =  class RuleController {
         //    name:name,
         //    description:description
         //}
-        router.post('/rule/create', (ctx, next) => {
+        router.post('/rule/create', async (ctx, next) => {
             let userId = ctx.userId;
-            let result = this.ruleService.createRuleFile(userId, ctx.request.body.name
+            let result = await this.ruleService.createRuleFile(userId, ctx.request.body.name
                 , ctx.request.body.description);
-            this.body = {
+            ctx.body = {
                 code: result ? 0 : 1,
                 msg: result ? '' : '文件已存在'
             };
@@ -36,19 +37,19 @@ module.exports =  class RuleController {
         router.get('/rule/filelist', async (ctx, next) => {
             let userId = ctx.userId;
             let ruleFileList = await this.ruleService.getRuleFileList(userId);
-            this.body = {
+            ctx.body = {
                 code: 0,
                 list: ruleFileList
-            }
+            };
         });
         // 删除规则文件
         // /rule/deletefile?name=${name}
         router.get('/rule/deletefile', (ctx, next) => {
             let userId = ctx.userId;
             this.ruleService.deleteRuleFile(userId, ctx.query.name);
-            this.body = {
+            ctx.body = {
                 code: 0
-            }
+            };
         });
         // 设置文件勾选状态
         // /rule/setfilecheckstatus?name=${name}&checked=${checked?1:0}
@@ -56,7 +57,7 @@ module.exports =  class RuleController {
             let userId = ctx.userId;
             this.ruleService.setRuleFileCheckStatus(userId, ctx.query.name,
                 ctx.query.checked == 1 ? true : false);
-            this.body = {
+            ctx.body = {
                 code: 0
             };
         });
@@ -65,17 +66,28 @@ module.exports =  class RuleController {
         router.get('/rule/getfile', async (ctx, next) => {
             let userId = ctx.userId;
             let content = await this.ruleService.getRuleFile(userId, ctx.query.name);
-            this.body = {
+            ctx.body = {
                 code: 0,
                 data: content
             };
         });
         // 保存规则文件
         // /rule/savefile?name=${name} ,content
-        router.post('/rule/savefile', (ctx, next) => {
+        router.post('/rule/savefile', async (ctx, next) => {
             let userId = ctx.userId;
-            this.ruleService.saveRuleFile(userId, ctx.query.name, ctx.request.body);
-            this.body = {
+            await this.ruleService.saveRuleFile(userId, ctx.query.name, ctx.request.body.content);
+            ctx.body = {
+                code: 0
+            };
+        });
+
+        // 导入gitlab仓库中的文件
+        router.post('/rule/importrepository', async (ctx, next) => {
+            let userId = ctx.userId;
+            let { gitlabUrl, token = '' } = ctx.request.body;
+            // 下载gitlab中的文件
+            await this.ruleService.saveRuleFile(userId, ctx.query.name, ctx.request.body.content);
+            ctx.body = {
                 code: 0
             };
         });
@@ -84,10 +96,10 @@ module.exports =  class RuleController {
         // /rule/download?name=${name}
         router.get('/rule/download', async (ctx, next) => {
             let userId = ctx.userId;
-            let name = this.query.name;
+            let name = ctx.query.name;
             let content = await this.ruleService.getRuleFile(userId, name);
-            ctx.response.header['Content-disposition'] = `attachment;filename=${name}.json`;
-            this.body = content;
+            ctx.set('Content-disposition', `attachment;filename=${name}.json`);
+            ctx.body = content;
         });
         // 测试规则
         // /rule/test
@@ -105,14 +117,14 @@ module.exports =  class RuleController {
             let matchRlt = '不匹配';
 
             if (match && (url.indexOf(match) >= 0 || (new RegExp(match)).test(url))) {
-                matchRlt = 'url匹配通过'
+                matchRlt = 'url匹配通过';
             }
 
             let targetTpl = ctx.request.body.targetTpl;
             let targetRlt = await this.configService.calcPathbyUser(userId, url, match, targetTpl);
 
             // 测试规则
-            this.body = {
+            ctx.body = {
                 code: 0,
                 data: {
                     matchRlt: matchRlt,
@@ -121,4 +133,4 @@ module.exports =  class RuleController {
             };
         });
     }
-}
+};

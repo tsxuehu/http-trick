@@ -24,10 +24,11 @@ module.exports = class Launcher {
      * @param serviceType 使用的服务类型
      * @param isSingle 是否是单用户模式
      */
-    constructor(port, serviceType = "file", userMode = "single") {
+    constructor(port = 8001, webUIPort = 40001, serviceType = "file", userMode = "single") {
         this.serviceType = serviceType;
         this.single = userMode != "multi";
         this.port = port;
+        this.webUIPort = webUIPort;
     }
 
     /**
@@ -36,10 +37,12 @@ module.exports = class Launcher {
      */
     async start() {
         await this._initService();
-        await this._startServer();
+        await this._startProxyServer();
+        await this._startWebUiServer();
+        await this._startServiceMockServer();
     }
 
-    // 初始化各种服务
+    // 初始化各种服务 并注册
     async _initService() {
         let appInfoService;
         let breakpointService;
@@ -75,8 +78,8 @@ module.exports = class Launcher {
             certificationService = new FileCertificationService(baseService);
 
             profileService = new FileProfileService(baseService);
-            filterService = new FileFilterService(baseService);
-            hostService = new FileHostService(baseService);
+            filterService = new FileFilterService({profileService, ...baseService});
+            hostService = new FileHostService({profileService, ...baseService});
             httpTrafficService = new FileHttpTrafficService(baseService);
             mockDataService = new FileMockDataService(baseService);
             ruleService = new FileRuleService({profileService, ...baseService});
@@ -115,8 +118,8 @@ module.exports = class Launcher {
         });
     }
 
-    // 初始化服务器
-    async _startServer() {
+    // 启动代理服务器(http 代理、https代理)
+    async _startProxyServer() {
         this.appInfoService = ServiceRegistry.getAppInfoService();
         this.configureService = ServiceRegistry.getConfigureService();
         this.profileService = ServiceRegistry.getProfileService();
@@ -137,8 +140,11 @@ module.exports = class Launcher {
 
         // 启动https转发服务器
         await new HttpsServer(httpsPort).start();
+    }
 
-        let webUiPort = await getPort(40001);
+    // 启动管理界面服务器
+    async _startWebUiServer() {
+        let webUiPort = await getPort(this.webUIPort);
 
         // 设置运行时的用户界面端口
         this.appInfoService.setRealUiPort(webUiPort);
@@ -147,5 +153,10 @@ module.exports = class Launcher {
         await new WebUiServer(webUiPort).start();
 
         this.appInfoService.printRuntimeInfo();
+    }
+
+    // 启动service mock服务器
+    async _startServiceMockServer(){
+
     }
 }

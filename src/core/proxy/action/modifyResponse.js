@@ -1,6 +1,5 @@
 const Action = require( "./action");
 const queryString = require( "query-string");
-const sendErrorToClient = require( "../sendToClient/error");
 const _ = require( "lodash");
 
 let modifyResponse;
@@ -35,7 +34,12 @@ module.exports = class ModifyResponse extends Action {
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容
-                  extraRequestHeaders, // 请求头
+                  additionalRequestHeaders, // 请求头
+                  actualRequestHeaders,
+                  additionalRequestQuery, // query
+                  actualRequestQuery,
+                  additionalRequestCookies, // cookie
+                  actualRequestCookies,
                   toClientResponse, //响应内容
                   last = true
               }) {
@@ -67,8 +71,9 @@ module.exports = class ModifyResponse extends Action {
 
         } else if (action.data.modifyResponseType == "return404") {
 
-            toClientResponse.sendedToClient = true;
-            sendErrorToClient(req, res, 404, 'user want');
+            toClientResponse.hasContent = true;
+            toClientResponse.statusCode = 404;
+            toClientResponse.body = 'user want';
 
         }
     }
@@ -81,7 +86,7 @@ var srcReg = /src=['"].*?['"]/gi;
 function addTimestampToJsCss(body) {
     //<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic">
     //<script async="async" crossorigin="anonymous"  src="https://assets-cdn.github.com/assets/60.js">
-    var timestamp = new Date().getTime();
+    var timestamp = Date.now();
     body = body.replace(/<script .*?>|<link .*?>/gi, element => {
         // 对script src属性进行处理
         var isLink = element.startsWith('<link');

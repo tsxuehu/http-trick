@@ -1,0 +1,126 @@
+Error: Can't set headers after they are sent.
+    at validateHeader (_http_outgoing.js:494:11)
+    at ServerResponse.setHeader (_http_outgoing.js:501:3)
+    at /Users/tsxuehu/workspace-mock/fe-proxy/src/core/proxy/sendToClient/specific.js:19:13
+    at /Users/tsxuehu/workspace-mock/fe-proxy/node_modules/lodash/lodash.js:4944:15
+    at baseForOwn (/Users/tsxuehu/workspace-mock/fe-proxy/node_modules/lodash/lodash.js:3001:24)
+    at /Users/tsxuehu/workspace-mock/fe-proxy/node_modules/lodash/lodash.js:4913:18
+    at Function.forEach (/Users/tsxuehu/workspace-mock/fe-proxy/node_modules/lodash/lodash.js:9359:14)
+    at module.exports (/Users/tsxuehu/workspace-mock/fe-proxy/src/core/proxy/sendToClient/specific.js:18:7)
+    at HttpHandle._runAtions (/Users/tsxuehu/workspace-mock/fe-proxy/src/core/proxy/handle/httpHandle.js:280:21)
+    at <anonymous>
+stream err { Error: unexpected end of file
+    at Unzip.zlibOnError (zlib.js:153:15) errno: -5, code: 'Z_BUF_ERROR' }
+{ hasContent: true,
+  sendedToClient: false,
+  stopRunAction: true,
+  requestData:
+   { method: '',
+     protocol: '',
+     port: '',
+     path: '',
+     headers: {},
+     body: '' },
+  remoteIp: '60.190.116.34',
+  receiveRequestTime: 1516116758898,
+  dnsResolveBeginTime: 1516116758898,
+  remoteRequestBeginTime: 1516116759399,
+  remoteResponseStartTime: 1516116759428,
+  remoteResponseEndTime: 0,
+  requestEndTime: 0,
+  statusCode: 600,
+  headers:
+   { server: 'JSP3/2.0.14',
+     date: 'Tue, 16 Jan 2018 15:32:39 GMT',
+     'content-type': 'application/x-javascript',
+     'content-length': 106,
+     connection: 'close',
+     etag: '"5a56f6c6-7ed4"',
+     'last-modified': 'Thu, 11 Jan 2018 05:31:50 GMT',
+     expires: 'Tue, 16 Jan 2018 15:47:33 GMT',
+     age: '2706',
+     'cache-control': 'max-age=3600',
+     'accept-ranges': 'bytes',
+     'content-encoding': 'gzip',
+     'ohc-response-time': '1 0 0 0 0 0',
+     'fe-proxy-userId': 'root',
+     'fe-proxy-action-0': '--bypass-run',
+     'fe-proxy-content': 'http://cpro.baidustatic.com:80/cpro/ui/c.js',
+     'remote-ip': '60.190.116.34' },
+  body: '{ Error: unexpected end of file\n    at Unzip.zlibOnError (zlib.js:153:15) errno: -5, code: \'Z_BUF_ERROR\' }' }
+Url {
+  protocol: 'http:',
+  slashes: true,
+  auth: null,
+  host: 'cpro.baidustatic.com',
+  port: 80,
+  hostname: 'cpro.baidustatic.com',
+  hash: null,
+  search: null,
+  query: null,
+  pathname: '/cpro/ui/c.js',
+  path: '/cpro/ui/c.js',
+  href: 'http://cpro.baidustatic.com/cpro/ui/c.js' }
+stream err { Error: unexpected end of file
+    at Unzip.zlibOnError (zlib.js:153:15) errno: -5, code: 'Z_BUF_ERROR' }
+{ hasContent: true,
+  sendedToClient: false,
+  stopRunAction: true,
+  requestData:
+   { method: '',
+     protocol: '',
+     port: '',
+     path: '',
+     headers: {},
+     body: '' },
+  remoteIp: '60.190.116.49',
+  receiveRequestTime: 1516116762266,
+  dnsResolveBeginTime: 1516116762267,
+  remoteRequestBeginTime: 1516116762849,
+  remoteResponseStartTime: 1516116762906,
+  remoteResponseEndTime: 0,
+Error: Can't set headers after they are sent.
+  requestEndTime: 0,
+    at validateHeader (_http_outgoing.js:494:11)
+  statusCode: 600,
+    at ServerResponse.setHeader (_http_outgoing.js:501:3)
+  headers:
+   { server: 'bfe/1.0.8.13-sslpool-patch',
+    at /Users/tsxuehu/workspace-mock/fe-proxy/src/core/proxy/sendToClient/specific.js:19:13
+     date: 'Tue, 16 Jan 2018 15:32:42 GMT',
+    at /Users/tsxuehu/workspace-mock/fe-proxy/node_modules/lodash/lodash.js:4944:15
+     'content-type': 'application/x-javascript',
+     'content-length': 106,
+    at baseForOwn (/Users/tsxuehu/workspace-mock/fe-proxy/node_modules/lodash/lodash.js:3001:24)
+     connection: 'keep-alive',
+     etag: '"5a56f6ca-299"',
+     'last-modified': 'Thu, 11 Jan 2018 05:31:54 GMT',
+    at /Users/tsxuehu/workspace-mock/fe-proxy/node_modules/lodash/lodash.js:4913:18
+    at Function.forEach (/Users/tsxuehu/workspace-mock/fe-proxy/node_modules/lodash/lodash.js:9359:14)
+    at module.exports (/Users/tsxuehu/workspace-mock/fe-proxy/src/core/proxy/sendToClient/specific.js:18:7)
+    at HttpHandle._runAtions (/Users/tsxuehu/workspace-mock/fe-proxy/src/core/proxy/handle/httpHandle.js:280:21)
+    at <anonymous>
+     expires: 'Tue, 16 Jan 2018 16:28:38 GMT',
+     age: '244',
+     'cache-control': 'max-age=3600',
+     'accept-ranges': 'bytes',
+     'content-encoding': 'gzip',
+     'ohc-response-time': '1 0 0 0 0 0',
+     'fe-proxy-userId': 'root',
+     'fe-proxy-action-0': '--bypass-run',
+     'fe-proxy-content': 'https://dup.baidustatic.com:443/tpl/fb.js',
+     'remote-ip': '60.190.116.49' },
+  body: '{ Error: unexpected end of file\n    at Unzip.zlibOnError (zlib.js:153:15) errno: -5, code: \'Z_BUF_ERROR\' }' }
+Url {
+  protocol: 'https:',
+  slashes: true,
+  auth: null,
+  host: 'dup.baidustatic.com',
+  port: 443,
+  hostname: 'dup.baidustatic.com',
+  hash: null,
+  search: null,
+  query: null,
+  pathname: '/tpl/fb.js',
+  path: '/tpl/fb.js',
+  href: 'https://dup.baidustatic.com/tpl/fb.js' }

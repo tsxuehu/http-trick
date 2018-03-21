@@ -22,15 +22,27 @@ module.exports = class HttpsServer {
     async start() {
         let certification =
             await this.certificationService.getCertificationForHost('internal_https_server');
-
+        // https://support.comodo.com/index.php?/Knowledgebase/Article/View/1120/38/what-is-sni-and-how-it-works
         this.httpsProxyServer = https.createServer({
             SNICallback: this.SNIPrepareCert.bind(this),
             key: certification.key,
             cert: certification.cert
         });
+        // 事件监听函数的this指针会被改变
+        let that = this;
 
-        this.httpsProxyServer.on('request', this.httpHandle.handle.bind(this.httpHandle));
-        this.httpsProxyServer.on('upgrade', this.wsHandle.handle.bind(this.wsHandle));
+        this.httpsProxyServer.on('request', (req, res) => {
+            that.httpHandle.handle(req, res).catch(e => {
+                console.error(e);
+            });
+
+        });
+        this.httpsProxyServer.on('upgrade', (req, socket, head) => {
+            that.wsHandle.handle(req, socket, head).catch(e => {
+                console.error(e);
+            });
+
+        });
         this.httpsProxyServer.on('error', function (err) {
             console.log(err);
             process.exit(0);
@@ -40,7 +52,7 @@ module.exports = class HttpsServer {
 
     SNIPrepareCert(serverName, SNICallback) {
         this.certificationService.getCertificationForHost(serverName)
-            .then(function ({cert, key}) {
+            .then(function ({ cert, key }) {
                 let ctx = createSecureContext({
                     key: key,
                     cert: cert
@@ -48,4 +60,4 @@ module.exports = class HttpsServer {
                 SNICallback(null, ctx);
             });
     }
-}
+};

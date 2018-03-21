@@ -3,7 +3,7 @@
  */
 const Action = require("./action");
 const ServiceRegistry = require("../../service");
-const sendSpecificToClient = require("../sendToClient/specific");
+const sendSpecificToClient = require("../../utils/sendSpecificToClient");
 const addHeaderToResponse = require("../../utils/addHeaderToResponse");
 
 let mockData;
@@ -44,26 +44,26 @@ module.exports = class MockData extends Action {
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容
-                  extraRequestHeaders, // 请求头
+                  additionalRequestHeaders, // 请求头
+                  actualRequestHeaders,
+                  additionalRequestQuery, // query
+                  actualRequestQuery,
+                  additionalRequestCookies, // cookie
+                  actualRequestCookies,
                   toClientResponse, //响应内容
                   last = true
               }) {
         // 获取数据文件id
         let dataId = action.data.dataId;
-        let content = await this.mockDataService.getDataContent(userId, dataId);
+        let content = await this.mockDataService.getDataFileContent(userId, dataId);
         let contentType = await this.mockDataService.getDataFileContentType(userId, dataId);
-        toClientResponse.headers['fe-proxy-content'] = `mock data ${dataId}`;
+        toClientResponse.headers['proxy-content'] = `mock data ${dataId}`;
         toClientResponse.headers['Content-Type'] = contentType;
         if (last) {
-            toClientResponse.sendedToClient = true;
-            addHeaderToResponse(res, toClientResponse.headers);
-            sendSpecificToClient({
-                res,
-                statusCode: 200,
-                headers: toClientResponse.headers,
-                content
-            });
+            toClientResponse.hasContent = true;
+            toClientResponse.body = content;
         } else {
+            toClientResponse.hasContent = true;
             toClientResponse.body = content;
         }
 

@@ -2,11 +2,15 @@ const EventEmitter = require("events");
 const _ = require("lodash");
 const path = require("path");
 const fileUtil = require("../../core/utils/file");
+const DnsResolver = require("../../core/utils/dns");
+
+const ipReg = /((?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d))/;
+
 /**
  * Created by tsxuehu on 8/3/17.
  */
 module.exports = class HostService extends EventEmitter {
-    constructor({appInfoService}) {
+    constructor({ profileService, appInfoService }) {
         super();
         // userId -> { filename -> content}
         this.userHostFilesMap = {};
@@ -14,7 +18,11 @@ module.exports = class HostService extends EventEmitter {
         // userId, {globHostMap, hostMap}
         this._inUsingHostsMapCache = {};
         let proxyDataDir = appInfoService.getProxyDataDir();
-        this.hostSaveDir = path.join(proxyDataDir, "rule");
+        this.hostSaveDir = path.join(proxyDataDir, "host");
+
+        this.profileService = profileService;
+        // dns解析服务
+        this.dns = new DnsResolver({});
     }
 
     async start() {
@@ -25,38 +33,62 @@ module.exports = class HostService extends EventEmitter {
             let userId = fileName.substr(0, this._getUserIdLength(fileName, hostName));
             this.userHostFilesMap[userId] = this.userHostFilesMap[userId] || {};
             this.userHostFilesMap[userId][hostName] = content;
-        })
+        });
     }
 
     async resolveHost(userId, hostname) {
         if (!hostname) return hostname;
-        let inUsingHosts = this.getInUsingHosts(userId);
 
-        let ip = inUsingHosts.hostMap[hostname];
-        if (ip) return ip;
-        // 配置 *开头的host  计算属性globHostMap已经将*去除
-        ip = _.find(inUsingHosts.globHostMap, (value, host) => {
-            return hostname.endsWith(host);
-        });
-        return ip || hostname;
+        if (ipReg.test(hostname)) {
+            return hostname;
+        }
+        let ip;
+        if (this.profileService.enableHost(userId)) {
+            // 解析host
+            let inUsingHosts = this.getInUsingHosts(userId);
+
+            ip = inUsingHosts.hostMap[hostname];
+            if (ip) return ip;
+            // 配置 *开头的host  计算属性globHostMap已经将*去除
+            ip = _.find(inUsingHosts.globHostMap, (value, host) => {
+                return hostname.endsWith(host);
+            });
+            if (ip) return ip;
+        }
+
+        // 调用dns解析
+        ip = await this.dns.resovleIp(hostname);
+
+        return ip;
     }
 
+    /**
+     * 获取用户生效的host
+     * @param userId
+     * @returns {*}
+     */
     getInUsingHosts(userId) {
         let hosts = this._inUsingHostsMapCache[userId];
         if (!hosts) {
             // 读文件加载host
             let hostMap = {};
             let globHostMap = {};
+
             let findedUsingHost = _.find(this.userHostFilesMap[userId], (content) => {
                 return content.checked;
             });
             if (findedUsingHost) {
-                _.forEach(findedUsingHost.content, (ip, host) => {
-                    if (host.startsWith('*')) {
-                        globHostMap[host.substr(1, host.length)] = ip;
-                    } else {
-                        hostMap[host] = ip;
-                    }
+                // 解析host
+                let parsed = this._parseHost(findedUsingHost.content);
+
+                _.forEach(parsed, ( hosts, ip ) => {
+                    hosts.forEach(host=>{
+                        if (host.startsWith('*')) {
+                            globHostMap[host.substr(1, host.length)] = ip;
+                        } else {
+                            hostMap[host] = ip;
+                        }
+                    })
                 });
             }
             hosts = {
@@ -67,7 +99,11 @@ module.exports = class HostService extends EventEmitter {
         return hosts;
     }
 
-
+    /**
+     * 获取用户的host文件列表
+     * @param userId
+     * @returns {Array}
+     */
     getHostFileList(userId) {
         let fileList = [];
         _.forEach(this.userHostFilesMap[userId], (content, key) => {
@@ -76,13 +112,20 @@ module.exports = class HostService extends EventEmitter {
                 checked: content.checked,
                 description: content.description,
                 meta: content.meta
-            })
+            });
         });
         return fileList;
     }
 
-    createHostFile(userId, name, description) {
-        if (this.userHostFilesMap[userId][name]) {
+    /**
+     * 创建host文件
+     * @param userId
+     * @param name
+     * @param description
+     * @returns {boolean}
+     */
+    async createHostFile(userId, name, description) {
+        if (this.userHostFilesMap[userId] && this.userHostFilesMap[userId][name]) {
             // 文件已经存在不让创建
             return false;
         }
@@ -96,7 +139,11 @@ module.exports = class HostService extends EventEmitter {
             "description": description,
             "content": {}
         };
+        this.userHostFilesMap[userId] = this.userHostFilesMap[userId] || {};
         this.userHostFilesMap[userId][name] = content;
+
+        let hostfileName = this._getHostFilePath(userId, name);
+        await fileUtil.writeJsonToFile(hostfileName, content);
 
         this.emit("data-change", userId, this.getHostFileList(userId));
         this.emit("host-saved", userId, name, content);
@@ -114,16 +161,24 @@ module.exports = class HostService extends EventEmitter {
         this.emit("host-deleted", userId, name);
     }
 
-    setUseHost(userId, filename) {
+    async setUseHost(userId, filename) {
+        let toSaveFileName = [];
         _.forEach(this.userHostFilesMap[userId], (content, name) => {
-            if (content.name == filename) {
+            if (content.name == filename && content.checked != true) {
                 content.checked = true;
-            } else {
+                toSaveFileName.push(name);
+            } else if (content.name != filename && content.checked != false) {
                 content.checked = false;
+                toSaveFileName.push(name);
             }
 
         });
         // 保存文件
+        for (let name of toSaveFileName) {
+            let hostfileName = this._getHostFilePath(userId, name);
+            let content = this.userHostFilesMap[userId][name];
+            await fileUtil.writeJsonToFile(hostfileName, content);
+        }
         delete this._inUsingHostsMapCache[userId];
         this.emit("data-change", userId, this.getHostFileList(userId));
     }
@@ -132,18 +187,41 @@ module.exports = class HostService extends EventEmitter {
         return this.userHostFilesMap[userId][name];
     }
 
-    saveHostFile(userId, name, content) {
+    async saveHostFile(userId, name, content) {
         this.userHostFilesMap[userId][name] = content;
+
+        // 如果正在使用，则删除
+        if (content.checked) {
+            delete this._inUsingHostsMapCache[userId];
+        }
+
+        let hostfileName = this._getHostFilePath(userId, name);
+        await fileUtil.writeJsonToFile(hostfileName, content);
         this.emit("host-saved", userId, name, content);
     }
 
-    _getHostFilePath(userId, ruleName) {
-        let fileName = `${userId}_${ruleName}.json`;
-        let filePath = path.join(this.ruleSaveDir, fileName);
+
+
+    _getHostFilePath(userId, hostName) {
+        let fileName = `${userId}_${hostName}.json`;
+        let filePath = path.join(this.hostSaveDir, fileName);
         return filePath;
     }
 
-    _getUserIdLength(ruleFileName, ruleName) {
-        return ruleFileName.length - ruleName.length - 6;
+    _getUserIdLength(ruleFileName, hostName) {
+        return ruleFileName.length - hostName.length - 6;
+    }
+
+    _parseHost(content) {
+        let result = {};
+        let lines = content.replace(/#.*/g, '').split(/[\r\n]/);
+        for (let i = 0, len = lines.length; i < len; i++) {
+            let line = lines[i];
+            let md = /(\d+\.\d+\.\d+\.\d+)\s+(.+)/.exec(line);
+            if (md) {
+                result[md[1]] = _.union(result[md[1]] || [], md[2].trim().split(/\s+/));
+            }
+        }
+        return result;
     }
 };

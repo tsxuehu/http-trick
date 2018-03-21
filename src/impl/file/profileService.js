@@ -4,8 +4,14 @@ const fileUtil = require("../../core/utils/file");
 const path = require('path');
 
 const defaultProfile = {
+    // 工程路径配置
     "projectPath": {},
-    "enableRule": true
+    // 是否启用转发规则
+    "enableRule": true,
+    // 是否启用host解析
+    "enableHost": true,
+    // 是否启用filter
+    "enableFilter": true
 };
 /**
  * 代理运转需要的规则数据
@@ -13,38 +19,43 @@ const defaultProfile = {
  * Created by tsxuehu on 8/3/17.
  */
 module.exports = class ProfileService extends EventEmitter {
-    constructor({ appInfoService}) {
+    constructor({ appInfoService }) {
         super();
         // userId -> profile
         this.userProfileMap = {};
         // clientIp -> userId
         this.clientIpUserMap = {};
-
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
-        this.profileSaveFile = path.join(proxyDataDir, "profile.json");
+        this.profileSaveDir = path.join(proxyDataDir, "profile");
         this.clientIpUserMapSaveFile = path.join(proxyDataDir, "clientIpUserMap.json");
     }
 
     async start() {
-        let savedUserProfileMap = await fileUtil.readJsonFromFile(this.profileSaveFile);
-        this.clientIpUserMap = await fileUtil.readJsonFromFile(this.clientIpUserMapSaveFile);
-        // 数据补全
-        _.forEach(savedUserProfileMap, (profile, userId) => {
-            this.userProfileMap[userId] = _.assign({}, defaultProfile, profile);
+        let profileMap = await fileUtil.getJsonFileContentInDir(this.profileSaveDir);
+        _.forEach(profileMap, (profile, fileName) => {
+            let userId = fileName.slice(0, -5);
+            // 补全profile数据
+            // this.userProfileMap[userId] = _.assign({}, defaultProfile, profile);;
+            this.userProfileMap[userId] = profile;
+
         });
+        // 加载ip-> userID映射
+        this.clientIpUserMap = await fileUtil.readJsonFromFile(this.clientIpUserMapSaveFile);
     }
 
     getProfile(userId) {
         return this.userProfileMap[userId] || defaultProfile;
     }
 
-    async setProfile(userId, conf) {
-        this.userProfileMap[userId] = conf;
-        // 发送通知
-        this.emit('data-change-profile', userId, conf);
+    async setProfile(userId, profile) {
+        this.userProfileMap[userId] = profile;
+
+        let filePath = path.join(this.profileSaveDir, `${userId}.json`);
         // 将数据写入文件
-        await fileUtil.writeJsonToFile(this.profileSaveFile, this.userProfileMap);
+        await fileUtil.writeJsonToFile(filePath, profile);
+        // 发送通知
+        this.emit('data-change-profile', userId, profile);
     }
 
     /**
@@ -57,20 +68,17 @@ module.exports = class ProfileService extends EventEmitter {
      */
     calcPath(userId, href, match, target) {
         if (match) {
-            try {
-                let matchList = href.match(new RegExp(match));
-                _.forEach(matchList, function (value, index) {
-                    if (index == 0) return;
-                    var reg = new RegExp('\\$' + index, 'g');
-                    if (value === undefined) value = '';
-                    target = target.replace(reg, value);
-                });
-                let compiled = _.template(target);
-                let projectPath = this.getProfile(userId).projectPath;
-                // 解析应用的变量
-                return compiled(projectPath);
-            } catch (e) {
-            }
+            let matchList = href.match(new RegExp(match));
+            _.forEach(matchList, function (value, index) {
+                if (index == 0) return;
+                var reg = new RegExp('\\$' + index, 'g');
+                if (value === undefined) value = '';
+                target = target.replace(reg, value);
+            });
+            let compiled = _.template(target);
+            let projectPath = this.getProfile(userId).projectPath;
+            // 解析应用的变量
+            return compiled(projectPath);
         }
     }
 
@@ -80,10 +88,23 @@ module.exports = class ProfileService extends EventEmitter {
      * @param enable
      */
     async setEnableRule(userId, enable) {
-        let conf = this.userProfileMap[userId];
+        let conf = this.getProfile(userId);
         conf.enableRule = enable;
-        await this.setProfile(userId, this.userProfileMap[userId]);
+        await this.setProfile(userId, conf);
     }
+
+    async setEnableHost(userId, enable) {
+        let conf = this.getProfile(userId);
+        conf.enableHost = enable;
+        await this.setProfile(userId, conf);
+    }
+
+    async setEnableFilter(userId, enable) {
+        let conf = this.getProfile(userId);
+        conf.enableFilter = enable;
+        await this.setProfile(userId, conf);
+    }
+
 
     /**
      * 获取转发规则启用开关
@@ -91,6 +112,14 @@ module.exports = class ProfileService extends EventEmitter {
      */
     enableRule(userId) {
         return this.getProfile(userId).enableRule;
+    }
+
+    enableHost(userId) {
+        return this.getProfile(userId).enableHost;
+    }
+
+    enableFilter(userId) {
+        return this.getProfile(userId).enableFilter;
     }
 
     // 获取clientIp对应的user id

@@ -15,11 +15,11 @@ module.exports = class AppInfoService extends EventEmitter {
             "single": single,
             "realUiPort": "",
             "httpProxyPort": "",
-            "httpsProxyPort":"",
-            "pcIp": "",
+            "httpsProxyPort": "",
+            "pcIp": ""
         };
 
-        this.appDir = path.join(__dirname, "../../../")
+        this.appDir = path.join(__dirname, "../../../");
     }
 
     start() {
@@ -27,7 +27,7 @@ module.exports = class AppInfoService extends EventEmitter {
 
         this.setAppInfo({
             pcIp: ip.address()
-        })
+        });
     }
 
     getAppDir() {
@@ -40,7 +40,7 @@ module.exports = class AppInfoService extends EventEmitter {
      */
     setAppInfo(info) {
         _.assign(this.appInfo, info);
-        this.emit('data-change', this.appInfo)
+        this.emit('data-change', this.appInfo);
     }
 
     /**
@@ -131,8 +131,18 @@ module.exports = class AppInfoService extends EventEmitter {
         return this.appInfo.pcIp;
     }
 
+    getAppInfo() {
+        return this.appInfo;
+    }
+
+    // 是否是webui请求
+    isWebUiRequest(hostname, port) {
+        return (hostname == '127.0.0.1' || hostname == this.appInfo.pcIp)
+            && port == this.appInfo.realUiPort;
+    }
+
     printRuntimeInfo() {
         console.log(`Proxy Port: ${ this.appInfo.httpProxyPort}`);
         console.log(`Manager: http://${this.appInfo.pcIp}:${this.appInfo.realUiPort}`);
     }
-}
+};

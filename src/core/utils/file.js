@@ -98,7 +98,7 @@ function getJsonFileNameListInDir(dir) {
     return new Promise((resolve, reject) => {
         fs.readdir(dir, function (err, files) {
             if (err) reject(err);
-            let jsonFileNames = files.map(nameWithExtention => {
+            let jsonFileNames = files.filter(nameWithExtention => {
                 if (!nameWithExtention.endsWith('.json')) {
                     return false;
                 } else {

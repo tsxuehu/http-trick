@@ -1,11 +1,13 @@
-const Action = require( "./action");
-const _ = require( "lodash");
-const ServiceRegistry = require( "../../service");
-const sendErrorToClient = require( "../sendToClient/error");
-const Local = require( "../../utils/local");
-const url = require( "url");
-const Remote = require( "../../utils/remote");
-const addHeaderToResponse = require( "../../utils/addHeaderToResponse");
+const Action = require("./action");
+const _ = require("lodash");
+const ServiceRegistry = require("../../service");
+const Local = require("../../utils/local");
+const toClientResponseUtils = require("../../utils/toClientResponseUtils");
+const url = require("url");
+const Remote = require("../../utils/remote");
+const addHeaderToResponse = require("../../utils/addHeaderToResponse");
+const cookie2Str = require("../../utils/cookie2Str");
+const queryString = require("query-string");
 
 /**
  * 重定向 本地 或者 远程
@@ -35,7 +37,6 @@ module.exports = class Redirect extends Action {
         return false;
     }
 
-
     willGetContent() {
         return true;
     }
@@ -46,23 +47,33 @@ module.exports = class Redirect extends Action {
     async run({
                   req,
                   res,
+                  recordResponse,
                   urlObj,
                   clientIp,
                   userId,
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容
-                  extraRequestHeaders, // 请求头
+                  additionalRequestHeaders, // 请求头
+                  actualRequestHeaders,
+                  additionalRequestQuery, // query
+                  actualRequestQuery,
+                  additionalRequestCookies, // cookie
+                  actualRequestCookies,
                   toClientResponse, //响应内容
                   last = true
               }) {
         //================== 转发到本地 或远程
-        let {href} = urlObj;
+        let { href } = urlObj;
+        let target = '';
         // 解析目标
-        let target = await this.profileService.calcPath(userId, href, rule.match, action.data.target);
-        if (!target) {
-            toClientResponse.sendedToClient = true;
-            sendErrorToClient(req, res, 500, 'target parse error' + action.data.target);
+        try {
+            target = this.profileService.calcPath(userId, href, rule.match, action.data.target);
+            if (!target) {
+                throw new Error("target parse empty ");
+            }
+        } catch (e) {
+            toClientResponseUtils.setError(toClientResponse, action.data.target, e);
             return;
         }
         // 远程
@@ -70,9 +81,15 @@ module.exports = class Redirect extends Action {
             await this._toRemote({
                 req,
                 res,
+                recordResponse,
                 clientIp,
                 target,
-                extraRequestHeaders,
+                additionalRequestHeaders, // 请求头
+                actualRequestHeaders,
+                additionalRequestQuery, // query
+                actualRequestQuery,
+                additionalRequestCookies, // cookie
+                actualRequestCookies,
                 toClientResponse,
                 last
             });
@@ -85,47 +102,80 @@ module.exports = class Redirect extends Action {
                 rule,
                 action,
                 requestContent,
-                extraRequestHeaders,
+                additionalRequestHeaders,
                 toClientResponse,
                 last
             });
         }
-
-
     }
-
 
     async _toRemote({
                         req,
                         res,
+                        recordResponse,
                         clientIp,
                         userId,
                         target,
-                        extraRequestHeaders, // 请求头
+                        additionalRequestHeaders, // 请求头
+                        actualRequestHeaders,
+                        additionalRequestQuery, // query
+                        actualRequestQuery,
+                        additionalRequestCookies, // cookie
+                        actualRequestCookies,
                         toClientResponse, //响应内容
                         last
                     }) {
         let redirectUrlObj = url.parse(target);
-        let {protocol, hostname, path, port} = redirectUrlObj;
+        let { protocol, hostname, path, port,query } = redirectUrlObj;
 
-        let ipOrHost = await this.hostRepository.resolveHost(userId, hostname);
+        // 构造path
+        try {
+            let originQuery = queryString.parse(query);
+            Object.assign(actualRequestQuery, originQuery);
+            if (Object.keys(additionalRequestQuery).length > 0) {
+                Object.assign(actualRequestQuery, additionalRequestQuery);
+                path = `${pathname}?${queryString.stringify(actualRequestQuery)}`;
+            }
+        }catch (e) {}
+
+        // dns解析
+        toClientResponse.dnsResolveBeginTime = Date.now();
+        let ip = '';
+        try {
+            ip = await this.hostService.resolveHost(userId, hostname);
+        } catch (e) {
+            let href = `${protocol}//${hostname}:${port}${path}`;
+            toClientResponseUtils.setError(toClientResponse, href, e);
+            return;
+        }
+        toClientResponse.headers['remote-ip'] = ip;
+        toClientResponse.remoteIp = ip;
 
         port = port || ('https:' == protocol ? 443 : 80);
 
-        let targetUrl = protocol + '//' + ipOrHost + ':' + port + path;
-        toClientResponse.headers['fe-proxy-content'] = encodeURI(targetUrl);
-        let headers = _.assign({}, req.headers, extraRequestHeaders);
+        let targetUrl = protocol + '//' + ip + ':' + port + path;
+        toClientResponse.headers['proxy-content'] = encodeURI(targetUrl);
+
+        Object.assign(actualRequestHeaders, req.headers);
+        actualRequestHeaders['host'] = hostname;
+        Object.assign(actualRequestHeaders, additionalRequestHeaders);
+        Object.assign(actualRequestCookies, additionalRequestCookies);
+        actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
+
         if (last) {
-            toClientResponse.sendedToClient = true;
             addHeaderToResponse(res, toClientResponse.headers);
-            this.remote.pipe({
-                req, res,
-                protocol, hostname, path, port, headers
+            await this.remote.pipe({
+                req, res, recordResponse,
+                method: req.method,
+                protocol, hostname: ip, path, port,
+                headers: actualRequestHeaders, toClientResponse
             });
         } else {
-            this.remote.cache({
+            await this.remote.cache({
                 req, res,
-                targetUrl, headers, toClientResponse
+                method: req.method,
+                protocol, hostname: ip, path, port,
+                headers: actualRequestHeaders, toClientResponse
             });
         }
     }
@@ -133,28 +183,30 @@ module.exports = class Redirect extends Action {
     async _toLocal({
                        req,
                        res,
+                       recordResponse,
                        urlObj,
                        clientIp,
                        target,
                        rule, // 规则
                        action, // 规则里的一个动作
                        requestContent, // 请求内容
-                       extraRequestHeaders, // 请求头
+                       additionalRequestHeaders, // 请求头
                        toClientResponse, //响应内容
                        last
                    }) {
 
-        toClientResponse.headers['fe-proxy-content'] = encodeURI(target);
+        toClientResponse.headers['proxy-content'] = encodeURI(target);
         if (last) {
             toClientResponse.sendedToClient = true;
             addHeaderToResponse(res, toClientResponse.headers);
-            this.local.pipe({
+            await this.local.pipe({
                 req,
                 res,
-                path: target
+                path: target,
+                toClientResponse
             });
         } else {
-            await this.local.pipe({
+            await this.local.cache({
                 req,
                 res,
                 path: target,
@@ -162,4 +214,4 @@ module.exports = class Redirect extends Action {
             });
         }
     }
-}
+};

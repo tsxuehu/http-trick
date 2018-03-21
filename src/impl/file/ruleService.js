@@ -2,7 +2,35 @@ const _ = require("lodash");
 const fileUtil = require("../../core/utils/file");
 const path = require('path');
 const EventEmitter = require("events");
-let passRule = {
+const defaultRule =  {
+    "name": "js",
+    "key": "9a489eaa-ca4a-481d-b3fb-75b41dd33cc0",
+    "method": "get",
+    "match": "/v2/wsc/build/js/(.+)_.+.js$",
+    "checked": true,
+    "actionList": [ // 执行的动作列表
+        {
+            "type": "redirect", // 动作类型
+            "data": {
+                target: "",// 转发目标路径
+                dataId: '', //返回数据文件的id
+                modifyResponseType: '',// 修改响应内容类型
+                callbackName: "", // jsonp请求参数名
+                cookieKey: "", // 设置到请求里的cookie key
+                cookieValue: "", // 设置到请求里的cookie value
+                reqHeaderKey: "", // 请求header
+                reqHeaderValue: "",
+                resHeaderKey: "", // 响应header
+                resHeaderValue: "",
+                queryKey: "", // 请求query
+                queryValue: "",
+                modifyRequestScript: "", // 脚本修改请求
+                modifyResponseScript: "" // 脚本修改响应
+            }
+        }
+    ]
+};
+const passRule = {
     "method": "",
     "match": "",
     "actionList": [{
@@ -36,9 +64,9 @@ module.exports = class RuleService extends EventEmitter {
     }
 
     // 创建规则文件
-    createRuleFile(userId, name, description) {
+    async createRuleFile(userId, name, description) {
         if (this.rules[userId] && this.rules[userId][name]) {
-            throw new Error('rule file already exist');
+            return false;
         }
         let ruleFile = {
             "meta": {
@@ -47,18 +75,19 @@ module.exports = class RuleService extends EventEmitter {
                 "ETag": "",
                 "remoteETag": ""
             },
-            "checked": true,
+            "checked": false,
             "name": name,
             "description": description,
             "content": []
         };
         this.rules[userId] = this.rules[userId] || {};
         this.rules[userId][name] = ruleFile;
-        // 发送消息通知
-        this.emit('data-change', userId, this.getRuleFileList(userId));
         // 写文件
         let filePath = this._getRuleFilePath(userId, name);
-        fileUtil.writeJsonToFile(filePath, ruleFile);
+        await fileUtil.writeJsonToFile(filePath, ruleFile);
+        // 发送消息通知
+        this.emit('data-change', userId, this.getRuleFileList(userId));
+        return true;
     }
 
     // 返回用户的规则文件列表
@@ -96,7 +125,8 @@ module.exports = class RuleService extends EventEmitter {
 
         let path = this._getRuleFilePath(userId, name);
         fileUtil.deleteFile(path);
-
+        // 发送消息通知
+        this.emit('data-change', userId, this.getRuleFileList(userId));
         if (rule.checked) {
             // 清空缓存
             delete this.usingRuleCache[userId];
@@ -104,10 +134,12 @@ module.exports = class RuleService extends EventEmitter {
     }
 
     // 设置规则文件的使用状态
-    setRuleFileCheckStatus(userId, name, checked) {
+   async setRuleFileCheckStatus(userId, name, checked) {
         this.rules[userId][name].checked = checked;
         let path = this._getRuleFilePath(userId, name);
-        fileUtil.writeJsonToFile(path, this.rules[userId][name]);
+        await fileUtil.writeJsonToFile(path, this.rules[userId][name]);
+        // 发送消息通知
+        this.emit('data-change', userId, this.getRuleFileList(userId));
         delete this.usingRuleCache[userId];
     }
 
@@ -119,11 +151,11 @@ module.exports = class RuleService extends EventEmitter {
     // 保存规则文件(可能是远程、或者本地)
     saveRuleFile(userId, name, content) {
         let userRuleMap = this.rules[userId] || {};
-        userRuleMap[name] = content;
+        userRuleMap[name].content = content;
         this.rules[userId] = userRuleMap;
         // 写文件
         let filePath = this._getRuleFilePath(userId, name);
-        fileUtil.writeJsonToFile(filePath, content);
+        fileUtil.writeJsonToFile(filePath, userRuleMap[name]);
         // 清空缓存
         delete this.usingRuleCache[userId];
     }
@@ -163,7 +195,7 @@ module.exports = class RuleService extends EventEmitter {
         // 计算使用中的规则
         let rulesLocal = [];
         let rulesRemote = [];
-        _.forEach(ruleMap, function (file, name) {
+        _.forEach(ruleMap, function (file, filename) {
             if (!file.checked) return;
             _.forEach(file.content, function (rule) {
                 if (!rule.checked) return;

@@ -16,7 +16,7 @@ const EventEmitter = require("events");
  */
 module.exports = class HttpTrafficService extends EventEmitter {
 
-    constructor({userService, appInfoService}) {
+    constructor({ userService, appInfoService }) {
         super();
         this.userService = userService;
         this.appInfoService = appInfoService;
@@ -30,37 +30,84 @@ module.exports = class HttpTrafficService extends EventEmitter {
         let proxyDataDir = this.appInfoService.getProxyDataDir();
         // 监控数据缓存目录
         this.trafficDir = path.join(proxyDataDir, "traffic");
+        this.filterMap = {};
+        this.stopRecord = {};
+
         // 创建定时任务，推送日志记录
         setInterval(_ => {
             this.sendCachedData();
-        }, 2500);
+        }, 2000);
     }
 
     start() {
         // 删除缓存
+       /* rimraf.sync(this.trafficDir);
+        fs.mkdirSync(this.trafficDir);*/
+    }
 
+    getFilter(userId) {
+        let filters = this.filterMap[userId] || { host: '', path: '' };
+        return  filters;
+    }
+
+    setFilter(userId, filter) {
+        this.filterMap[userId] = filter;
+        this.emit("filter", userId, filter);
+    }
+
+    getStatus(userId) {
+        return {
+            stopRecord: this.stopRecord[userId] || false,
+            overflow: this.userRequestPointer[userId] > logCountPerUser
+        };
+    }
+
+    setStopRecord(userId, stop) {
+        this.stopRecord[userId] = stop;
+        // 发送通知
+        this.emit("state-change", userId, this.getStatus(userId));
+    }
+
+    clear(userId) {
+        this.userRequestPointer[userId] = 0;
+        // 发送通知
+        this.emit("clear", userId);
     }
 
     // 将缓存数据发送给用户
     sendCachedData() {
-        _.forEach(this.cache, async (rows, userId) => {
+        _.forEach(this.cache, (rows, userId) => {
             this.emit("traffic", userId, rows);
         });
         this.cache = {};
     }
 
-
     // 为请求分配id
-    async getRequestId(userId) {
+    getRequestId(userId, urlObj) {
+        // 处于停止记录状态 则不返回id
+        if (this.stopRecord[userId]) return -1;
 
         // 获取当前ip
         let id = this.userRequestPointer[userId] || 0;
-        // 超过500个请求则不再记录
-        if (id > logCountPerUser) return -1;
 
-        id++;
-        this.userRequestPointer[userId] = id;
-        return id;
+        // 超过500个请求则不再记录
+        if (id > logCountPerUser) {
+            return -1;
+        }
+
+        let filter = this.getFilter(userId);
+        let { path, host } = urlObj;
+        if (path.indexOf(filter.path) > -1 && host.indexOf(filter.host) > -1) {
+            id++;
+            this.userRequestPointer[userId] = id;
+            if (id > logCountPerUser) {
+                let state = this.getStatus(userId);
+                // 向监控窗推送通知
+                this.emit("state-change", userId, state);
+            }
+            return id;
+        }
+        return -1;
     }
 
     resetRequestId(userId) {
@@ -68,7 +115,7 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 获取监控窗口的数量，没有监控窗口 则不做记录
-    async hasMonitor(userId) {
+    hasMonitor(userId) {
         let cnt = this.userMonitorCount[userId] || 0;
         return cnt > 0;
     }
@@ -76,6 +123,9 @@ module.exports = class HttpTrafficService extends EventEmitter {
     // 用户监控窗数加1
     incMonitor(userId) {
         let cnt = this.userMonitorCount[userId] || 0;
+        if (cnt == 0) {
+            this.resetRequestId(userId);
+        }
         cnt++;
         this.userMonitorCount[userId] = cnt;
     }
@@ -88,64 +138,82 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 记录请求
-    async requestBegin({userId, clientIp, id, req, res, urlObj}) {
-        let {protocol, host, pathname, port} = urlObj;
-
+    async requestBegin({ id, userId, clientIp, method, httpVersion, urlObj, headers }) {
         let queue = this.cache[userId] || [];
+        // 原始请求信息
         queue.push({
             id: id,
-            start: true, // 请求开始的标记
-            result: '-', // 状态码
-            clientIp,
-            protocol: protocol.toUpperCase(),
-            host: host,
-            url: req.url,
-            port,
-            path: path,
-            pathname: pathname,
-            method: req.method,
-            httpVersion: req.httpVersion,
-            reqHeaders: req.headers,
-            reqTime: +new Date()
+            originRequest: Object.assign({
+                clientIp,
+                method,
+                httpVersion,
+                headers
+            }, urlObj)
         });
 
         this.cache[userId] = queue;
     }
 
     // 记录请求body
-    async requestBody({userId,  id, req, res, body}) {
+    async actualRequest({ userId, id, requestData, originBody }) {
         // 将body写文件
 
-        let bodyPath = this.getRequestBodyPath(userId, id);
-        await fileUtil.writeFile(bodyPath, body);
+        let body = requestData.body;
+        delete requestData.body;
+
+        let queue = this.cache[userId] || [];
+        queue.push({
+            id: id,
+            requestData
+        });
+        this.cache[userId] = queue;
+
+        if (body) {
+            let bodyPath = this.getRequestBodyPath(userId, id);
+            await fileUtil.writeFile(bodyPath, body);
+        }
+        if (originBody) {
+            let bodyPath = this.getOriginRequestBodyPath(userId, id);
+            await fileUtil.writeFile(bodyPath, originBody);
+        }
     }
 
     // 记录响应
-    async requestReturn({userId, id, req, res, responseContent}) {
-
+    async serverReturn({ userId, id, toClientResponse }) {
         let queue = this.cache[userId] || [];
-
-        let expires = res.getHeader('expires');
+        let {
+            statusCode,
+            headers,
+            receiveRequestTime,
+            dnsResolveBeginTime,
+            remoteRequestBeginTime,
+            remoteResponseStartTime,
+            remoteResponseEndTime,
+            requestEndTime,
+            remoteIp,
+            body
+        } = toClientResponse;
         queue.push({
             id: id,
-            result: res.statusCode,
-            body: res.getHeader('content-length') || (body && body.length) || 0,
-            caching: (res.getHeader('cache-control') || '') + (expires ? '; expires:' + expires : ''),
-            contentType: res.getHeader('content-type') || '',
-            resHeaders: res._headers,
-            resTime: +new Date()
+            response: {
+                statusCode,
+                headers,
+                receiveRequestTime,
+                dnsResolveBeginTime,
+                remoteRequestBeginTime,
+                remoteResponseStartTime,
+                remoteResponseEndTime,
+                requestEndTime,
+                remoteIp
+            }
         });
 
         this.cache[userId] = queue;
 
-        let bodyPath = this.getResponseBodyPath(userId, id);
-        await fileUtil.writeFile(bodyPath, responseContent);
-    }
-
-    // 启动的时候先清空请求记录目录
-    clearTraffic() {
-        rimraf.sync(this.trafficDir);
-        fs.mkdirSync(this.trafficDir);
+        if (body) {
+            let bodyPath = this.getResponseBodyPath(userId, id);
+            await fileUtil.writeFile(bodyPath, body);
+        }
     }
 
     /**
@@ -173,8 +241,12 @@ module.exports = class HttpTrafficService extends EventEmitter {
         return path.join(this.trafficDir, userId + '_' + requestId + '_req_body');
     }
 
+    getOriginRequestBodyPath() {
+        return path.join(this.trafficDir, userId + '_' + requestId + '_req_body_origin');
+    }
+
     // 获取响应记录path
     getResponseBodyPath(userId, requestId) {
         return path.join(this.trafficDir, userId + '_' + requestId + '_res_body');
     }
-}
+};

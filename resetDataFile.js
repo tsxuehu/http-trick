@@ -12,15 +12,17 @@ async function resetData(force = false) {
 
     await createDir(proxyDataDir);
     await createDir(path.join(proxyDataDir, "certificate"));
+    await createDir(path.join(proxyDataDir, "host"));
     await createDir(path.join(proxyDataDir, "rule"));
+    await createDir(path.join(proxyDataDir, "breakpoint"));
     await createDir(path.join(proxyDataDir, "mock-data"));
+    await createDir(path.join(proxyDataDir, "mock-list"));
+    await createDir(path.join(proxyDataDir, "profile"));
+    await createDir(path.join(proxyDataDir, "filter"));
+    await createDir(path.join(proxyDataDir, "traffic"));
 
-    await resetFile(path.join(proxyDataDir, "breakpoints.json"), {}, force);
     await resetFile(path.join(proxyDataDir, "clientIpUserMap.json"), {}, force);
-    await resetFile(path.join(proxyDataDir, "clientUserMap.json"), {}, force);
     await resetFile(path.join(proxyDataDir, "configure.json"), {}, force);
-    await resetFile(path.join(proxyDataDir, "mockDataList.json"), {}, force);
-    await resetFile(path.join(proxyDataDir, "profile.json"), {}, force);
 }
 
 async function resetFile(path, data, force) {
