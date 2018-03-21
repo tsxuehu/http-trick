@@ -43,11 +43,4 @@ async function createDir(path) {
     }
 }
 
-process.on("uncaughtException", function (err) {
-    console.error(err);
-});
-process.on('unhandledRejection', (reason, p) => {
-    console.error("Unhandled Rejection at: Promise ", p, " reason: ", reason);
-});
-
-resetData();
+module.exports = resetData;
