@@ -98,7 +98,7 @@ module.exports = class RuleController {
             let userId = ctx.userId;
             let name = ctx.query.name;
             let content = await this.ruleService.getRuleFile(userId, name);
-            ctx.set('Content-disposition', `attachment;filename=${name}.json`);
+            ctx.set('Content-disposition', `attachment;filename=${encodeURIComponent(name)}.json`);
             ctx.body = content;
         });
         // 测试规则
