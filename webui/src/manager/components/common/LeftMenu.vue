@@ -119,6 +119,13 @@
                         link: 'datalist'
                     }
                 ]);
+                if (this.$dc.userId != 'root') {
+                    menu.push({
+                        name: '绑定设备',
+                        icon: 'icon-bargraph',
+                        link: 'equipment'
+                    })
+                }
                 return menu;
             },
 

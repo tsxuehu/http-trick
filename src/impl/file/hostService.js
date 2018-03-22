@@ -137,7 +137,7 @@ module.exports = class HostService extends EventEmitter {
             "checked": false,
             "name": name,
             "description": description,
-            "content": {}
+            "content": ''
         };
         this.userHostFilesMap[userId] = this.userHostFilesMap[userId] || {};
         this.userHostFilesMap[userId][name] = content;

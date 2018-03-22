@@ -74,13 +74,34 @@
             <a href="/help/index.html" target="_blank">
                 <el-button type="text">帮助中心</el-button>
             </a>
+            <a href="javascript:void(0)" v-if="!$dc.appInfo.single" @click="changeUser">
+                <el-tooltip class="item" effect="dark" content="点击切换用户" placement="top">
+                    <el-button type="text">{{$dc.userId}}</el-button>
+                </el-tooltip>
+            </a>
         </div>
     </div>
 </template>
 
 <script>
     import './header.pcss'
+    import profileApi from '../../../api/profile';
     export default {
-        name: 'ManagerHeader'
+        name: 'ManagerHeader',
+        methods: {
+            changeUser() {
+                this.$prompt('请输入用户名(不输入内容将会使用本机ip作为用户名)', '切换用户', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(async ({ value }) => {
+                    let result = await profileApi.setUserId(value || '');
+                    let userId = result.data.data.userId;
+                    this.$dc.userId = userId;
+                    // 刷新
+                    location.reload();
+                }).catch(() => {
+                });
+            }
+        }
     };
 </script>
