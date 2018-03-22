@@ -15,6 +15,8 @@ import Filter from 'src/manager/components/filter/Filter'
 
 import DataList from 'src/manager/components/data/DataList'
 
+import DeviceList from 'src/manager/components/device/DeviceList'
+
 import HelpInstall from 'src/manager/components/help/Install'
 
 
@@ -36,6 +38,8 @@ export default new Router({
     {path: '/filter',component: Filter},
 
     {path: '/datalist',component: DataList},
+
+    {path: '/device',component: DeviceList},
 
     {path: '/helpinstall',component: HelpInstall, alias: '/'}
   ]

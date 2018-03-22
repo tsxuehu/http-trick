@@ -1,0 +1,68 @@
+<template>
+    <div>
+        <div class="main-content__title">绑定的设备列表</div>
+        <div class="project-path-info">
+            列表中的设备通过http trick发起请求时，请求会被当前用户的过滤器、规则处理。<br/>
+            如果设备没有绑定任何用户则会使用root用户的过滤器、规则。<br/>
+            扫描右边的二维码可绑定设备。
+        </div>
+        <div class="bind-qrcode-panel">
+            <div class="title">扫码绑定设备</div>
+            <div class="qrcode">
+                <img class="bind-qrcode" :src="imgUrl">
+            </div>
+            <div class="bottom">
+                <el-button type="text" @click="copyBindUrl">点击复制绑定链接</el-button>
+            </div>
+        </div>
+        <el-table border align='center' style="width: 436px;" :data="showedDevice">
+            <el-table-column prop="ip" label="IP" align="center" width="300" :sortable="true">
+            </el-table-column>
+            <el-table-column label="操作" :width="136" align="center" :context="_self">
+                <template scope='scope'>
+                    <el-button type="danger" icon='el-icon-delete' size="mini"
+                               @click='unbind(scope.row, scope.$index )'>
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </div>
+</template>
+
+<script>
+    import qrcode from 'qrcode-js';
+    import profileApi from '../../../api/profile';
+    import copyToClipboard from 'copy-to-clipboard';
+    import './devicelist.pcss'
+    export default {
+        name: 'DeviceList',
+
+        methods: {
+            copyBindUrl(){
+                copyToClipboard(this.bindUrl);
+                this.$message('已将设备绑定链接复制到剪切板，在设备中打开此url即可绑定设备');
+            },
+            async unbind(row,index){
+                await profileApi.setUserId(value || '');
+                this.$message('解绑成功');
+            }
+        },
+
+        computed: {
+            showedDevice(){
+               return this.$dc.mappedClientIps.map(ip => {
+                    return {
+                        ip,
+                    }
+               });
+            },
+            bindUrl(){
+                return `http://${this.$dc.appInfo.pcIp}:${this.$dc.appInfo.realUiPort}/profile/device/bind?userId=${this.$dc.userId}`;
+            },
+            imgUrl() {
+                return qrcode.toDataURL(this.bindUrl, 4);
+            }
+        }
+    };
+
+</script>

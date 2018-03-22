@@ -63,7 +63,7 @@ export default {
               '/utils/rootCA.crt';
           return qrcode.toDataURL(certUrl, 4);
       }
-  }
+    }
 };
 </script>
 

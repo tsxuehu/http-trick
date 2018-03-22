@@ -48,6 +48,31 @@ module.exports = class ConfigController {
             };
         });
 
+        // 绑定设备
+        router.get('/profile/device/bind', async (ctx,next) =>{
+            let userId = ctx.query.userId;
+            let ip = ctx.ip;
+            if (ip.substr(0, 7) == "::ffff:") {
+                ip = ip.substr(7)
+            }
+            this.profileService.bindClientIp(userId, ip);
+            ctx.body = {
+                code: 0,
+                msg: `绑定成功: binded userId: ${userId}; ip: ${ip}`
+            };
+        });
+
+        // 解绑设备
+        router.get('/profile/device/unbind', async (ctx,next) =>{
+            let userId = ctx.userId;
+            let ip = ctx.query.ip;
+            this.profileService.unbindClientIp(ip);
+            ctx.body = {
+                code: 0,
+                msg: '解绑成功'
+            };
+        });
+
         // 获取用户id
         router.get('/profile/getUserId', async (ctx,next) =>{
             let userId = ctx.userId;

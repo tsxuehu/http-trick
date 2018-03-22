@@ -119,11 +119,11 @@
                         link: 'datalist'
                     }
                 ]);
-                if (this.$dc.userId != 'root') {
+                if (!this.$dc.appInfo.single) {
                     menu.push({
                         name: '绑定设备',
                         icon: 'icon-bargraph',
-                        link: 'equipment'
+                        link: 'device'
                     })
                 }
                 return menu;

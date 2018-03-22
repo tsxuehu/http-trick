@@ -143,6 +143,19 @@ module.exports = class ProfileService extends EventEmitter {
         }
     }
 
+    // 解除绑定至用户
+    async unbindClientIp(clientIp) {
+        let originUserId = this.clientIpUserMap[clientIp];
+        delete this.clientIpUserMap[clientIp];
+
+        await fileUtil.writeJsonToFile(this.clientIpUserMapSaveFile, this.clientIpUserMap);
+
+        if (originUserId) {
+            let originClientIpList = this.getClientIpsMappedToUserId(originUserId);
+            this.emit('data-change-clientIpUserMap', originUserId, originClientIpList);
+        }
+    }
+
     // 获取用户绑定的clientip
     getClientIpsMappedToUserId(userId) {
         let ips = [];

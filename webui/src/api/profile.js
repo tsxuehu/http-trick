@@ -30,5 +30,8 @@ export default {
     },
     setUserId(userId){
         return axios.get(`/profile/setUserId?userId=${userId}`);
+    },
+    unBind(ip){
+        return axios.get(`/profile/device/unbind?ip=${ip}`);
     }
 }
