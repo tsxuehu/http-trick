@@ -130,6 +130,9 @@ module.exports = class ProfileService extends EventEmitter {
     // 将ip绑定至用户
     async bindClientIp(userId, clientIp) {
         let originUserId = this.clientIpUserMap[clientIp];
+        if (userId == originUserId) {
+            return
+        }
         this.clientIpUserMap[clientIp] = userId;
 
         await fileUtil.writeJsonToFile(this.clientIpUserMapSaveFile, this.clientIpUserMap);
