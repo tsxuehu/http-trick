@@ -157,6 +157,7 @@ module.exports = class Bypass extends Action {
 
         // 合并header
         Object.assign(actualRequestHeaders, req.headers, additionalRequestHeaders);
+
         let originCookies = cookie.parse(req.headers.cookie || "");
         Object.assign(actualRequestCookies, originCookies, additionalRequestCookies);
         actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);

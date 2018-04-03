@@ -8,6 +8,7 @@ const Remote = require("../../utils/remote");
 const addHeaderToResponse = require("../../utils/addHeaderToResponse");
 const cookie2Str = require("../../utils/cookie2Str");
 const queryString = require("query-string");
+const cookie = require("cookie");
 
 /**
  * 重定向 本地 或者 远程
@@ -23,7 +24,7 @@ module.exports = class Redirect extends Action {
 
     constructor() {
         super();
-        this.hostRepository = ServiceRegistry.getHostService();
+        this.hostService = ServiceRegistry.getHostService();
         this.profileService = ServiceRegistry.getProfileService();
         this.remote = Remote.getInstance();
         this.local = Local.getInstance();
@@ -126,7 +127,7 @@ module.exports = class Redirect extends Action {
                         last
                     }) {
         let redirectUrlObj = url.parse(target);
-        let { protocol, hostname, path, port,query } = redirectUrlObj;
+        let { protocol, hostname, path, port, query } = redirectUrlObj;
 
         // 构造path
         try {
@@ -136,7 +137,8 @@ module.exports = class Redirect extends Action {
                 Object.assign(actualRequestQuery, additionalRequestQuery);
                 path = `${pathname}?${queryString.stringify(actualRequestQuery)}`;
             }
-        }catch (e) {}
+        } catch (e) {
+        }
 
         // dns解析
         toClientResponse.dnsResolveBeginTime = Date.now();
@@ -157,18 +159,26 @@ module.exports = class Redirect extends Action {
         toClientResponse.headers['proxy-content'] = encodeURI(targetUrl);
 
         Object.assign(actualRequestHeaders, req.headers);
-        actualRequestHeaders['host'] = hostname;
+        // actualRequestHeaders['host'] = hostname;
         Object.assign(actualRequestHeaders, additionalRequestHeaders);
-        Object.assign(actualRequestCookies, additionalRequestCookies);
+        // cookie设置
+        let originCookies = cookie.parse(req.headers.cookie || "");
+        Object.assign(actualRequestCookies, originCookies, additionalRequestCookies);
         actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
 
         if (last) {
             addHeaderToResponse(res, toClientResponse.headers);
             await this.remote.pipe({
-                req, res, recordResponse,
+                req,
+                res,
+                recordResponse,
                 method: req.method,
-                protocol, hostname: ip, path, port,
-                headers: actualRequestHeaders, toClientResponse
+                protocol,
+                hostname: ip,
+                path,
+                port,
+                headers: actualRequestHeaders,
+                toClientResponse
             });
         } else {
             await this.remote.cache({
