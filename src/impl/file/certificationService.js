@@ -23,8 +23,11 @@ module.exports = class CertificationService {
                 altNames: [host],
                 days: 365 * 10
             }, function (err, result) {
-                if (err) reject(err);
-                resolve({key: result.clientKey, cert: result.certificate});
+                if (err){
+                    reject(err);
+                } else {
+                    resolve({key: result.clientKey, cert: result.certificate});
+                }
             })
         });
 

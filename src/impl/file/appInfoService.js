@@ -9,7 +9,7 @@ module.exports = class AppInfoService extends EventEmitter {
         // 用户home目录
         let userHome = process.env.HOME || process.env.USERPROFILE;
         // proxy data存放目录
-        this.proxyDataDir = path.join(userHome, ".front-end-proxy");
+        this.proxyDataDir = path.join(userHome, ".http-trick");
         // app信息
         this.appInfo = {
             "single": single,
