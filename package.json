@@ -1,6 +1,6 @@
 {
   "name": "http-trick",
-  "version": "v0.0.7",
+  "version": "v0.0.8",
   "description": "Http Trick - 拦截http(s)请求拦截，修改请求数据，修改响应内容",
   "scripts": {
     "start": "node bin.js",
@@ -32,7 +32,7 @@
     "node-notifier": "^5.1.2",
     "opn": "^4.0.2",
     "parse-domain": "^1.1.0",
-    "pem": "^1.9.4",
+    "pem": "^1.12.3",
     "psaux": "^0.3.0",
     "query-string": "^4.3.4",
     "regenerator-runtime": "^0.10.5",

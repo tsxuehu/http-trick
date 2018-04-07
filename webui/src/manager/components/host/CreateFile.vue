@@ -47,6 +47,7 @@
                             if (serverData.code == 0) {
                                 // 判断创建成功还是失败
                                 this.$message({
+                                    showClose: true,
                                     message: '恭喜你，创建成功',
                                     type: 'success'
                                 });

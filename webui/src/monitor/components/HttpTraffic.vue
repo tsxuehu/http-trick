@@ -48,6 +48,7 @@
             saveData(){
                 if (!this.$dc.rightClickRow.response) {
                     this.$message({
+                        showClose: true,
                         message: '服务器还没有响应',
                         type: 'warning'
                     });
@@ -62,6 +63,7 @@
                         var serverData = res.data;
                         if (serverData.code == 0) {
                             this.$message({
+                                showClose: true,
                                 type: 'success',
                                 message: '保存成功!'
                             });

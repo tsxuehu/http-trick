@@ -166,6 +166,7 @@
                     if (serverData.code == 0) {
                         if (!donotalert) {
                             this.$message({
+                                showClose: true,
                                 type: 'success',
                                 message: '保存成功!'
                             });

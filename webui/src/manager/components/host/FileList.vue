@@ -74,6 +74,7 @@
             var serverData = response.data;
             if (serverData.code == 0) {
               this.$message({
+                  showClose: true,
                 type: 'success',
                 message: '删除成功!'
               });
@@ -88,6 +89,7 @@
           var serverData = response.data;
           if (serverData.code == 0) {
             this.$message({
+                showClose: true,
               type: 'success',
               message: '设置成功!'
             });

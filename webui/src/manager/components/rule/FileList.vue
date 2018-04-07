@@ -83,6 +83,7 @@ export default {
           var serverData = response.data;
           if (serverData.code == 0) {
             this.$message({
+                showClose: true,
               type: 'success',
               message: '删除成功!'
             });
@@ -123,6 +124,7 @@ export default {
             if (serverData.code == 0) {
               // 判断创建成功还是失败
               this.$message({
+                  showClose: true,
                 message: '恭喜你，更新成功',
                 type: 'success'
               });
@@ -178,6 +180,7 @@ export default {
               if (serverData.code == 0) {
                 // 判断创建成功还是失败
                 this.$message({
+                    showClose: true,
                   message: '恭喜你，导入成功',
                   type: 'success'
                 });
@@ -194,6 +197,7 @@ export default {
         var serverData = response.data;
         if (serverData.code == 0) {
           this.$message({
+              showClose: true,
             type: 'success',
             message: '设置成功!'
           });
@@ -250,6 +254,7 @@ export default {
                 if (serverData.code == 0) {
                   // 判断创建成功还是失败
                   _this.$message({
+                      showClose: true,
                     message: '恭喜你，导入成功',
                     type: 'success'
                   });

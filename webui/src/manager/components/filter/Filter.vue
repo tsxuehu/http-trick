@@ -77,6 +77,7 @@
                 let result = await filtersApi.saveFilters(this.$dc.filters);
                 if (result.code == 0) {
                     this.$message({
+                        showClose: true,
                         type: 'success',
                         message: '保存成功!'
                     });

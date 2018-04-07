@@ -42,6 +42,7 @@ export default {
       let serverData = response.data;
       if (serverData.code == 0) {
         this.$message({
+            showClose: true,
           type: 'success',
           message: '保存成功!'
         });
