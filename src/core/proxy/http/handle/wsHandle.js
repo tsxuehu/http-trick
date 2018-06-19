@@ -1,8 +1,8 @@
 const url = require("url");
-const WsMock = require("../wsmock");
+const WsMock = require("../../wsmock/index");
 const HttpProxy = require("http-proxy");
-const ServiceRegistry = require("../../service");
-const getClientIp = require("../../utils/getClientIp");
+const ServiceRegistry = require("../../../service/index");
+const getClientIp = require("../../../utils/getClientIp");
 
 let wsHandle;
 module.exports = class WsHandle {

@@ -16,6 +16,7 @@ module.exports = class AppInfoService extends EventEmitter {
             "realUiPort": "",
             "httpProxyPort": "",
             "httpsProxyPort": "",
+            "socks5ProxyPort": "",
             "pcIp": ""
         };
 
@@ -96,6 +97,20 @@ module.exports = class AppInfoService extends EventEmitter {
     }
 
     /**
+     * socks5端口
+     * @returns {*}
+     */
+    getSocks5ProxyPort() {
+        return this.appInfo.socks5ProxyPort;
+    }
+
+    setSocks5ProxyPort(socks5ProxyPort) {
+        this.setAppInfo({
+            socks5ProxyPort: socks5ProxyPort
+        });
+    }
+
+    /**
      * 真实的代理端口
      * @returns {string}
      */
@@ -142,7 +157,8 @@ module.exports = class AppInfoService extends EventEmitter {
     }
 
     printRuntimeInfo() {
-        console.log(`Proxy Port: ${ this.appInfo.httpProxyPort}`);
+        console.log(`Http Proxy Port: ${ this.appInfo.httpProxyPort}`);
+        console.log(`Socks5 Proxy Port: ${ this.appInfo.socks5ProxyPort}`);
         console.log(`Manager: http://${this.appInfo.pcIp}:${this.appInfo.realUiPort}`);
     }
 };

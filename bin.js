@@ -7,7 +7,6 @@ const AppInfoService = require("./src/impl/file/appInfoService");
 const fs = require('fs');
 const resetDataFile = require('./resetDataFile');
 
-
 process.on("SIGINT", function () {
     process.exit();
 });
@@ -33,6 +32,7 @@ async function start() {
         .version(packageInfo.version)
         .option('-p, --proxyPort [value]', '指定代理端口')
         .option('-u, --uiPort [value]', '指定UI端口')
+        .option('-s, --socks5Port [value]', '指定socks5端口')
         .option('-m, --userMode [value]', '用户模式 ')
         // .option('-s, --serviceType [value]', '启动类型，默认desktop')
         .parse(process.argv);
@@ -40,12 +40,14 @@ async function start() {
     // 启动开发代理服务器
     let proxyPort = program.proxyPort;
     let uiPort = program.uiPort;
+    let socks5Port = program.socks5Port;
     let userMode = program.userMode;
     let serviceType = program.serviceType;
 
-    let launcher = new Launcher(proxyPort, uiPort, serviceType, userMode);
+    let launcher = new Launcher(proxyPort, socks5Port, uiPort, serviceType, userMode);
     launcher.start();
 }
+
 start();
 
 

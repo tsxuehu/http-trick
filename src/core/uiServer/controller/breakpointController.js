@@ -1,5 +1,5 @@
 const ServiceRegistry = require("../../service");
-const Breakpoint = require("../../proxy/breakpoint");
+const Breakpoint = require("../../proxy/http/breakpoint");
 
 let instance;
 module.exports = class BreakpointController {

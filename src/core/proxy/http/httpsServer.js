@@ -1,7 +1,7 @@
 const https = require("https");
 const tls = require("tls");
 const crypto = require("crypto");
-const ServiceRegistry = require("../service");
+const ServiceRegistry = require("../../service/index");
 const HttpHandle = require("./handle/httpHandle");
 const WsHandle = require("./handle/wsHandle");
 

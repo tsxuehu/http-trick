@@ -1,12 +1,12 @@
 const Action = require("./action");
-const Remote = require("../../utils/remote");
+const Remote = require("../../../utils/remote");
 const _ = require("lodash");
-const ServiceRegistry = require("../../service");
-const addHeaderToResponse = require("../../utils/addHeaderToResponse");
-const cookie2Str = require("../../utils/cookie2Str");
-const sendSpecificToClient = require("../../utils/sendSpecificToClient");
+const ServiceRegistry = require("../../../service");
+const addHeaderToResponse = require("../../../utils/addHeaderToResponse");
+const cookie2Str = require("../../../utils/cookie2Str");
+const sendSpecificToClient = require("../../../utils/sendSpecificToClient");
 const cookie = require("cookie");
-const toClientResponseUtils = require("../../utils/toClientResponseUtils");
+const toClientResponseUtils = require("../../../utils/toClientResponseUtils");
 const queryString = require("query-string");
 
 let bypass;

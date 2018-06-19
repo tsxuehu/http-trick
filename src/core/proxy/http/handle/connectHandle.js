@@ -1,5 +1,5 @@
 const net = require("net");
-const ServiceRegistry = require("../../service");
+const ServiceRegistry = require("../../../service/index");
 
 // 对于https协议，client connect请求proxy proxy和https server建立链接
 // 此字段记录proxy 请求内部https server链接 和 client的ip 之间的映射关系

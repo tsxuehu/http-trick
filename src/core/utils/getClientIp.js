@@ -1,4 +1,4 @@
-const ConnectHandle = require("../proxy/handle/connectHandle");
+const ConnectHandle = require("../proxy/http/handle/connectHandle");
 
 module.exports = function (req) {
     if (req.connection.encrypted) {

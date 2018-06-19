@@ -2,9 +2,9 @@
  * Created by tsxuehu on 17/3/19.
  */
 const Action = require("./action");
-const ServiceRegistry = require("../../service");
-const sendSpecificToClient = require("../../utils/sendSpecificToClient");
-const addHeaderToResponse = require("../../utils/addHeaderToResponse");
+const ServiceRegistry = require("../../../service");
+const sendSpecificToClient = require("../../../utils/sendSpecificToClient");
+const addHeaderToResponse = require("../../../utils/addHeaderToResponse");
 
 let mockData;
 module.exports = class MockData extends Action {
