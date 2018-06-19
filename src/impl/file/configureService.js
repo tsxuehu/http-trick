@@ -6,6 +6,7 @@ const path = require('path');
 const defaultConfigure = {
     "gitlabToken": "",
     "proxyPort": 8001,
+    "socks5Port": 8002,
     "requestTimeoutTime": 30000
 };
 /**
@@ -14,7 +15,7 @@ const defaultConfigure = {
  * Created by tsxuehu on 8/3/17.
  */
 module.exports = class ConfigureService extends EventEmitter {
-    constructor({appInfoService}) {
+    constructor({ appInfoService }) {
         super();
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
@@ -37,11 +38,15 @@ module.exports = class ConfigureService extends EventEmitter {
         this.configure = configure;
         await fileUtil.writeJsonToFile(this.configureFile, this.configure);
         // 发送通知
-        this.emit('data-change',userId, this.configure);
+        this.emit('data-change', userId, this.configure);
     }
 
     // 获取代理端口
     getProxyPort() {
         return this.configure.proxyPort;
     }
-}
+
+    getSocks5Port() {
+        return this.configure.socks5Port;
+    }
+};

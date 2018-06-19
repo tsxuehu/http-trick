@@ -1,14 +1,14 @@
 const zlib = require("zlib");
-const parseUrl = require("../../utils/parseUrl");
-const log = require("../../utils/log");
-const requestResponseUtils = require("../../utils/requestResponseUtils");
-const ServiceRegistry = require("../../service");
+const parseUrl = require("../../../utils/parseUrl");
+const log = require("../../../utils/log");
+const requestResponseUtils = require("../../../utils/requestResponseUtils");
+const ServiceRegistry = require("../../../service/index");
 const Action = require("../action/index");
-const getClientIp = require("../../utils/getClientIp");
+const getClientIp = require("../../../utils/getClientIp");
 const Breakpoint = require("../breakpoint");
 const _ = require("lodash");
 const cookie = require("cookie");
-const sendSpecificToClient = require("../../utils/sendSpecificToClient");
+const sendSpecificToClient = require("../../../utils/sendSpecificToClient");
 
 // request session id seed
 let httpHandle;

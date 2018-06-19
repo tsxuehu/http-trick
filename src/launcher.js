@@ -1,7 +1,8 @@
 const getPort = require("get-port");
 const ServiceRegistry = require("./core/service/index");
-const HttpServer = require("./core/proxy/httpServer");
-const HttpsServer = require("./core/proxy/httpsServer");
+const HttpServer = require("./core/proxy/http/httpServer");
+const HttpsServer = require("./core/proxy/http/httpsServer");
+const Socks5Server = require("./core/proxy/socks5/socks5");
 const WebUiServer = require("./core/uiServer");
 
 // 基于文件的service导入
@@ -24,10 +25,11 @@ module.exports = class Launcher {
      * @param serviceType 使用的服务类型
      * @param isSingle 是否是单用户模式
      */
-    constructor(port = 8001, webUIPort = 40001, serviceType = "file", userMode = "single") {
+    constructor(port = 8001, socks5Port = 8002, webUIPort = 40001, serviceType = "file", userMode = "single") {
         this.serviceType = serviceType;
         this.single = userMode != "multi";
         this.port = port;
+        this.socks5Port = socks5Port;
         this.webUIPort = webUIPort;
     }
 
@@ -69,20 +71,20 @@ module.exports = class Launcher {
             logService = new FileLogService();
             appInfoService = new FileAppInfoService(this.single);
 
-            configureService = new FileConfigureService({appInfoService});
+            configureService = new FileConfigureService({ appInfoService });
 
-            let baseService = {logService, appInfoService, configureService};
+            let baseService = { logService, appInfoService, configureService };
 
             // 复合服务
             breakpointService = new FileBreakpointService(baseService);
             certificationService = new FileCertificationService(baseService);
 
             profileService = new FileProfileService(baseService);
-            filterService = new FileFilterService({profileService, ...baseService});
-            hostService = new FileHostService({profileService, ...baseService});
+            filterService = new FileFilterService({ profileService, ...baseService });
+            hostService = new FileHostService({ profileService, ...baseService });
             httpTrafficService = new FileHttpTrafficService(baseService);
             mockDataService = new FileMockDataService(baseService);
-            ruleService = new FileRuleService({profileService, ...baseService});
+            ruleService = new FileRuleService({ profileService, ...baseService });
             wsMockService = new FilewsMockService(baseService);
 
         }
@@ -114,7 +116,7 @@ module.exports = class Launcher {
             logService,
             mockDataService,
             ruleService,
-            wsMockService,
+            wsMockService
         });
     }
 
@@ -135,11 +137,23 @@ module.exports = class Launcher {
         let httpsPort = await getPort(40005);
         this.appInfoService.setHttpsProxyPort(httpsPort);
 
+        // 获取socks5代理端口
+        if (!this.socks5Port) {
+            this.socks5Port = this.configureService.getSocks5Port();
+        }
+        this.appInfoService.setSocks5ProxyPort(this.socks5Port);
         // 启动http转发服务器
         await new HttpServer(this.port, httpsPort).start();
 
         // 启动https转发服务器
         await new HttpsServer(httpsPort).start();
+
+        // 启动socks5代理服务器
+        await new Socks5Server({
+            socks5Port: this.socks5Port,
+            httpPort: this.port,
+            httpsPort: httpsPort
+        }).start();
     }
 
     // 启动管理界面服务器
@@ -156,7 +170,7 @@ module.exports = class Launcher {
     }
 
     // 启动service mock服务器
-    async _startServiceMockServer(){
+    async _startServiceMockServer() {
 
     }
-}
+};
