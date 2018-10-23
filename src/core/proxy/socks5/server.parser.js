@@ -34,7 +34,13 @@ class Parser extends EventEmitter {
         this._dstaddrp = 0;
         this._dstport = undefined;
 
+        this._clientIp = stream.remoteAddress;
+        this._clientPort = stream.remotePort;
+
         this.authed = false;
+
+        this.username = '';
+        this.password = '';
 
         this.start();
     }
@@ -214,10 +220,12 @@ class Parser extends EventEmitter {
 
                         this.emit('request', {
                             cmd: this._cmd,
-                            srcAddr: undefined,
-                            srcPort: undefined,
+                            srcAddr:  this._clientIp,
+                            srcPort:  this._clientPort,
                             dstAddr: this._dstaddr,
-                            dstPort: this._dstport
+                            dstPort: this._dstport,
+                            username: this.username,
+                            password: this.password
                         });
                         return;
                     }

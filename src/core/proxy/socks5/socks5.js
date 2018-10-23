@@ -37,7 +37,7 @@ module.exports = class Server extends EventEmitter {
         this.httpPort = httpPort;
         this.httpsPort = httpsPort;
         this._connections = 0;
-        this.maxConnections = Infinity;
+        this.maxConnections = 1000;
         this._authMap = {};
         this.hostService = ServiceRegistry.getHostService();
         this.profileService = ServiceRegistry.getProfileService();
@@ -46,7 +46,7 @@ module.exports = class Server extends EventEmitter {
 
         // 创建socket
         this._srv = new net.Server(function (socket) {
-            if (self._connections >= self.maxConnections) {
+            if (self._connections >= self.maxConnections) { // 超过最大连接数拒绝连接
                 socket.destroy();
                 return;
             }
@@ -55,11 +55,11 @@ module.exports = class Server extends EventEmitter {
                 --self._connections;
             });
             // 处理请求链接
-            self._onConnection(socket);
+            self._handleSocks5Connection(socket);
         }).on('error', function (err) {
             self.emit('error', err);
         }).on('listening', function () {
-            console.log('listening')
+            console.log('socks5 listening')
             self.emit('listening');
         }).on('close', function () {
             self.emit('close');
@@ -72,25 +72,27 @@ module.exports = class Server extends EventEmitter {
      * @param socket
      * @private
      */
-    _onConnection(socket) {
+    _handleSocks5Connection(socket) {
         let self = this;
         let parser = new Parser(socket);
         parser.on('error', function (err) {
             if (socket.writable)
                 socket.end();
         });
-        parser.on('methods', function (methods) {
+        parser.on('methods', function (methods) { // 验证
             let authsMap = self._authMap;
             let auth = null;
-            for(let i = 0;i< methods.length;i++){
+            for (let i = 0; i < methods.length; i++) {
                 let method = methods[i];
                 auth = authsMap[method];
                 if (auth) break;
             }
             if (auth) {
-                auth.server(socket, function (result) {
+                auth.server(socket, function (result, user, pass) {
                     if (result === true) {
                         parser.authed = true;
+                        parser.username = user;
+                        parser.password = pass;
                         parser.start();
                     } else {
                         if (util.isError(result)) {
@@ -105,7 +107,7 @@ module.exports = class Server extends EventEmitter {
                 socket.end(BUF_AUTH_NO_ACCEPT);
             }
         });
-        parser.on('request', function (reqInfo) {
+        parser.on('request', function (reqInfo) { // 请求数据
             if (reqInfo.cmd !== 'connect')
                 return socket.end(BUF_REP_CMDUNSUPP);
 
@@ -142,7 +144,7 @@ module.exports = class Server extends EventEmitter {
             let dstSock = new net.Socket();
             let connected = false;
 
-            let targetIp ;
+            let targetIp;
             let targetPort = req.dstPort;
             if (targetPort == 443) {
                 targetIp = '127.0.0.1';
