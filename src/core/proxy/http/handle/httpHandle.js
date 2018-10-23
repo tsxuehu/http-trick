@@ -9,7 +9,7 @@ const Breakpoint = require("../breakpoint");
 const _ = require("lodash");
 const cookie = require("cookie");
 const sendSpecificToClient = require("../../../utils/sendSpecificToClient");
-
+const getTranserPortInfo = require("../../socks5/socks5").getTranserPortInfo;
 // request session id seed
 let httpHandle;
 module.exports = class HttpHandle {
@@ -37,11 +37,23 @@ module.exports = class HttpHandle {
      * 处理流程 更具转发规则、mock规则
      */
     async handle(req, res) {
+
+        let clientIp = '';
+        let userId = '';
         // 解析请求参数
         let urlObj = parseUrl(req);
+        // sock5代理，目前做法直接将用户的包转发给http(s)端口
+        let remotePort = req.socket.remotePort;
+        let remoteIp = req.socket.remoteAddress;
+        let transerInfo = getTranserPortInfo(remotePort);
+        if (remoteIp == '127.0.0.1' && transerInfo) {
+            clientIp = transerInfo.srcAddr;
+            userId = transerInfo.userId || 'root';
+        } else {
+            clientIp = getClientIp(req);
+            userId = this.profileService.getClientIpMappedUserId(clientIp);
+        }
 
-        let clientIp = getClientIp(req);
-        let userId = this.profileService.getClientIpMappedUserId(clientIp);
 
         // 如果是 ui server请求，则直接转发不做记录
         if (this.appInfoService.isWebUiRequest(urlObj.hostname, urlObj.port)) {
@@ -286,14 +298,14 @@ module.exports = class HttpHandle {
         // 动作运行完还没响应浏览器、则响应浏览器
         if (!toClientResponse.sendedToClient) {
             if (toClientResponse.hasContent) {
-                try{
+                try {
                     sendSpecificToClient({
                         res,
                         statusCode: toClientResponse.statusCode,
                         headers: toClientResponse.headers,
                         content: toClientResponse.body
                     });
-                }catch (e){
+                } catch (e) {
                     this.logService.error(e);
                     this.logService.log(toClientResponse)
                     this.logService.log(urlObj)

@@ -11,7 +11,7 @@ var STATE_VERSION = 0,
 var BUF_SUCCESS = new Buffer([0x01, 0x00]),
     BUF_FAILURE = new Buffer([0x01, 0x01]);
 
-function authHandle(cb) {
+function authHandle(user,passworld, cb) {
     cb && cb(true)
 }
 

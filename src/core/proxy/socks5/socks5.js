@@ -6,6 +6,7 @@ const ipbytes = require('./utils').ipbytes;
 
 const ServiceRegistry = require("../../service");
 const NoneAuth = require("./auth/None");
+const UserPassword = require("./auth/UserPassword");
 
 const ATYP = require('./constants').ATYP;
 const CMD = require('./constants').CMD;
@@ -26,7 +27,10 @@ const BUF_REP_DISALLOW = new Buffer([0x05, REP.DISALLOW]);
 // 命令不支持
 const BUF_REP_CMDUNSUPP = new Buffer([0x05, REP.CMDUNSUPP]);
 
-module.exports = class Server extends EventEmitter {
+// 记录连接http代理的端口的用户
+let transferClientPortUserReqMap = {};
+
+module.exports.Server = class Server extends EventEmitter {
     constructor({
                     socks5Port,
                     httpPort,
@@ -76,6 +80,7 @@ module.exports = class Server extends EventEmitter {
         let self = this;
         let parser = new Parser(socket);
         parser.on('error', function (err) {
+            console.log(err)
             if (socket.writable)
                 socket.end();
         });
@@ -110,12 +115,6 @@ module.exports = class Server extends EventEmitter {
         parser.on('request', function (reqInfo) { // 请求数据
             if (reqInfo.cmd !== 'connect')
                 return socket.end(BUF_REP_CMDUNSUPP);
-
-            reqInfo.srcAddr = socket.remoteAddress;
-            reqInfo.srcPort = socket.remotePort;
-
-            // socket.write(BUF_REP_INTR_SUCCESS) ？？
-            // 拒绝代理  socket.end(BUF_REP_DISALLOW);
             self.proxySocket(socket, reqInfo);
         });
 
@@ -141,19 +140,24 @@ module.exports = class Server extends EventEmitter {
         // 比较简洁的方法通过端口号判断--不准确
         // 理想情况通过首个数据包判断
         try {
+            // 请求socket
+
             let dstSock = new net.Socket();
             let connected = false;
-
+            let transferClientPort = '';
             let targetIp;
             let targetPort = req.dstPort;
+            let username = req.username;
+            let userId = this.profileService.getUserIdByUserName(username);
+            req.userId = userId;
             if (targetPort == 443) {
                 targetIp = '127.0.0.1';
                 targetPort = this.httpsPort;
             } else if (targetPort == 80) {
+                targetIp = '127.0.0.1';
                 targetPort = this.httpPort;
             } else {
-                let clientIp = socket.remoteAddress;
-                let userId = this.profileService.getClientIpMappedUserId(clientIp);
+
                 let ip = await this.hostService.resolveHost(userId, req.dstAddr);
                 let targetIp = ip;
             }
@@ -163,7 +167,13 @@ module.exports = class Server extends EventEmitter {
                 if (!connected)
                     handleProxyError(socket, err);
             });
+            dstSock.on('close', had_error => {
+                delete transferClientPortUserReqMap[transferClientPort];
+            })
             dstSock.on('connect', function () {
+                let {port} = dstSock.address();
+                transferClientPort = port;
+                transferClientPortUserReqMap[transferClientPort] = req;
                 connected = true;
                 if (socket.writable) {
                     let localbytes = ipbytes(dstSock.localAddress || '127.0.0.1'),
@@ -224,6 +234,7 @@ module.exports = class Server extends EventEmitter {
     }
 
     start() {
+        this.useAuth(new UserPassword());
         this.useAuth(new NoneAuth());
         this._srv.listen(this.socks5Port);
         return this;
@@ -242,6 +253,11 @@ module.exports = class Server extends EventEmitter {
         return this;
     }
 };
+
+module.exports.getTranserPortInfo = function (port) {
+    return transferClientPortUserReqMap[port]
+}
+
 
 function onErrorNoop(err) {
 }

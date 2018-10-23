@@ -2,7 +2,7 @@ const getPort = require("get-port");
 const ServiceRegistry = require("./core/service/index");
 const HttpServer = require("./core/proxy/http/httpServer");
 const HttpsServer = require("./core/proxy/http/httpsServer");
-const Socks5Server = require("./core/proxy/socks5/socks5");
+const Socks5Server = require("./core/proxy/socks5/socks5").Server;
 const WebUiServer = require("./core/uiServer");
 
 // 基于文件的service导入

@@ -127,6 +127,10 @@ module.exports = class ProfileService extends EventEmitter {
         return this.clientIpUserMap[clientIp] || 'root';
     }
 
+    getUserIdByUserName(userName) {
+        return userName
+    }
+
     // 将ip绑定至用户
     async bindClientIp(userId, clientIp) {
         let originUserId = this.clientIpUserMap[clientIp];
