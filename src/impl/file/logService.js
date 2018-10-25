@@ -3,7 +3,7 @@
  */
 module.exports = class LogService {
 
-    start(){
+    start() {
 
     }
 
@@ -11,7 +11,7 @@ module.exports = class LogService {
         console.log(msg)
     }
 
-    log() {
+    log(msg) {
         console.log(msg)
     }
 }

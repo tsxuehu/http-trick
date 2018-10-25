@@ -20,8 +20,8 @@ module.exports = function UserPasswordAuthHandlers() {
         METHOD: 0x02,
         server: function serverHandler(stream, cb) {
             var state = STATE_VERSION,
-                user,
-                pass,
+                user = '',
+                pass = '',
                 userp = 0,
                 passp = 0;
 
