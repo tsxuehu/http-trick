@@ -160,12 +160,35 @@ module.exports.Server = class Server extends EventEmitter {
         // 比较简洁的方法通过端口号判断--不准确
         // 理想情况通过首个数据包判断
         try {
+            let username = req.username;
+            let userId = this.profileService.getUserIdByUserName(username);
             // 请求socket
             if (req.dstPort == 80) {
                 http._connectionListener.call(this.httpServer, socket);
-               /* socket.on('data', data => {
-                    console.log(data)
-                })*/
+                /* socket.on('data', data => {
+                     console.log(data)
+                 })*/
+                socket.resume();
+                let localbytes = ipbytes('127.0.0.1'),
+                    len = localbytes.length,
+                    bufrep = new Buffer(6 + len),
+                    p = 4;
+                bufrep[0] = 0x05;
+                bufrep[1] = REP.SUCCESS;
+                bufrep[2] = 0x00;
+                bufrep[3] = (len === 4 ? ATYP.IPv4 : ATYP.IPv6);
+                for (let i = 0; i < len; ++i, ++p)
+                    bufrep[p] = localbytes[i];
+                bufrep.writeUInt16BE(80, p, true);
+
+                socket.write(bufrep);
+                return;
+            }
+
+            if (req.dstPort == 443) {
+                // tls
+
+
                 socket.resume();
                 let localbytes = ipbytes('127.0.0.1'),
                     len = localbytes.length,
@@ -185,8 +208,7 @@ module.exports.Server = class Server extends EventEmitter {
 
             let targetIp;
             let targetPort = req.dstPort;
-            let username = req.username;
-            let userId = this.profileService.getUserIdByUserName(username);
+
             req.userId = userId;
             if (targetPort == 443) {
                 targetIp = '127.0.0.1';
