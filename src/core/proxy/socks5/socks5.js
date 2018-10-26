@@ -1,8 +1,12 @@
 const net = require('net');
 const util = require('util');
 const EventEmitter = require('events');
+const http = require('http')
+
 const Parser = require('./server.parser');
 const ipbytes = require('./utils').ipbytes;
+
+const HttpHandle = require("../http/handle/httpHandle");
 
 const ServiceRegistry = require("../../service");
 const NoneAuth = require("./auth/None");
@@ -30,6 +34,9 @@ const BUF_REP_CMDUNSUPP = new Buffer([0x05, REP.CMDUNSUPP]);
 // 记录连接http代理的端口的用户
 let transferClientPortUserReqMap = {};
 
+/**
+ *  forward TCP connection to a new HTTP req/res
+ */
 module.exports.Server = class Server extends EventEmitter {
     constructor({
                     socks5Port,
@@ -37,6 +44,8 @@ module.exports.Server = class Server extends EventEmitter {
                     httpsPort
                 }) {
         super();
+        this.httpHandle = HttpHandle.getInstance();
+
         this.socks5Port = socks5Port;
         this.httpPort = httpPort;
         this.httpsPort = httpsPort;
@@ -45,6 +54,17 @@ module.exports.Server = class Server extends EventEmitter {
         this._authMap = {};
         this.hostService = ServiceRegistry.getHostService();
         this.profileService = ServiceRegistry.getProfileService();
+
+        this.httpServer = http.createServer();
+        this.httpServer.on('request', (req, res) => {
+            this.httpHandle.handle(req, res).catch(e => {
+                console.error(e);
+            });
+
+        });
+        this.httpServer.on('error', function (err) {
+            console.log(err);
+        });
 
         let self = this;
 
@@ -141,10 +161,28 @@ module.exports.Server = class Server extends EventEmitter {
         // 理想情况通过首个数据包判断
         try {
             // 请求socket
+            if (req.dstPort == 80) {
+                http._connectionListener.call(this.httpServer, socket);
+               /* socket.on('data', data => {
+                    console.log(data)
+                })*/
+                socket.resume();
+                let localbytes = ipbytes('127.0.0.1'),
+                    len = localbytes.length,
+                    bufrep = new Buffer(6 + len),
+                    p = 4;
+                bufrep[0] = 0x05;
+                bufrep[1] = REP.SUCCESS;
+                bufrep[2] = 0x00;
+                bufrep[3] = (len === 4 ? ATYP.IPv4 : ATYP.IPv6);
+                for (let i = 0; i < len; ++i, ++p)
+                    bufrep[p] = localbytes[i];
+                bufrep.writeUInt16BE(80, p, true);
 
-            let dstSock = new net.Socket();
-            let connected = false;
-            let transferClientPort = '';
+                socket.write(bufrep);
+                return;
+            }
+
             let targetIp;
             let targetPort = req.dstPort;
             let username = req.username;
@@ -157,11 +195,14 @@ module.exports.Server = class Server extends EventEmitter {
                 targetIp = '127.0.0.1';
                 targetPort = this.httpPort;
             } else {
-
                 let ip = await this.hostService.resolveHost(userId, req.dstAddr);
                 let targetIp = ip;
             }
 
+
+            let dstSock = new net.Socket();
+            let transferClientPort = '';
+            let connected = false;
             dstSock.setKeepAlive(false);
             dstSock.on('error', (err) => {
                 if (!connected)
@@ -191,13 +232,9 @@ module.exports.Server = class Server extends EventEmitter {
                     socket.write(bufrep);
 
                     if (req.dstPort == 80) {
-                        socket.pipe(dstSock).pipe(socket);
-                        /* socket.on('data', d => {
-                             console.log(d.toString('utf-8'));
-                         });
-                         socket.end(`HTTP/1.1 200 OK
+                        // 调用http模块里的东西进行处理
 
- aa`);*/
+
                     } /*else if (req.dstPort == 443) { // 如何识别握手包
                        /!* socket.on('data', d => {
                             console.log(d.toString('hex'));
@@ -234,9 +271,11 @@ module.exports.Server = class Server extends EventEmitter {
     }
 
     start() {
+
         this.useAuth(new UserPassword());
         this.useAuth(new NoneAuth());
         this._srv.listen(this.socks5Port);
+
         return this;
     }
 

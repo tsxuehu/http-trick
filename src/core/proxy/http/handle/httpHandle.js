@@ -9,7 +9,6 @@ const Breakpoint = require("../breakpoint");
 const _ = require("lodash");
 const cookie = require("cookie");
 const sendSpecificToClient = require("../../../utils/sendSpecificToClient");
-const getTranserPortInfo = require("../../socks5/socks5").getTranserPortInfo;
 // request session id seed
 let httpHandle;
 module.exports = class HttpHandle {
@@ -45,7 +44,7 @@ module.exports = class HttpHandle {
         // sock5代理，目前做法直接将用户的包转发给http(s)端口
         let remotePort = req.socket.remotePort;
         let remoteIp = req.socket.remoteAddress;
-        let transerInfo = getTranserPortInfo(remotePort);
+        let transerInfo = null //getTranserPortInfo(remotePort);
         if (remoteIp == '127.0.0.1' && transerInfo) {
             clientIp = transerInfo.srcAddr;
             userId = transerInfo.userId || 'root';
