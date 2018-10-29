@@ -156,40 +156,21 @@ module.exports = class Server extends EventEmitter {
      * @param req
      */
     async proxySocket(socket, req) {
-        // 如何判别通信的协议
-        // 比较简洁的方法通过端口号判断--不准确
-        // 理想情况通过首个数据包判断
+        // 通过默认端口号判断通信协议
         try {
+            let needResume = true;// 对于透传，等远程连接建立后再resume
             let username = req.username;
             let clientIp = req.srcAddr;
             let userId = this.profileService.getUserIdByUserName(username);
             // 请求socket
+
             if (req.dstPort == 80) {
                 socket.userId = userId;
                 socket.clientIp = clientIp;
                 socket.socks5 = true;
                 http._connectionListener.call(this._srv, socket);
-                /* socket.on('data', data => {
-                     console.log(data)
-                 })*/
-                socket.resume();
-                let localbytes = ipbytes('127.0.0.1'),
-                    len = localbytes.length,
-                    bufrep = new Buffer(6 + len),
-                    p = 4;
-                bufrep[0] = 0x05;
-                bufrep[1] = REP.SUCCESS;
-                bufrep[2] = 0x00;
-                bufrep[3] = (len === 4 ? ATYP.IPv4 : ATYP.IPv6);
-                for (let i = 0; i < len; ++i, ++p)
-                    bufrep[p] = localbytes[i];
-                bufrep.writeUInt16BE(80, p, true);
 
-                socket.write(bufrep);
-                return;
-            }
-
-            if (req.dstPort == 443) {
+            } else if (req.dstPort == 443) {
                 // tls
                 let context = await this.certificationService.getCertificationForHost(req.dstAddr);
                 let tlsSocket = new tls.TLSSocket(socket, {
@@ -197,62 +178,56 @@ module.exports = class Server extends EventEmitter {
                     key: context.key,
                     cert: context.cert
                 });
+
                 tlsSocket.userId = userId;
                 tlsSocket.clientIp = clientIp;
                 tlsSocket.socks5 = true;
                 http._connectionListener.call(this._srv, tlsSocket);
-                socket.resume();
-                let localbytes = ipbytes('127.0.0.1'),
-                    len = localbytes.length,
-                    bufrep = new Buffer(6 + len),
-                    p = 4;
-                bufrep[0] = 0x05;
-                bufrep[1] = REP.SUCCESS;
-                bufrep[2] = 0x00;
-                bufrep[3] = (len === 4 ? ATYP.IPv4 : ATYP.IPv6);
-                for (let i = 0; i < len; ++i, ++p)
-                    bufrep[p] = localbytes[i];
-                bufrep.writeUInt16BE(80, p, true);
 
-                socket.write(bufrep);
-                return;
+                tlsSocket.on('data', data => {
+                    console.log('tlsSocket ------- ', data.toString())
+                })
+                tlsSocket.on('error', e => {
+                    console.log(e)
+                })
+            } else {
+                needResume = false;
+                let targetIp = await this.hostService.resolveHost(userId, req.dstAddr);
+                let targetPort = req.dstPort;
+                let dstSock = new net.Socket();
+                dstSock.setKeepAlive(false);
+                let connected = false;
+                dstSock.on('error', (err) => {
+                    if (!connected)
+                        handleProxyError(socket, err);
+                });
+                dstSock.on('connect', function () {
+                    connected = true;
+                    if (socket.writable) {
+                        socket.pipe(dstSock).pipe(socket);
+                        socket.resume();
+                    } else if (dstSock.writable)
+                        dstSock.end();
+                });
+                dstSock.connect(targetPort, targetIp);
+                socket.dstSock = dstSock;
             }
-
-            let targetIp = await this.hostService.resolveHost(userId, req.dstAddr);
-            let targetPort = req.dstPort;
-
-            let dstSock = new net.Socket();
-            let connected = false;
-            dstSock.setKeepAlive(false);
-            dstSock.on('error', (err) => {
-                if (!connected)
-                    handleProxyError(socket, err);
-            });
-
-            dstSock.on('connect', function () {
-                connected = true;
-                if (socket.writable) {
-                    let localbytes = ipbytes(dstSock.localAddress || '127.0.0.1'),
-                        len = localbytes.length,
-                        bufrep = new Buffer(6 + len),
-                        p = 4;
-                    bufrep[0] = 0x05;
-                    bufrep[1] = REP.SUCCESS;
-                    bufrep[2] = 0x00;
-                    bufrep[3] = (len === 4 ? ATYP.IPv4 : ATYP.IPv6);
-                    for (let i = 0; i < len; ++i, ++p)
-                        bufrep[p] = localbytes[i];
-                    bufrep.writeUInt16BE(dstSock.localPort, p, true);
-
-                    socket.write(bufrep);
-                    socket.pipe(dstSock).pipe(socket);
-                    socket.resume();
-                } else if (dstSock.writable)
-                    dstSock.end();
-            });
-            dstSock.connect(targetPort, targetIp);
-            socket.dstSock = dstSock;
-
+            // 向client发送连接成功消息
+            let localbytes = ipbytes('0.0.0.0'),
+                len = localbytes.length,
+                bufrep = new Buffer(6 + len),
+                p = 4;
+            bufrep[0] = 0x05;
+            bufrep[1] = REP.SUCCESS;
+            bufrep[2] = 0x00;
+            bufrep[3] = (len === 4 ? ATYP.IPv4 : ATYP.IPv6);
+            for (let i = 0; i < len; ++i, ++p)
+                bufrep[p] = localbytes[i];
+            bufrep.writeUInt16BE(0, p, true);
+            socket.write(bufrep);
+            if (needResume) {
+                socket.resume();
+            }
         } catch (err) {
             handleProxyError(socket, err);
         }
