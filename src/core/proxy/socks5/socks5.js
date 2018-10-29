@@ -34,13 +34,10 @@ const BUF_REP_DISALLOW = new Buffer([0x05, REP.DISALLOW]);
 // 命令不支持
 const BUF_REP_CMDUNSUPP = new Buffer([0x05, REP.CMDUNSUPP]);
 
-// 记录连接http代理的端口的用户
-let transferClientPortUserReqMap = {};
-
 /**
  *  forward TCP connection to a new HTTP req/res
  */
-module.exports.Server = class Server extends EventEmitter {
+module.exports = class Server extends EventEmitter {
     constructor({
                     socks5Port,
                     httpPort,
@@ -221,37 +218,18 @@ module.exports.Server = class Server extends EventEmitter {
                 return;
             }
 
-            let targetIp;
+            let targetIp = await this.hostService.resolveHost(userId, req.dstAddr);
             let targetPort = req.dstPort;
 
-            req.userId = userId;
-            if (targetPort == 443) {
-                targetIp = '127.0.0.1';
-                targetPort = this.httpsPort;
-            } else if (targetPort == 80) {
-                targetIp = '127.0.0.1';
-                targetPort = this.httpPort;
-            } else {
-                let ip = await this.hostService.resolveHost(userId, req.dstAddr);
-                let targetIp = ip;
-            }
-
-
             let dstSock = new net.Socket();
-            let transferClientPort = '';
             let connected = false;
             dstSock.setKeepAlive(false);
             dstSock.on('error', (err) => {
                 if (!connected)
                     handleProxyError(socket, err);
             });
-            dstSock.on('close', had_error => {
-                delete transferClientPortUserReqMap[transferClientPort];
-            })
+
             dstSock.on('connect', function () {
-                let {port} = dstSock.address();
-                transferClientPort = port;
-                transferClientPortUserReqMap[transferClientPort] = req;
                 connected = true;
                 if (socket.writable) {
                     let localbytes = ipbytes(dstSock.localAddress || '127.0.0.1'),
@@ -306,10 +284,6 @@ module.exports.Server = class Server extends EventEmitter {
         return this;
     }
 };
-
-module.exports.getTranserPortInfo = function (port) {
-    return transferClientPortUserReqMap[port]
-}
 
 
 function onErrorNoop(err) {
