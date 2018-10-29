@@ -1,7 +1,10 @@
 const net = require('net');
 const util = require('util');
 const EventEmitter = require('events');
-const http = require('http')
+const http = require('http');
+const tls = require('tls');
+const crypto = require("crypto");
+let createSecureContext = tls.createSecureContext || crypto.createSecureContext;
 
 const Parser = require('./server.parser');
 const ipbytes = require('./utils').ipbytes;
@@ -54,17 +57,7 @@ module.exports.Server = class Server extends EventEmitter {
         this._authMap = {};
         this.hostService = ServiceRegistry.getHostService();
         this.profileService = ServiceRegistry.getProfileService();
-
-        this.httpServer = http.createServer();
-        this.httpServer.on('request', (req, res) => {
-            this.httpHandle.handle(req, res).catch(e => {
-                console.error(e);
-            });
-
-        });
-        this.httpServer.on('error', function (err) {
-            console.log(err);
-        });
+        this.certificationService = ServiceRegistry.getCertificationService();
 
         let self = this;
 
@@ -87,6 +80,16 @@ module.exports.Server = class Server extends EventEmitter {
             self.emit('listening');
         }).on('close', function () {
             self.emit('close');
+        });
+
+        this._srv.on('request', (req, res) => {
+            this.httpHandle.handle(req, res).catch(e => {
+                console.error(e);
+            });
+
+        });
+        this._srv.on('error', function (err) {
+            console.log(err);
         });
 
     }
@@ -161,10 +164,14 @@ module.exports.Server = class Server extends EventEmitter {
         // 理想情况通过首个数据包判断
         try {
             let username = req.username;
+            let clientIp = req.srcAddr;
             let userId = this.profileService.getUserIdByUserName(username);
             // 请求socket
             if (req.dstPort == 80) {
-                http._connectionListener.call(this.httpServer, socket);
+                socket.userId = userId;
+                socket.clientIp = clientIp;
+                socket.socks5 = true;
+                http._connectionListener.call(this._srv, socket);
                 /* socket.on('data', data => {
                      console.log(data)
                  })*/
@@ -187,8 +194,16 @@ module.exports.Server = class Server extends EventEmitter {
 
             if (req.dstPort == 443) {
                 // tls
-
-
+                let context = await this.certificationService.getCertificationForHost(req.dstAddr);
+                let tlsSocket = new tls.TLSSocket(socket, {
+                    isServer: true,
+                    key: context.key,
+                    cert: context.cert
+                });
+                tlsSocket.userId = userId;
+                tlsSocket.clientIp = clientIp;
+                tlsSocket.socks5 = true;
+                http._connectionListener.call(this._srv, tlsSocket);
                 socket.resume();
                 let localbytes = ipbytes('127.0.0.1'),
                     len = localbytes.length,
@@ -252,29 +267,7 @@ module.exports.Server = class Server extends EventEmitter {
                     bufrep.writeUInt16BE(dstSock.localPort, p, true);
 
                     socket.write(bufrep);
-
-                    if (req.dstPort == 80) {
-                        // 调用http模块里的东西进行处理
-
-
-                    } /*else if (req.dstPort == 443) { // 如何识别握手包
-                       /!* socket.on('data', d => {
-                            console.log(d.toString('hex'));
-                            socket.destroy();
-                        });*!/
-                        let tlsSocket = new tls.TLSSocket(socket, {
-                            isServer: true,
-                            SNICallback(serverName, SNICallback) {
-                                console.log(serverName)
-                            }
-                        })
-                        tlsSocket.renegotiate({},err=>{
-                            console.log('xieshang')
-                        })
-                    }*/ else {
-                        socket.pipe(dstSock).pipe(socket);
-                    }
-
+                    socket.pipe(dstSock).pipe(socket);
                     socket.resume();
                 } else if (dstSock.writable)
                     dstSock.end();
@@ -292,12 +285,11 @@ module.exports.Server = class Server extends EventEmitter {
         return this;
     }
 
-    start() {
+    async start() {
 
         this.useAuth(new UserPassword());
         this.useAuth(new NoneAuth());
         this._srv.listen(this.socks5Port);
-
         return this;
     }
 

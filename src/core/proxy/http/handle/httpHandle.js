@@ -37,22 +37,19 @@ module.exports = class HttpHandle {
      */
     async handle(req, res) {
 
-        let clientIp = '';
         let userId = '';
-        // 解析请求参数
-        let urlObj = parseUrl(req);
-        // sock5代理，目前做法直接将用户的包转发给http(s)端口
-        let remotePort = req.socket.remotePort;
-        let remoteIp = req.socket.remoteAddress;
-        let transerInfo = null //getTranserPortInfo(remotePort);
-        if (remoteIp == '127.0.0.1' && transerInfo) {
-            clientIp = transerInfo.srcAddr;
-            userId = transerInfo.userId || 'root';
-        } else {
+        let clientIp = '';
+
+        if (req.socket.socks5) { // sock5协议
+            let userId = req.socket.userId;
+            let clientIp = req.socket.clientIp;
+        } else {// http代理协议
             clientIp = getClientIp(req);
             userId = this.profileService.getClientIpMappedUserId(clientIp);
         }
 
+        // 解析请求参数
+        let urlObj = parseUrl(req);
 
         // 如果是 ui server请求，则直接转发不做记录
         if (this.appInfoService.isWebUiRequest(urlObj.hostname, urlObj.port)) {
