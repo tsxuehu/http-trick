@@ -22,6 +22,7 @@ module.exports = {
   entry: {
     manager: './src/manager/index.js',
     monitor: './src/monitor/index.js',
+    monitor2: './src/monitor2/index.js',
     wsmock: './src/wsmock/index.js'
   },
   output: {

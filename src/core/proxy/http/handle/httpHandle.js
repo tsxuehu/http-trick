@@ -40,9 +40,9 @@ module.exports = class HttpHandle {
         let userId = '';
         let clientIp = '';
 
-        if (req.socket.socks5) { // sock5协议
-            let userId = req.socket.userId;
-            let clientIp = req.socket.clientIp;
+        if (req.socket.socks5) { // socks5协议
+            userId = req.socket.userId;
+            clientIp = req.socket.clientIp;
         } else {// http代理协议
             clientIp = getClientIp(req);
             userId = this.profileService.getClientIpMappedUserId(clientIp);

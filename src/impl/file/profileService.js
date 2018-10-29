@@ -128,7 +128,7 @@ module.exports = class ProfileService extends EventEmitter {
     }
 
     getUserIdByUserName(userName) {
-        return userName
+        return userName || 'root'
     }
 
     // 将ip绑定至用户
