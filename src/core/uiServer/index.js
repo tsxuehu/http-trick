@@ -81,13 +81,16 @@ module.exports = class UiServer {
     _initTraffic() {
         this.httpTraficMonitorNS = this.io.of('/httptrafic');
         // 客户端发起连接请求
-        this.httpTraficMonitorNS.on('connection', client => {
+        this.httpTraficMonitorNS.on('connection', async client => {
 
             let userId = this._getUserId(client);
             client.join(userId, err => {
             });
 
             this.httpTrafficService.incMonitor(userId);
+
+            let deviceList = await this.profileService.getDeviceListBindedToUserId(userId);
+            client.emit('mappedDeviceList', deviceList);
             // 推送过滤器，状态
             let state = this.httpTrafficService.getStatus(userId);
             client.emit('state', state);
@@ -117,6 +120,10 @@ module.exports = class UiServer {
             let state = this.httpTrafficService.getStatus(userId);
             this.httpTraficMonitorNS.to(userId).emit('state', state);
         });
+        // 推送设备列表信息
+        this.profileService.on("data-change-deviceList", (userId, deviceList) => {
+            this.managerNS.to(userId).emit('mappedDeviceList', deviceList);
+        });
     }
 
     // 管理界面 使用的功能
@@ -139,8 +146,8 @@ module.exports = class UiServer {
             // 个人配置
             let profile = await this.profileService.getProfile(userId);
             client.emit('profile', profile);
-            let mappedClientIps = await this.profileService.getDeviceListBindedToUserId(userId);
-            client.emit('mappedDeviceList', mappedClientIps);
+            let deviceList = await this.profileService.getDeviceListBindedToUserId(userId);
+            client.emit('mappedDeviceList', deviceList);
             // host文件列表
             let hostFileList = await this.hostService.getHostFileList(userId);
             client.emit('hostfilelist', hostFileList);
