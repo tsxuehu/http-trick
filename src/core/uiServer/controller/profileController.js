@@ -77,6 +77,25 @@ module.exports = class ConfigController {
             };
         });
 
+        router.get('/profile/device/setName', async (ctx, next) => {
+            let userId = ctx.userId;
+            let deviceId = ctx.query.deviceId;
+            let name = ctx.query.name;
+            try {
+                await this.profileService.setDeviceName(deviceId, name);
+                ctx.body = {
+                    code: 0,
+                    msg: '解绑成功'
+                };
+            } catch (e) {
+                ctx.body = {
+                    code: 1,
+                    msg: e.message
+                };
+            }
+
+        });
+
         // 获取用户id
         router.get('/profile/getUserId', async (ctx, next) => {
             let userId = ctx.userId;

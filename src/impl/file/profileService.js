@@ -172,6 +172,22 @@ module.exports = class ProfileService extends EventEmitter {
         }
     }
 
+    async setDeviceName(deviceId, name) {
+        let info = this.deviceInfo[deviceId];
+        if (!info) throw new Error(`${deviceId}不存在`);
+
+        this.deviceInfo[deviceId] = {
+            id: deviceId,
+            name: name,
+            userId: info.userId
+        };
+
+        await fileUtil.writeJsonToFile(this.deviceInfoSaveFile, this.deviceInfo);
+
+        let deviceList = this.getDeviceListBindedToUserId(info.userId);
+        this.emit('data-change-deviceList', info.userId, deviceList);
+    }
+
     // 获取用户绑定的clientip
     getDeviceListBindedToUserId(userId) {
         let deviceList = [];

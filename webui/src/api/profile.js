@@ -3,35 +3,39 @@
  */
 
 import axios from 'axios';
+
 export default {
-    saveFile(content){
+    saveFile(content) {
         return axios.post('/profile/savefile', content);
     },
-    disableRule(){
+    disableRule() {
         return axios.post(`/profile/setRuleState`);
     },
-    enableRule(){
+    enableRule() {
         return axios.post(`/profile/setRuleState?rulestate=1`);
     },
-    disableHost(){
+    disableHost() {
         return axios.post(`/profile/setHostState`);
     },
-    enableHost(){
+    enableHost() {
         return axios.post(`/profile/setHostState?hoststate=1`);
     },
-    disableFilter(){
+    disableFilter() {
         return axios.post(`/profile/setFilterState`);
     },
-    enableFilter(){
+    enableFilter() {
         return axios.post(`/profile/setFilterState?filterstate=1`);
     },
-    getUserId(){
+    getUserId() {
         return axios.get(`/profile/getUserId`);
     },
-    setUserId(userId){
+    setUserId(userId) {
         return axios.get(`/profile/setUserId?userId=${userId}`);
     },
-    unBind(ip){
-        return axios.get(`/profile/device/unbind?ip=${ip}`);
+    unBind(id) {
+        return axios.get(`/profile/device/unbind?deviceId=${id}`);
+    },
+    setDeviceName(deviceId, name) {
+        return axios.get(`/profile/device/setName?deviceId=${deviceId}&name=${encodeURI(name)}`);
     }
 }
