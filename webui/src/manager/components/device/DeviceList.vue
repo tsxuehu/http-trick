@@ -50,9 +50,9 @@
 
         computed: {
             showedDevice(){
-               return this.$dc.mappedClientIps.map(ip => {
+               return this.$dc.mappedDeviceList.map(device => {
                     return {
-                        ip,
+                        device,
                     }
                });
             },
