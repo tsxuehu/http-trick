@@ -21,7 +21,7 @@ async function resetData(force = false) {
     await createDir(path.join(proxyDataDir, "filter"));
     await createDir(path.join(proxyDataDir, "traffic"));
 
-    await resetFile(path.join(proxyDataDir, "clientIpUserMap.json"), {}, force);
+    await resetFile(path.join(proxyDataDir, "deviceUserMap.json"), {}, force);
     await resetFile(path.join(proxyDataDir, "configure.json"), {}, force);
 }
 

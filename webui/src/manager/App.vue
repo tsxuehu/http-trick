@@ -377,7 +377,7 @@
                 this.projectPathArray = result;
             });
 
-            socket.on('mappedClientIps', ips => {
+            socket.on('mappedDeviceList', ips => {
                 this.mappedClientIps = ips;
             });
 

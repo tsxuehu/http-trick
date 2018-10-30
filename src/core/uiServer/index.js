@@ -45,7 +45,7 @@ module.exports = class UiServer {
                     }
                     userId = ip;
                     // 当前机器的ip和用户id绑定. 当机器为ip的机器发代理请求时，会使用userId用户的规则
-                    this.profileService.bindClientIp(userId, ip);
+                    // this.profileService.bindClient(userId, ip);
                 }
                 ctx.cookies.set('userId', userId, { maxAge: 1000 * 60 * 60 * 24 * 365 });
             }
@@ -139,8 +139,8 @@ module.exports = class UiServer {
             // 个人配置
             let profile = await this.profileService.getProfile(userId);
             client.emit('profile', profile);
-            let mappedClientIps = await this.profileService.getClientIpsMappedToUserId(userId);
-            client.emit('mappedClientIps', mappedClientIps);
+            let mappedClientIps = await this.profileService.getDeviceListMappedToUserId(userId);
+            client.emit('mappedDeviceList', mappedClientIps);
             // host文件列表
             let hostFileList = await this.hostService.getHostFileList(userId);
             client.emit('hostfilelist', hostFileList);
@@ -162,8 +162,8 @@ module.exports = class UiServer {
         this.profileService.on("data-change-profile", (userId, profile) => {
             this.managerNS.to(userId).emit('profile', profile);
         });
-        this.profileService.on("data-change-clientIpUserMap", (userId, clientIpList) => {
-            this.managerNS.to(userId).emit('mappedClientIps', clientIpList);
+        this.profileService.on("data-change-deviceUserMap", (userId, deviceList) => {
+            this.managerNS.to(userId).emit('mappedDeviceList', deviceList);
         });
         // host文件变化
         this.hostService.on("data-change", (userId, hostFilelist) => {

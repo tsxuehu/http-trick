@@ -51,22 +51,20 @@ module.exports = class ConfigController {
         // 绑定设备
         router.get('/profile/device/bind', async (ctx,next) =>{
             let userId = ctx.query.userId;
-            let ip = ctx.ip;
-            if (ip.substr(0, 7) == "::ffff:") {
-                ip = ip.substr(7)
-            }
-            this.profileService.bindClientIp(userId, ip);
+            let deviceId = ctx.query.deviceId;
+
+            this.profileService.bindClient(userId, deviceId);
             ctx.body = {
                 code: 0,
-                msg: `绑定成功: binded userId: ${userId}; ip: ${ip}`
+                msg: `绑定成功: binded userId: ${userId}; ip: ${deviceId}`
             };
         });
 
         // 解绑设备
         router.get('/profile/device/unbind', async (ctx,next) =>{
             let userId = ctx.userId;
-            let ip = ctx.query.ip;
-            this.profileService.unbindClientIp(ip);
+            let deviceId = ctx.query.deviceId;
+            this.profileService.unbindClient(deviceId);
             ctx.body = {
                 code: 0,
                 msg: '解绑成功'
@@ -97,7 +95,7 @@ module.exports = class ConfigController {
                 userId = ip;
             }
             userId = userId.trim();
-            this.profileService.bindClientIp(userId, ip);
+           // this.profileService.bindClient(userId, ip);
             ctx.cookies.set('userId', userId, { maxAge: 1000 * 60 * 60 * 24 * 365 });
             ctx.body = {
                 code: 0,

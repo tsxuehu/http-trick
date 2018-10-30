@@ -45,7 +45,7 @@ module.exports = class HttpHandle {
             clientIp = req.socket.clientIp;
         } else {// http代理协议
             clientIp = getClientIp(req);
-            userId = this.profileService.getClientIpMappedUserId(clientIp);
+            userId = this.profileService.getDeviceMappedUserId(clientIp);
         }
 
         // 解析请求参数

@@ -19,16 +19,16 @@ const defaultProfile = {
  * Created by tsxuehu on 8/3/17.
  */
 module.exports = class ProfileService extends EventEmitter {
-    constructor({ appInfoService }) {
+    constructor({appInfoService}) {
         super();
         // userId -> profile
         this.userProfileMap = {};
         // clientIp -> userId
-        this.clientIpUserMap = {};
+        this.deviceUserMap = {};
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
         this.profileSaveDir = path.join(proxyDataDir, "profile");
-        this.clientIpUserMapSaveFile = path.join(proxyDataDir, "clientIpUserMap.json");
+        this.deviceUserMapSaveFile = path.join(proxyDataDir, "deviceUserMap.json");
     }
 
     async start() {
@@ -40,8 +40,8 @@ module.exports = class ProfileService extends EventEmitter {
             this.userProfileMap[userId] = profile;
 
         });
-        // 加载ip-> userID映射
-        this.clientIpUserMap = await fileUtil.readJsonFromFile(this.clientIpUserMapSaveFile);
+        // 加载deviceId-> userID映射
+        this.deviceUserMap = await fileUtil.readJsonFromFile(this.deviceUserMapSaveFile);
     }
 
     getProfile(userId) {
@@ -123,8 +123,8 @@ module.exports = class ProfileService extends EventEmitter {
     }
 
     // 获取clientIp对应的user id
-    getClientIpMappedUserId(clientIp) {
-        return this.clientIpUserMap[clientIp] || 'root';
+    getDeviceMappedUserId(deviceId) {
+        return this.deviceUserMap[deviceId] || 'root';
     }
 
     getUserIdByUserName(userName) {
@@ -132,45 +132,45 @@ module.exports = class ProfileService extends EventEmitter {
     }
 
     // 将ip绑定至用户
-    async bindClientIp(userId, clientIp) {
-        let originUserId = this.clientIpUserMap[clientIp];
+    async bindClient(userId, deviceId) {
+        let originUserId = this.deviceUserMap[deviceId];
         if (userId == originUserId) {
             return
         }
-        this.clientIpUserMap[clientIp] = userId;
+        this.deviceUserMap[deviceId] = userId;
 
-        await fileUtil.writeJsonToFile(this.clientIpUserMapSaveFile, this.clientIpUserMap);
+        await fileUtil.writeJsonToFile(this.deviceUserMapSaveFile, this.deviceUserMap);
 
-        let clientIpList = this.getClientIpsMappedToUserId(userId);
-        this.emit('data-change-clientIpUserMap', userId, clientIpList);
+        let clientIpList = this.getDeviceListMappedToUserId(userId);
+        this.emit('data-change-deviceUserMap', userId, clientIpList);
 
         if (originUserId) {
-            let originClientIpList = this.getClientIpsMappedToUserId(originUserId);
-            this.emit('data-change-clientIpUserMap', originUserId, originClientIpList);
+            let originClientIpList = this.getDeviceListMappedToUserId(originUserId);
+            this.emit('data-change-deviceUserMap', originUserId, originClientIpList);
         }
     }
 
     // 解除绑定至用户
-    async unbindClientIp(clientIp) {
-        let originUserId = this.clientIpUserMap[clientIp];
-        delete this.clientIpUserMap[clientIp];
+    async unbindClient(deviceId) {
+        let originUserId = this.deviceUserMap[deviceId];
+        delete this.deviceUserMap[deviceId];
 
-        await fileUtil.writeJsonToFile(this.clientIpUserMapSaveFile, this.clientIpUserMap);
+        await fileUtil.writeJsonToFile(this.deviceUserMapSaveFile, this.deviceUserMap);
 
         if (originUserId) {
-            let originClientIpList = this.getClientIpsMappedToUserId(originUserId);
-            this.emit('data-change-clientIpUserMap', originUserId, originClientIpList);
+            let originClientIpList = this.getDeviceListMappedToUserId(originUserId);
+            this.emit('data-change-deviceUserMap', originUserId, originClientIpList);
         }
     }
 
     // 获取用户绑定的clientip
-    getClientIpsMappedToUserId(userId) {
-        let ips = [];
-        _.forEach(this.clientIpUserMap, (mapedUserId, ip) => {
+    getDeviceListMappedToUserId(userId) {
+        let deviceList = [];
+        _.forEach(this.deviceUserMap, (mapedUserId, device) => {
             if (mapedUserId == userId) {
-                ips.push(ip);
+                deviceList.push(device);
             }
         });
-        return ips;
+        return deviceList;
     }
 };
