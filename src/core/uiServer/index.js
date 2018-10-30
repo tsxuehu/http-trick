@@ -139,7 +139,7 @@ module.exports = class UiServer {
             // 个人配置
             let profile = await this.profileService.getProfile(userId);
             client.emit('profile', profile);
-            let mappedClientIps = await this.profileService.getDeviceListMappedToUserId(userId);
+            let mappedClientIps = await this.profileService.getDeviceListBindedToUserId(userId);
             client.emit('mappedDeviceList', mappedClientIps);
             // host文件列表
             let hostFileList = await this.hostService.getHostFileList(userId);
@@ -162,7 +162,7 @@ module.exports = class UiServer {
         this.profileService.on("data-change-profile", (userId, profile) => {
             this.managerNS.to(userId).emit('profile', profile);
         });
-        this.profileService.on("data-change-deviceUserMap", (userId, deviceList) => {
+        this.profileService.on("data-change-deviceList", (userId, deviceList) => {
             this.managerNS.to(userId).emit('mappedDeviceList', deviceList);
         });
         // host文件变化

@@ -62,7 +62,7 @@ module.exports = class ConfigController {
             this.profileService.bindClient(userId, deviceId);
             ctx.body = {
                 code: 0,
-                msg: `绑定成功: binded userId: ${userId}; ip: ${deviceId}`
+                msg: `绑定成功: binded userId: ${userId}; deviceId: ${deviceId}`
             };
         });
 

@@ -26,6 +26,8 @@
     import HttpTraffic from './components/HttpTraffic.vue';
     import Detail from './components/Detail.vue';
     import * as trafficApi from '../api/traffic';
+    import profileApi from '../api/profile';
+
     export default {
         components: {
             HttpTraffic, Detail
@@ -33,6 +35,7 @@
         data(){
             return {
                 isDataCenter: true,
+                userId: 'guest',
                 // 当前选择的记录
                 width: 0,
                 height: 0,
@@ -241,8 +244,11 @@
                 deep: true
             }
         },
-        created() {
+        async created() {
             this.calcSize();
+
+            let result = await profileApi.getUserId();
+            this.userId = result.data.data.userId;
 
             $(window).resize(_.debounce(this.calcSize, 200));
 

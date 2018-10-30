@@ -23,12 +23,12 @@ module.exports = class ProfileService extends EventEmitter {
         super();
         // userId -> profile
         this.userProfileMap = {};
-        // clientIp -> userId
-        this.deviceUserMap = {};
+        // deviceId -> info { userId: , name: '', id: ''}
+        this.deviceInfo = {};
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
         this.profileSaveDir = path.join(proxyDataDir, "profile");
-        this.deviceUserMapSaveFile = path.join(proxyDataDir, "deviceUserMap.json");
+        this.deviceInfoSaveFile = path.join(proxyDataDir, "deviceInfo.json");
     }
 
     async start() {
@@ -41,7 +41,7 @@ module.exports = class ProfileService extends EventEmitter {
 
         });
         // 加载deviceId-> userID映射
-        this.deviceUserMap = await fileUtil.readJsonFromFile(this.deviceUserMapSaveFile);
+        this.deviceInfo = await fileUtil.readJsonFromFile(this.deviceInfoSaveFile);
     }
 
     getProfile(userId) {
@@ -124,7 +124,11 @@ module.exports = class ProfileService extends EventEmitter {
 
     // 获取clientIp对应的user id
     getDeviceMappedUserId(deviceId) {
-        return this.deviceUserMap[deviceId] || 'root';
+        let info = this.deviceInfo[deviceId];
+        if (!info) {
+            return 'root'
+        }
+        return info.userId;
     }
 
     getUserIdByUserName(userName) {
@@ -133,42 +137,47 @@ module.exports = class ProfileService extends EventEmitter {
 
     // 将ip绑定至用户
     async bindClient(userId, deviceId) {
-        let originUserId = this.deviceUserMap[deviceId];
+        let info = this.deviceInfo[deviceId];
+        let originUserId = (info || {}).userId;
         if (userId == originUserId) {
             return
         }
-        this.deviceUserMap[deviceId] = userId;
+        this.deviceInfo[deviceId] = {
+            id: deviceId,
+            userId: userId,
+            name: (info || {}).name || deviceId
+        };
 
-        await fileUtil.writeJsonToFile(this.deviceUserMapSaveFile, this.deviceUserMap);
+        await fileUtil.writeJsonToFile(this.deviceInfoSaveFile, this.deviceInfo);
 
-        let clientIpList = this.getDeviceListMappedToUserId(userId);
-        this.emit('data-change-deviceUserMap', userId, clientIpList);
+        let deviceList = this.getDeviceListBindedToUserId(userId);
+        this.emit('data-change-deviceList', userId, deviceList);
 
         if (originUserId) {
-            let originClientIpList = this.getDeviceListMappedToUserId(originUserId);
-            this.emit('data-change-deviceUserMap', originUserId, originClientIpList);
+            let originClientIpList = this.getDeviceListBindedToUserId(originUserId);
+            this.emit('data-change-deviceList', originUserId, originClientIpList);
         }
     }
 
     // 解除绑定至用户
     async unbindClient(deviceId) {
-        let originUserId = this.deviceUserMap[deviceId];
-        delete this.deviceUserMap[deviceId];
+        let info = this.deviceInfo[deviceId];
+        delete this.deviceInfo[deviceId];
 
-        await fileUtil.writeJsonToFile(this.deviceUserMapSaveFile, this.deviceUserMap);
+        await fileUtil.writeJsonToFile(this.deviceInfoSaveFile, this.deviceInfo);
 
-        if (originUserId) {
-            let originClientIpList = this.getDeviceListMappedToUserId(originUserId);
-            this.emit('data-change-deviceUserMap', originUserId, originClientIpList);
+        if (info) {
+            let originDeviceList = this.getDeviceListBindedToUserId(info.userId);
+            this.emit('data-change-deviceList', info.userId, originDeviceList);
         }
     }
 
     // 获取用户绑定的clientip
-    getDeviceListMappedToUserId(userId) {
+    getDeviceListBindedToUserId(userId) {
         let deviceList = [];
-        _.forEach(this.deviceUserMap, (mapedUserId, device) => {
-            if (mapedUserId == userId) {
-                deviceList.push(device);
+        _.forEach(this.deviceInfo, (info, deviceId) => {
+            if (info.userId == userId) {
+                deviceList.push(info);
             }
         });
         return deviceList;

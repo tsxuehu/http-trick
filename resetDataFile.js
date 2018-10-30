@@ -21,7 +21,7 @@ async function resetData(force = false) {
     await createDir(path.join(proxyDataDir, "filter"));
     await createDir(path.join(proxyDataDir, "traffic"));
 
-    await resetFile(path.join(proxyDataDir, "deviceUserMap.json"), {}, force);
+    await resetFile(path.join(proxyDataDir, "deviceInfo.json"), {}, force);
     await resetFile(path.join(proxyDataDir, "configure.json"), {}, force);
 }
 
@@ -46,3 +46,4 @@ async function createDir(path) {
 // sudo npm i -g http-trick安装时，执行postinstall脚本的用户的身份是啥？
 
 module.exports = resetData;
+resetData()

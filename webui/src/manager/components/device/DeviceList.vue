@@ -15,8 +15,10 @@
                 <el-button type="text" @click="copyBindUrl">点击复制绑定链接</el-button>
             </div>
         </div>
-        <el-table border align='center' style="width: 436px;" :data="showedDevice">
-            <el-table-column prop="ip" label="IP" align="center" width="300" :sortable="true">
+        <el-table border align='center' style="width: 800px;" :data="this.$dc.mappedDeviceList">
+            <el-table-column prop="id" label="ID" align="center" width="150" :sortable="true">
+            </el-table-column>
+            <el-table-column prop="name" label="Name" align="center" :sortable="true">
             </el-table-column>
             <el-table-column label="操作" :width="136" align="center" :context="_self">
                 <template scope='scope'>
@@ -34,29 +36,30 @@
     import profileApi from '../../../api/profile';
     import copyToClipboard from 'copy-to-clipboard';
     import './devicelist.pcss'
+
     export default {
         name: 'DeviceList',
 
         methods: {
-            copyBindUrl(){
+            copyBindUrl() {
                 copyToClipboard(this.bindUrl);
                 this.$message('已将设备绑定链接复制到剪切板，在设备中打开此url即可绑定设备');
             },
-            async unbind(row,index){
-                await profileApi.setUserId(value || '');
+            async unbind(row, index) {
+                await profileApi.unBind(row.id);
                 this.$message('解绑成功');
             }
         },
 
         computed: {
-            showedDevice(){
-               return this.$dc.mappedDeviceList.map(device => {
+            showedDevice() {
+                return this.$dc.mappedDeviceList.map(device => {
                     return {
                         device,
                     }
-               });
+                });
             },
-            bindUrl(){
+            bindUrl() {
                 return `http://${this.$dc.appInfo.pcIp}:${this.$dc.appInfo.realUiPort}/profile/device/bind?userId=${this.$dc.userId}`;
             },
             imgUrl() {
