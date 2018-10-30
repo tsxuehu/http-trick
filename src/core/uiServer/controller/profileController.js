@@ -10,6 +10,7 @@ module.exports = class ConfigController {
         }
         return instance;
     }
+
     constructor() {
         this.profileService = ServiceRegistry.getProfileService();
         this.appInfoService = ServiceRegistry.getAppInfoService();
@@ -49,10 +50,15 @@ module.exports = class ConfigController {
         });
 
         // 绑定设备
-        router.get('/profile/device/bind', async (ctx,next) =>{
+        router.get('/profile/device/bind', async (ctx, next) => {
             let userId = ctx.query.userId;
             let deviceId = ctx.query.deviceId;
-
+            if (!deviceId) { // 没传设备id，则将设备的ip作为设备id
+                let ip = ctx.ip;
+                if (ip.substr(0, 7) == "::ffff:") {
+                    deviceId = ip.substr(7)
+                }
+            }
             this.profileService.bindClient(userId, deviceId);
             ctx.body = {
                 code: 0,
@@ -61,7 +67,7 @@ module.exports = class ConfigController {
         });
 
         // 解绑设备
-        router.get('/profile/device/unbind', async (ctx,next) =>{
+        router.get('/profile/device/unbind', async (ctx, next) => {
             let userId = ctx.userId;
             let deviceId = ctx.query.deviceId;
             this.profileService.unbindClient(deviceId);
@@ -72,7 +78,7 @@ module.exports = class ConfigController {
         });
 
         // 获取用户id
-        router.get('/profile/getUserId', async (ctx,next) =>{
+        router.get('/profile/getUserId', async (ctx, next) => {
             let userId = ctx.userId;
             ctx.body = {
                 code: 0,
@@ -83,7 +89,7 @@ module.exports = class ConfigController {
         });
 
         // 重载用户id
-        router.get('/profile/setUserId', async (ctx,next) =>{
+        router.get('/profile/setUserId', async (ctx, next) => {
             let userId = ctx.query.userId;
 
             let ip = ctx.ip;
@@ -95,8 +101,8 @@ module.exports = class ConfigController {
                 userId = ip;
             }
             userId = userId.trim();
-           // this.profileService.bindClient(userId, ip);
-            ctx.cookies.set('userId', userId, { maxAge: 1000 * 60 * 60 * 24 * 365 });
+            // this.profileService.bindClient(userId, ip);
+            ctx.cookies.set('userId', userId, {maxAge: 1000 * 60 * 60 * 24 * 365});
             ctx.body = {
                 code: 0,
                 data: {
