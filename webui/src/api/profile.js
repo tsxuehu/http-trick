@@ -37,5 +37,8 @@ export default {
     },
     setDeviceName(deviceId, name) {
         return axios.get(`/profile/device/setName?deviceId=${deviceId}&name=${encodeURI(name)}`);
+    },
+    disableMonitor(deviceId) {
+        return axios.get(`/profile/device/disableMonitor?deviceId=${deviceId}`);
     }
 }

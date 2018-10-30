@@ -96,6 +96,24 @@ module.exports = class ConfigController {
 
         });
 
+        router.get('/profile/device/disableMonitor', async (ctx, next) => {
+            let userId = ctx.userId;
+            let deviceId = ctx.query.deviceId;
+            try {
+                await this.profileService.disableMonitor(deviceId);
+                ctx.body = {
+                    code: 0,
+                    msg: `${deviceId}已经解除监控`
+                };
+            } catch (e) {
+                ctx.body = {
+                    code: 1,
+                    msg: e.message
+                };
+            }
+
+        });
+
         // 获取用户id
         router.get('/profile/getUserId', async (ctx, next) => {
             let userId = ctx.userId;

@@ -11,10 +11,12 @@
   display: flex;
   height: calc(100% - 28px);
   overflow: hidden;
+  .device-list {
+    width: 250px;
+  }
   .traffic {
     flex-grow: 1;
     flex-shrink: 0;
-    width: calc(100% - 400px);
   }
   .detail {
     width: 400px;
@@ -41,8 +43,16 @@
     line-height: 27px;
     height: 27px;
   }
+  .username {
+    flex-grow: 1;
+    text-align: right;
+    padding-right: 20px;
+  }
   input {
     width: 150px;
+  }
+  .el-button--text {
+    padding: 0;
   }
   .search {
     margin-left: 5px;

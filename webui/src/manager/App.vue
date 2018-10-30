@@ -104,7 +104,7 @@
                 // 将工程路径配置转换为数组格式 方便编辑
                 projectPathArray: [],
                 // 关联的ip
-                mappedDeviceList: [],
+                bindedDeviceList: [],
                 // 生效的规则
                 rule: [],
                 // host文件列表
@@ -377,8 +377,8 @@
                 this.projectPathArray = result;
             });
 
-            socket.on('mappedDeviceList', deviceList => {
-                this.mappedDeviceList = deviceList;
+            socket.on('bindedDeviceList', deviceList => {
+                this.bindedDeviceList = deviceList;
             });
 
             socket.on('hostfilelist', data => {

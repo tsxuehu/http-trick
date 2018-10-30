@@ -145,7 +145,8 @@ module.exports = class ProfileService extends EventEmitter {
         this.deviceInfo[deviceId] = {
             id: deviceId,
             userId: userId,
-            name: (info || {}).name || deviceId
+            name: (info || {}).name || deviceId,
+            disableMonitor: false
         };
 
         await fileUtil.writeJsonToFile(this.deviceInfoSaveFile, this.deviceInfo);
@@ -176,11 +177,23 @@ module.exports = class ProfileService extends EventEmitter {
         let info = this.deviceInfo[deviceId];
         if (!info) throw new Error(`${deviceId}不存在`);
 
-        this.deviceInfo[deviceId] = {
-            id: deviceId,
-            name: name,
-            userId: info.userId
-        };
+        info.name = name;
+
+        this.deviceInfo[deviceId] = info;
+
+        await fileUtil.writeJsonToFile(this.deviceInfoSaveFile, this.deviceInfo);
+
+        let deviceList = this.getDeviceListBindedToUserId(info.userId);
+        this.emit('data-change-deviceList', info.userId, deviceList);
+    }
+
+    async disableMonitor(deviceId) {
+        let info = this.deviceInfo[deviceId];
+        if (!info) throw new Error(`${deviceId}不存在`);
+
+        info.disableMonitor = true;
+
+        this.deviceInfo[deviceId] = info;
 
         await fileUtil.writeJsonToFile(this.deviceInfoSaveFile, this.deviceInfo);
 

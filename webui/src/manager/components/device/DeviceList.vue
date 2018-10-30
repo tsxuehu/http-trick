@@ -15,7 +15,7 @@
                 <el-button type="text" @click="copyBindUrl">点击复制绑定链接</el-button>
             </div>
         </div>
-        <el-table border align='center' style="width: 800px;" :data="this.$dc.mappedDeviceList">
+        <el-table border align='center' style="width: 800px;" :data="this.$dc.bindedDeviceList">
             <el-table-column prop="id" label="ID" align="center" width="150" :sortable="true">
             </el-table-column>
             <el-table-column prop="name" label="Name" align="center" :sortable="true">
@@ -33,8 +33,9 @@
 
 <script>
     import qrcode from 'qrcode-js';
-    import profileApi from '../../../api/profile';
     import copyToClipboard from 'copy-to-clipboard';
+
+    import profileApi from '../../../api/profile';
     import './devicelist.pcss'
 
     export default {
@@ -52,13 +53,6 @@
         },
 
         computed: {
-            showedDevice() {
-                return this.$dc.mappedDeviceList.map(device => {
-                    return {
-                        device,
-                    }
-                });
-            },
             bindUrl() {
                 return `http://${this.$dc.appInfo.pcIp}:${this.$dc.appInfo.realUiPort}/profile/device/bind?userId=${this.$dc.userId}`;
             },

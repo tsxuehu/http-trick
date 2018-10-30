@@ -8,13 +8,19 @@
             </span>
             <i class="iconfont icon-qingchu icon-btn" @click="requestClear"></i>
             <span class="tips " :style="{visibility: state.overflow? 'initial' : 'hidden'}">记录已满，请清除历史记录</span>
-            <span class="filters">Filter:
-                <input placeholder="Host" v-model="filter.host"/>
-                / <input placeholder="Path" v-model="filter.path"/>
+            <span class="filters">
+                Filter: <input placeholder="Host" v-model="filter.host"/> / <input placeholder="Path"
+                                                                                   v-model="filter.path"/>
                 <i class="iconfont icon-sousuo search"></i>
             </span>
+            <a href="javascript:void(0)" v-if="!$dc.appInfo.single" class="username" @click="changeUser">
+                <el-tooltip class="item" effect="dark" content="点击切换用户" placement="top">
+                    <el-button type="text">{{$dc.userId}}</el-button>
+                </el-tooltip>
+            </a>
         </div>
         <div class="monitor">
+            <device-list v-if="!$dc.appInfo.single"></device-list>
             <http-traffic :height="height"></http-traffic>
             <detail :height="height"></detail>
         </div>
@@ -23,19 +29,23 @@
 <script>
     import $ from 'jquery';
     import _ from 'lodash';
-    import HttpTraffic from './components/HttpTraffic.vue';
-    import Detail from './components/Detail.vue';
+    import HttpTraffic from './components/traffic/HttpTraffic.vue';
+    import Detail from './components/detail/Detail.vue';
+    import DeviceList from './components/device/DeviceList.vue';
     import * as trafficApi from '../api/traffic';
     import profileApi from '../api/profile';
+    import appApi from '../api/app';
 
     export default {
         components: {
-            HttpTraffic, Detail
+            HttpTraffic, Detail, DeviceList
         },
-        data(){
+        data() {
             return {
                 isDataCenter: true,
+                appInfo: {},
                 userId: 'guest',
+                bindedDeviceList: [],
                 // 当前选择的记录
                 width: 0,
                 height: 0,
@@ -59,32 +69,32 @@
             };
         },
         computed: {
-            total(){
+            total() {
                 return this.filterdRecordArray.length;
             },
 
-            currentRow(){
+            currentRow() {
                 return this.recordMap[this.selectId] || {};
             },
-            rightClickRow(){
+            rightClickRow() {
                 return this.recordMap[this.rightClickId];
             },
             // 原始请求的header键值对
-            originRequestHeader(){
+            originRequestHeader() {
                 try {
                     return this.currentRow.originRequest.headers;
                 } catch (e) {
                     return {};
                 }
             },
-            originRequestCookie(){
+            originRequestCookie() {
                 try {
                     return trafficApi.parseCookie(this.currentRow.originRequest.headers.cookie || '');
                 } catch (e) {
                     return {};
                 }
             },
-            originRequestQueryParams(){
+            originRequestQueryParams() {
                 try {
                     return trafficApi.parseQuery(this.currentRow.originRequest.path);
                 } catch (e) {
@@ -92,21 +102,21 @@
                 }
             },
             // 当前请求的header键值对
-            requestHeader(){
+            requestHeader() {
                 try {
                     return this.currentRow.requestData.headers;
                 } catch (e) {
                     return {};
                 }
             },
-            requestCookie(){
+            requestCookie() {
                 try {
                     return trafficApi.parseCookie(this.currentRow.requestData.headers.cookie || '');
                 } catch (e) {
                     return {};
                 }
             },
-            requestQueryParams(){
+            requestQueryParams() {
                 try {
                     return trafficApi.parseQuery(this.currentRow.requestData.path);
                 } catch (e) {
@@ -114,7 +124,7 @@
                 }
             },
 
-            responseHeader(){
+            responseHeader() {
                 try {
                     let headers = Object.assign({}, this.currentRow.response.headers);
                     delete headers['set-cookie'];
@@ -123,7 +133,7 @@
                     return {};
                 }
             },
-            setCookies(){
+            setCookies() {
                 try {
                     return this.currentRow.response.headers['set-cookie'] || [];
                 } catch (e) {
@@ -131,27 +141,30 @@
                 }
             },
 
-            timeline(){
+            timeline() {
                 return {
                     '请求': ''
                 }
             }
         },
         methods: {
-            requestToggleRecordState(){
+            changeUser() {
+
+            },
+            requestToggleRecordState() {
                 this.state.stopRecord = !this.state.stopRecord;
                 // 向远端发送请求
                 trafficApi.setStopRecord(this.state.stopRecord);
             },
-            requestClear(){
+            requestClear() {
                 this.requestingClear = true;
                 this.clear();
                 trafficApi.clear();
                 // 向远端发送请求
             },
-            filterRecords(){
+            filterRecords() {
                 let filtered = [];
-                let { host: hostFilter, path: pathFilter } = this.filter;
+                let {host: hostFilter, path: pathFilter} = this.filter;
                 this.originRecordArray.forEach(id => {
                     let r = this.recordMap[id];
                     let originRequest = r.originRequest;
@@ -163,14 +176,14 @@
                 });
                 this.filterdRecordArray = filtered;
             },
-            calcSize(){
+            calcSize() {
                 this.width = $(window).width();
                 this.height = $(window).height() - 28;
             },
             // 处理接受到的请求处理数据
-            receiveTraffic(rows){
+            receiveTraffic(rows) {
                 if (this.state.stopRecord || this.requestingClear) return;
-                let { host: hostFilter, path: pathFilter } = this.filter;
+                let {host: hostFilter, path: pathFilter} = this.filter;
                 _.forEach(rows, (row) => {
                     let id = row.id;
                     let hasRecieved = !!this.recordMap[id];
@@ -191,7 +204,7 @@
                     }
                 });
             },
-            async setCurrentRowIndex(id){
+            async setCurrentRowIndex(id) {
                 if (this.selectId == id) return;
                 this.selectId = id;
                 this.currentRequestBody = '';
@@ -211,10 +224,10 @@
                     console.log(e);
                 }
             },
-            setRightClickedRecordId(id){
+            setRightClickedRecordId(id) {
                 this.rightClickId = id;
             },
-            setFilter(filter){
+            setFilter(filter) {
                 let origin = this.filter;
                 if (origin.path == filter.path && origin.host == filter.host) {
                     return;
@@ -222,7 +235,7 @@
                 this.filter = filter;
 
             },
-            setState(state){
+            setState(state) {
                 this.state = state;
             },
             clear() {
@@ -249,6 +262,8 @@
 
             let result = await profileApi.getUserId();
             this.userId = result.data.data.userId;
+            let appInfo = await appApi.getAppInfo();
+            this.appInfo = appInfo;
 
             $(window).resize(_.debounce(this.calcSize, 200));
 
@@ -262,6 +277,9 @@
             socket.on('clear', () => {
                 this.requestingClear = false;
                 this.clear();
+            });
+            socket.on('bindedDeviceList', deviceList => {
+                this.bindedDeviceList = deviceList;
             });
         }
     };
