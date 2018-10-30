@@ -17,6 +17,7 @@ function authHandle(user,passworld, cb) {
 
 module.exports = function UserPasswordAuthHandlers() {
     return {
+        needUserName: true,
         METHOD: 0x02,
         server: function serverHandler(stream, cb) {
             var state = STATE_VERSION,

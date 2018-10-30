@@ -39,8 +39,8 @@ module.exports = class HttpHandle {
 
         let userId = '';
         let clientIp = '';
-
-        if (req.socket.socks5) { // socks5协议
+        let socks5proxy = req.socket.socks5;
+        if (socks5proxy) { // socks5协议
             userId = req.socket.userId;
             clientIp = req.socket.clientIp;
         } else {// http代理协议

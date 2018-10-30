@@ -110,10 +110,11 @@ module.exports = class Server extends EventEmitter {
             for (let i = 0; i < methods.length; i++) {
                 let method = methods[i];
                 auth = authsMap[method];
-                if (auth) break;
+                if (auth && auth.needUserName) break;
             }
             if (auth) {
                 auth.server(socket, function (result, user, pass) {
+                    console.log(user, pass)
                     if (result === true) {
                         parser.authed = true;
                         parser.username = user;
@@ -170,7 +171,7 @@ module.exports = class Server extends EventEmitter {
                 socket.socks5 = true;
                 http._connectionListener.call(this._srv, socket);
 
-            } else if (req.dstPort == 443) {
+            } else if (req.dstPort == 4431) {
                 // tls
                 let context = await this.certificationService.getCertificationForHost(req.dstAddr);
                 let tlsSocket = new tls.TLSSocket(socket, {
@@ -182,7 +183,7 @@ module.exports = class Server extends EventEmitter {
                 tlsSocket.userId = userId;
                 tlsSocket.clientIp = clientIp;
                 tlsSocket.socks5 = true;
-                http._connectionListener.call(this._srv, tlsSocket);
+                //   http._connectionListener.call(this._srv, tlsSocket);
 
                 tlsSocket.on('data', data => {
                     console.log('tlsSocket ------- ', data.toString())
