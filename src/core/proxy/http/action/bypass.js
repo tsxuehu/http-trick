@@ -70,6 +70,7 @@ module.exports = class Bypass extends Action {
                 recordResponse,
                 urlObj,
                 clientIp,
+                deviceId,
                 userId,
                 rule, // 规则
                 action, // 规则里的一个动作
@@ -90,6 +91,7 @@ module.exports = class Bypass extends Action {
                 recordResponse,
                 urlObj,
                 clientIp,
+                deviceId,
                 userId,
                 rule, // 规则
                 action, // 规则里的一个动作
@@ -112,6 +114,7 @@ module.exports = class Bypass extends Action {
                      recordResponse,
                      urlObj,
                      clientIp,
+                     deviceId,
                      userId,
                      rule, // 规则
                      action, // 规则里的一个动作
@@ -143,7 +146,7 @@ module.exports = class Bypass extends Action {
         toClientResponse.dnsResolveBeginTime = Date.now();
         let ip = '';
         try {
-            ip = await this.hostService.resolveHost(userId, hostname);
+            ip = await this.hostService.resolveHost(userId, hostname, deviceId);
         } catch (e) {
             let href = `${protocol}//${hostname}:${port}${path}`;
             toClientResponseUtils.setError(toClientResponse, href, e);
@@ -199,6 +202,7 @@ module.exports = class Bypass extends Action {
                                        recordResponse,
                                        urlObj,
                                        clientIp,
+                                       deviceId,
                                        userId,
                                        rule, // 规则
                                        action, // 规则里的一个动作
@@ -221,7 +225,7 @@ module.exports = class Bypass extends Action {
         toClientResponse.dnsResolveBeginTime = Date.now();
         let ip = '';
         try {
-            ip = await this.hostService.resolveHost(userId, hostname);
+            ip = await this.hostService.resolveHost(userId, hostname, deviceId);
         } catch (e) {
             let href = `${protocol}//${hostname}:${port}${pathname}?${queryString.stringify(actualRequestQuery)}`;
             toClientResponseUtils.setError(toClientResponse, href, e);

@@ -21,6 +21,7 @@
                       :ctxCancel="resetCtxLocals"
                       :ctxClose="onCtxClose">
             <li class="ctx-item" @click="renameDevice">取别名</li>
+            <li class="ctx-item" @click="changeHost">修改host</li>
             <li class="ctx-item" @click="removeDevice">删除设备</li>
             <li class="ctx-item" v-if="!$dc.rightClickDevice.disableMonitor" @click="disableMonitor">停止监控</li>
             <li class="ctx-item" v-if="$dc.rightClickDevice.disableMonitor" @click="enableMonitor">开启监控</li>
@@ -44,6 +45,10 @@
                 copyToClipboard(this.bindUrl);
                 this.$message('已将设备绑定链接复制到剪切板，在设备中打开此url即可绑定设备');
             },
+            // 修改设备host
+            changeHost() {
+
+            },
             async removeDevice(row, index) {
                 await profileApi.unBind(row.id);
                 this.$message('解绑成功');
@@ -52,7 +57,7 @@
                 this.$prompt('请输入设备名字', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                }).then(async ({ value }) => {
+                }).then(async ({value}) => {
                     await profileApi.setDeviceName(this.$dc.rightClickDeviceId, value);
                     this.$message({
                         type: 'success',

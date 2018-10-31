@@ -66,7 +66,7 @@ module.exports = class Redirect extends Action {
                   last = true
               }) {
         //================== 转发到本地 或远程
-        let { href } = urlObj;
+        let {href} = urlObj;
         let target = '';
         // 解析目标
         try {
@@ -85,6 +85,7 @@ module.exports = class Redirect extends Action {
                 res,
                 recordResponse,
                 clientIp,
+                deviceId,
                 target,
                 additionalRequestHeaders, // 请求头
                 actualRequestHeaders,
@@ -116,6 +117,7 @@ module.exports = class Redirect extends Action {
                         res,
                         recordResponse,
                         clientIp,
+                        deviceId,
                         userId,
                         target,
                         additionalRequestHeaders, // 请求头
@@ -128,7 +130,7 @@ module.exports = class Redirect extends Action {
                         last
                     }) {
         let redirectUrlObj = url.parse(target);
-        let { protocol, hostname, path, port, query } = redirectUrlObj;
+        let {protocol, hostname, path, port, query} = redirectUrlObj;
 
         // 构造path
         try {
@@ -145,7 +147,7 @@ module.exports = class Redirect extends Action {
         toClientResponse.dnsResolveBeginTime = Date.now();
         let ip = '';
         try {
-            ip = await this.hostService.resolveHost(userId, hostname);
+            ip = await this.hostService.resolveHost(userId, hostname, deviceId);
         } catch (e) {
             let href = `${protocol}//${hostname}:${port}${path}`;
             toClientResponseUtils.setError(toClientResponse, href, e);

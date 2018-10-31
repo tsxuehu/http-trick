@@ -10,7 +10,7 @@ const ipReg = /((?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]
  * Created by tsxuehu on 8/3/17.
  */
 module.exports = class HostService extends EventEmitter {
-    constructor({ profileService, appInfoService }) {
+    constructor({profileService, appInfoService}) {
         super();
         // userId -> { filename -> content}
         this.userHostFilesMap = {};
@@ -36,7 +36,7 @@ module.exports = class HostService extends EventEmitter {
         });
     }
 
-    async resolveHost(userId, hostname) {
+    async resolveHost(userId, hostname, deviceId) {
         if (!hostname) return hostname;
 
         if (ipReg.test(hostname)) {
@@ -81,8 +81,8 @@ module.exports = class HostService extends EventEmitter {
                 // 解析host
                 let parsed = this._parseHost(findedUsingHost.content);
 
-                _.forEach(parsed, ( hosts, ip ) => {
-                    hosts.forEach(host=>{
+                _.forEach(parsed, (hosts, ip) => {
+                    hosts.forEach(host => {
                         if (host.startsWith('*')) {
                             globHostMap[host.substr(1, host.length)] = ip;
                         } else {
@@ -184,7 +184,7 @@ module.exports = class HostService extends EventEmitter {
     }
 
     getHostFile(userId, name) {
-        return (this.userHostFilesMap[userId]||{})[name];
+        return (this.userHostFilesMap[userId] || {})[name];
     }
 
     async saveHostFile(userId, name, content) {
@@ -199,7 +199,6 @@ module.exports = class HostService extends EventEmitter {
         await fileUtil.writeJsonToFile(hostfileName, content);
         this.emit("host-saved", userId, name, content);
     }
-
 
 
     _getHostFilePath(userId, hostName) {
