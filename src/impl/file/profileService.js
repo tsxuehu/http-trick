@@ -187,11 +187,11 @@ module.exports = class ProfileService extends EventEmitter {
         this.emit('data-change-deviceList', info.userId, deviceList);
     }
 
-    async disableMonitor(deviceId) {
+    async setDisableMonitor(deviceId, disableMonitor) {
         let info = this.deviceInfo[deviceId];
         if (!info) throw new Error(`${deviceId}不存在`);
 
-        info.disableMonitor = true;
+        info.disableMonitor = disableMonitor;
 
         this.deviceInfo[deviceId] = info;
 

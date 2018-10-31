@@ -3,8 +3,8 @@
         <div class="op-bar">
             <span class="icon-btn" :class="{'overflow':state.overflow}"
                   @click="requestToggleRecordState">
-                <i class="iconfont icon-zanting" v-if="!state.stopRecord"></i>
-                <i class="iconfont icon-bofang" v-else></i>
+                <i class="iconfont icon-zanting zanting" v-if="!state.stopRecord"></i>
+                <i class="iconfont icon-bofang bofang" v-else></i>
             </span>
             <i class="iconfont icon-qingchu icon-btn" @click="requestClear"></i>
             <span class="tips " :style="{visibility: state.overflow? 'initial' : 'hidden'}">记录已满，请清除历史记录</span>
@@ -54,7 +54,8 @@
                 originRecordArray: [],// 原始记录数组 存放记录id
                 filterdRecordArray: [], // 过滤后的数组 存放记录id
                 selectId: '',//当前选择的记录
-                rightClickId: '',// 右击的id
+                rightClickId: '',// 右击的记录id
+                rightClickDeviceId: '',// 右击的设备id
                 currentRequestBody: '',// 选择记录的请求body
                 currentResponseBody: '',// 选择记录的响应body
                 requestingClear: false, // 请求清除记录
@@ -78,6 +79,12 @@
             },
             rightClickRow() {
                 return this.recordMap[this.rightClickId];
+            },
+            rightClickDevice() {
+                let device = this.bindedDeviceList.find(d => {
+                    return d.id == this.rightClickDeviceId;
+                })
+                return device || {};
             },
             // 原始请求的header键值对
             originRequestHeader() {
@@ -227,6 +234,9 @@
             setRightClickedRecordId(id) {
                 this.rightClickId = id;
             },
+            setRightClickedDeviceId(deviceId) {
+                this.rightClickDeviceId = deviceId;
+            },
             setFilter(filter) {
                 let origin = this.filter;
                 if (origin.path == filter.path && origin.host == filter.host) {
@@ -263,7 +273,7 @@
             let result = await profileApi.getUserId();
             this.userId = result.data.data.userId;
             let appInfo = await appApi.getAppInfo();
-            this.appInfo = appInfo;
+            this.appInfo = appInfo.data.data;
 
             $(window).resize(_.debounce(this.calcSize, 200));
 

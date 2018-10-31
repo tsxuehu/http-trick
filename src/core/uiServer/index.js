@@ -67,7 +67,7 @@ module.exports = class UiServer {
 
         // 初始化socket io
         this._initTraffic();
-        this._initManger();
+        this._initManager();
         this._initWsMock();
         this._initBreakpoint();
     }
@@ -122,12 +122,12 @@ module.exports = class UiServer {
         });
         // 推送设备列表信息
         this.profileService.on("data-change-deviceList", (userId, deviceList) => {
-            this.managerNS.to(userId).emit('bindedDeviceList', deviceList);
+            this.httpTraficMonitorNS.to(userId).emit('bindedDeviceList', deviceList);
         });
     }
 
     // 管理界面 使用的功能
-    _initManger() {
+    _initManager() {
         this.managerNS = this.io.of('/manager');
 
         // 注册通知

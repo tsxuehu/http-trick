@@ -100,7 +100,25 @@ module.exports = class ConfigController {
             let userId = ctx.userId;
             let deviceId = ctx.query.deviceId;
             try {
-                await this.profileService.disableMonitor(deviceId);
+                await this.profileService.setDisableMonitor(deviceId, true);
+                ctx.body = {
+                    code: 0,
+                    msg: `${deviceId}已经解除监控`
+                };
+            } catch (e) {
+                ctx.body = {
+                    code: 1,
+                    msg: e.message
+                };
+            }
+
+        });
+
+        router.get('/profile/device/enableMonitor', async (ctx, next) => {
+            let userId = ctx.userId;
+            let deviceId = ctx.query.deviceId;
+            try {
+                await this.profileService.setDisableMonitor(deviceId, false);
                 ctx.body = {
                     code: 0,
                     msg: `${deviceId}已经解除监控`
