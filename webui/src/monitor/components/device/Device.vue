@@ -1,8 +1,9 @@
 <template>
     <div class="device"
          @contextmenu.prevent="rightClicked($event, device.id)">
-        <div class="name">{{device.name}}</div>
-        <div class="id">{{device.id}}</div>
+        <div class="name"  key="name">Name: {{device.name}}</div>
+        <div class="host" v-if="device.hostFileName" key="host">HOST: {{device.hostFileName}}</div>
+        <div class="id"  key="id">ID: {{device.id}}</div>
         <div class="status offline" v-if="device.disableMonitor"></div>
         <div class="status online" v-if="!device.disableMonitor"></div>
     </div>

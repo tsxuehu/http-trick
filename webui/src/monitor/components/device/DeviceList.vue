@@ -26,6 +26,21 @@
             <li class="ctx-item" v-if="!$dc.rightClickDevice.disableMonitor" @click="disableMonitor">停止监控</li>
             <li class="ctx-item" v-if="$dc.rightClickDevice.disableMonitor" @click="enableMonitor">开启监控</li>
         </context-menu>
+        <el-dialog
+                :title="chooseHostTitle"
+                :visible.sync="showChoseHostFile"
+                width="30%"
+                center>
+            <div class="hostfile-list">
+                <div v-for="(hostfile, index) in $dc.hostFileList"
+                     :key="hostfile.name" @click="useHost(hostfile.name)">
+                    <el-tag :class="{'used-host': hostfile.name == $dc.rightClickDevice.hostFileName}">
+                        {{hostfile.name}}
+                    </el-tag>
+                </div>
+
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -40,6 +55,22 @@
     export default {
         name: "DeviceList",
         components: {Device, ContextMenu},
+        data() {
+            return {
+                showChoseHostFile: false
+            }
+        },
+        computed: {
+            bindUrl() {
+                return `http://${this.$dc.appInfo.pcIp}:${this.$dc.appInfo.realUiPort}/profile/device/bind?userId=${this.$dc.userId}`;
+            },
+            imgUrl() {
+                return qrcode.toDataURL(this.bindUrl, 4);
+            },
+            chooseHostTitle() {
+                return `选择${this.$dc.rightClickDevice.name}使用的Host文件`;
+            }
+        },
         methods: {
             copyBindUrl() {
                 copyToClipboard(this.bindUrl);
@@ -47,7 +78,16 @@
             },
             // 修改设备host
             changeHost() {
-
+                this.showChoseHostFile = true;
+            },
+            async useHost(hostFileName) {
+                this.showChoseHostFile = false;
+                let actual = hostFileName == this.$dc.rightClickDevice.hostFileName ? '' : hostFileName
+                await profileApi.deviceUseHost(this.$dc.rightClickDeviceId, actual);
+                this.$message({
+                    type: 'success',
+                    message: actual ? '设置Host成功' : '取消Host成功'
+                });
             },
             async removeDevice(row, index) {
                 await profileApi.unBind(row.id);
@@ -101,14 +141,6 @@
             // 点击空白地方
             resetCtxLocals() {
                 this.$dc.setRightClickedDeviceId('');
-            }
-        },
-        computed: {
-            bindUrl() {
-                return `http://${this.$dc.appInfo.pcIp}:${this.$dc.appInfo.realUiPort}/profile/device/bind?userId=${this.$dc.userId}`;
-            },
-            imgUrl() {
-                return qrcode.toDataURL(this.bindUrl, 4);
             }
         }
     }
