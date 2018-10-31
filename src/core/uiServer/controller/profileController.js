@@ -59,7 +59,7 @@ module.exports = class ConfigController {
                     deviceId = ip.substr(7)
                 }
             }
-            this.profileService.bindClient(userId, deviceId);
+            this.profileService.bindDevice(userId, deviceId);
             ctx.body = {
                 code: 0,
                 msg: `绑定成功: binded userId: ${userId}; deviceId: ${deviceId}`
@@ -70,7 +70,7 @@ module.exports = class ConfigController {
         router.get('/profile/device/unbind', async (ctx, next) => {
             let userId = ctx.userId;
             let deviceId = ctx.query.deviceId;
-            this.profileService.unbindClient(deviceId);
+            this.profileService.unbindDevice(deviceId);
             ctx.body = {
                 code: 0,
                 msg: '解绑成功'
@@ -156,7 +156,6 @@ module.exports = class ConfigController {
                 userId = ip;
             }
             userId = userId.trim();
-            // this.profileService.bindClient(userId, ip);
             ctx.cookies.set('userId', userId, {maxAge: 1000 * 60 * 60 * 24 * 365});
             ctx.body = {
                 code: 0,

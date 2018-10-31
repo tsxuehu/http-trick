@@ -137,8 +137,12 @@ module.exports = class ProfileService extends EventEmitter {
         return !info.disableMonitor;
     }
 
+    getDevice(deviceId) {
+        return this.deviceInfo[deviceId];
+    }
+
     // 将ip绑定至用户
-    async bindClient(userId, deviceId) {
+    async bindDevice(userId, deviceId) {
         let info = this.deviceInfo[deviceId];
         let originUserId = (info || {}).userId;
         if (userId == originUserId) {
@@ -148,7 +152,8 @@ module.exports = class ProfileService extends EventEmitter {
             id: deviceId,
             userId: userId,
             name: (info || {}).name || deviceId,
-            disableMonitor: false
+            disableMonitor: false,
+            hostfileName: ''
         };
 
         await fileUtil.writeJsonToFile(this.deviceInfoSaveFile, this.deviceInfo);
@@ -163,7 +168,7 @@ module.exports = class ProfileService extends EventEmitter {
     }
 
     // 解除绑定至用户
-    async unbindClient(deviceId) {
+    async unbindDevice(deviceId) {
         let info = this.deviceInfo[deviceId];
         delete this.deviceInfo[deviceId];
 
@@ -194,6 +199,20 @@ module.exports = class ProfileService extends EventEmitter {
         if (!info) throw new Error(`${deviceId}不存在`);
 
         info.disableMonitor = disableMonitor;
+
+        this.deviceInfo[deviceId] = info;
+
+        await fileUtil.writeJsonToFile(this.deviceInfoSaveFile, this.deviceInfo);
+
+        let deviceList = this.getDeviceListBindedToUserId(info.userId);
+        this.emit('data-change-deviceList', info.userId, deviceList);
+    }
+
+    async setDeviceHostfile(deviceId, hostfileName) {
+        let info = this.deviceInfo[deviceId];
+        if (!info) throw new Error(`${deviceId}不存在`);
+
+        info.hostfileName = hostfileName;
 
         this.deviceInfo[deviceId] = info;
 

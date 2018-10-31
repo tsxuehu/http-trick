@@ -45,7 +45,6 @@ module.exports = class UiServer {
                     }
                     userId = ip;
                     // 当前机器的ip和用户id绑定. 当机器为ip的机器发代理请求时，会使用userId用户的规则
-                    // this.profileService.bindClient(userId, ip);
                 }
                 ctx.cookies.set('userId', userId, { maxAge: 1000 * 60 * 60 * 24 * 365 });
             }

@@ -16,7 +16,7 @@ module.exports = class HostService extends EventEmitter {
         this.userHostFilesMap = {};
         // 缓存
         // userId, {globHostMap, hostMap}
-        this._inUsingHostsMapCache = {};
+        this._userHostsCache = {};
         let proxyDataDir = appInfoService.getProxyDataDir();
         this.hostSaveDir = path.join(proxyDataDir, "host");
 
@@ -36,30 +36,51 @@ module.exports = class HostService extends EventEmitter {
         });
     }
 
-    async resolveHost(userId, hostname, deviceId) {
+    async resolveHost(userId, hostname) {
+        let result = await this.resolveHostWithWay(userId, '', hostname);
+
+        return result.ip;
+    }
+
+    async resolveHostWithWay(userId, deviceId, hostname) {
+        let ip = '';
+        let way = '';
         if (!hostname) return hostname;
 
         if (ipReg.test(hostname)) {
-            return hostname;
-        }
-        let ip;
-        if (this.profileService.enableHost(userId)) {
+            way = 'hostname is ip';
+            ip = hostname;
+        } else if (this.profileService.enableHost(userId)) {
             // 解析host
-            let inUsingHosts = this.getInUsingHosts(userId);
+            let device = this.profileService.getDevice(deviceId);
+            let inUsingHosts = {};
+            if (device) {
+                way = 'device-' + device.hostfileName;
+                inUsingHosts = this.getSpecificHosts(userId, device.hostfileName)
+            } else {
+                way = 'default-' + device.hostfileName;
+                inUsingHosts = this.getDefaultHosts(userId);
 
+            }
             ip = inUsingHosts.hostMap[hostname];
-            if (ip) return ip;
-            // 配置 *开头的host  计算属性globHostMap已经将*去除
-            ip = _.find(inUsingHosts.globHostMap, (value, host) => {
-                return hostname.endsWith(host);
-            });
-            if (ip) return ip;
+            if (!ip) {
+                // 配置 *开头的host  计算属性globHostMap已经将*去除
+                ip = _.find(inUsingHosts.globHostMap, (value, host) => {
+                    return hostname.endsWith(host);
+                });
+            }
         }
 
-        // 调用dns解析
-        ip = await this.dns.resovleIp(hostname);
+        if (!ip) {
+            way = 'dns';
+            // 调用dns解析
+            ip = await this.dns.resovleIp(hostname);
+        }
 
-        return ip;
+
+        return {
+            way, ip
+        };
     }
 
     /**
@@ -67,20 +88,39 @@ module.exports = class HostService extends EventEmitter {
      * @param userId
      * @returns {*}
      */
-    getInUsingHosts(userId) {
-        let hosts = this._inUsingHostsMapCache[userId];
+    getDefaultHosts(userId) {
+        if (!this._userHostsCache[userId]) {
+            this._userHostsCache[userId] = {};
+        }
+        let hosts = this._userHostsCache[userId].defaultHost;
+        if (!hosts) {
+            let fileList = this.getHostFileList(userId);
+            // 找到启用的文件
+            let findedUsingHost = _.find(fileList, (fileMeta) => {
+                return fileMeta.checked;
+            });
+
+            hosts = this.getSpecificHosts(userId, (findedUsingHost || {}).name);
+
+            this._userHostsCache[userId].defaultHost = hosts;
+        }
+        return hosts;
+    }
+
+    getSpecificHosts(userId, hostFileName) {
+        if (!this._userHostsCache[userId]) {
+            this._userHostsCache[userId] = {};
+        }
+        let hosts = this._userHostsCache[userId][hostFileName];
         if (!hosts) {
             // 读文件加载host
             let hostMap = {};
             let globHostMap = {};
 
-            let findedUsingHost = _.find(this.userHostFilesMap[userId], (content) => {
-                return content.checked;
-            });
-            if (findedUsingHost) {
+            let fileContent = this.getHostFile(userId, hostFileName);
+            if (fileContent) {
                 // 解析host
-                let parsed = this._parseHost(findedUsingHost.content);
-
+                let parsed = this._parseHost(fileContent.content);
                 _.forEach(parsed, (hosts, ip) => {
                     hosts.forEach(host => {
                         if (host.startsWith('*')) {
@@ -91,12 +131,18 @@ module.exports = class HostService extends EventEmitter {
                     })
                 });
             }
+
             hosts = {
                 hostMap, globHostMap
             };
-            this._inUsingHostsMapCache[userId] = hosts;
+            this._userHostsCache[userId][hostFileName] = hosts;
         }
         return hosts;
+    }
+
+    getHostFile(userId, name) {
+        // 如果找不到文件，则去默认文件里查找
+        return (this.userHostFilesMap[userId] || {})[name];
     }
 
     /**
@@ -105,6 +151,7 @@ module.exports = class HostService extends EventEmitter {
      * @returns {Array}
      */
     getHostFileList(userId) {
+        // 添加默认文件
         let fileList = [];
         _.forEach(this.userHostFilesMap[userId], (content, key) => {
             fileList.push({
@@ -129,11 +176,15 @@ module.exports = class HostService extends EventEmitter {
             // 文件已经存在不让创建
             return false;
         }
+        if (name == 'defaultHost') {
+            name += 'not-allow-defaultHost'
+        }
 
         let content = {
             "meta": {
                 "local": true
             },
+            "readonly": false,
             "checked": false,
             "name": name,
             "description": description,
@@ -152,11 +203,11 @@ module.exports = class HostService extends EventEmitter {
 
     deleteHostFile(userId, name) {
         delete this.userHostFilesMap[userId][name];
-        delete this._inUsingHostsMapCache[userId];
+        delete this._userHostsCache[userId].defaultHost;
+        delete this._userHostsCache[userId][name];
         /**
          * 删除文件
          */
-
         this.emit("data-change", userId, this.getHostFileList(userId));
         this.emit("host-deleted", userId, name);
     }
@@ -179,21 +230,16 @@ module.exports = class HostService extends EventEmitter {
             let content = this.userHostFilesMap[userId][name];
             await fileUtil.writeJsonToFile(hostfileName, content);
         }
-        delete this._inUsingHostsMapCache[userId];
+        delete this._userHostsCache[userId].defaultHost;
         this.emit("data-change", userId, this.getHostFileList(userId));
     }
 
-    getHostFile(userId, name) {
-        return (this.userHostFilesMap[userId] || {})[name];
-    }
 
     async saveHostFile(userId, name, content) {
         this.userHostFilesMap[userId][name] = content;
 
-        // 如果正在使用，则删除
-        if (content.checked) {
-            delete this._inUsingHostsMapCache[userId];
-        }
+        // 删除缓存
+        delete this._userHostsCache[userId][name];
 
         let hostfileName = this._getHostFilePath(userId, name);
         await fileUtil.writeJsonToFile(hostfileName, content);
