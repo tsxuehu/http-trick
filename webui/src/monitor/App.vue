@@ -20,7 +20,7 @@
             </a>
         </div>
         <div class="monitor">
-            <device-list v-if="!$dc.appInfo.single"></device-list>
+            <device-list></device-list>
             <http-traffic :height="height"></http-traffic>
             <detail :height="height"></detail>
         </div>
