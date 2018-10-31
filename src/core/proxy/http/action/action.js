@@ -32,6 +32,7 @@ module.exports = class Action {
                   recordResponse,
                   urlObj,
                   clientIp,
+                  deviceId,
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true

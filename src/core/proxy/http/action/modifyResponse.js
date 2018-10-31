@@ -31,6 +31,7 @@ module.exports = class ModifyResponse extends Action {
                   res,
                   urlObj,
                   clientIp,
+                  deviceId,
                   rule, // 规则
                   action, // 规则里的一个动作
                   requestContent, // 请求内容

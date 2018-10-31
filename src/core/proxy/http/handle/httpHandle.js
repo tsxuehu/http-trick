@@ -240,12 +240,12 @@ module.exports = class HttpHandle {
 
             // 若action handle不存在，则处理下一个
             if (!actionHandler) {
-                toClientResponse.headers[`proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-notfound`);
+                toClientResponse.headers[`proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-not_found`);
                 continue;
             }
             // 已经有response, 则不运行获取response的action
             if (actionHandler.willGetContent() && toClientResponse.hasContent) {
-                toClientResponse.headers[`proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-notrun`);
+                toClientResponse.headers[`proxy-action-${i}`] = encodeURI(`${rule.method}-${rule.match}-${action.type}-not_run`);
                 continue;
             }
             // 响应头里面记录运行的动作
@@ -259,6 +259,7 @@ module.exports = class HttpHandle {
                     recordResponse,
                     urlObj,
                     clientIp,
+                    deviceId,
                     userId,
                     rule, // 规则
                     action, // 规则里的一个动作
@@ -286,6 +287,7 @@ module.exports = class HttpHandle {
                 recordResponse,
                 urlObj,
                 clientIp,
+                deviceId,
                 userId,
                 rule, // 规则
                 action, // 规则里的一个动作
@@ -326,6 +328,7 @@ module.exports = class HttpHandle {
                     urlObj,
                     clientIp,
                     userId,
+                    deviceId,
                     requestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
                     additionalRequestHeaders, // 请求头
                     actualRequestHeaders,
