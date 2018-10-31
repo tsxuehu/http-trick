@@ -90,6 +90,10 @@ module.exports = class UiServer {
 
             let deviceList = await this.profileService.getDeviceListBindedToUserId(userId);
             client.emit('bindedDeviceList', deviceList);
+            // host文件列表
+            let hostFileList = await this.hostService.getHostFileList(userId);
+            client.emit('hostfilelist', hostFileList);
+
             // 推送过滤器，状态
             let state = this.httpTrafficService.getStatus(userId);
             client.emit('state', state);
@@ -122,6 +126,11 @@ module.exports = class UiServer {
         // 推送设备列表信息
         this.profileService.on("data-change-deviceList", (userId, deviceList) => {
             this.httpTraficMonitorNS.to(userId).emit('bindedDeviceList', deviceList);
+        });
+
+        // host文件变化
+        this.hostService.on("data-change", (userId, hostFilelist) => {
+            this.httpTraficMonitorNS.to(userId).emit('hostfilelist', hostFilelist);
         });
     }
 

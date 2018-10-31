@@ -46,6 +46,8 @@
                 appInfo: {},
                 userId: 'guest',
                 bindedDeviceList: [],
+                // host文件列表
+                hostFileList: [],
                 // 当前选择的记录
                 width: 0,
                 height: 0,
@@ -290,6 +292,9 @@
             });
             socket.on('bindedDeviceList', deviceList => {
                 this.bindedDeviceList = deviceList;
+            });
+            socket.on('hostfilelist', data => {
+                this.hostFileList = data;
             });
         }
     };

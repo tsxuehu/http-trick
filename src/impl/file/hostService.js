@@ -55,11 +55,11 @@ module.exports = class HostService extends EventEmitter {
             let device = this.profileService.getDevice(deviceId);
             let inUsingHosts = {};
             if (device && device.hostFileName) {
-                way = 'device-' + device.hostfileName;
+                way = 'device-' + device.hostfileName + ' ';
                 inUsingHosts = this.getSpecificHosts(userId, device.hostFileName)
             } else {
                 inUsingHosts = this.getDefaultHosts(userId);
-                way = 'default-' + inUsingHosts.name;
+                way = 'default-' + inUsingHosts.name + ' ';
             }
             ip = inUsingHosts.hostMap[hostname];
             if (!ip) {
@@ -71,11 +71,10 @@ module.exports = class HostService extends EventEmitter {
         }
 
         if (!ip) {
-            way = 'dns';
+            way += 'dns';
             // 调用dns解析
             ip = await this.dns.resovleIp(hostname);
         }
-
 
         return {
             way, ip

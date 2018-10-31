@@ -41,6 +41,9 @@ export default {
     disableMonitor(deviceId) {
         return axios.get(`/profile/device/disableMonitor?deviceId=${deviceId}`);
     },
+    deviceUseHost(deviceId, hostname) {
+        return axios.get(`/profile/device/usehost?deviceId=${deviceId}&hostname=${encodeURI(hostname)}`);
+    },
     enableMonitor(deviceId) {
         return axios.get(`/profile/device/enableMonitor?deviceId=${deviceId}`);
     }
