@@ -190,7 +190,7 @@ module.exports = class Server extends EventEmitter {
                  })*/
             } else {
                 needResume = false;
-                let targetIp = await this.hostService.resolveHost(userId, req.dstAddr);
+                let targetIp = await this.hostService.resolveHostDirect(userId, req.dstAddr);
                 let targetPort = req.dstPort;
                 let dstSock = new net.Socket();
                 dstSock.setKeepAlive(false);

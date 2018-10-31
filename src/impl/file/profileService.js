@@ -141,20 +141,29 @@ module.exports = class ProfileService extends EventEmitter {
         return this.deviceInfo[deviceId];
     }
 
+    getDeviceInfoSetDefaultIfPossible(deviceId) {
+        let info = this.deviceInfo[deviceId];
+        if (!info) {
+            info = this.deviceInfo[deviceId] = {
+                id: deviceId,
+                userId: '',
+                name: deviceId,
+                disableMonitor: false,
+                hostFileName: ''
+            };
+        }
+        return info;
+    }
+
     // 将ip绑定至用户
     async bindDevice(userId, deviceId) {
-        let info = this.deviceInfo[deviceId];
-        let originUserId = (info || {}).userId;
+        let info = this.getDeviceInfoSetDefaultIfPossible(deviceId);
+        let originUserId = info.userId;
         if (userId == originUserId) {
             return
         }
-        this.deviceInfo[deviceId] = {
-            id: deviceId,
-            userId: userId,
-            name: (info || {}).name || deviceId,
-            disableMonitor: false,
-            hostfileName: ''
-        };
+        info.userId = userId;
+        this.deviceInfo[deviceId] = info;
 
         await fileUtil.writeJsonToFile(this.deviceInfoSaveFile, this.deviceInfo);
 
@@ -181,8 +190,7 @@ module.exports = class ProfileService extends EventEmitter {
     }
 
     async setDeviceName(deviceId, name) {
-        let info = this.deviceInfo[deviceId];
-        if (!info) throw new Error(`${deviceId}不存在`);
+        let info = this.getDeviceInfoSetDefaultIfPossible(deviceId);
 
         info.name = name;
 
@@ -195,8 +203,7 @@ module.exports = class ProfileService extends EventEmitter {
     }
 
     async setDisableMonitor(deviceId, disableMonitor) {
-        let info = this.deviceInfo[deviceId];
-        if (!info) throw new Error(`${deviceId}不存在`);
+        let info = this.getDeviceInfoSetDefaultIfPossible(deviceId);
 
         info.disableMonitor = disableMonitor;
 
@@ -208,11 +215,10 @@ module.exports = class ProfileService extends EventEmitter {
         this.emit('data-change-deviceList', info.userId, deviceList);
     }
 
-    async setDeviceHostfile(deviceId, hostfileName) {
-        let info = this.deviceInfo[deviceId];
-        if (!info) throw new Error(`${deviceId}不存在`);
+    async setDeviceHostFileName(deviceId, hostFileName) {
+        let info = this.getDeviceInfoSetDefaultIfPossible(deviceId);
 
-        info.hostfileName = hostfileName;
+        info.hostFileName = hostFileName;
 
         this.deviceInfo[deviceId] = info;
 

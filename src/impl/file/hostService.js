@@ -36,7 +36,7 @@ module.exports = class HostService extends EventEmitter {
         });
     }
 
-    async resolveHost(userId, hostname) {
+    async resolveHostDirect(userId, hostname) {
         let result = await this.resolveHostWithWay(userId, '', hostname);
 
         return result.ip;
@@ -54,13 +54,12 @@ module.exports = class HostService extends EventEmitter {
             // 解析host
             let device = this.profileService.getDevice(deviceId);
             let inUsingHosts = {};
-            if (device) {
+            if (device && device.hostFileName) {
                 way = 'device-' + device.hostfileName;
-                inUsingHosts = this.getSpecificHosts(userId, device.hostfileName)
+                inUsingHosts = this.getSpecificHosts(userId, device.hostFileName)
             } else {
-                way = 'default-' + device.hostfileName;
                 inUsingHosts = this.getDefaultHosts(userId);
-
+                way = 'default-' + inUsingHosts.name;
             }
             ip = inUsingHosts.hostMap[hostname];
             if (!ip) {
@@ -99,9 +98,9 @@ module.exports = class HostService extends EventEmitter {
             let findedUsingHost = _.find(fileList, (fileMeta) => {
                 return fileMeta.checked;
             });
-
-            hosts = this.getSpecificHosts(userId, (findedUsingHost || {}).name);
-
+            let name = (findedUsingHost || {}).name || '';
+            hosts = this.getSpecificHosts(userId, name);
+            hosts.name = name
             this._userHostsCache[userId].defaultHost = hosts;
         }
         return hosts;

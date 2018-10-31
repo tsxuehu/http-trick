@@ -129,7 +129,7 @@ module.exports = class Bypass extends Action {
                      last = true
                  }) {
         // 构造url
-        let { protocol, hostname, path, pathname, port, query } = urlObj;
+        let {protocol, hostname, path, pathname, port, query} = urlObj;
 
         // 构造path
         try {
@@ -139,20 +139,25 @@ module.exports = class Bypass extends Action {
                 Object.assign(actualRequestQuery, additionalRequestQuery);
                 path = `${pathname}?${queryString.stringify(actualRequestQuery)}`;
             }
-        } catch (e) {}
+        } catch (e) {
+        }
 
 
         // dns解析
         toClientResponse.dnsResolveBeginTime = Date.now();
         let ip = '';
+        let resolveWay = '';
         try {
-            ip = await this.hostService.resolveHost(userId, hostname, deviceId);
+            let result = await this.hostService.resolveHostWithWay(userId, deviceId, hostname);
+            resolveWay = result.way;
+            ip = result.ip;
         } catch (e) {
             let href = `${protocol}//${hostname}:${port}${path}`;
             toClientResponseUtils.setError(toClientResponse, href, e);
             return;
         }
-        toClientResponse.headers['remote-ip'] = ip;
+        toClientResponse.headers['proxy-remote-ip'] = ip;
+        toClientResponse.headers['proxy-resolve-way'] = resolveWay;
         toClientResponse.remoteIp = ip;
 
         // 日志
@@ -217,21 +222,25 @@ module.exports = class Bypass extends Action {
                                        last = true
                                    }) {
         // 构造url
-        let { protocol, hostname, pathname, port, query, method, headers, body } = requestContent;
+        let {protocol, hostname, pathname, port, query, method, headers, body} = requestContent;
 
         Object.assign(actualRequestQuery, query, additionalRequestQuery);
 
         // dns解析
         toClientResponse.dnsResolveBeginTime = Date.now();
         let ip = '';
+        let resolveWay = '';
         try {
-            ip = await this.hostService.resolveHost(userId, hostname, deviceId);
+            let result = await this.hostService.resolveHostWithWay(userId, deviceId, hostname);
+            resolveWay = result.way;
+            ip = result.ip;
         } catch (e) {
             let href = `${protocol}//${hostname}:${port}${pathname}?${queryString.stringify(actualRequestQuery)}`;
             toClientResponseUtils.setError(toClientResponse, href, e);
             return;
         }
-        toClientResponse.headers['remote-ip'] = ip;
+        toClientResponse.headers['proxy-remote-ip'] = ip;
+        toClientResponse.headers['proxy-resolve-way'] = resolveWay;
         toClientResponse.remoteIp = ip;
 
         // 日志记录请求地址

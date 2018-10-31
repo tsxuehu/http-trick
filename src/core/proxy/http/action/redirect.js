@@ -146,14 +146,18 @@ module.exports = class Redirect extends Action {
         // dns解析
         toClientResponse.dnsResolveBeginTime = Date.now();
         let ip = '';
+        let resolveWay = '';
         try {
-            ip = await this.hostService.resolveHost(userId, hostname, deviceId);
+            let result = await this.hostService.resolveHostWithWay(userId, deviceId, hostname);
+            resolveWay = result.way;
+            ip = result.ip;
         } catch (e) {
             let href = `${protocol}//${hostname}:${port}${path}`;
             toClientResponseUtils.setError(toClientResponse, href, e);
             return;
         }
-        toClientResponse.headers['remote-ip'] = ip;
+        toClientResponse.headers['proxy-remote-ip'] = ip;
+        toClientResponse.headers['proxy-resolve-way'] = resolveWay;
         toClientResponse.remoteIp = ip;
 
         port = port || ('https:' == protocol ? 443 : 80);

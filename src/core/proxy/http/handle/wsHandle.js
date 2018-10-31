@@ -42,7 +42,7 @@ module.exports = class WsHandle {
             this.proxy.ws(req, socket, head, {
                 target: {
                     protocol: protocal,
-                    hostname: await this.hostService.resolveHost(clientIp, host),
+                    hostname: await this.hostService.resolveHostDirect(clientIp, host),
                     port: port || (protocal == 'http' ? 80 : 443)
                 }
             });
