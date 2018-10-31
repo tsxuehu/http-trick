@@ -159,13 +159,12 @@ module.exports = class Server extends EventEmitter {
         // 通过默认端口号判断通信协议
         try {
             let needResume = true;// 对于透传，等远程连接建立后再resume
-            let username = req.username;
             let clientIp = req.srcAddr;
-            let userId = this.profileService.getUserIdByUserName(username);
+            let deviceId = req.username;// 将认证的username当做deviceId
             // 请求socket
 
             if (req.dstPort == 80) {
-                socket.userId = userId;
+                socket.deviceId = deviceId;
                 socket.clientIp = clientIp;
                 socket.socks5 = true;
                 http._connectionListener.call(this._srv, socket);
@@ -179,16 +178,16 @@ module.exports = class Server extends EventEmitter {
                     cert: context.cert
                 });
 
-                tlsSocket.userId = userId;
+                tlsSocket.deviceId = deviceId;
                 tlsSocket.clientIp = clientIp;
                 tlsSocket.socks5 = true;
                 http._connectionListener.call(this._srv, tlsSocket);
-               /* tlsSocket.on('data', data => {
-                    console.log('tlsSocket ------- ', data.toString())
-                })
-                tlsSocket.on('error', e => {
-                    console.log(e)
-                })*/
+                /* tlsSocket.on('data', data => {
+                     console.log('tlsSocket ------- ', data.toString())
+                 })
+                 tlsSocket.on('error', e => {
+                     console.log(e)
+                 })*/
             } else {
                 needResume = false;
                 let targetIp = await this.hostService.resolveHost(userId, req.dstAddr);

@@ -2,7 +2,7 @@ const _ = require("lodash");
 const fileUtil = require("../../core/utils/file");
 const path = require('path');
 const EventEmitter = require("events");
-const defaultRule =  {
+const defaultRule = {
     "name": "js",
     "key": "9a489eaa-ca4a-481d-b3fb-75b41dd33cc0",
     "method": "get",
@@ -37,7 +37,7 @@ const passRule = {
         "type": "bypass",
     }]
 };
-// 
+//
 module.exports = class RuleService extends EventEmitter {
     constructor({profileService, appInfoService}) {
         super();
@@ -134,7 +134,7 @@ module.exports = class RuleService extends EventEmitter {
     }
 
     // 设置规则文件的使用状态
-   async setRuleFileCheckStatus(userId, name, checked) {
+    async setRuleFileCheckStatus(userId, name, checked) {
         this.rules[userId][name].checked = checked;
         let path = this._getRuleFilePath(userId, name);
         await fileUtil.writeJsonToFile(path, this.rules[userId][name]);
@@ -165,9 +165,9 @@ module.exports = class RuleService extends EventEmitter {
      * @param method
      * @param urlObj
      */
-    getProcessRuleList(userId, method, urlObj) {
+    getProcessRule(userId, deviceId, enable, method, urlObj) {
         let candidateRule = null;
-        if (this.profileService.enableRule(userId)) {
+        if (enable) {
             // 规则匹配部分
             let inusingRules = this._getInuseRules(userId);
             for (let i = 0; i < inusingRules.length; i++) {

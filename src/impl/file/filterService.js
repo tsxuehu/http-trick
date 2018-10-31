@@ -17,13 +17,13 @@ module.exports = class FilterService extends EventEmitter {
     async start() {
         let filterMap = await fileUtil.getJsonFileContentInDir(this.breakpointSaveDir);
         _.forEach(filterMap, (filters, fileName) => {
-            let userId = fileName.slice(0,-5);
+            let userId = fileName.slice(0, -5);
             this.filters[userId] = filters;
         });
     }
 
-    async getMatchedRuleList(userId, method, urlObj) {
-        if (!this.profileService.enableFilter(userId)) {
+    async getMatchedRuleList(userId, deviceId, enable, method, urlObj) {
+        if (!enable) {
             return [];
         }
         let ruleLists = await this.getFilterRuleList(userId);
@@ -39,7 +39,7 @@ module.exports = class FilterService extends EventEmitter {
 
     async save(userId, filters) {
         this.filters[userId] = filters;
-        let filePath = path.join(this.breakpointSaveDir,`${userId}.json`);
+        let filePath = path.join(this.breakpointSaveDir, `${userId}.json`);
         // 将数据写入文件
         await fileUtil.writeJsonToFile(filePath, filters);
         this.emit("data-change", userId, filters);

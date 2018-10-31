@@ -37,16 +37,20 @@ module.exports = class HttpHandle {
      */
     async handle(req, res) {
 
-        let userId = '';
-        let clientIp = '';
+        let clientIp = ''; // 设备ip
+        let deviceId = '';// 设备id
         let socks5proxy = req.socket.socks5;
+
         if (socks5proxy) { // socks5协议
-            userId = req.socket.userId;
+            deviceId = req.socket.deviceId;
             clientIp = req.socket.clientIp;
         } else {// http代理协议
             clientIp = getClientIp(req);
-            userId = this.profileService.getDeviceMappedUserId(clientIp);
+            deviceId = clientIp; // 将设备的ip当做设备的id
         }
+
+        // 设备对应的用户
+        let userId = this.profileService.getUserIdBindDevice(deviceId);
 
         // 解析请求参数
         let urlObj = parseUrl(req);
@@ -84,16 +88,17 @@ module.exports = class HttpHandle {
         }
 
         // 规则处理
-        let hasMonitor = this.httpTrafficService.hasMonitor(userId);
+        let needRecordTraffic = this.httpTrafficService.hasMonitor(userId) && this.profileService.isDeviceEnableMonitor(deviceId);
         let requestId = -1;
         // 如果有客户端监听请求内容，则做记录
-        if (hasMonitor) {
+        if (needRecordTraffic) {
             // 记录请求
             requestId = this.httpTrafficService.getRequestId(userId, urlObj);
             if (requestId > -1) {
                 this.httpTrafficService.requestBegin({
                     userId,
                     clientIp,
+                    deviceId,
                     id: requestId,
                     urlObj,
                     method: req.method,
@@ -104,16 +109,22 @@ module.exports = class HttpHandle {
         }
         try {
             // 是否需要记录请求日志
-            let recordResponse = hasMonitor && requestId > -1;
+            let recordResponse = needRecordTraffic && requestId > -1;
 
             // =====================================================
             // 限流 https://github.com/tjgq/node-stream-throttle
 
-            let matchedRule = this.ruleService.getProcessRuleList(userId, req.method, urlObj);
+            // 查找匹配到的过滤规则
+            let enableFilter = this.profileService.enableFilter(userId);
+            let filterRuleList = await this.filterService.getMatchedRuleList(userId, deviceId, enableFilter, req.method, urlObj);
+            // 匹配的规则
+            let enableRule = this.profileService.enableRule(userId)
+            let matchedRule = this.ruleService.getProcessRule(userId, deviceId, enableRule, req.method, urlObj);
 
             let toClientResponse = await this._runAtions({
-                req, res, recordResponse, requestId,
-                urlObj, clientIp, userId, rule: matchedRule
+                req, res, urlObj, requestId, recordResponse,
+                clientIp, userId, deviceId, enableFilter, enableRule,
+                rule: matchedRule, filterRuleList
             });
 
             // 处理结束 记录额外的请求日志(附加的请求头、cookie、body)
@@ -148,8 +159,9 @@ module.exports = class HttpHandle {
      * @private
      */
     async _runAtions({
-                         req, res, recordResponse, requestId,
-                         urlObj, rule, clientIp, userId
+                         req, res, urlObj, requestId, recordResponse,
+                         clientIp, deviceId, userId, enableFilter, enableRule,
+                         rule, filterRuleList
                      }) {
         // 原始的请求头部
         let requestContent = {
@@ -178,7 +190,7 @@ module.exports = class HttpHandle {
             hasContent: false,// 是否存在要发送给浏览器的内容
             sendedToClient: false, // 已经向浏览器发送响应内容
             stopRunAction: false, // 停止运行action
-            requestData: {// 发送请崎岖时使用的数据
+            requestData: {// 发送请求时使用的数据
                 method: '',
                 protocol: '',
                 port: '',
@@ -198,15 +210,13 @@ module.exports = class HttpHandle {
             body: ''// 要发送给浏览器的body
         };
 
-        // 转发规则处理
-        if (!this.profileService.enableRule(userId)) {// 判断转发规则有没有开启
-            toClientResponse.headers['proxy-rule-disabled'] = "true";
-        }
-        // 记录请求对应的用户id
+        // 记录设备新信息
         toClientResponse.headers['proxy-userId'] = userId;
-
-        // 查找匹配到的过滤规则
-        let filterRuleList = await this.filterService.getMatchedRuleList(userId, req.method, urlObj);
+        toClientResponse.headers['proxy-deviceId'] = deviceId;
+        toClientResponse.headers['proxy-clientIp'] = clientIp;
+        // 记录状态信息
+        enableFilter || (toClientResponse.headers['proxy-filter-disabled'] = "true");
+        enableRule || (toClientResponse.headers['proxy-rule-disabled'] = "true");
 
         // 合并所有匹配到的过滤器规则的action列表、请求匹配的规则的 action 列表
         // 动作分为请求前和请求后两种类型, 合并后的顺序，前置过滤器动作 -> 请求匹配到的动作 -> 后置过滤器的动作

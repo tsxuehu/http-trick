@@ -16,7 +16,7 @@ const EventEmitter = require("events");
  */
 module.exports = class HttpTrafficService extends EventEmitter {
 
-    constructor({ userService, appInfoService }) {
+    constructor({userService, appInfoService}) {
         super();
         this.userService = userService;
         this.appInfoService = appInfoService;
@@ -41,13 +41,13 @@ module.exports = class HttpTrafficService extends EventEmitter {
 
     start() {
         // 删除缓存
-       /* rimraf.sync(this.trafficDir);
-        fs.mkdirSync(this.trafficDir);*/
+        /* rimraf.sync(this.trafficDir);
+         fs.mkdirSync(this.trafficDir);*/
     }
 
     getFilter(userId) {
-        let filters = this.filterMap[userId] || { host: '', path: '' };
-        return  filters;
+        let filters = this.filterMap[userId] || {host: '', path: ''};
+        return filters;
     }
 
     setFilter(userId, filter) {
@@ -96,7 +96,7 @@ module.exports = class HttpTrafficService extends EventEmitter {
         }
 
         let filter = this.getFilter(userId);
-        let { path, host } = urlObj;
+        let {path, host} = urlObj;
         if (path.indexOf(filter.path) > -1 && host.indexOf(filter.host) > -1) {
             id++;
             this.userRequestPointer[userId] = id;
@@ -138,7 +138,7 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 记录请求
-    async requestBegin({ id, userId, clientIp, method, httpVersion, urlObj, headers }) {
+    async requestBegin({id, userId, clientIp, deviceId, method, httpVersion, urlObj, headers}) {
         let queue = this.cache[userId] || [];
         // 原始请求信息
         queue.push({
@@ -146,6 +146,7 @@ module.exports = class HttpTrafficService extends EventEmitter {
             originRequest: Object.assign({
                 clientIp,
                 method,
+                deviceId,
                 httpVersion,
                 headers
             }, urlObj)
@@ -155,7 +156,7 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 记录请求body
-    async actualRequest({ userId, id, requestData, originBody }) {
+    async actualRequest({userId, id, requestData, originBody}) {
         // 将body写文件
 
         let body = requestData.body;
@@ -179,7 +180,7 @@ module.exports = class HttpTrafficService extends EventEmitter {
     }
 
     // 记录响应
-    async serverReturn({ userId, id, toClientResponse }) {
+    async serverReturn({userId, id, toClientResponse}) {
         let queue = this.cache[userId] || [];
         let {
             statusCode,

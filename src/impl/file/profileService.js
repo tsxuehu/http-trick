@@ -123,7 +123,7 @@ module.exports = class ProfileService extends EventEmitter {
     }
 
     // 获取clientIp对应的user id
-    getDeviceMappedUserId(deviceId) {
+    getUserIdBindDevice(deviceId) {
         let info = this.deviceInfo[deviceId];
         if (!info) {
             return 'root'
@@ -131,8 +131,10 @@ module.exports = class ProfileService extends EventEmitter {
         return info.userId;
     }
 
-    getUserIdByUserName(userName) {
-        return userName || 'root'
+    isDeviceEnableMonitor(deviceId) {
+        let info = this.deviceInfo[deviceId];
+        if (!info) return true;
+        return !info.disableMonitor;
     }
 
     // 将ip绑定至用户
