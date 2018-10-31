@@ -6,6 +6,7 @@ const DnsResolver = require("../../core/utils/dns");
 
 const ipReg = /((?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d))/;
 
+const DefaultHost = require('./host-default');
 /**
  * Created by tsxuehu on 8/3/17.
  */
@@ -140,7 +141,11 @@ module.exports = class HostService extends EventEmitter {
 
     getHostFile(userId, name) {
         // 如果找不到文件，则去默认文件里查找
-        return (this.userHostFilesMap[userId] || {})[name];
+        let file = (this.userHostFilesMap[userId] || {})[name];
+        if (!file) {
+            file = DefaultHost[name];
+        }
+        return file;
     }
 
     /**
@@ -151,13 +156,25 @@ module.exports = class HostService extends EventEmitter {
     getHostFileList(userId) {
         // 添加默认文件
         let fileList = [];
+        let nameMap = {};
         _.forEach(this.userHostFilesMap[userId], (content, key) => {
+            nameMap[content.name] = 1;
             fileList.push({
                 name: content.name,
                 checked: content.checked,
                 description: content.description,
                 meta: content.meta
             });
+        });
+        _.forEach(DefaultHost, (content, key) => {
+            if (!nameMap[content.name]) {
+                fileList.push({
+                    name: content.name,
+                    checked: content.checked,
+                    description: content.description,
+                    meta: content.meta
+                });
+            }
         });
         return fileList;
     }
@@ -183,6 +200,7 @@ module.exports = class HostService extends EventEmitter {
                 "local": true
             },
             "readonly": false,
+            "default": false,
             "checked": false,
             "name": name,
             "description": description,
@@ -200,9 +218,13 @@ module.exports = class HostService extends EventEmitter {
     }
 
     deleteHostFile(userId, name) {
+        let fileContent = this.userHostFilesMap[userId][name];
+        if (fileContent.default) {
+            throw new Error('默认文件不允许删除');
+        }
         delete this.userHostFilesMap[userId][name];
-        delete this._userHostsCache[userId].defaultHost;
-        delete this._userHostsCache[userId][name];
+        this._userHostsCache[userId] && delete this._userHostsCache[userId].defaultHost;
+        this._userHostsCache[userId] && delete this._userHostsCache[userId][name];
         /**
          * 删除文件
          */
@@ -212,38 +234,52 @@ module.exports = class HostService extends EventEmitter {
 
     async setUseHost(userId, filename) {
         let toSaveFileName = [];
+        let toUseFileFinded = false;
         _.forEach(this.userHostFilesMap[userId], (content, name) => {
             if (content.name == filename && content.checked != true) {
                 content.checked = true;
+                toUseFileFinded = true;
                 toSaveFileName.push(name);
             } else if (content.name != filename && content.checked != false) {
                 content.checked = false;
                 toSaveFileName.push(name);
             }
-
         });
+        // 用户文件中没有找到,则在默认文件中查找
+        if (!toUseFileFinded) {
+            let toUse = DefaultHost[filename];
+            if (toUse) {
+                toUse = JSON.parse(JSON.stringify(toUse));
+                toUse.default = false;
+                toUse.checked = true;
+                toSaveFileName.push(filename);
+                this.userHostFilesMap[userId][filename] = toUse;
+            }
+        }
         // 保存文件
         for (let name of toSaveFileName) {
             let hostfileName = this._getHostFilePath(userId, name);
             let content = this.userHostFilesMap[userId][name];
             await fileUtil.writeJsonToFile(hostfileName, content);
         }
-        delete this._userHostsCache[userId].defaultHost;
+        this._userHostsCache[userId] && delete this._userHostsCache[userId].defaultHost;
         this.emit("data-change", userId, this.getHostFileList(userId));
     }
 
 
     async saveHostFile(userId, name, content) {
+        if (content.default) {
+            content.default = false;
+        }
         this.userHostFilesMap[userId][name] = content;
 
         // 删除缓存
-        delete this._userHostsCache[userId][name];
+        this._userHostsCache[userId] && delete this._userHostsCache[userId][name];
 
         let hostfileName = this._getHostFilePath(userId, name);
         await fileUtil.writeJsonToFile(hostfileName, content);
         this.emit("host-saved", userId, name, content);
     }
-
 
     _getHostFilePath(userId, hostName) {
         let fileName = `${userId}_${hostName}.json`;

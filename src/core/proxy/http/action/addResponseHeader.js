@@ -45,6 +45,10 @@ module.exports = class AddResponseHeader extends Action {
                   toClientResponse, //响应内容
                   last = true
               }) {
-        toClientResponse.headers[action.data.resHeaderKey] = action.data.resHeaderValue;
+        let value = action.data.resHeaderValue;
+        if (value == '$deviceId') {
+            value = deviceId;
+        }
+        toClientResponse.headers[action.data.resHeaderKey] = value;
     }
 };

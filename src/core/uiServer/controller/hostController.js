@@ -11,7 +11,7 @@ module.exports = class HostController {
     constructor() {
 
         this.hostService = ServiceRegistry.getHostService();
-
+        this.profileService = ServiceRegistry.getProfileService();
     }
 
     regist(router) {
@@ -32,6 +32,10 @@ module.exports = class HostController {
         });
         router.get('/host/filelist', async (ctx, next) => {
             let userId = ctx.userId;
+            let deviceId = ctx.query.deviceId;
+            if (deviceId) {
+                userId = this.profileService.getUserIdBindDevice(deviceId);
+            }
             let hostList = await this.hostService.getHostFileList(userId);
             ctx.body = {
                 code: 0,

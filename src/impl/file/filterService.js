@@ -2,16 +2,19 @@ const EventEmitter = require("events");
 const _ = require("lodash");
 const fileUtil = require("../../core/utils/file");
 const path = require('path');
+const DefaultFilters = require('./filter-default');
 
 module.exports = class FilterService extends EventEmitter {
     constructor({profileService, appInfoService}) {
         super();
+        this._filtersCache = {};
         // user -> filters 映射
         this.filters = {};
         let proxyDataDir = appInfoService.getProxyDataDir();
         this.breakpointSaveDir = path.join(proxyDataDir, "filter");
 
         this.profileService = profileService;
+
     }
 
     async start() {
@@ -34,11 +37,35 @@ module.exports = class FilterService extends EventEmitter {
     }
 
     async getFilterRuleList(userId) {
-        return this.filters[userId] || [];
+        if (this._filtersCache[userId]) {
+            return this._filtersCache[userId];
+        }
+
+        let userFilters = this.filters[userId] || [];
+        if (userFilters.length == 0) return DefaultFilters;
+
+        let keysMap = {};
+        userFilters.forEach(f => {
+            keysMap[f.key] = 1;
+        });
+        // 取出需要的默认filter
+        let finalFilters = [];
+        DefaultFilters.forEach(f => {
+            if (!keysMap[f.key]) {
+                finalFilters.push(f);
+            }
+        });
+        finalFilters = finalFilters.concat(userFilters);
+        this._filtersCache[userId] = finalFilters;
+        return finalFilters;
     }
 
     async save(userId, filters) {
+        filters.forEach(f => {
+            f.default = false;
+        });
         this.filters[userId] = filters;
+        delete this._filtersCache[userId];
         let filePath = path.join(this.breakpointSaveDir, `${userId}.json`);
         // 将数据写入文件
         await fileUtil.writeJsonToFile(filePath, filters);
