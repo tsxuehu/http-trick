@@ -46,9 +46,6 @@ module.exports = class AddResponseHeader extends Action {
                   last = true
               }) {
         let value = action.data.resHeaderValue;
-        if (value == '$deviceId') {
-            value = deviceId;
-        }
         toClientResponse.headers[action.data.resHeaderKey] = value;
     }
 };

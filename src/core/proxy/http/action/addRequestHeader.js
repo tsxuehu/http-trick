@@ -49,7 +49,11 @@ module.exports = class AddRequestHeader extends Action {
             let toAddCookie = cookie.parse(action.data.reqHeaderValue || "");
             Object.assign(additionalRequestCookies, toAddCookie);
         } else {
-            additionalRequestHeaders[action.data.reqHeaderKey] = action.data.reqHeaderValue;
+            let value = action.data.reqHeaderValue;
+            if (value == '$deviceId') {
+                value = deviceId;
+            }
+            additionalRequestHeaders[action.data.reqHeaderKey] = value;
         }
     }
 };

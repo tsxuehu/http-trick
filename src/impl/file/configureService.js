@@ -8,7 +8,7 @@ const defaultConfigure = {
     "proxyPort": 8001,
     "socks5Port": 8002,
     "requestTimeoutTime": 30000,
-    "socksProxy": '',
+    "socksProxy": '0.0.0.0',
 };
 /**
  * 代理运转需要的规则数据
@@ -16,12 +16,13 @@ const defaultConfigure = {
  * Created by tsxuehu on 8/3/17.
  */
 module.exports = class ConfigureService extends EventEmitter {
-    constructor({ appInfoService }) {
+    constructor({appInfoService}) {
         super();
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
         this.configureFile = path.join(proxyDataDir, "configure.json");
         this.configure = {};
+        this._socksProxyCahce = null;
     }
 
     async start() {
@@ -37,6 +38,7 @@ module.exports = class ConfigureService extends EventEmitter {
     // 设置配置，保存到文件
     async setConfigure(userId, configure) {
         this.configure = configure;
+        this._socksProxyCahce = null;
         await fileUtil.writeJsonToFile(this.configureFile, this.configure);
         // 发送通知
         this.emit('data-change', userId, this.configure);
@@ -52,6 +54,28 @@ module.exports = class ConfigureService extends EventEmitter {
     }
 
     canSocksProxy(host, ip) {
-        return true;
+        let ipMap = this._getSocksProxyMap();
+        if (ipMap['0.0.0.0']) return true;
+        return ipMap[ip];
+    }
+
+    _getSocksProxyMap() {
+        if (this._socksProxyCahce) {
+            return this._socksProxyCahce;
+        }
+        this._socksProxyCahce = this._parseIp(this.configure.socksProxy);
+    }
+
+    _parseIp(content) {
+        let result = {};
+        let lines = content.replace(/#.*/g, '').split(/[\r\n]/);
+        for (let i = 0, len = lines.length; i < len; i++) {
+            let line = lines[i];
+            let ip = line.trim();
+            if (ip) {
+                result[ip] = 1;
+            }
+        }
+        return result;
     }
 };

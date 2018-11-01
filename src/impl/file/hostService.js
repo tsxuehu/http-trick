@@ -235,6 +235,9 @@ module.exports = class HostService extends EventEmitter {
     async setUseHost(userId, filename) {
         let toSaveFileName = [];
         let toUseFileFinded = false;
+        if (!this.userHostFilesMap[userId]) {
+            this.userHostFilesMap[userId] = {};
+        }
         _.forEach(this.userHostFilesMap[userId], (content, name) => {
             if (content.name == filename && content.checked != true) {
                 content.checked = true;

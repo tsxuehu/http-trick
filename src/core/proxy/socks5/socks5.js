@@ -171,7 +171,7 @@ module.exports = class Server extends EventEmitter {
 
             // 请求socket
 
-            if (canSocksProxy && req.dstPort == 80) {
+            if (canSocksProxy && (req.dstPort == 80 || req.dstPort == 12345)) {
                 socket.deviceId = deviceId;
                 socket.clientIp = clientIp;
                 socket.userId = userId;
@@ -189,6 +189,7 @@ module.exports = class Server extends EventEmitter {
 
                 tlsSocket.deviceId = deviceId;
                 tlsSocket.clientIp = clientIp;
+                tlsSocket.userId = userId;
                 tlsSocket.socks5 = true;
                 http._connectionListener.call(this._srv, tlsSocket);
                 /* tlsSocket.on('data', data => {

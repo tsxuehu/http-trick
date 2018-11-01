@@ -7,8 +7,8 @@ module.exports = {
         "readonly": false,
         "default": true,
         "name": "gateway-daily",
-        "description": "12",
-        "content": "3.4.5.3   *.baidu.com\n4.4.4.4 *.youzan.com"
+        "description": "daily",
+        "content": "192.168.66.241 *.youzan.com"
     },
     'gateway-qa': {
         "meta": {
@@ -18,8 +18,8 @@ module.exports = {
         "readonly": false,
         "default": true,
         "name": "gateway-qa",
-        "description": "12",
-        "content": "3.4.5.3   *.baidu.com\n4.4.4.4 *.youzan.com"
+        "description": "qa",
+        "content": "192.168.66.239 *.youzan.com"
     },
     'gateway-pre': {
         "meta": {
@@ -29,7 +29,7 @@ module.exports = {
         "readonly": false,
         "default": true,
         "name": "gateway-pre",
-        "description": "12",
-        "content": "3.4.5.3   *.baidu.com\n4.4.4.4 *.youzan.com"
+        "description": "pre",
+        "content": "192.168.66.240 *.youzan.com"
     },
 }
