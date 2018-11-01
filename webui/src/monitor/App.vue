@@ -19,10 +19,10 @@
                 </el-tooltip>
             </a>
         </div>
-        <div class="monitor">
+        <div :style="{height: contentHeight+'px'}" class="monitor">
             <device-list></device-list>
-            <http-traffic :height="height"></http-traffic>
-            <detail :height="height"></detail>
+            <http-traffic :height="contentHeight"></http-traffic>
+            <detail :height="contentHeight"></detail>
         </div>
     </div>
 </template>
@@ -50,7 +50,7 @@
                 hostFileList: [],
                 // 当前选择的记录
                 width: 0,
-                height: 0,
+                contentHeight: 0,
                 // 记录id 和 row中索引的映射关系
                 recordMap: {}, // 当前所有记录
                 originRecordArray: [],// 原始记录数组 存放记录id
@@ -187,7 +187,7 @@
             },
             calcSize() {
                 this.width = $(window).width();
-                this.height = $(window).height() - 28;
+                this.contentHeight = $(window).height() - 28;
             },
             // 处理接受到的请求处理数据
             receiveTraffic(rows) {

@@ -3,7 +3,7 @@ module.exports = function NoneAuthHandlers() {
         needUserName: false,
         METHOD: 0x00,
         server: function serverHandler(stream, cb) {
-            cb(true, 'root', 'noauth');
+            cb(true, '', '');
         }
     };
 };

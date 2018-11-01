@@ -8,7 +8,7 @@
         <div class="cell cell-method">{{method}}</div>
         <div class="cell cell-protocol">{{protocol}}</div>
         <div class="cell cell-host">{{host}}</div>
-        <div class="cell cell-path">{{path}}</div>
+        <div class="cell cell-path">{{pathname}}</div>
         <div class="cell cell-type">{{type}}</div>
         <div class="cell cell-time">{{duration}}</div>
     </div>
@@ -42,8 +42,8 @@
             host(){
                 return this.row.originRequest.host;
             },
-            path(){
-                return this.row.originRequest.path;
+            pathname(){
+                return this.row.originRequest.pathname;
             },
             type(){
                 try {

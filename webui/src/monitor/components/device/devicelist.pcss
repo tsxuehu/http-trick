@@ -1,5 +1,6 @@
 .device-list {
   border-right: 1px solid #ccc;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   .title {
@@ -13,7 +14,7 @@
 
   .list-wrapper {
     overflow-y: auto;
-    flex-grow: 1;
+    height: calc(100% - 313px);
     padding-top: 5px;
     padding-left: 10px;
     padding-right: 10px;
