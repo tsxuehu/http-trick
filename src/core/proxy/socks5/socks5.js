@@ -55,6 +55,7 @@ module.exports = class Server extends EventEmitter {
         this.hostService = ServiceRegistry.getHostService();
         this.profileService = ServiceRegistry.getProfileService();
         this.certificationService = ServiceRegistry.getCertificationService();
+        this.configureService = ServiceRegistry.getConfigureService();
 
         let self = this;
 
@@ -161,19 +162,23 @@ module.exports = class Server extends EventEmitter {
             let needResume = true;// 对于透传，等远程连接建立后再resume
             let clientIp = req.srcAddr;
             let deviceId = req.username;// 将认证的username当做deviceId
-
             if (!deviceId) { // 如果没有认证，则拿clientIp作为deviceId
                 deviceId = clientIp;
             }
+            let userId = this.profileService.getUserIdBindDevice(deviceId);
+            let targetIp = await this.hostService.resolveHostDirect(userId, req.dstAddr);
+            let canSocksProxy = this.configureService.canSocksProxy(null, targetIp);
+
             // 请求socket
 
-            if (req.dstPort == 80) {
+            if (canSocksProxy && req.dstPort == 80) {
                 socket.deviceId = deviceId;
                 socket.clientIp = clientIp;
+                socket.userId = userId;
                 socket.socks5 = true;
                 http._connectionListener.call(this._srv, socket);
 
-            } else if (req.dstPort == 443) {
+            } else if (canSocksProxy && req.dstPort == 443) {
                 // tls
                 let context = await this.certificationService.getCertificationForHost(req.dstAddr);
                 let tlsSocket = new tls.TLSSocket(socket, {
@@ -194,7 +199,6 @@ module.exports = class Server extends EventEmitter {
                  })*/
             } else {
                 needResume = false;
-                let targetIp = await this.hostService.resolveHostDirect('root', req.dstAddr);
                 let targetPort = req.dstPort;
                 let dstSock = new net.Socket();
                 dstSock.setKeepAlive(false);

@@ -39,18 +39,18 @@ module.exports = class HttpHandle {
 
         let clientIp = ''; // 设备ip
         let deviceId = '';// 设备id
+        let userId = '';// 设备绑定的用户id
         let socks5proxy = req.socket.socks5;
 
         if (socks5proxy) { // socks5协议
             deviceId = req.socket.deviceId;
             clientIp = req.socket.clientIp;
+            userId = req.socket.userId;
         } else {// http代理协议
             clientIp = getClientIp(req);
             deviceId = clientIp; // 将设备的ip当做设备的id
+            userId = this.profileService.getUserIdBindDevice(deviceId);
         }
-
-        // 设备对应的用户
-        let userId = this.profileService.getUserIdBindDevice(deviceId);
 
         // 解析请求参数
         let urlObj = parseUrl(req);

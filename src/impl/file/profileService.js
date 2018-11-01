@@ -125,7 +125,7 @@ module.exports = class ProfileService extends EventEmitter {
     // 获取clientIp对应的user id
     getUserIdBindDevice(deviceId) {
         let info = this.deviceInfo[deviceId];
-        if (!info) {
+        if (!info || info.userId) {
             return 'root'
         }
         return info.userId;

@@ -7,7 +7,8 @@ const defaultConfigure = {
     "gitlabToken": "",
     "proxyPort": 8001,
     "socks5Port": 8002,
-    "requestTimeoutTime": 30000
+    "requestTimeoutTime": 30000,
+    "socksProxy": '',
 };
 /**
  * 代理运转需要的规则数据
@@ -48,5 +49,9 @@ module.exports = class ConfigureService extends EventEmitter {
 
     getSocks5Port() {
         return this.configure.socks5Port;
+    }
+
+    canSocksProxy(host, ip) {
+        return true;
     }
 };
