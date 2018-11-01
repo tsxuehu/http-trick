@@ -38,6 +38,31 @@ module.exports = class TrafficController {
             ctx.body = await this.rootCertService.getRootCACertPem(userId);
         });
 
+        // 获取网关信息
+        router.get('/utils/gateway/get-info', async (ctx, next) => {
+            let deviceId = ctx.query.deviceId;
+            ctx.set('Content-disposition', 'attachment;filename=zproxy.crt');
+            ctx.body = await this.rootCertService.getRootCACertPem(userId);
+        });
+
+        router.post('/utils/gateway/set', async (ctx, next) => {
+            /**
+            {
+                "ip": "10.98.1.172",
+                "port": 80,
+                "hostname": "sh2-daily-sc-nginx0",
+                "desc": "sh2-daily-sc-nginx0",
+                "who": "www",
+                "sc": "prj00326",
+                "carmen_ip": "10.9.183.89",
+                "carmen_port": "7001"
+            }*/
+            await  axios.post('http://192.168.66.239:12345/index')
+            let deviceId = ctx.query.deviceId;
+            ctx.set('Content-disposition', 'attachment;filename=zproxy.crt');
+            ctx.body = await this.rootCertService.getRootCACertPem(userId);
+        });
+
         // pac文件
         router.get('/pac', async (ctx) => {
             let ip = this.appInfoService.getPcIp();

@@ -74,7 +74,6 @@ module.exports = class Server extends EventEmitter {
         }).on('error', function (err) {
             self.emit('error', err);
         }).on('listening', function () {
-            console.log('socks5 listening')
             self.emit('listening');
         }).on('close', function () {
             self.emit('close');

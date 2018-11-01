@@ -8,31 +8,11 @@
         >
             <template v-for="(item,index) in menuList">
                 <div :key="index">
-                    <el-submenu :index="index + ''" v-if="item.children">
-                        <!-- 菜单标题 -->
-                        <template slot="title">
-                            <i class="iconfont" :class="item.icon"/>
-                            <span class='menu-name'>{{item.name}}</span>
-                        </template>
-                        <!-- 子菜单 -->
-                        <el-menu-item
-                                v-for='(child,cindex) in item.children'
-                                :style="{'padding-left':'40px'}"
-                                :index='index+"-"+cindex'
-                                :key="cindex"
-                        >
-                            <i class="iconfont" :class="child.icon"/>
-                            <span class='menu-name'>
-                {{ child.name }}
-              </span>
-                        </el-menu-item>
-                    </el-submenu>
-                    <!-- 子菜单 -->
-                    <el-menu-item :index="index + ''" v-else>
+                    <el-menu-item :index="index + ''">
                         <i class="iconfont" :class="item.icon"/>
                         <span class='menu-name'>
-              {{ item.name }}
-            </span>
+                          {{ item.name }}
+                        </span>
                     </el-menu-item>
                 </div>
             </template>
@@ -137,9 +117,8 @@
                 const { hash } = location;
                 let defaultActive = '0';
                 this.menuList.forEach((item, index1) => {
-                    if (Array.isArray(item)) {
-
-                    } else if (hash.indexOf(item.link) !== -1) {
+                    if (hash.indexOf(item.link) !== -1) {
+                        console.log(item, index1)
                         defaultActive = index1 + '';
                     }
                 });

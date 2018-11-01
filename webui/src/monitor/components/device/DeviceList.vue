@@ -39,7 +39,29 @@
                         {{hostfile.name}}
                     </el-tag>
                 </div>
-
+                <div class="fake-tag"></div>
+                <div class="fake-tag"></div>
+                <div class="fake-tag"></div>
+            </div>
+        </el-dialog>
+        <el-dialog
+                :title="setGatewayTitle"
+                :visible.sync="showSetGateway"
+                width="30%"
+                center>
+            <div class="gateway">
+                <div>
+                    <span>Name</span>
+                </div>
+                <div>
+                    <span>SC</span>
+                </div>
+                <div>
+                    <span>卡门</span>
+                </div>
+                <div>
+                    <span>机器</span>
+                </div>
             </div>
         </el-dialog>
     </div>
@@ -58,7 +80,8 @@
         components: {Device, ContextMenu},
         data() {
             return {
-                showChoseHostFile: false
+                showChoseHostFile: false,
+                showSetGateway: false
             }
         },
         computed: {
@@ -70,6 +93,9 @@
             },
             chooseHostTitle() {
                 return `选择${this.$dc.rightClickDevice.name}使用的Host文件`;
+            },
+            setGatewayTitle() {
+                return `设置${this.$dc.rightClickDevice.name}的网关信息`;
             }
         },
         methods: {
