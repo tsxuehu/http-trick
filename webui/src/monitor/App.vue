@@ -22,7 +22,7 @@
         <div :style="{height: contentHeight+'px'}" class="monitor">
             <device-list></device-list>
             <http-traffic :height="contentHeight"></http-traffic>
-            <detail :height="contentHeight"></detail>
+            <detail></detail>
         </div>
     </div>
 </template>

@@ -9,6 +9,7 @@
             <div class="cell cell-host">Host</div>
             <div class="cell cell-path">Path</div>
             <div class="cell cell-type">Type</div>
+            <div class="cell cell-device">Device</div>
             <div class="cell cell-time">Time</div>
         </div>
         <!-- 列表区域 优化后的列表展示组件，只展示显示区域 -->

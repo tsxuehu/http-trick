@@ -2,16 +2,18 @@
   .header {
     line-height: 27px;
     height: 27px;
-    font-size: 14px;
     font-weight: bolder;
     background-color: #fafafa;
-    border: 1px solid #eaeefb;
+    border-bottom: 1px solid #eaeefb;
+    .cell{
+      font-size: 14px;
+    }
   }
 
   .row {
-    display: flex;
     width: 100%;
     cursor: default;
+    font-size: 0;
     .cell-index {
       width: 50px;
     }
@@ -28,11 +30,13 @@
       width: 136px;
     }
     .cell-path {
-      flex-grow: 1;
-      flex-basis: 0%;
+      width: calc(100% - 763px);
     }
     .cell-type {
-      width: 100px;
+      width: 150px;
+    }
+    .cell-device {
+      width: 150px;
     }
     .cell-time {
       width: 70px;
@@ -40,20 +44,18 @@
   }
 
   .cell {
-    flex-grow: 0;
-    flex-shrink: 0;
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
     word-break: break-all;
     white-space: nowrap;
+    display: inline-block;
   }
 
   .record {
-    line-height: 22px;
+    line-height: 23px;
     height: 24px;
     border-bottom: 1px solid #ddd;
-    border-top: 1px solid #ddd;
     .cell {
       font-size: 12px;
     }

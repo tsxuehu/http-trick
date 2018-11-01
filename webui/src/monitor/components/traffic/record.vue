@@ -10,6 +10,7 @@
         <div class="cell cell-host">{{host}}</div>
         <div class="cell cell-path">{{pathname}}</div>
         <div class="cell cell-type">{{type}}</div>
+        <div class="cell cell-device">{{device}}</div>
         <div class="cell cell-time">{{duration}}</div>
     </div>
 </template>
@@ -48,6 +49,13 @@
             type(){
                 try {
                     return this.row.response.headers['content-type'];
+                } catch (e) {
+                    return '';
+                }
+            },
+            device(){
+                try {
+                    return '设备';
                 } catch (e) {
                     return '';
                 }
