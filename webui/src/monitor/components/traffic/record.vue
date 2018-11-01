@@ -48,14 +48,15 @@
             },
             type(){
                 try {
-                    return this.row.response.headers['content-type'];
+                    return this.row.originRequest.headers['content-type'];
                 } catch (e) {
                     return '';
                 }
             },
             device(){
                 try {
-                    return '设备';
+                    let id = this.row.originRequest.deviceId;
+                    return this.$dc.deviceIdNameMap[id];
                 } catch (e) {
                     return '';
                 }

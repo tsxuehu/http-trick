@@ -75,7 +75,13 @@
             total() {
                 return this.filterdRecordArray.length;
             },
-
+            deviceIdNameMap() {
+                let idNameMap = {};
+                this.bindedDeviceList.forEach(device => {
+                    idNameMap[device.id] = device.name;
+                });
+                return idNameMap;
+            },
             currentRow() {
                 return this.recordMap[this.selectId] || {};
             },
