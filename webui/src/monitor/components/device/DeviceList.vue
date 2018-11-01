@@ -22,6 +22,7 @@
                       :ctxClose="onCtxClose">
             <li class="ctx-item" @click="renameDevice">取别名</li>
             <li class="ctx-item" @click="changeHost">修改host</li>
+            <li class="ctx-item" @click="changeHost">设置网关</li>
             <li class="ctx-item" @click="removeDevice">删除设备</li>
             <li class="ctx-item" v-if="!$dc.rightClickDevice.disableMonitor" @click="disableMonitor">停止监控</li>
             <li class="ctx-item" v-if="$dc.rightClickDevice.disableMonitor" @click="enableMonitor">开启监控</li>
