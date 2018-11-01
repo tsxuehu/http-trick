@@ -164,7 +164,16 @@
         },
         methods: {
             changeUser() {
-
+                this.$prompt('请输入用户名(不输入内容将会使用本机ip作为用户名)', '切换用户', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(async ({value}) => {
+                    let result = await profileApi.setUserId(value || '');
+                    this.userId = result.data.data.userId;
+                    // 刷新
+                    location.reload();
+                }).catch(() => {
+                });
             },
             requestToggleRecordState() {
                 this.state.stopRecord = !this.state.stopRecord;
