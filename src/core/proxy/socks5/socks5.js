@@ -167,7 +167,7 @@ module.exports = class Server extends EventEmitter {
             }
             let userId = this.profileService.getUserIdBindDevice(deviceId);
             let targetIp = await this.hostService.resolveHostDirect(userId, req.dstAddr);
-            let canSocksProxy = this.configureService.canSocksProxy(null, targetIp);
+            let canSocksProxy = this.profileService.canSocksProxy(userId, null, targetIp);
 
             // 请求socket
 

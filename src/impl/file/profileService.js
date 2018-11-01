@@ -11,7 +11,9 @@ const defaultProfile = {
     // 是否启用host解析
     "enableHost": true,
     // 是否启用filter
-    "enableFilter": true
+    "enableFilter": true,
+    // socks代理解析的ip
+    "socksProxyNeedParseIp": '0.0.0.0',
 };
 /**
  * 代理运转需要的规则数据
@@ -25,6 +27,8 @@ module.exports = class ProfileService extends EventEmitter {
         this.userProfileMap = {};
         // deviceId -> info { userId: , name: '', id: ''}
         this.deviceInfo = {};
+        // 用户socks配置缓存
+        this._socksProxyCahce = {};
         this.appInfoService = appInfoService;
         let proxyDataDir = this.appInfoService.getProxyDataDir();
         this.profileSaveDir = path.join(proxyDataDir, "profile");
@@ -50,6 +54,7 @@ module.exports = class ProfileService extends EventEmitter {
 
     async setProfile(userId, profile) {
         this.userProfileMap[userId] = profile;
+        delete  this._socksProxyCahce[userId];
 
         let filePath = path.join(this.profileSaveDir, `${userId}.json`);
         // 将数据写入文件
@@ -237,5 +242,33 @@ module.exports = class ProfileService extends EventEmitter {
             }
         });
         return deviceList;
+    }
+
+    canSocksProxy(userId, host, ip) {
+        let ipMap = this._getSocksProxyMap(userId);
+        if (ipMap['0.0.0.0']) return true;
+        return ipMap[ip];
+    }
+
+    _getSocksProxyMap(userId) {
+        if (this._socksProxyCahce[userId]) {
+            return this._socksProxyCahce[userId];
+        }
+        let content = this.getProfile(userId).socksProxyNeedParseIp;
+        this._socksProxyCahce[userId] = this._parseIp(content);
+        return this._socksProxyCahce[userId];
+    }
+
+    _parseIp(content) {
+        let result = {};
+        let lines = content.replace(/#.*/g, '').split(/[\r\n]/);
+        for (let i = 0, len = lines.length; i < len; i++) {
+            let line = lines[i];
+            let ip = line.trim();
+            if (ip) {
+                result[ip] = 1;
+            }
+        }
+        return result;
     }
 };

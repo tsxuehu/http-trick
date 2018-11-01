@@ -117,15 +117,19 @@
                         name: '自定义 mock 数据',
                         icon: 'icon-suoding',
                         link: 'datalist'
-                    }
-                ]);
-                if (!this.$dc.appInfo.single) {
-                    menu.push({
-                        name: '绑定设备',
+                    },
+                    {
+                        name: '设备管理',
                         icon: 'icon-bargraph',
                         link: 'device'
-                    })
-                }
+                    },
+                    {
+                        name: 'Socks5配置',
+                        icon: 'icon-set',
+                        link: 'socks5'
+                    },
+                ]);
+
                 return menu;
             },
 

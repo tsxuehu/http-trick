@@ -19,6 +19,8 @@ import DeviceList from 'src/manager/components/device/DeviceList'
 
 import HelpInstall from 'src/manager/components/help/Install'
 
+import Socks5Configure from 'src/manager/components/socks5/Configure'
+
 
 Vue.use(Router);
 
@@ -41,6 +43,8 @@ export default new Router({
 
     {path: '/device',component: DeviceList},
 
-    {path: '/helpinstall',component: HelpInstall, alias: '/'}
+    {path: '/helpinstall',component: HelpInstall, alias: '/'},
+
+    {path: '/socks5',component: Socks5Configure}
   ]
 })

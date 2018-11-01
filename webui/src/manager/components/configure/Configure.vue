@@ -8,15 +8,17 @@
                         placeholder="proxy的代理端口"
                 />
             </el-form-item>
+            <el-form-item label="Socks5端口">
+                <el-input
+                        v-model="$dc.configure.socks5Port"
+                        placeholder="proxy的代理端口"
+                />
+            </el-form-item>
             <el-form-item label="超时时间">
                 <el-input
                         v-model="$dc.configure.requestTimeoutTime"
                         placeholder="远程服务器响应超时，proxy会终止请求"
                 />
-            </el-form-item>
-            <el-form-item label="Socks解析">
-                <textarea class="socks-editor" :placeholder="socksProxyExample"
-                          v-model="$dc.configure.socksProxy"></textarea>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="saveFile">保存</el-button>
@@ -44,6 +46,7 @@
                     this.$dc.configure.requestTimeoutTime
                 );
                 this.$dc.configure.proxyPort = parseInt(this.$dc.configure.proxyPort);
+                this.$dc.configure.socks5Port = parseInt(this.$dc.configure.socks5Port);
                 let response = await confApi.saveFile(this.$dc.configure);
                 let serverData = response.data;
                 if (serverData.code == 0) {
