@@ -54,7 +54,11 @@ module.exports = class ConfigController {
             let userId = ctx.query.userId;
             let deviceId = ctx.query.deviceId;
             if (!deviceId) { // 没传设备id，则将设备的ip作为设备id
-                deviceId = ctx.ip;
+                let ip = ctx.ip;
+                if (ip.indexOf('::') !== -1) {
+                    ip = ip.split(':')[3];
+                }
+                deviceId = ip;
             }
             this.profileService.bindDevice(userId, deviceId);
             ctx.body = {

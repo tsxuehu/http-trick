@@ -1,6 +1,6 @@
 const ServiceRegistry = require("../../service");
 const gitlab = require("../../utils/gitlab");
-
+const axios = require('axios');
 let instance;
 module.exports = class TrafficController {
     static getInstance() {
@@ -38,29 +38,55 @@ module.exports = class TrafficController {
             ctx.body = await this.rootCertService.getRootCACertPem(userId);
         });
 
-        // 获取网关信息
-        router.get('/utils/gateway/get-info', async (ctx, next) => {
+        // 获取机器
+        router.get('/utils/gateway/get-machine', async (ctx, next) => {
+
+            // 获取信息
+            let servers = (await axios.get('http://192.168.66.241:12345/servers')).data;
+            // 获取配置信息
+            ctx.body = {
+                servers
+            }
+        });
+
+        // 获取网关配置
+        router.get('/utils/gateway/config', async (ctx, next) => {
             let deviceId = ctx.query.deviceId;
-            ctx.set('Content-disposition', 'attachment;filename=zproxy.crt');
-            ctx.body = await this.rootCertService.getRootCACertPem(userId);
+            let config = {
+                headers: {
+                    'x-forwarded-for': deviceId
+                }
+            };
+            // 获取信息
+            let info = (await axios.get('http://192.168.66.241:12345/index/config-info', config)).data;
+            // 获取配置信息
+            ctx.body = {
+                data: info
+            }
         });
 
         router.post('/utils/gateway/set', async (ctx, next) => {
             /**
-            {
-                "ip": "10.98.1.172",
-                "port": 80,
-                "hostname": "sh2-daily-sc-nginx0",
-                "desc": "sh2-daily-sc-nginx0",
-                "who": "www",
-                "sc": "prj00326",
-                "carmen_ip": "10.9.183.89",
-                "carmen_port": "7001"
-            }*/
-            await  axios.post('http://192.168.66.239:12345/index')
+             {
+                 "ip": "10.98.1.172",
+                 "port": 80,
+                 "hostname": "sh2-daily-sc-nginx0",
+                 "desc": "sh2-daily-sc-nginx0",
+                 "who": "www",
+                 "sc": "prj00326",
+                 "carmen_ip": "10.9.183.89",
+                 "carmen_port": "7001"
+             }*/
             let deviceId = ctx.query.deviceId;
-            ctx.set('Content-disposition', 'attachment;filename=zproxy.crt');
-            ctx.body = await this.rootCertService.getRootCACertPem(userId);
+            let config = {
+                headers: {
+                    'x-forwarded-for': deviceId
+                }
+            };
+            await axios.post('http://192.168.66.239:12345/index', ctx.request.body, config);
+            ctx.body = {
+                code: 0
+            }
         });
 
         // pac文件

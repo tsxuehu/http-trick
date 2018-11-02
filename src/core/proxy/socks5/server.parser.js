@@ -34,7 +34,11 @@ class Parser extends EventEmitter {
         this._dstaddrp = 0;
         this._dstport = undefined;
 
-        this._clientIp = stream.remoteAddress;
+        let clientIp = stream.remoteAddress;
+        if (clientIp.indexOf('::') !== -1) {
+            clientIp = clientIp.split(':')[3];
+        }
+        this._clientIp = clientIp;
         this._clientPort = stream.remotePort;
 
         this.authed = false;
@@ -220,8 +224,8 @@ class Parser extends EventEmitter {
 
                         this.emit('request', {
                             cmd: this._cmd,
-                            srcAddr:  this._clientIp,
-                            srcPort:  this._clientPort,
+                            srcAddr: this._clientIp,
+                            srcPort: this._clientPort,
                             dstAddr: this._dstaddr,
                             dstPort: this._dstport,
                             username: this.username,

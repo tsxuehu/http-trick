@@ -6,8 +6,9 @@ module.exports = function (req) {
         let ip = ConnectHandle.getProxyRequestPortMapedClientIp(remotePort);
         if (ip) return ip;
     }
-    return req.headers['x-forwarded-for'] ||
-        req.connection.remoteAddress ||
-        req.socket.remoteAddress ||
-        req.connection.socket.remoteAddress;
+    let clientIp = req.socket.remoteAddress;
+    if (clientIp.indexOf('::') !== -1) {
+        clientIp = ip.split(':')[3];
+    }
+    return clientIp;
 }
