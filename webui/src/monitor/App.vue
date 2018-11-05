@@ -15,7 +15,7 @@
             </span>
             <a href="javascript:void(0)" v-if="!$dc.appInfo.single" class="username" @click="changeUser">
                 <el-tooltip class="item" effect="dark" content="点击切换用户" placement="top">
-                    <el-button type="text">{{$dc.userId}}</el-button>
+                    <el-button type="text">{{$dc.userInfo.userId}}</el-button>
                 </el-tooltip>
             </a>
         </div>
@@ -44,7 +44,9 @@
             return {
                 isDataCenter: true,
                 appInfo: {},
-                userId: 'guest',
+                userInfo: {
+                    userId: 'guest', deviceId: '', clientIp: ''
+                },
                 bindedDeviceList: [],
                 // host文件列表
                 hostFileList: [],
@@ -81,6 +83,9 @@
                     idNameMap[device.id] = device.name;
                 });
                 return idNameMap;
+            },
+            currentDeviceId(){
+                return this.userInfo.deviceId;
             },
             currentRow() {
                 return this.recordMap[this.selectId] || {};
@@ -287,8 +292,8 @@
         async created() {
             this.calcSize();
 
-            let result = await profileApi.getUserId();
-            this.userId = result.data.data.userId;
+            let result = await profileApi.getUserInfo();
+            this.userInfo = result.data.data;
             let appInfo = await appApi.getAppInfo();
             this.appInfo = appInfo.data.data;
 

@@ -8,6 +8,7 @@ const router = require("./router");
 const SocketIO = require("socket.io");
 const cookieParser = require("cookie");
 const ServiceRegistry = require("../service");
+const socketIp = require("../utils/socketIp");
 
 module.exports = class UiServer {
 
@@ -39,10 +40,7 @@ module.exports = class UiServer {
                     userId = 'root';
                 } else {
                     // 多用户模式 则把用户的ip当做id
-                    let ip = ctx.ip;
-                    if (ip.indexOf('::') !== -1) {
-                        ip = ip.split(':')[3];
-                    }
+                    let ip = socketIp.getRemoteIp(ctx.req.socket);
                     userId = ip;
                     // 当前机器的ip和用户id绑定. 当机器为ip的机器发代理请求时，会使用userId用户的规则
                 }

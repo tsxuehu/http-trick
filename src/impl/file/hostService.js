@@ -56,7 +56,7 @@ module.exports = class HostService extends EventEmitter {
             let device = this.profileService.getDevice(deviceId);
             let inUsingHosts = {};
             if (device && device.hostFileName) {
-                way = 'device-' + device.hostfileName + ' ';
+                way = 'device-' + device.hostFileName + ' ';
                 inUsingHosts = this.getSpecificHosts(userId, device.hostFileName)
             } else {
                 inUsingHosts = this.getDefaultHosts(userId);

@@ -29,6 +29,9 @@ export default {
     getUserId() {
         return axios.get(`/profile/getUserId`);
     },
+    getUserInfo() {
+        return axios.get(`/profile/getUserInfo`);
+    },
     setUserId(userId) {
         return axios.get(`/profile/setUserId?userId=${userId}`);
     },

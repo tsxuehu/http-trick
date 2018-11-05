@@ -1,7 +1,7 @@
 <template>
     <div class="device"
          @contextmenu.prevent="rightClicked($event, device.id)">
-        <div class="name"  key="name">Name: {{device.name}}</div>
+        <div class="name"  key="name">Name: {{device.name}}<span v-if="$dc.currentDeviceId == device.id" style="color: #eab700">(本机)</span></div>
         <div class="host" v-if="device.hostFileName" key="host">HOST: {{device.hostFileName}}</div>
         <div class="id"  key="id">ID: {{device.id}}</div>
         <div class="status offline" v-if="device.disableMonitor"></div>

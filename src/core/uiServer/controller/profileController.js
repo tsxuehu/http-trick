@@ -2,6 +2,8 @@
  * Created by tsxuehu on 4/11/17.
  */
 const ServiceRegistry = require("../../service");
+const socketIp = require("../../utils/socketIp");
+
 let instance;
 module.exports = class ConfigController {
     static getInstance() {
@@ -54,10 +56,7 @@ module.exports = class ConfigController {
             let userId = ctx.query.userId;
             let deviceId = ctx.query.deviceId;
             if (!deviceId) { // 没传设备id，则将设备的ip作为设备id
-                let ip = ctx.ip;
-                if (ip.indexOf('::') !== -1) {
-                    ip = ip.split(':')[3];
-                }
+                let ip = socketIp.getRemoteIp(ctx.request.socket);
                 deviceId = ip;
             }
             this.profileService.bindDevice(userId, deviceId);
@@ -159,6 +158,27 @@ module.exports = class ConfigController {
                 code: 0,
                 data: {
                     userId
+                }
+            };
+        });
+
+        router.get('/profile/getUserInfo', async (ctx, next) => {
+            // 用户id
+            let userId = ctx.userId;
+            let ip = socketIp.getRemoteIp(ctx.request.socket);
+            let deviceId = ip;
+            // 检查访问设备是否绑定当前用户，若没有则绑定
+            let info = this.profileService.getDevice(deviceId);
+            if (!info || info.userId != userId) {
+                this.profileService.bindDevice(userId, deviceId);
+            }
+
+
+            // 设备id -- 浏览器端访问将设备ip作为设备id
+            ctx.body = {
+                code: 0,
+                data: {
+                    userId, deviceId, ip
                 }
             };
         });
