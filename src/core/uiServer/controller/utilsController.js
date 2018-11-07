@@ -1,6 +1,8 @@
 const ServiceRegistry = require("../../service");
 const gitlab = require("../../utils/gitlab");
 const axios = require('axios');
+const path = require('path');
+const fs = require('fs');
 let instance;
 module.exports = class TrafficController {
     static getInstance() {
@@ -36,6 +38,13 @@ module.exports = class TrafficController {
             let userId = ctx.userId;
             ctx.set('Content-disposition', 'attachment;filename=zproxy.crt');
             ctx.body = await this.rootCertService.getRootCACertPem(userId);
+        });
+
+        router.get('/utils/rootCA.mobileconfig', async (ctx, next) => {
+            let userId = ctx.userId;
+            ctx.set('Content-disposition', 'attachment;filename=zproxy.mobileconfig');
+
+            ctx.body = fs.createReadStream(path.join(__dirname, '../../../../certificate/zproxy.mobileconfig'));
         });
 
         // 获取机器
@@ -83,7 +92,7 @@ module.exports = class TrafficController {
                     'x-forwarded-for': deviceId
                 }
             };
-            await axios.post('http://192.168.66.239:12345/index', ctx.request.body, config);
+            await axios.post('http://192.168.66.241:12345/index', ctx.request.body, config);
             ctx.body = {
                 code: 0
             }

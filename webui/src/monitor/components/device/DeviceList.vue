@@ -163,7 +163,7 @@
                     spinner: 'el-icon-loading',
                     background: 'rgba(0, 0, 0, 0.7)'
                 });
-                let config = (await utilsApi.getConfigInfo(this.$dc.rightClickDeviceId)).data;
+                let config = (await utilsApi.getConfigInfo(this.$dc.rightClickDeviceId)).data.data;
                 this.gateWayConfig = {
                     "ip": config.machine.ip,
                     "port": config.machine.port,
@@ -182,8 +182,9 @@
                     spinner: 'el-icon-loading',
                     background: 'rgba(0, 0, 0, 0.7)'
                 });
-                await this.setGateWay(this.$dc.rightClickDeviceId, this.gateWayConfig);
+                await utilsApi.setGateWay(this.$dc.rightClickDeviceId, this.gateWayConfig);
                 loading.close();
+                this.showSetGateway = false;
             },
             resetGatewayConfig() {
                 this.gateWayConfig = {

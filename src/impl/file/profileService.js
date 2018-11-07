@@ -13,7 +13,7 @@ const defaultProfile = {
     // 是否启用filter
     "enableFilter": true,
     // socks代理解析的ip
-    "socksProxyNeedParseIp": '192.168.66.241\n192.168.66.240\n192.168.66.239',
+    "socksProxyNeedParseIp": '',
 };
 /**
  * 代理运转需要的规则数据
@@ -36,6 +36,7 @@ module.exports = class ProfileService extends EventEmitter {
     }
 
     async start() {
+        defaultProfile.socksProxyNeedParseIp = await fileUtil.readFile(path.join(__dirname, 'youzan-ip.txt'));
         let profileMap = await fileUtil.getJsonFileContentInDir(this.profileSaveDir);
         _.forEach(profileMap, (profile, fileName) => {
             let userId = fileName.slice(0, -5);
@@ -130,7 +131,7 @@ module.exports = class ProfileService extends EventEmitter {
     // 获取clientIp对应的user id
     getUserIdBindDevice(deviceId) {
         let info = this.deviceInfo[deviceId];
-        if (!info || info.userId) {
+        if (!info || !info.userId) {
             return 'root'
         }
         return info.userId;

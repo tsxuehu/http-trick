@@ -1,5 +1,5 @@
 module.exports = {
-    'gateway-daily': {
+    'daily': {
         "meta": {
             "local": true
         },
@@ -10,7 +10,7 @@ module.exports = {
         "description": "daily",
         "content": "192.168.66.241 *.youzan.com"
     },
-    'gateway-qa': {
+    'qa': {
         "meta": {
             "local": true
         },
@@ -21,7 +21,7 @@ module.exports = {
         "description": "qa",
         "content": "192.168.66.239 *.youzan.com"
     },
-    'gateway-pre': {
+    'pre': {
         "meta": {
             "local": true
         },
