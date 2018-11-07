@@ -33,9 +33,9 @@
 			RS0tLS0tCg==
 			</data>
 			<key>PayloadDescription</key>
-			<string>ZanProxy CA root certificate</string>
+			<string>YouZan CA root certificate</string>
 			<key>PayloadDisplayName</key>
-			<string>ZanProxy</string>
+			<string>YouZan Mobile Proxy</string>
 			<key>PayloadIdentifier</key>
 			<string>com.apple.security.root.E4BBBE08-F742-4CA5-A174-F0B37B3E59D9</string>
 			<key>PayloadType</key>
@@ -47,9 +47,9 @@
 		</dict>
 	</array>
 	<key>PayloadDisplayName</key>
-	<string>ZanProxy</string>
+	<string>YouZan Mobile Proxy</string>
 	<key>PayloadIdentifier</key>
-	<string>Geminis-Macbook-Pro.363AC4CC-A336-4378-A873-9F36054807F9</string>
+	<string>com.youzan.apubcompanionvip.363AC4CC-A336-4378-A873-9F36054807F9</string>
 	<key>PayloadRemovalDisallowed</key>
 	<false/>
 	<key>PayloadType</key>
