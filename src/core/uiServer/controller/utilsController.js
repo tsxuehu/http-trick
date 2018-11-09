@@ -115,7 +115,7 @@ module.exports = class TrafficController {
              }*/
             let request = ctx.request.body;
             let host = request.host;
-            let deviceId = ctx.query.deviceId;
+            let deviceId = request.deviceId;
 
             // 设置host
             await this.profileService.setDeviceHostFileName(deviceId, host);
