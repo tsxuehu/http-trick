@@ -15,6 +15,7 @@ module.exports = class TrafficController {
     constructor() {
         this.appInfoService = ServiceRegistry.getAppInfoService();
         this.rootCertService = ServiceRegistry.getCertificationService();
+        this.profileService = ServiceRegistry.getProfileService();
     }
 
     regist(router) {
@@ -68,6 +69,11 @@ module.exports = class TrafficController {
             };
             // 获取信息
             let info = (await axios.get('http://192.168.66.241:12345/index/config-info', config)).data;
+            // 获取host
+            let device = this.profileService.getDevice(deviceId);
+            if (device) {
+                info.host = device.hostFileName;
+            }
             // 获取配置信息
             ctx.body = {
                 data: info
@@ -79,8 +85,6 @@ module.exports = class TrafficController {
              {
                  "ip": "10.98.1.172",
                  "port": 80,
-                 "hostname": "sh2-daily-sc-nginx0",
-                 "desc": "sh2-daily-sc-nginx0",
                  "who": "www",
                  "sc": "prj00326",
                  "carmen_ip": "10.9.183.89",
@@ -93,6 +97,58 @@ module.exports = class TrafficController {
                 }
             };
             await axios.post('http://192.168.66.241:12345/index', ctx.request.body, config);
+            ctx.body = {
+                code: 0
+            }
+        });
+
+        // gate、host一体设置
+        router.post('/utils/gateway-host/set', async (ctx, next) => {
+            /**
+             {
+                 "host":"qa",
+                 "deviceId": "",
+                 "ip": "10.98.1.172",
+                 "port": 80,
+                 "who": "www",
+                 "sc": "prj00326",
+             }*/
+            let request = ctx.request.body;
+            let host = request.host;
+            let deviceId = ctx.query.deviceId;
+
+            // 设置host
+            await this.profileService.setDeviceHostFileName(deviceId, host);
+
+            let carmenIp = request.carmen_ip;
+            let carmenPort = request.carmen_port || '7001';
+            if (host == 'daily') {
+                carmenIp = '10.98.0.153'
+            } else if (host == 'qa') {
+                carmenIp = '10.9.42.160'
+            } else if (host == 'pre') {
+                carmenIp = '10.9.183.89'
+            } else {
+                ctx.body = {
+                    code: 0
+                };
+                return;
+            }
+            // 设置网关
+            let config = {
+                headers: {
+                    'x-forwarded-for': deviceId
+                }
+            };
+            let gatewayConfig = {
+                "ip": request.ip,
+                "port": request.port,
+                "who": request.who,
+                "sc": request.sc || '',
+                "carmen_ip": carmenIp,
+                "carmen_port": carmenPort
+            };
+            await axios.post('http://192.168.66.241:12345/index', gatewayConfig, config);
             ctx.body = {
                 code: 0
             }
