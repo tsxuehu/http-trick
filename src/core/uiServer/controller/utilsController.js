@@ -147,24 +147,21 @@ module.exports = class TrafficController {
                 "carmen_ip": info.carmen.ip,
                 "carmen_port": info.carmen.port || 7001
             };
-
-            if (host == 'daily') {
-                gateway.carmen_ip = '10.98.0.153';
-                gateway.ip = '10.98.1.172';
-            } else if (host == 'qa') {
-                gateway.carmen_ip = '10.9.42.160';
-                gateway.ip = '10.9.104.142';
-            } else if (host == 'pre') {
-                gateway.carmen_ip = '10.9.183.89';
-                gateway.ip = '10.19.103.89';
-            } else {
-                ctx.body = {
-                    code: 0
-                };
-                return;
+            if (host) {
+                if (host == 'daily') {
+                    gateway.carmen_ip = '10.98.0.153';
+                    gateway.ip = '10.98.1.172';
+                } else if (host == 'qa') {
+                    gateway.carmen_ip = '10.9.42.160';
+                    gateway.ip = '10.9.104.142';
+                } else if (host == 'pre') {
+                    gateway.carmen_ip = '10.9.183.89';
+                    gateway.ip = '10.19.103.89';
+                }
+                // 设置默认的配置
+                await axios.post('http://192.168.66.241:12345/index', gateway, config);
             }
-            // 设置默认的配置
-            await axios.post('http://192.168.66.241:12345/index', gateway, config);
+
 
             let servers = (await axios.get('http://192.168.66.241:12345/servers')).data;
             let machine = servers.find(server => {
