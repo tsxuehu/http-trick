@@ -43,6 +43,13 @@ module.exports = class HostService extends EventEmitter {
         return result.ip;
     }
 
+    isIp(str) {
+        if (ipReg.test(str)) {
+            return true
+        }
+        return false;
+    }
+
     async resolveHostWithWay(userId, deviceId, hostname) {
         let ip = '';
         let way = '';

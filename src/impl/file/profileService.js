@@ -245,10 +245,17 @@ module.exports = class ProfileService extends EventEmitter {
         return deviceList;
     }
 
-    canSocksProxy(userId, host, ip) {
-        let ipMap = this._getSocksProxyMap(userId);
-        if (ipMap['0.0.0.0']) return true;
-        return ipMap[ip];
+    canSocksProxy(userId, host) {
+        let {hostMap, globHostArray} = this._getSocksProxyMap(userId);
+        if (hostMap['all']) return true;
+        if (host[host]) {
+            return true;
+        }
+
+        let finded = _.find(globHostArray, (value) => {
+            return host.endsWith(value);
+        });
+        return !!finded;
     }
 
     _getSocksProxyMap(userId) {
@@ -256,20 +263,31 @@ module.exports = class ProfileService extends EventEmitter {
             return this._socksProxyCahce[userId];
         }
         let content = this.getProfile(userId).socksProxyNeedParseIp;
-        this._socksProxyCahce[userId] = this._parseIp(content);
+        this._socksProxyCahce[userId] = this._parseHost(content);
         return this._socksProxyCahce[userId];
     }
 
-    _parseIp(content) {
-        let result = {};
+    _parseHost(content) {
+        let result = [];
         let lines = content.replace(/#.*/g, '').split(/[\r\n]/);
         for (let i = 0, len = lines.length; i < len; i++) {
             let line = lines[i];
-            let ip = line.trim();
-            if (ip) {
-                result[ip] = 1;
+            let host = line.trim();
+            if (host) {
+                result.push(host);
             }
         }
-        return result;
+        let globHostArray = [];
+        let hostMap = {};
+        _.forEach(result, (host) => {
+            if (host.startsWith('*')) {
+                globHostArray.push(host.substr(1, host.length));
+            } else {
+                hostMap[host] = 1;
+            }
+        });
+        return {
+            hostMap, globHostArray
+        };
     }
 };

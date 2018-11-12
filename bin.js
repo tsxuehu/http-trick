@@ -33,6 +33,7 @@ async function start() {
         .option('-p, --proxyPort [value]', '指定代理端口')
         .option('-u, --uiPort [value]', '指定UI端口')
         .option('-s, --socks5Port [value]', '指定socks5端口')
+        .option('-d, --dnsPort [value]', '指定dns端口')
         .option('-m, --userMode [value]', '用户模式 ')
         // .option('-s, --serviceType [value]', '启动类型，默认desktop')
         .parse(process.argv);
@@ -41,10 +42,11 @@ async function start() {
     let proxyPort = program.proxyPort;
     let uiPort = program.uiPort;
     let socks5Port = program.socks5Port;
+    let dnsPort = program.dnsPort;
     let userMode = program.userMode;
     let serviceType = program.serviceType;
 
-    let launcher = new Launcher(proxyPort, socks5Port, uiPort, serviceType, userMode);
+    let launcher = new Launcher(proxyPort, socks5Port,dnsPort, uiPort, serviceType, userMode);
     launcher.start();
 }
 

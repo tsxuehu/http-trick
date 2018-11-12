@@ -17,6 +17,7 @@ module.exports = class AppInfoService extends EventEmitter {
             "httpProxyPort": "",
             "httpsProxyPort": "",
             "socks5ProxyPort": "",
+            "dnsPort": "",
             "pcIp": ""
         };
 
@@ -110,6 +111,12 @@ module.exports = class AppInfoService extends EventEmitter {
         });
     }
 
+    setDnsPortPort(dnsPort) {
+        this.setAppInfo({
+            dnsPort: dnsPort
+        });
+    }
+
     /**
      * 真实的代理端口
      * @returns {string}
@@ -159,6 +166,7 @@ module.exports = class AppInfoService extends EventEmitter {
     printRuntimeInfo() {
         console.log(`Http Proxy Port: ${ this.appInfo.httpProxyPort}`);
         console.log(`Socks5 Proxy Port: ${ this.appInfo.socks5ProxyPort}`);
+        console.log(`DNS Port: ${ this.appInfo.dnsPort}`);
         console.log(`Manager: http://${this.appInfo.pcIp}:${this.appInfo.realUiPort}`);
     }
 };

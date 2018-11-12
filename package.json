@@ -36,10 +36,12 @@
     "pem": "^1.12.3",
     "psaux": "^0.3.0",
     "query-string": "^4.3.4",
+    "random-ipv4": "^1.0.2",
     "regenerator-runtime": "^0.10.5",
     "rimraf": "^2.6.1",
     "socket.io": "^1.7.3",
     "stream-throttle": "^0.1.3",
+    "updns": "^1.3.1",
     "vue": "^2.1.10",
     "ws": "2.2.1"
   },

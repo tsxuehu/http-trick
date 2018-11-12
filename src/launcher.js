@@ -25,12 +25,13 @@ module.exports = class Launcher {
      * @param serviceType 使用的服务类型
      * @param isSingle 是否是单用户模式
      */
-    constructor(port = 8001, socks5Port = 8002, webUIPort = 40001, serviceType = "file", userMode = "single") {
+    constructor(port = 8001, socks5Port = 8002, dnsPort = 53, webUIPort = 40001, serviceType = "file", userMode = "single") {
         this.serviceType = serviceType;
         this.single = userMode != "multi";
         this.port = port;
         this.socks5Port = socks5Port;
         this.webUIPort = webUIPort;
+        this.dnsPort = dnsPort;
     }
 
     /**
@@ -71,20 +72,20 @@ module.exports = class Launcher {
             logService = new FileLogService();
             appInfoService = new FileAppInfoService(this.single);
 
-            configureService = new FileConfigureService({ appInfoService });
+            configureService = new FileConfigureService({appInfoService});
 
-            let baseService = { logService, appInfoService, configureService };
+            let baseService = {logService, appInfoService, configureService};
 
             // 复合服务
             breakpointService = new FileBreakpointService(baseService);
             certificationService = new FileCertificationService(baseService);
 
             profileService = new FileProfileService(baseService);
-            filterService = new FileFilterService({ profileService, ...baseService });
-            hostService = new FileHostService({ profileService, ...baseService });
+            filterService = new FileFilterService({profileService, ...baseService});
+            hostService = new FileHostService({profileService, ...baseService});
             httpTrafficService = new FileHttpTrafficService(baseService);
             mockDataService = new FileMockDataService(baseService);
-            ruleService = new FileRuleService({ profileService, ...baseService });
+            ruleService = new FileRuleService({profileService, ...baseService});
             wsMockService = new FilewsMockService(baseService);
 
         }
@@ -142,6 +143,7 @@ module.exports = class Launcher {
             this.socks5Port = this.configureService.getSocks5Port();
         }
         this.appInfoService.setSocks5ProxyPort(this.socks5Port);
+        this.appInfoService.setDnsPortPort(this.dnsPort);
         // 启动http转发服务器
         await new HttpServer(this.port, httpsPort).start();
 
@@ -152,7 +154,8 @@ module.exports = class Launcher {
         await new Socks5Server({
             socks5Port: this.socks5Port,
             httpPort: this.port,
-            httpsPort: httpsPort
+            httpsPort: httpsPort,
+            dnsPort: this.dnsPort
         }).start();
     }
 

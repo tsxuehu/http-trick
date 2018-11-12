@@ -4,6 +4,9 @@ const EventEmitter = require('events');
 const http = require('http');
 const tls = require('tls');
 const crypto = require("crypto");
+const updns = require('updns');
+const randomIpv4 = require('random-ipv4');
+
 let createSecureContext = tls.createSecureContext || crypto.createSecureContext;
 
 const Parser = require('./server.parser');
@@ -41,7 +44,8 @@ module.exports = class Server extends EventEmitter {
     constructor({
                     socks5Port,
                     httpPort,
-                    httpsPort
+                    httpsPort,
+                    dnsPort
                 }) {
         super();
         this.httpHandle = HttpHandle.getInstance();
@@ -56,6 +60,10 @@ module.exports = class Server extends EventEmitter {
         this.profileService = ServiceRegistry.getProfileService();
         this.certificationService = ServiceRegistry.getCertificationService();
         this.configureService = ServiceRegistry.getConfigureService();
+
+        this.dnsPort = dnsPort;
+        this._dnsHostIpCache = {};
+        this._dnsIpHostCache = {};
 
         let self = this;
 
@@ -165,10 +173,19 @@ module.exports = class Server extends EventEmitter {
                 deviceId = clientIp;
             }
             let userId = this.profileService.getUserIdBindDevice(deviceId);
-            let targetIp = await this.hostService.resolveHostDirect(userId, req.dstAddr);
-            let canSocksProxy = this.profileService.canSocksProxy(userId, null, targetIp);
-            // 请求socket
+            let isIp = this.hostService.isIp(req.dstAddr);
+            let hostName = '';
+            let targetIp = '';
+            if (isIp) {
+                targetIp = req.dstAddr;
+                hostName = this._dnsIpHostCache[targetIp];
+            } else {
+                hostName = req.dstAddr;
+                targetIp = await this.hostService.resolveHostDirect(userId, req.dstAddr);
+            }
 
+            let canSocksProxy = (isIp && hostName) || !isIp;
+            // 请求socket
             if (canSocksProxy && (req.dstPort == 80 || req.dstPort == 12345)) {
                 socket.deviceId = deviceId;
                 socket.clientIp = clientIp;
@@ -178,7 +195,7 @@ module.exports = class Server extends EventEmitter {
 
             } else if (canSocksProxy && req.dstPort == 443) {
                 // tls
-                let context = await this.certificationService.getCertificationForHost(req.dstAddr);
+                let context = await this.certificationService.getCertificationForHost(hostName);
                 let tlsSocket = new tls.TLSSocket(socket, {
                     isServer: true,
                     key: context.key,
@@ -248,6 +265,41 @@ module.exports = class Server extends EventEmitter {
         this.useAuth(new UserPassword());
         this.useAuth(new NoneAuth());
         this._srv.listen(this.socks5Port);
+
+
+        let server = updns.createServer(this.dnsPort);
+        this.server = server;
+        server.on('error', error => {
+            console.log(error)
+        });
+
+        server.on('listening', server => {
+            console.log('DNS service has started')
+        });
+
+        server.on('message', (domain, send, proxy) => {
+            if (this._dnsHostIpCache[domain]) {
+                send(this._dnsHostIpCache[domain]);
+                return;
+            }
+            let can = this.profileService.canSocksProxy('root', domain);
+            // 如果是要抓包的域名 则解析
+            if (can) {
+                while (true) {
+                    let ip = randomIpv4();
+                    if (!this._dnsIpHostCache[ip]) {
+                        this._dnsIpHostCache[ip] = domain;
+                        this._dnsHostIpCache[domain] = ip;
+                        send(ip);
+                        return;
+                    }
+                }
+            } else {
+                proxy('172.17.1.236')
+            }
+        });
+
+
         return this;
     }
 
