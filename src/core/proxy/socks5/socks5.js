@@ -209,10 +209,11 @@ module.exports = class Server extends EventEmitter {
                 http._connectionListener.call(this._srv, tlsSocket);
                 /* tlsSocket.on('data', data => {
                      console.log('tlsSocket ------- ', data.toString())
-                 })
+                 })*/
                  tlsSocket.on('error', e => {
                      console.log(e)
-                 })*/
+                     handleProxyError(tlsSocket, e);
+                 })
             } else {
                 needResume = false;
                 let targetPort = req.dstPort;
