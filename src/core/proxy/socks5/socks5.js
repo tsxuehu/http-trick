@@ -89,12 +89,18 @@ module.exports = class Server extends EventEmitter {
 
         this._srv.on('request', (req, res) => {
             this.httpHandle.handle(req, res).catch(e => {
-                console.error(e);
+                console.error('httphandle error in socks5', e);
+                handleProxyError(req.socket, e);
             });
 
         });
         this._srv.on('error', function (err) {
-            console.log(err);
+            console.log('socks5 server error', err);
+        });
+
+        this._srv.on('clientError', (err, socket) => {
+            console.error('clientError error in socks5', err);
+            handleProxyError(socket, err);
         });
 
     }
@@ -210,10 +216,10 @@ module.exports = class Server extends EventEmitter {
                 /* tlsSocket.on('data', data => {
                      console.log('tlsSocket ------- ', data.toString())
                  })*/
-                 tlsSocket.on('error', e => {
-                     console.log(e)
-                     handleProxyError(tlsSocket, e);
-                 })
+                tlsSocket.on('error', e => {
+                    console.log(e)
+                    handleProxyError(tlsSocket, e);
+                })
             } else {
                 needResume = false;
                 let targetPort = req.dstPort;
