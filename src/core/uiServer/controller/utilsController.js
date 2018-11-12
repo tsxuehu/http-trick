@@ -71,12 +71,35 @@ module.exports = class TrafficController {
             let info = (await axios.get('http://192.168.66.241:12345/index/config-info', config)).data;
             // 获取host
             let device = this.profileService.getDevice(deviceId);
+            let host = ''
             if (device) {
-                info.host = device.hostFileName;
+                host = device.hostFileName;
             }
+
+            let servers = (await axios.get('http://192.168.66.241:12345/servers')).data;
+            let machineIp = info.machine.ip;
+            let machine = servers.find(server => {
+                return server.ip == machineIp;
+            });
+            let machineName = '';
+            if (machine) {
+                machineName = machine.hostname;
+            }
+
             // 获取配置信息
             ctx.body = {
-                data: info
+                code: 0,
+                data: {
+                    "carmen": info.carmen,
+                    "machine": {
+                        "ip": machineIp,
+                        "port": info.machine.who.port,
+                        "hostname": machineName
+                    },
+                    "sc": info.sc,
+                    "host": host,
+                    "who": info.machine.who
+                }
             }
         });
 
@@ -99,6 +122,74 @@ module.exports = class TrafficController {
             await axios.post('http://192.168.66.241:12345/index', ctx.request.body, config);
             ctx.body = {
                 code: 0
+            }
+        });
+
+        router.post('/utils/device/usehost', async (ctx, next) => {
+
+            let request = ctx.request.body;
+            let host = request.host;
+            let deviceId = request.deviceId;
+            // 设置host
+            await this.profileService.setDeviceHostFileName(deviceId, host);
+            // 获取当前gate配置
+            let config = {
+                headers: {
+                    'x-forwarded-for': deviceId
+                }
+            };
+            let info = (await axios.get('http://192.168.66.241:12345/index/config-info', config)).data;
+            let gateway = {
+                "ip": info.machine.ip,
+                "port": info.machine.who.port || 80,
+                "who": info.machine.who || 'www',
+                "sc": info.sc,
+                "carmen_ip": info.carmen.ip,
+                "carmen_port": info.carmen.port || 7001
+            };
+
+            if (host == 'daily') {
+                gateway.carmen_ip = '10.98.0.153';
+                gateway.ip = '10.98.1.172';
+            } else if (host == 'qa') {
+                gateway.carmen_ip = '10.9.42.160';
+                gateway.ip = '10.9.104.142';
+            } else if (host == 'pre') {
+                gateway.carmen_ip = '10.9.183.89';
+                gateway.ip = '10.19.103.89';
+            } else {
+                ctx.body = {
+                    code: 0
+                };
+                return;
+            }
+            // 设置默认的配置
+            await axios.post('http://192.168.66.241:12345/index', gateway, config);
+
+            let servers = (await axios.get('http://192.168.66.241:12345/servers')).data;
+            let machine = servers.find(server => {
+                return server.ip == gateway.ip;
+            });
+            let machineName = '';
+            if (machine) {
+                machineName = machine.hostname;
+            }
+            ctx.body = {
+                code: 0,
+                data: {
+                    "carmen": {
+                        "ip": gateway.carmen_ip,
+                        "port": gateway.carmen_port
+                    },
+                    "machine": {
+                        "ip": gateway.ip,
+                        "port": gateway.port,
+                        "hostname": machineName
+                    },
+                    "sc": gateway.sc,
+                    "host": host,
+                    "who": gateway.who
+                }
             }
         });
 

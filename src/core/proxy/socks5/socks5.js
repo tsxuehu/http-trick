@@ -286,7 +286,7 @@ module.exports = class Server extends EventEmitter {
             // 如果是要抓包的域名 则解析
             if (can) {
                 while (true) {
-                    let ip = randomIpv4();
+                    let ip = randomIpv4('198.18.{token}.{token}');
                     if (!this._dnsIpHostCache[ip]) {
                         this._dnsIpHostCache[ip] = domain;
                         this._dnsHostIpCache[domain] = ip;
