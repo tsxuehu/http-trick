@@ -82,8 +82,10 @@ module.exports = class TrafficController {
                 return server.ip == machineIp;
             });
             let machineName = '';
+            let machineDec = '';
             if (machine) {
                 machineName = machine.hostname;
+                machineDec = machine.desc;
             }
 
             // 获取配置信息
@@ -94,7 +96,8 @@ module.exports = class TrafficController {
                     "machine": {
                         "ip": machineIp,
                         "port": info.machine.who.port,
-                        "hostname": machineName
+                        "hostname": machineName,
+                        "desc": machineDec
                     },
                     "sc": info.sc,
                     "host": host,
@@ -147,30 +150,38 @@ module.exports = class TrafficController {
                 "carmen_ip": info.carmen.ip,
                 "carmen_port": info.carmen.port || 7001
             };
+            let machineName = '';
+            let machineDec = '';
             if (host) {
                 if (host == 'daily') {
                     gateway.carmen_ip = '10.98.0.153';
                     gateway.ip = '10.98.1.172';
+                    machineName = 'sh2-daily-sc-nginx0';
+                    machineDec = 'sh2-daily-sc-nginx0';
                 } else if (host == 'qa') {
                     gateway.carmen_ip = '10.9.42.160';
                     gateway.ip = '10.9.104.142';
+                    machineName = 'qabb-qa-sc-nginx0';
+                    machineDec = 'SC网关';
                 } else if (host == 'pre') {
                     gateway.carmen_ip = '10.9.183.89';
                     gateway.ip = '10.19.103.89';
+                    machineName = 'bd-pre-httpgw0';
+                    machineDec = 'docker预发网关';
                 }
                 // 设置默认的配置
                 await axios.post('http://192.168.66.241:12345/index', gateway, config);
+            } else {
+                let servers = (await axios.get('http://192.168.66.241:12345/servers')).data;
+                let machine = servers.find(server => {
+                    return server.ip == gateway.ip;
+                });
+                if (machine) {
+                    machineName = machine.hostname;
+                    machineDec = machine.desc;
+                }
             }
 
-
-            let servers = (await axios.get('http://192.168.66.241:12345/servers')).data;
-            let machine = servers.find(server => {
-                return server.ip == gateway.ip;
-            });
-            let machineName = '';
-            if (machine) {
-                machineName = machine.hostname;
-            }
             ctx.body = {
                 code: 0,
                 data: {
@@ -181,7 +192,8 @@ module.exports = class TrafficController {
                     "machine": {
                         "ip": gateway.ip,
                         "port": gateway.port,
-                        "hostname": machineName
+                        "hostname": machineName,
+                        "desc": machineDec
                     },
                     "sc": gateway.sc,
                     "host": host,
