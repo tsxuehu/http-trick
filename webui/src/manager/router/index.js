@@ -19,7 +19,7 @@ import DeviceList from 'src/manager/components/device/DeviceList'
 
 import HelpInstall from 'src/manager/components/help/Install'
 
-import Socks5Configure from 'src/manager/components/socks5/Configure'
+import ProxyConfigure from 'src/manager/components/proxy/Configure'
 
 
 Vue.use(Router);
@@ -45,6 +45,6 @@ export default new Router({
 
     {path: '/helpinstall',component: HelpInstall, alias: '/'},
 
-    {path: '/socks5',component: Socks5Configure}
+    {path: '/proxyconfig',component: ProxyConfigure}
   ]
 })

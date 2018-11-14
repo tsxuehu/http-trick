@@ -13,7 +13,11 @@ const defaultProfile = {
     // 是否启用filter
     "enableFilter": true,
     // socks代理解析的ip
-    "socksProxyNeedParseIp": '',
+    "socksProxyDomain": '',
+    // 是否使用外部http代理
+    "externalHttpProxy": false,
+    "httpIp": '',
+    "httpPort": '',
 };
 /**
  * 代理运转需要的规则数据
@@ -36,7 +40,7 @@ module.exports = class ProfileService extends EventEmitter {
     }
 
     async start() {
-        defaultProfile.socksProxyNeedParseIp = await fileUtil.readFile(path.join(__dirname, 'youzan-ip.txt'));
+        defaultProfile.socksProxyDomain = await fileUtil.readFile(path.join(__dirname, 'youzan-ip.txt'));
         let profileMap = await fileUtil.getJsonFileContentInDir(this.profileSaveDir);
         _.forEach(profileMap, (profile, fileName) => {
             let userId = fileName.slice(0, -5);
@@ -262,7 +266,7 @@ module.exports = class ProfileService extends EventEmitter {
         if (this._socksProxyCahce[userId]) {
             return this._socksProxyCahce[userId];
         }
-        let content = this.getProfile(userId).socksProxyNeedParseIp;
+        let content = this.getProfile(userId).socksProxyDomain;
         this._socksProxyCahce[userId] = this._parseHost(content);
         return this._socksProxyCahce[userId];
     }

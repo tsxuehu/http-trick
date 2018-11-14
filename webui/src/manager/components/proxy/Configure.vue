@@ -1,10 +1,20 @@
 <template>
     <div class="socks-configure">
-        <div class="main-content__title">Socks配置修改</div>
-        <el-form label-width="100px">
-            <el-form-item label="Socks解析">
+        <div class="main-content__title">代理配置</div>
+        <el-form label-width="200px">
+            <el-form-item label="使用外部代理">
+                <el-checkbox v-model="$dc.profile.externalHttpProxy">使用</el-checkbox>
+            </el-form-item>
+            <el-form-item label="External Http代理" v-if="$dc.profile.externalHttpProxy">
+                <div class="http-proxy">
+                    <el-input class="ip" v-model="$dc.profile.httpIp" placeholder="Ip"></el-input>
+                    :
+                    <el-input class="port" v-model="$dc.profile.httpPort" placeholder="端口"></el-input>
+                </div>
+            </el-form-item>
+            <el-form-item label="Socks代理域名">
                 <textarea class="socks-editor" :placeholder="socksProxyExample"
-                          v-model="$dc.profile.socksProxyNeedParseIp"></textarea>
+                          v-model="$dc.profile.socksProxyDomain"></textarea>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="saveFile">保存</el-button>
@@ -21,8 +31,8 @@
         computed: {
             socksProxyExample() {
                 return `#示例
-0.0.0.0    # 任何80 443端口的请求经过socks5时都会被解析
-4.4.4.4    # 没有0.0.0.0的情况下，socks5代理中只有4.4.4.4的80、443端口的请求被解析`
+*.youzan.com    # 所有有赞域名都会走socks5代理
+carmen.youzan.com    # carmen.youzan.com走socks5代理`
             }
         },
         methods: {
@@ -46,6 +56,21 @@
 <style>
     .socks-configure {
         max-width: 500px;
+
+        .http-proxy {
+            width: 400px;
+            .ip {
+                width: 200px;
+                display: inline-block;
+                margin-right: 10px;
+            }
+            .port {
+                width: 100px;
+                margin-left: 10px;
+                display: inline-block;
+            }
+        }
+
         .el-button {
             margin-top: 15px;
             padding: 10px 28px;
@@ -53,7 +78,7 @@
         }
 
         .socks-editor {
-            height: 500px;
+            height: 200px;
             width: 760px;
             font-size: 18px;
             padding: 10px 20px;

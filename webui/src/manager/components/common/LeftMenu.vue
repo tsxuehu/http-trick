@@ -104,9 +104,9 @@
                         link: 'device'
                     },
                     {
-                        name: 'Socks5配置',
+                        name: '代理设置',
                         icon: 'icon-set',
-                        link: 'socks5'
+                        link: 'proxyconfig'
                     },
                 ]);
 
