@@ -105,7 +105,36 @@ module.exports = class ConfigController {
             });
             ctx.body = {
                 code: 0,
-                msg: '解绑成功'
+                msg: '设置成功'
+            };
+        });
+
+        router.get('/profile/device/externalProxy', async (ctx, next) => {
+            let deviceId = ctx.query.deviceId;
+
+
+            let proxy = false;
+            let type = 'socks5';
+            let ip = '';
+            let port = '';
+            let device = this.profileService.getDevice(deviceId);
+
+            if (device) {
+                proxy = device.externalProxy;
+                type = device.externalSocks5Proxy ? 'socks5' : 'http';
+                if (device.externalSocks5Proxy) {
+                    ip = device.socks5Ip;
+                    port = device.socks5Port;
+                } else {
+                    ip = device.httpIp;
+                    port = device.httpPort;
+                }
+            }
+            ctx.body = {
+                code: 0,
+                msg: {
+                    proxy, type, ip, port
+                }
             };
         });
 
