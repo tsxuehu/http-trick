@@ -17,7 +17,7 @@ const defaultProfile = {
     // 是否使用外部http代理
     "externalProxy": false,
     "externalHttpProxy": false,
-    "externalSocks5Proxy": false,
+    "externalSocks5Proxy": true,
     "httpIp": '',
     "httpPort": '',
     "socks5Ip": '',

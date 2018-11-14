@@ -188,7 +188,7 @@ module.exports = class Remote {
     // 请求远程服务器，并将响应流通过promise的方式返回
     _requestServer({
                        req, body, protocol, method, ip, hostname, port, path, headers, timeout = 10000,
-                       externalProxy = false, externalProxyType ,proxyIp, proxyPort
+                       hasExternalProxy = false, proxyType ,proxyIp, proxyPort
                    }) {
         let proxyRequestPromise = new Promise((resolve, reject) => {
 
@@ -197,17 +197,17 @@ module.exports = class Remote {
             let requestPort = '';
             let requestHostname = '';
             let agent = null;
-            if (!externalProxy) {
+            if (!hasExternalProxy) {
                 requestPath = path;
                 requestProtocol = protocol;
                 requestPort = port;
                 requestHostname = ip || hostname;
-            } else if(externalProxyType == 'http') {
+            } else if(proxyType == 'http') {
                 requestPath = `${protocol}//${ip}:${port}${path}`;
                 requestProtocol = 'http:';
                 requestPort = proxyPort;
                 requestHostname = proxyIp;
-            } else if (externalProxyType == 'socks5'){
+            } else if (proxyType == 'socks5'){
                 requestPath = path;
                 requestProtocol = protocol;
                 requestPort = port;

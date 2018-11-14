@@ -3,13 +3,26 @@
         <div class="main-content__title">代理配置</div>
         <el-form label-width="200px">
             <el-form-item label="使用外部代理">
-                <el-checkbox v-model="$dc.profile.externalHttpProxy">使用</el-checkbox>
+                <el-checkbox v-model="$dc.profile.externalProxy">使用</el-checkbox>
             </el-form-item>
-            <el-form-item label="External Http代理" v-if="$dc.profile.externalHttpProxy">
+            <el-form-item label="外部代理类型"  v-if="$dc.profile.externalProxy">
+                <el-radio-group v-model="socks5Proxy">
+                    <el-radio :label="true">Socks5代理</el-radio>
+                    <el-radio :label="false">Http代理</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="External Http代理" v-if="$dc.profile.externalProxy && !socks5Proxy">
                 <div class="http-proxy">
-                    <el-input class="ip" v-model="$dc.profile.httpIp" placeholder="Ip"></el-input>
+                    <el-input class="ip" v-model="$dc.profile.httpIp" placeholder="Http Ip"></el-input>
                     :
-                    <el-input class="port" v-model="$dc.profile.httpPort" placeholder="端口"></el-input>
+                    <el-input class="port" v-model="$dc.profile.httpPort" placeholder="http port"></el-input>
+                </div>
+            </el-form-item>
+            <el-form-item label="External Socks代理" v-if="$dc.profile.externalProxy && socks5Proxy">
+                <div class="http-proxy">
+                    <el-input class="ip" v-model="$dc.profile.socks5Ip" placeholder="Socks5 Ip"></el-input>
+                    :
+                    <el-input class="port" v-model="$dc.profile.socks5Port" placeholder="socks5 port"></el-input>
                 </div>
             </el-form-item>
             <el-form-item label="Socks代理域名">
@@ -33,6 +46,20 @@
                 return `#示例
 *.youzan.com    # 所有有赞域名都会走socks5代理
 carmen.youzan.com    # carmen.youzan.com走socks5代理`
+            },
+            socks5Proxy : {
+                get: function () {
+                    return this.$dc.profile.externalSocks5Proxy;
+                },
+                set: function (v) {
+                    if (v) {
+                        this.$dc.profile.externalSocks5Proxy = true;
+                        this.$dc.profile.externalHttpProxy = false;
+                    } else {
+                        this.$dc.profile.externalSocks5Proxy = false;
+                        this.$dc.profile.externalHttpProxy = true;
+                    }
+                }
             }
         },
         methods: {
@@ -65,7 +92,7 @@ carmen.youzan.com    # carmen.youzan.com走socks5代理`
                 margin-right: 10px;
             }
             .port {
-                width: 100px;
+                width: 150px;
                 margin-left: 10px;
                 display: inline-block;
             }
