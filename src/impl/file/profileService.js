@@ -115,7 +115,17 @@ module.exports = class ProfileService extends EventEmitter {
         await this.setProfile(userId, conf);
     }
 
+    hasExternalHttpProxy(userId) {
 
+        return this.getProfile(userId).externalHttpProxy;
+    }
+    getExternalHttpProxy(userId) {
+        let profile = this.getProfile(userId);
+        return {
+            httpIp: profile.httpIp,
+            httpPort: profile.httpPort
+        }
+    }
     /**
      * 获取转发规则启用开关
      * @param clientIp

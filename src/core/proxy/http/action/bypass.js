@@ -21,7 +21,7 @@ module.exports = class Bypass extends Action {
     constructor() {
         super();
         this.hostService = ServiceRegistry.getHostService();
-        this.httpTrafficService = ServiceRegistry.getHttpTrafficService();
+        this.profileService = ServiceRegistry.getProfileService();
         this.remote = Remote.getInstance();
     }
 
@@ -171,6 +171,15 @@ module.exports = class Bypass extends Action {
         Object.assign(actualRequestCookies, originCookies, additionalRequestCookies);
         actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
 
+        // 判断是否需要proxy
+        let externalHttpProxy = this.profileService.hasExternalHttpProxy(userId);
+        let proxyIp = '';
+        let proxyPort = '';
+        if (externalHttpProxy) {
+           let {httpIp, httpPort} = this.profileService.getExternalHttpProxy(userId);
+           proxyIp = httpIp;
+           proxyPort = httpPort;
+        }
         if (!last) {
             await this.remote.cache({
                 req,
@@ -178,12 +187,13 @@ module.exports = class Bypass extends Action {
                 recordResponse,
                 method: req.method,
                 protocol,
-                hostname: ip,
+                hostname,
                 ip,
                 path,
                 port,
                 headers: actualRequestHeaders,
-                toClientResponse
+                toClientResponse,
+                externalHttpProxy, proxyIp, proxyPort
             });
         } else {
             await this.remote.pipe({
@@ -195,9 +205,10 @@ module.exports = class Bypass extends Action {
                 toClientResponse,
                 recordResponse,
                 method: req.method,
-                hostname: ip,
+                hostname,
                 ip,
-                headers: actualRequestHeaders
+                headers: actualRequestHeaders,
+                externalHttpProxy, proxyIp, proxyPort
             });
         }
 
@@ -255,17 +266,28 @@ module.exports = class Bypass extends Action {
         Object.assign(actualRequestCookies, originCookies, additionalRequestCookies);
         actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
 
+        // 判断是否需要proxy
+        let externalHttpProxy = this.profileService.hasExternalHttpProxy(userId);
+        let proxyIp = '';
+        let proxyPort = '';
+        if (externalHttpProxy) {
+            let {httpIp, httpPort} = this.profileService.getExternalHttpProxy(userId);
+            proxyIp = httpIp;
+            proxyPort = httpPort;
+        }
+
         await this.remote.cacheFromRequestContent({
             requestContent: {
                 protocol,
                 method,
-                hostname: ip,
+                hostname,
                 ip,
                 pathname,
                 actualRequestQuery,
                 port,
                 headers: actualRequestHeaders,
-                body
+                body,
+                externalHttpProxy, proxyIp, proxyPort
             },
             recordResponse,
             toClientResponse

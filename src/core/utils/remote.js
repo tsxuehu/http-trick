@@ -28,7 +28,8 @@ module.exports = class Remote {
      */
     async pipe({
                    req, res, recordResponse,
-                   method, protocol, ip, hostname, path, port, headers, timeout, toClientResponse
+                   method, protocol, ip, hostname, path, port, headers, timeout, toClientResponse,
+                   externalHttpProxy, proxyIp, proxyPort
                }) {
         // http.request 解析dns时，偶尔会出错
         // pipe流 获取远程数据 并做记录
@@ -40,7 +41,8 @@ module.exports = class Remote {
             let proxyResponsePromise = this._requestServer({
                 req, ip, hostname,
                 protocol, method, port, path,
-                headers, timeout
+                headers, timeout,
+                externalHttpProxy, proxyIp, proxyPort
             });
             // 记录日志
             let clientRequestPromise;
@@ -86,7 +88,8 @@ module.exports = class Remote {
     async cache({
                     req, res, recordResponse, method,
                     protocol, ip, hostname, path, port,
-                    headers, toClientResponse, timeout
+                    headers, toClientResponse, timeout,
+                    externalHttpProxy, proxyIp, proxyPort
                 }) {
 
         try {
@@ -95,7 +98,8 @@ module.exports = class Remote {
             let proxyResponsePromise = await this._requestServer({
                 req, ip, hostname,
                 protocol, method, port, path,
-                headers, timeout
+                headers, timeout,
+                externalHttpProxy, proxyIp, proxyPort
             });
 
             // 记录日志
@@ -139,7 +143,7 @@ module.exports = class Remote {
     /**
      * 根据RequestContent
      */
-    async cacheFromRequestContent({requestContent, recordResponse, toClientResponse, timeout}) {
+    async cacheFromRequestContent({requestContent, recordResponse, toClientResponse, timeout, externalHttpProxy, proxyIp, proxyPort}) {
         let {protocol, hostname, ip, pathname, port, query, method, headers, body} = requestContent;
         try {
             toClientResponse.remoteRequestBeginTime = Date.now();
@@ -147,7 +151,8 @@ module.exports = class Remote {
             let proxyResponse = await this._requestServer({
                 body: requestContent.body,
                 protocol, method, port, path,
-                ip, hostname, headers, timeout
+                ip, hostname, headers, timeout,
+                externalHttpProxy, proxyIp, proxyPort
             });
 
             toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
@@ -190,7 +195,7 @@ module.exports = class Remote {
             let requestPort = '';
             let requestHostname = '';
             if (externalHttpProxy) {
-                requestPath = `${protocol}${ip}:${port}${path}`;
+                requestPath = `${protocol}//${ip}:${port}${path}`;
                 requestProtocol = 'http:';
                 requestPort = proxyPort;
                 requestHostname = proxyIp;
@@ -200,7 +205,7 @@ module.exports = class Remote {
                 requestPort = port;
                 requestHostname = ip || hostname;
             }
-            let client = requestProtocal === 'https:' ? https : http;
+            let client = requestProtocol === 'https:' ? https : http;
             let proxyRequest = client.request({
                 protocol: requestProtocol,
                 method,

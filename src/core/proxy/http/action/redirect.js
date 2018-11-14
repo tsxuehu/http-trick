@@ -173,6 +173,16 @@ module.exports = class Redirect extends Action {
         Object.assign(actualRequestCookies, originCookies, additionalRequestCookies);
         actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
 
+        // 判断是否需要proxy
+        let externalHttpProxy = this.profileService.hasExternalHttpProxy(userId);
+        let proxyIp = '';
+        let proxyPort = '';
+        if (externalHttpProxy) {
+            let {httpIp, httpPort} = this.profileService.getExternalHttpProxy(userId);
+            proxyIp = httpIp;
+            proxyPort = httpPort;
+        }
+
         if (last) {
             addHeaderToResponse(res, toClientResponse.headers);
             await this.remote.pipe({
@@ -181,19 +191,21 @@ module.exports = class Redirect extends Action {
                 recordResponse,
                 method: req.method,
                 protocol,
-                hostname: ip,
+                hostname,
                 ip,
                 path,
                 port,
                 headers: actualRequestHeaders,
-                toClientResponse
+                toClientResponse,
+                externalHttpProxy, proxyIp, proxyPort
             });
         } else {
             await this.remote.cache({
                 req, res,
                 method: req.method,
-                protocol, hostname: ip,ip, path, port,
-                headers: actualRequestHeaders, toClientResponse
+                protocol, hostname, ip, path, port,
+                headers: actualRequestHeaders, toClientResponse,
+                externalHttpProxy, proxyIp, proxyPort
             });
         }
     }
