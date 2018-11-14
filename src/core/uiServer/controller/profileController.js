@@ -80,6 +80,35 @@ module.exports = class ConfigController {
             };
         });
 
+        // 设置额外代理
+        router.post('/profile/device/externalProxy', async (ctx, next) => {
+            let request = ctx.request.body;
+            let deviceId = request.deviceId;
+            let externalProxyCanUseUserSetting = request.useUser || false;
+            let externalProxy = request.proxy;
+            let externalHttpProxy = request.type == 'http';
+            let externalSocks5Proxy = request.type == 'socks5';
+            let httpIp = request.ip;
+            let httpPort = request.port;
+            let socks5Ip = request.ip;
+            let socks5Port = request.port;
+            this.profileService.unbindDevice({
+                deviceId,
+                externalProxyCanUseUserSetting,
+                externalProxy,
+                externalHttpProxy,
+                externalSocks5Proxy,
+                httpIp,
+                httpPort,
+                socks5Ip,
+                socks5Port
+            });
+            ctx.body = {
+                code: 0,
+                msg: '解绑成功'
+            };
+        });
+
         router.get('/profile/device/setName', async (ctx, next) => {
             let userId = ctx.userId;
             let deviceId = ctx.query.deviceId;

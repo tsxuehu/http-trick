@@ -277,6 +277,36 @@ module.exports = class ProfileService extends EventEmitter {
         this.emit('data-change-deviceList', info.userId, deviceList);
     }
 
+    async setDeviceExternalProxy({
+                                     deviceId,
+                                     externalProxyCanUseUserSetting = true,
+                                     externalProxy = false,
+                                     externalHttpProxy = false,
+                                     externalSocks5Proxy = false,
+                                     httpIp = '',
+                                     httpPort = '',
+                                     socks5Ip = '',
+                                     socks5Port = ''
+                                 }) {
+        let info = this.getDeviceInfoSetDefaultIfPossible(deviceId);
+
+        info.externalProxyCanUseUserSetting = externalProxyCanUseUserSetting;
+        info.externalProxy = externalProxy;
+        info.externalHttpProxy = externalHttpProxy;
+        info.externalSocks5Proxy = externalSocks5Proxy;
+        info.httpIp = httpIp;
+        info.httpPort = httpPort;
+        info.socks5Ip = socks5Ip;
+        info.socks5Port = socks5Port;
+
+        this.deviceInfo[deviceId] = info;
+
+        await fileUtil.writeJsonToFile(this.deviceInfoSaveFile, this.deviceInfo);
+
+        let deviceList = this.getDeviceListBindedToUserId(info.userId);
+        this.emit('data-change-deviceList', info.userId, deviceList);
+    }
+
     async setDisableMonitor(deviceId, disableMonitor) {
         let info = this.getDeviceInfoSetDefaultIfPossible(deviceId);
 
