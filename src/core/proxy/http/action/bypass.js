@@ -172,19 +172,8 @@ module.exports = class Bypass extends Action {
         actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
 
         // 判断是否需要proxy
-        let hasExternalProxy = this.profileService.hasExternalProxy(userId);
-        let proxyIp = '';
-        let proxyPort = '';
-        let proxyType = '';
+        let {hasExternalProxy,proxyType, proxyIp, proxyPort} = this.profileService.getExternalProxy(userId, deviceId);
         if (hasExternalProxy) {
-            let proxyConfig = this.profileService.getExternalHttpProxy(userId);
-            if (!proxyConfig) {
-                hasExternalProxy = false;
-            } else {
-                proxyType = proxyConfig.proxyType;
-                proxyIp = proxyConfig.proxyIp;
-                proxyPort = proxyConfig.proxyPort;
-            }
             // 运行信息可以在下一个proxy中查看
             Object.assign(actualRequestHeaders, toClientResponse.headers);
         }
@@ -276,19 +265,8 @@ module.exports = class Bypass extends Action {
         actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
 
         // 判断是否需要proxy
-        let hasExternalProxy = this.profileService.hasExternalProxy(userId);
-        let proxyIp = '';
-        let proxyPort = '';
-        let proxyType = '';
+        let {hasExternalProxy,proxyType, proxyIp, proxyPort} = this.profileService.getExternalProxy(userId, deviceId);
         if (hasExternalProxy) {
-            let proxyConfig = this.profileService.getExternalHttpProxy(userId);
-            if (!proxyConfig) {
-                hasExternalProxy = false;
-            } else {
-                proxyType = proxyConfig.proxyType;
-                proxyIp = proxyConfig.proxyIp;
-                proxyPort = proxyConfig.proxyPort;
-            }
             // 运行信息可以在下一个proxy中查看
             Object.assign(actualRequestHeaders, toClientResponse.headers);
         }

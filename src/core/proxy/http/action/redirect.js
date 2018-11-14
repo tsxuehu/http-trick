@@ -174,13 +174,10 @@ module.exports = class Redirect extends Action {
         actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
 
         // 判断是否需要proxy
-        let externalHttpProxy = this.profileService.hasExternalHttpProxy(userId);
-        let proxyIp = '';
-        let proxyPort = '';
-        if (externalHttpProxy) {
-            let {httpIp, httpPort} = this.profileService.getExternalHttpProxy(userId);
-            proxyIp = httpIp;
-            proxyPort = httpPort;
+        let {hasExternalProxy, proxyType, proxyIp, proxyPort} = this.profileService.getExternalProxy(userId, deviceId);
+        if (hasExternalProxy) {
+            // 运行信息可以在下一个proxy中查看
+            Object.assign(actualRequestHeaders, toClientResponse.headers);
         }
 
         if (last) {
@@ -197,7 +194,7 @@ module.exports = class Redirect extends Action {
                 port,
                 headers: actualRequestHeaders,
                 toClientResponse,
-                externalHttpProxy, proxyIp, proxyPort
+                hasExternalProxy, proxyType, proxyIp, proxyPort
             });
         } else {
             await this.remote.cache({
@@ -205,7 +202,7 @@ module.exports = class Redirect extends Action {
                 method: req.method,
                 protocol, hostname, ip, path, port,
                 headers: actualRequestHeaders, toClientResponse,
-                externalHttpProxy, proxyIp, proxyPort
+                hasExternalProxy, proxyType, proxyIp, proxyPort
             });
         }
     }

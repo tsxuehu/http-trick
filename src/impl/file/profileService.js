@@ -127,7 +127,7 @@ module.exports = class ProfileService extends EventEmitter {
             return;
         }
         proxy = this.getExternalHttpProxyByUserId(userId);
-        return proxy;
+        return proxy || {hasExternalProxy: false};
     }
 
     getExternalHttpProxyByUserId(userId) {
