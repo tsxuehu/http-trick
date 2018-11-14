@@ -56,7 +56,10 @@ module.exports = class ConfigController {
             let userId = ctx.query.userId;
             let deviceId = ctx.query.deviceId;
             if (!deviceId) { // 没传设备id，则将设备的ip作为设备id
-                let ip = socketIp.getRemoteIp(ctx.request.socket);
+                let ip = ctx.request.headers['x-forwarded-for'];
+                if (!ip) {
+                    ip = socketIp.getRemoteIp(ctx.request.socket);
+                }
                 deviceId = ip;
             }
             this.profileService.bindDevice(userId, deviceId);
