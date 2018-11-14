@@ -6,6 +6,7 @@ const http = require('http');
 const https = require('https');
 const toClientResponseUtils = require('./toClientResponseUtils');
 const requestResponseUtils = require('./requestResponseUtils');
+const SocksProxyAgent = require('socks-proxy-agent');
 /**
  * 从远程服务器上获取响应内容
  */
@@ -186,7 +187,7 @@ module.exports = class Remote {
     // 请求远程服务器，并将响应流通过promise的方式返回
     _requestServer({
                        req, body, protocol, method, ip, hostname, port, path, headers, timeout = 10000,
-                       externalHttpProxy = false, proxyIp, proxyPort
+                       externalProxy = true, externalProxyType = 'socks5' ,proxyIp, proxyPort
                    }) {
         let proxyRequestPromise = new Promise((resolve, reject) => {
 
@@ -194,16 +195,23 @@ module.exports = class Remote {
             let requestProtocol = '';
             let requestPort = '';
             let requestHostname = '';
-            if (externalHttpProxy) {
-                requestPath = `${protocol}//${ip}:${port}${path}`;
-                requestProtocol = 'http:';
-                requestPort = proxyPort;
-                requestHostname = proxyIp;
-            } else {
+            let agent = null;
+            if (!externalProxy) {
                 requestPath = path;
                 requestProtocol = protocol;
                 requestPort = port;
                 requestHostname = ip || hostname;
+            } else if(externalProxyType == 'http') {
+                requestPath = `${protocol}//${ip}:${port}${path}`;
+                requestProtocol = 'http:';
+                requestPort = proxyPort;
+                requestHostname = proxyIp;
+            } else if (externalProxyType == 'socks5'){
+                requestPath = path;
+                requestProtocol = protocol;
+                requestPort = port;
+                requestHostname = ip || hostname;
+                agent = new SocksProxyAgent('socks://127.0.0.1:8889', protocol == 'https:');
             }
             let client = requestProtocol === 'https:' ? https : http;
             let proxyRequest = client.request({
@@ -215,7 +223,8 @@ module.exports = class Remote {
                 headers,
                 timeout,
                 rejectUnauthorized: false,
-                setHost: false
+                setHost: false,
+                agent
             }, (proxyResponse) => {
                 // 有响应时返回promise
                 resolve(proxyResponse);

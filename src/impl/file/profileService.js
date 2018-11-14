@@ -15,9 +15,13 @@ const defaultProfile = {
     // socks代理解析的ip
     "socksProxyDomain": '',
     // 是否使用外部http代理
+    "externalProxy": false,
     "externalHttpProxy": false,
+    "externalSocks5Proxy": false,
     "httpIp": '',
     "httpPort": '',
+    "socks5Ip": '',
+    "socks5Port": ''
 };
 /**
  * 代理运转需要的规则数据
@@ -115,17 +119,60 @@ module.exports = class ProfileService extends EventEmitter {
         await this.setProfile(userId, conf);
     }
 
-    hasExternalHttpProxy(userId) {
-
-        return this.getProfile(userId).externalHttpProxy;
+    getExternalProxy(userId, deviceId) {
+        let device = this.getDevice(deviceId);
+        let proxy = this.getExternalHttpProxyByDeviceInfo(device);
+        if (proxy) return proxy;
+        if (device && !device.externalProxyCanUseUserSetting) {
+            return;
+        }
+        proxy = this.getExternalHttpProxyByUserId(userId);
+        return proxy;
     }
-    getExternalHttpProxy(userId) {
+
+    getExternalHttpProxyByUserId(userId) {
         let profile = this.getProfile(userId);
-        return {
-            httpIp: profile.httpIp,
-            httpPort: profile.httpPort
+        if (!profile.externalProxy) {
+            return;
+        }
+        if (profile.externalSocks5Proxy) {
+            return {
+                hasExternalProxy: true,
+                proxyType: 'socks5',
+                proxyIp: profile.socks5Ip,
+                proxyPort: profile.socks5Port
+            }
+        } else if (profile.externalHttpProxy) {
+            return {
+                hasExternalProxy: true,
+                proxyType: 'http',
+                proxyIp: profile.httpIp,
+                proxyPort: profile.httpPort
+            }
         }
     }
+
+    getExternalHttpProxyByDeviceInfo(device) {
+        if (!device || !device.externalProxy) {
+            return;
+        }
+        if (device.externalSocks5Proxy) {
+            return {
+                hasExternalProxy: true,
+                proxyType: 'socks5',
+                proxyIp: device.socks5Ip,
+                proxyPort: device.socks5Port
+            }
+        } else if (device.externalHttpProxy) {
+            return {
+                hasExternalProxy: true,
+                proxyType: 'http',
+                proxyIp: device.httpIp,
+                proxyPort: device.httpPort
+            }
+        }
+    }
+
     /**
      * 获取转发规则启用开关
      * @param clientIp
@@ -169,7 +216,15 @@ module.exports = class ProfileService extends EventEmitter {
                 userId: '',
                 name: deviceId,
                 disableMonitor: false,
-                hostFileName: ''
+                hostFileName: '',
+                externalProxyCanUseUserSetting: true,
+                externalProxy: false,
+                externalHttpProxy: false,
+                externalSocks5Proxy: false,
+                httpIp: '',
+                httpPort: '',
+                socks5Ip: '',
+                socks5Port: ''
             };
         }
         return info;

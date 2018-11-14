@@ -172,14 +172,23 @@ module.exports = class Bypass extends Action {
         actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
 
         // 判断是否需要proxy
-        let externalHttpProxy = this.profileService.hasExternalHttpProxy(userId);
+        let hasExternalProxy = this.profileService.hasExternalProxy(userId);
         let proxyIp = '';
         let proxyPort = '';
-        if (externalHttpProxy) {
-           let {httpIp, httpPort} = this.profileService.getExternalHttpProxy(userId);
-           proxyIp = httpIp;
-           proxyPort = httpPort;
+        let proxyType = '';
+        if (hasExternalProxy) {
+            let proxyConfig = this.profileService.getExternalHttpProxy(userId);
+            if (!proxyConfig) {
+                hasExternalProxy = false;
+            } else {
+                proxyType = proxyConfig.proxyType;
+                proxyIp = proxyConfig.proxyIp;
+                proxyPort = proxyConfig.proxyPort;
+            }
+            // 运行信息可以在下一个proxy中查看
+            Object.assign(actualRequestHeaders, toClientResponse.headers);
         }
+
         if (!last) {
             await this.remote.cache({
                 req,
@@ -193,7 +202,7 @@ module.exports = class Bypass extends Action {
                 port,
                 headers: actualRequestHeaders,
                 toClientResponse,
-                externalHttpProxy, proxyIp, proxyPort
+                hasExternalProxy,proxyType, proxyIp, proxyPort
             });
         } else {
             await this.remote.pipe({
@@ -208,7 +217,7 @@ module.exports = class Bypass extends Action {
                 hostname,
                 ip,
                 headers: actualRequestHeaders,
-                externalHttpProxy, proxyIp, proxyPort
+                hasExternalProxy,proxyType, proxyIp, proxyPort
             });
         }
 
@@ -267,13 +276,21 @@ module.exports = class Bypass extends Action {
         actualRequestHeaders.cookie = cookie2Str(actualRequestCookies);
 
         // 判断是否需要proxy
-        let externalHttpProxy = this.profileService.hasExternalHttpProxy(userId);
+        let hasExternalProxy = this.profileService.hasExternalProxy(userId);
         let proxyIp = '';
         let proxyPort = '';
-        if (externalHttpProxy) {
-            let {httpIp, httpPort} = this.profileService.getExternalHttpProxy(userId);
-            proxyIp = httpIp;
-            proxyPort = httpPort;
+        let proxyType = '';
+        if (hasExternalProxy) {
+            let proxyConfig = this.profileService.getExternalHttpProxy(userId);
+            if (!proxyConfig) {
+                hasExternalProxy = false;
+            } else {
+                proxyType = proxyConfig.proxyType;
+                proxyIp = proxyConfig.proxyIp;
+                proxyPort = proxyConfig.proxyPort;
+            }
+            // 运行信息可以在下一个proxy中查看
+            Object.assign(actualRequestHeaders, toClientResponse.headers);
         }
 
         await this.remote.cacheFromRequestContent({
@@ -287,7 +304,7 @@ module.exports = class Bypass extends Action {
                 port,
                 headers: actualRequestHeaders,
                 body,
-                externalHttpProxy, proxyIp, proxyPort
+                hasExternalProxy,proxyType, proxyIp, proxyPort
             },
             recordResponse,
             toClientResponse
