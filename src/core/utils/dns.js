@@ -1,7 +1,7 @@
-const dns = require("dns");
+const { Resolver } = require('dns');
 const log = require("./log");
-
-dns.setServers([
+const resolver = new Resolver();
+resolver.setServers([
     '172.17.1.236', '172.17.1.235'
 ]); // 指定解析dns的服务器
 /**
@@ -43,14 +43,14 @@ module.exports = class DnsResolver {
 
     lookupDNSAndCache(hostname) {
         return new Promise((resolve, reject) => {
+            let done = false;
             try {
-                let done = false;
                 let timer = setTimeout(() => {
                     if (done) return;
                     done = true;
                     reject(`dns resolve: ${hostname} timeout`);
                 }, this.TIMEOUT);
-                dns.lookup(hostname,  (err, ip, type) => {
+                resolver.resolve4(hostname,  (err, addresses) => {
                     clearTimeout(timer);
                     if (done) return;
                     done = true;
@@ -58,7 +58,7 @@ module.exports = class DnsResolver {
                         reject(err);
                     } else {
                         let result = {
-                            ip: ip,
+                            ip: addresses[0],
                             hostname: hostname,
                             time: Date.now()
                         };
