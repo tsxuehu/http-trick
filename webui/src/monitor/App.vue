@@ -13,6 +13,10 @@
                                                                                    v-model="filter.path"/>
                 <i class="iconfont icon-sousuo search"></i>
             </span>
+            <div class="placeholder"></div>
+            <a class="goto-manager" href="/manager.html" target="_blank">
+                <el-button type="text">管理</el-button>
+            </a>
             <a href="javascript:void(0)" v-if="!$dc.appInfo.single" class="username" @click="changeUser">
                 <el-tooltip class="item" effect="dark" content="点击切换用户" placement="top">
                     <el-button type="text">{{$dc.userInfo.userId}}</el-button>
