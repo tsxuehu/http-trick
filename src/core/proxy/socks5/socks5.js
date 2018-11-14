@@ -4,7 +4,7 @@ const EventEmitter = require('events');
 const http = require('http');
 const tls = require('tls');
 const crypto = require("crypto");
-const updns = require('updns');
+const updns = require('../../dns/index');
 const randomIpv4 = require('random-ipv4');
 
 let createSecureContext = tls.createSecureContext || crypto.createSecureContext;

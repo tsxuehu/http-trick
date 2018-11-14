@@ -317,7 +317,7 @@ module.exports = class ProfileService extends EventEmitter {
     canSocksProxy(userId, host) {
         let {hostMap, globHostArray} = this._getSocksProxyMap(userId);
         if (hostMap['all']) return true;
-        if (host[host]) {
+        if (hostMap[host]) {
             return true;
         }
 
