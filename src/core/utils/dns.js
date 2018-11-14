@@ -1,5 +1,9 @@
 const dns = require("dns");
 const log = require("./log");
+
+dns.setServers([
+    '172.17.1.236', '172.17.1.235'
+]); // 指定解析dns的服务器
 /**
  * node 调用getAddress会出问题
  * @param host
