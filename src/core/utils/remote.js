@@ -188,7 +188,7 @@ module.exports = class Remote {
     // 请求远程服务器，并将响应流通过promise的方式返回
     _requestServer({
                        req, body, protocol, method, ip, hostname, port, path, headers, timeout = 10000,
-                       externalProxy = true, externalProxyType = 'socks5' ,proxyIp, proxyPort
+                       externalProxy = false, externalProxyType ,proxyIp, proxyPort
                    }) {
         let proxyRequestPromise = new Promise((resolve, reject) => {
 
@@ -212,7 +212,7 @@ module.exports = class Remote {
                 requestProtocol = protocol;
                 requestPort = port;
                 requestHostname = ip || hostname;
-                agent = new SocksProxyAgent('socks://127.0.0.1:8889', protocol == 'https:');
+                agent = new SocksProxyAgent(`socks://${proxyIp}:${proxyPort}`, protocol == 'https:');
             }
             let client = requestProtocol === 'https:' ? https : http;
             let proxyRequest = client.request({
