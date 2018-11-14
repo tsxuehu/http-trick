@@ -28,7 +28,7 @@ module.exports = class Remote {
      */
     async pipe({
                    req, res, recordResponse,
-                   method, protocol, hostname, path, port, headers, timeout, toClientResponse
+                   method, protocol, ip, hostname, path, port, headers, timeout, toClientResponse
                }) {
         // http.request 解析dns时，偶尔会出错
         // pipe流 获取远程数据 并做记录
@@ -38,7 +38,7 @@ module.exports = class Remote {
             }
 
             let proxyResponsePromise = this._requestServer({
-                req, hostname,
+                req, ip, hostname,
                 protocol, method, port, path,
                 headers, timeout
             });
@@ -85,7 +85,7 @@ module.exports = class Remote {
      */
     async cache({
                     req, res, recordResponse, method,
-                    protocol, hostname, path, port,
+                    protocol, ip, hostname, path, port,
                     headers, toClientResponse, timeout
                 }) {
 
@@ -93,7 +93,7 @@ module.exports = class Remote {
             toClientResponse.remoteRequestBeginTime = Date.now();
 
             let proxyResponsePromise = await this._requestServer({
-                req, hostname,
+                req, ip, hostname,
                 protocol, method, port, path,
                 headers, timeout
             });
@@ -139,15 +139,15 @@ module.exports = class Remote {
     /**
      * 根据RequestContent
      */
-    async cacheFromRequestContent({ requestContent, recordResponse, toClientResponse, timeout }) {
-        let { protocol, hostname, pathname, port, query, method, headers, body } = requestContent;
+    async cacheFromRequestContent({requestContent, recordResponse, toClientResponse, timeout}) {
+        let {protocol, hostname, ip, pathname, port, query, method, headers, body} = requestContent;
         try {
             toClientResponse.remoteRequestBeginTime = Date.now();
             let path = `${pathname}?${queryString.stringify(query)}`;
             let proxyResponse = await this._requestServer({
                 body: requestContent.body,
                 protocol, method, port, path,
-                hostname, headers, timeout
+                ip, hostname, headers, timeout
             });
 
             toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
@@ -179,18 +179,38 @@ module.exports = class Remote {
     }
 
     // 请求远程服务器，并将响应流通过promise的方式返回
-    _requestServer({ req, body, protocol, method, hostname, port, path, headers, timeout = 10000 }) {
+    _requestServer({
+                       req, body, protocol, method, ip, hostname, port, path, headers, timeout = 10000,
+                       externalHttpProxy = false, proxyIp, proxyPort
+                   }) {
         let proxyRequestPromise = new Promise((resolve, reject) => {
-            let client = protocol === 'https:' ? https : http;
+
+            let requestPath = '';
+            let requestProtocol = '';
+            let requestPort = '';
+            let requestHostname = '';
+            if (externalHttpProxy) {
+                requestPath = `${protocol}${ip}:${port}${path}`;
+                requestProtocol = 'http:';
+                requestPort = proxyPort;
+                requestHostname = proxyIp;
+            } else {
+                requestPath = path;
+                requestProtocol = protocol;
+                requestPort = port;
+                requestHostname = ip || hostname;
+            }
+            let client = requestProtocal === 'https:' ? https : http;
             let proxyRequest = client.request({
-                protocol,
+                protocol: requestProtocol,
                 method,
-                port,
-                path,
-                hostname,
+                port: requestPort,
+                path: requestPath,
+                hostname: requestHostname,
                 headers,
                 timeout,
-                rejectUnauthorized: false
+                rejectUnauthorized: false,
+                setHost: false
             }, (proxyResponse) => {
                 // 有响应时返回promise
                 resolve(proxyResponse);

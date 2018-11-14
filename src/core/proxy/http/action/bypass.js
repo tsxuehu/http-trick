@@ -179,6 +179,7 @@ module.exports = class Bypass extends Action {
                 method: req.method,
                 protocol,
                 hostname: ip,
+                ip,
                 path,
                 port,
                 headers: actualRequestHeaders,
@@ -195,6 +196,7 @@ module.exports = class Bypass extends Action {
                 recordResponse,
                 method: req.method,
                 hostname: ip,
+                ip,
                 headers: actualRequestHeaders
             });
         }
@@ -258,6 +260,7 @@ module.exports = class Bypass extends Action {
                 protocol,
                 method,
                 hostname: ip,
+                ip,
                 pathname,
                 actualRequestQuery,
                 port,

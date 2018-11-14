@@ -182,6 +182,7 @@ module.exports = class Redirect extends Action {
                 method: req.method,
                 protocol,
                 hostname: ip,
+                ip,
                 path,
                 port,
                 headers: actualRequestHeaders,
@@ -191,7 +192,7 @@ module.exports = class Redirect extends Action {
             await this.remote.cache({
                 req, res,
                 method: req.method,
-                protocol, hostname: ip, path, port,
+                protocol, hostname: ip,ip, path, port,
                 headers: actualRequestHeaders, toClientResponse
             });
         }
