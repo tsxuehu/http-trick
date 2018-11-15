@@ -226,14 +226,16 @@ module.exports = class ConfigController {
         router.get('/profile/getUserInfo', async (ctx, next) => {
             // 用户id
             let userId = ctx.userId;
-            let ip = socketIp.getRemoteIp(ctx.request.socket);
+            let ip = ctx.request.headers['x-forwarded-for'];
+            if (!ip) {
+                ip = socketIp.getRemoteIp(ctx.request.socket);
+            }
             let deviceId = ip;
             // 检查访问设备是否绑定当前用户，若没有则绑定
             let info = this.profileService.getDevice(deviceId);
             if (!info || info.userId != userId) {
                 this.profileService.bindDevice(userId, deviceId);
             }
-
 
             // 设备id -- 浏览器端访问将设备ip作为设备id
             ctx.body = {
