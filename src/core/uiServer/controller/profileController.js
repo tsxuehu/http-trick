@@ -230,6 +230,9 @@ module.exports = class ConfigController {
             if (!ip) {
                 ip = socketIp.getRemoteIp(ctx.request.socket);
             }
+            if (ip.indexOf(',') > -1){
+                ip = ip.split(',')[0];
+            }
             let deviceId = ip;
             // 检查访问设备是否绑定当前用户，若没有则绑定
             let info = this.profileService.getDevice(deviceId);
