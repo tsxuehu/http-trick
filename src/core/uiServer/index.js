@@ -46,6 +46,9 @@ module.exports = class UiServer {
                     if (!ip) {
                         ip = socketIp.getRemoteIp(ctx.req.socket);
                     }
+                    if (ip.indexOf(',') > -1){
+                        ip = ip.split(',')[0];
+                    }
                     userId = ip;
                     // 当前机器的ip和用户id绑定. 当机器为ip的机器发代理请求时，会使用userId用户的规则
                 }
