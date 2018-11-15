@@ -184,6 +184,7 @@ module.exports = class TrafficController {
                     machineDec = machine.desc;
                 }
             }
+            let proxy = this.profileService.getDeviceProxyInfo(deviceId);
 
             ctx.body = {
                 code: 0,
@@ -200,7 +201,8 @@ module.exports = class TrafficController {
                     },
                     "sc": gateway.sc,
                     "host": host,
-                    "who": gateway.who
+                    "who": gateway.who,
+                    proxy
                 }
             }
         });
