@@ -304,7 +304,7 @@ module.exports = class HttpHandle {
         }
 
         // 动作运行完还没响应浏览器、则响应浏览器
-        if (!toClientResponse.sendedToClient) {
+        if (!toClientResponse.sendedToClient && !res.finished) {
             if (toClientResponse.hasContent) {
                 try {
                     sendSpecificToClient({

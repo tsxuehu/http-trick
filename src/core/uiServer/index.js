@@ -40,7 +40,7 @@ module.exports = class UiServer {
                     userId = 'root';
                 } else {
                     // 多用户模式 则把用户的ip当做id
-                    let ip = '';
+                    let ip ;
                     // 取x-forword-for
                     ip = ctx.request.headers['x-forwarded-for'];
                     if (!ip) {

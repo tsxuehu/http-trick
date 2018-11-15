@@ -5,6 +5,7 @@
 const _ = require("lodash");
 
 module.exports = function ({ res, statusCode, headers, content }) {
+    if (res.finished) return;
     res.statusCode = statusCode || 200;
 
     let buffer = null;
@@ -14,10 +15,12 @@ module.exports = function ({ res, statusCode, headers, content }) {
         buffer = Buffer.from(content, 'utf-8');
     }
 
-    headers['content-length'] = buffer.length;
-    _.forEach(headers, function (value, key) {
-        res.setHeader(key, value);
-    });
+    if (!res.headersSent) {
+        headers['content-length'] = buffer.length;
+        _.forEach(headers, function (value, key) {
+            res.setHeader(key, value);
+        });
+    }
 
     res.end(buffer);
 };
