@@ -92,7 +92,7 @@ module.exports = class ConfigController {
             let httpPort = request.port;
             let socks5Ip = request.ip;
             let socks5Port = request.port;
-            this.profileService.unbindDevice({
+            this.profileService.setDeviceExternalProxy({
                 deviceId,
                 externalProxyCanUseUserSetting,
                 externalProxy,
