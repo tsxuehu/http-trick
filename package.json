@@ -10,6 +10,7 @@
     "http-trick": "./bin.js"
   },
   "dependencies": {
+    "agent-base": "^4.2.1",
     "axios": "^0.16.1",
     "co-fs": "^1.2.0",
     "commander": "^2.9.0",
@@ -41,7 +42,7 @@
     "regenerator-runtime": "^0.10.5",
     "rimraf": "^2.6.1",
     "socket.io": "^1.7.3",
-    "socks-proxy-agent": "^4.0.1",
+    "socks": "^2.2.2",
     "stream-throttle": "^0.1.3",
     "ws": "2.2.1"
   },
@@ -50,7 +51,6 @@
     "babel-preset-env": "^1.6.0",
     "babel-register": "^6.24.1",
     "vue": "^2.1.10"
-
   },
   "repository": {
     "type": "git",

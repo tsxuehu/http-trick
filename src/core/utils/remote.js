@@ -6,7 +6,7 @@ const http = require('http');
 const https = require('https');
 const toClientResponseUtils = require('./toClientResponseUtils');
 const requestResponseUtils = require('./requestResponseUtils');
-const SocksProxyAgent = require('socks-proxy-agent');
+const SocksProxyAgent = require('./socksAgent');
 /**
  * 从远程服务器上获取响应内容
  */
@@ -144,8 +144,10 @@ module.exports = class Remote {
     /**
      * 根据RequestContent
      */
-    async cacheFromRequestContent({requestContent, recordResponse, toClientResponse, timeout,
-                                      hasExternalProxy, proxyType, proxyIp, proxyPort}) {
+    async cacheFromRequestContent({
+                                      requestContent, recordResponse, toClientResponse, timeout,
+                                      hasExternalProxy, proxyType, proxyIp, proxyPort
+                                  }) {
         let {protocol, hostname, ip, pathname, port, query, method, headers, body} = requestContent;
         try {
             toClientResponse.remoteRequestBeginTime = Date.now();
@@ -188,10 +190,9 @@ module.exports = class Remote {
     // 请求远程服务器，并将响应流通过promise的方式返回
     _requestServer({
                        req, body, protocol, method, ip, hostname, port, path, headers, timeout = 10000,
-                       hasExternalProxy = false, proxyType ,proxyIp, proxyPort
+                       hasExternalProxy = false, proxyType, proxyIp, proxyPort
                    }) {
         let proxyRequestPromise = new Promise((resolve, reject) => {
-
             let requestPath = '';
             let requestProtocol = '';
             let requestPort = '';
@@ -202,17 +203,21 @@ module.exports = class Remote {
                 requestProtocol = protocol;
                 requestPort = port;
                 requestHostname = ip || hostname;
-            } else if(proxyType == 'http') {
+            } else if (proxyType == 'http') {
                 requestPath = `${protocol}//${ip}:${port}${path}`;
                 requestProtocol = 'http:';
                 requestPort = proxyPort;
                 requestHostname = proxyIp;
-            } else if (proxyType == 'socks5'){
+            } else if (proxyType == 'socks5') {
                 requestPath = path;
                 requestProtocol = protocol;
                 requestPort = port;
-                requestHostname = ip || hostname;
-                agent = new SocksProxyAgent(`socks://${proxyIp}:${proxyPort}`, protocol == 'https:');
+                requestHostname = hostname;
+                agent = new SocksProxyAgent({
+                    protocol: 'socks:',
+                    hostname: proxyIp,
+                    port: +proxyPort
+                });
             }
             let client = requestProtocol === 'https:' ? https : http;
             let proxyRequest = client.request({
@@ -221,6 +226,7 @@ module.exports = class Remote {
                 port: requestPort,
                 path: requestPath,
                 hostname: requestHostname,
+                desIp: ip,
                 headers,
                 timeout,
                 rejectUnauthorized: false,
