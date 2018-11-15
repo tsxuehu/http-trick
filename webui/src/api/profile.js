@@ -49,5 +49,9 @@ export default {
     },
     enableMonitor(deviceId) {
         return axios.get(`/profile/device/enableMonitor?deviceId=${deviceId}`);
-    }
+    },
+    setExternalProxy(deviceId, proxy) {
+        proxy.deviceId = deviceId;
+        return axios.post('/profile/device/externalProxy', proxy);
+    },
 }

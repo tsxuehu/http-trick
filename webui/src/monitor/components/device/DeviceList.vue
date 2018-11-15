@@ -23,6 +23,7 @@
             <li class="ctx-item" @click="renameDevice">取别名</li>
             <li class="ctx-item" @click="changeHost">修改host</li>
             <li class="ctx-item" @click="configGateway">设置网关</li>
+            <li class="ctx-item" @click="configExternalProxy">设置外部代理</li>
             <li class="ctx-item" @click="removeDevice">删除设备</li>
             <li class="ctx-item" v-if="!$dc.rightClickDevice.disableMonitor" @click="disableMonitor">停止监控</li>
             <li class="ctx-item" v-if="$dc.rightClickDevice.disableMonitor" @click="enableMonitor">开启监控</li>
@@ -97,6 +98,39 @@
                 </el-form>
             </div>
         </el-dialog>
+
+        <el-dialog
+                :title="setExternalProxyTitle"
+                :visible.sync="showSetExternalProxy"
+                width="30%"
+                center>
+            <div class="gateway">
+                <el-form label-width="100px" :model="currentProxy">
+                    <el-form-item label="使用用户设置">
+                        <el-checkbox v-model="currentProxy.canUseUserSetting">允许</el-checkbox>
+                    </el-form-item>
+                    <el-form-item label="代理">
+                        <el-checkbox v-model="currentProxy.proxy">开启</el-checkbox>
+                    </el-form-item>
+                    <el-form-item label="代理类型">
+                        <el-radio-group v-model="currentProxy.type">
+                            <el-radio label="socks5">Socks5代理</el-radio>
+                            <el-radio label="http">Http代理</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="IP">
+                        <el-input v-model="currentProxy.ip"></el-input>
+                    </el-form-item>
+                    <el-form-item label="端口">
+                        <el-input v-model="currentProxy.port"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="submitExternalProxy">提交</el-button>
+                        <el-button @click="resetExternalProxy">重置</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -122,6 +156,7 @@
                 ],
                 showChoseHostFile: false,
                 showSetGateway: false,
+                showSetExternalProxy: false,
                 gateWayConfig: {
                     "ip": "",
                     "port": '80',
@@ -129,6 +164,13 @@
                     "sc": "",
                     "carmen_ip": "10.9.183.89",
                     "carmen_port": "7001"
+                },
+                currentProxy: {
+                    canUseUserSetting: false,
+                    proxy: false,
+                    type: 'http',
+                    ip: '',
+                    port: ''
                 }
             }
         },
@@ -144,6 +186,9 @@
             },
             setGatewayTitle() {
                 return `设置${this.$dc.rightClickDevice.name}的网关信息`;
+            },
+            setExternalProxyTitle() {
+                return `设置${this.$dc.rightClickDevice.name}的外部代理`;
             }
         },
         methods: {
@@ -175,6 +220,7 @@
                 loading.close();
                 this.showSetGateway = true;
             },
+
             async submitGatewayConfig() {
                 const loading = this.$loading({
                     lock: true,
@@ -242,6 +288,37 @@
             },
             enableMonitor() {
                 profileApi.enableMonitor(this.$dc.rightClickDeviceId);
+            },
+            configExternalProxy() {
+                this.resetExternalProxy();
+                // 打开对话框
+                this.showSetExternalProxy = true;
+            },
+            resetExternalProxy() {
+                let device = this.$dc.rightClickDevice;
+                let canUseUserSetting = device.externalProxyCanUseUserSetting;
+                let proxy = false;
+                let type = 'socks5';
+                let ip = '';
+                let port = '';
+
+                if (device) {
+                    proxy = device.externalProxy;
+                    type = device.externalSocks5Proxy ? 'socks5' : 'http';
+                    if (device.externalSocks5Proxy) {
+                        ip = device.socks5Ip;
+                        port = device.socks5Port;
+                    } else {
+                        ip = device.httpIp;
+                        port = device.httpPort;
+                    }
+                }
+                this.currentProxy = {canUseUserSetting, proxy, type, ip, port};
+            },
+            async submitExternalProxy() {
+                profileApi.setExternalProxy(this.$dc.rightClickDeviceId, this.currentProxy);
+                this.showSetExternalProxy = false;
+                this.$message('解绑成功');
             },
             // -------------------------------右击菜单显示
             // 打开菜单

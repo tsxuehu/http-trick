@@ -6,7 +6,7 @@ module.exports = {
         "checked": false,
         "readonly": false,
         "default": true,
-        "name": "gateway-daily",
+        "name": "daily",
         "description": "daily",
         "content": "192.168.66.241 *.youzan.com"
     },
@@ -17,7 +17,7 @@ module.exports = {
         "checked": false,
         "readonly": false,
         "default": true,
-        "name": "gateway-qa",
+        "name": "qa",
         "description": "qa",
         "content": "192.168.66.239 *.youzan.com"
     },
@@ -28,7 +28,7 @@ module.exports = {
         "checked": false,
         "readonly": false,
         "default": true,
-        "name": "gateway-pre",
+        "name": "pre",
         "description": "pre",
         "content": "192.168.66.240 *.youzan.com"
     },

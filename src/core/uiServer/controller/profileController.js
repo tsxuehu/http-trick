@@ -84,7 +84,7 @@ module.exports = class ConfigController {
         router.post('/profile/device/externalProxy', async (ctx, next) => {
             let request = ctx.request.body;
             let deviceId = request.deviceId;
-            let externalProxyCanUseUserSetting = request.useUser || false;
+            let externalProxyCanUseUserSetting = request.canUseUserSetting || false;
             let externalProxy = request.proxy;
             let externalHttpProxy = request.type == 'http';
             let externalSocks5Proxy = request.type == 'socks5';
