@@ -88,6 +88,8 @@ module.exports = class TrafficController {
                 machineDec = machine.desc;
             }
 
+            let proxy = this.profileService.getDeviceProxyInfo(deviceId);
+
             // 获取配置信息
             ctx.body = {
                 code: 0,
@@ -101,7 +103,8 @@ module.exports = class TrafficController {
                     },
                     "sc": info.sc,
                     "host": host,
-                    "who": info.machine.who
+                    "who": info.machine.who,
+                    proxy
                 }
             }
         });

@@ -13,6 +13,7 @@ const Parser = require('./server.parser');
 const ipbytes = require('./utils').ipbytes;
 
 const HttpHandle = require("../http/handle/httpHandle");
+const WsHandle = require("../http/handle/wsHandle");
 
 const ServiceRegistry = require("../../service");
 const NoneAuth = require("./auth/None");
@@ -49,6 +50,7 @@ module.exports = class Server extends EventEmitter {
                 }) {
         super();
         this.httpHandle = HttpHandle.getInstance();
+        this.wsHandle = WsHandle.getInstance();
 
         this.socks5Port = socks5Port;
         this.httpPort = httpPort;
@@ -89,11 +91,19 @@ module.exports = class Server extends EventEmitter {
 
         this._srv.on('request', (req, res) => {
             this.httpHandle.handle(req, res).catch(e => {
-                console.error('httphandle error in socks5', e);
+                console.error('http handle error in socks5', e);
                 handleProxyError(req.socket, e);
             });
-
         });
+
+        this._srv.on('upgrade', (req, res) => {
+            this.wsHandle.handle(req, res).catch(e => {
+                console.error('upgrade handle error in socks5', e);
+                handleProxyError(req.socket, e);
+            });
+        });
+
+
         this._srv.on('error', function (err) {
             console.log('socks5 server error', err);
         });
@@ -192,7 +202,7 @@ module.exports = class Server extends EventEmitter {
 
             let canSocksProxy = (isIp && hostName) || !isIp;
             // 请求socket
-            if (canSocksProxy && (req.dstPort == 80 || req.dstPort == 12345)) {
+            if (canSocksProxy && (req.dstPort == 80 || req.dstPort == 12345 )) {
                 socket.deviceId = deviceId;
                 socket.clientIp = clientIp;
                 socket.userId = userId;

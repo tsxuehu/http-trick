@@ -110,7 +110,7 @@
                         <el-checkbox v-model="currentProxy.canUseUserSetting">允许</el-checkbox>
                     </el-form-item>
                     <el-form-item label="代理">
-                        <el-checkbox v-model="currentProxy.proxy">开启</el-checkbox>
+                        <el-checkbox v-model="currentProxy.enable">开启</el-checkbox>
                     </el-form-item>
                     <el-form-item label="代理类型">
                         <el-radio-group v-model="currentProxy.type">
@@ -167,7 +167,7 @@
                 },
                 currentProxy: {
                     canUseUserSetting: false,
-                    proxy: false,
+                    enable: false,
                     type: 'http',
                     ip: '',
                     port: ''
@@ -297,13 +297,13 @@
             resetExternalProxy() {
                 let device = this.$dc.rightClickDevice;
                 let canUseUserSetting = device.externalProxyCanUseUserSetting;
-                let proxy = false;
+                let enable = false;
                 let type = 'socks5';
                 let ip = '';
                 let port = '';
 
                 if (device) {
-                    proxy = device.externalProxy;
+                    enable = device.externalProxy;
                     type = device.externalSocks5Proxy ? 'socks5' : 'http';
                     if (device.externalSocks5Proxy) {
                         ip = device.socks5Ip;
@@ -313,7 +313,7 @@
                         port = device.httpPort;
                     }
                 }
-                this.currentProxy = {canUseUserSetting, proxy, type, ip, port};
+                this.currentProxy = {canUseUserSetting, enable, type, ip, port};
             },
             async submitExternalProxy() {
                 profileApi.setExternalProxy(this.$dc.rightClickDeviceId, this.currentProxy);

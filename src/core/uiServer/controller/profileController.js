@@ -84,25 +84,9 @@ module.exports = class ConfigController {
         router.post('/profile/device/externalProxy', async (ctx, next) => {
             let request = ctx.request.body;
             let deviceId = request.deviceId;
-            let externalProxyCanUseUserSetting = request.canUseUserSetting || false;
-            let externalProxy = request.proxy;
-            let externalHttpProxy = request.type == 'http';
-            let externalSocks5Proxy = request.type == 'socks5';
-            let httpIp = request.ip;
-            let httpPort = request.port;
-            let socks5Ip = request.ip;
-            let socks5Port = request.port;
-            this.profileService.setDeviceExternalProxy({
-                deviceId,
-                externalProxyCanUseUserSetting,
-                externalProxy,
-                externalHttpProxy,
-                externalSocks5Proxy,
-                httpIp,
-                httpPort,
-                socks5Ip,
-                socks5Port
-            });
+
+            await this.profileService.setDeviceProxyInfo(deviceId, request);
+
             ctx.body = {
                 code: 0,
                 msg: '设置成功'
@@ -112,29 +96,11 @@ module.exports = class ConfigController {
         router.get('/profile/device/externalProxy', async (ctx, next) => {
             let deviceId = ctx.query.deviceId;
 
+            let info = this.profileService.getDeviceProxyInfo(deviceId);
 
-            let proxy = false;
-            let type = 'socks5';
-            let ip = '';
-            let port = '';
-            let device = this.profileService.getDevice(deviceId);
-
-            if (device) {
-                proxy = device.externalProxy;
-                type = device.externalSocks5Proxy ? 'socks5' : 'http';
-                if (device.externalSocks5Proxy) {
-                    ip = device.socks5Ip;
-                    port = device.socks5Port;
-                } else {
-                    ip = device.httpIp;
-                    port = device.httpPort;
-                }
-            }
             ctx.body = {
                 code: 0,
-                data: {
-                    proxy, type, ip, port
-                }
+                data: info
             };
         });
 
@@ -230,7 +196,7 @@ module.exports = class ConfigController {
             if (!ip) {
                 ip = socketIp.getRemoteIp(ctx.request.socket);
             }
-            if (ip.indexOf(',') > -1){
+            if (ip.indexOf(',') > -1) {
                 ip = ip.split(',')[0];
             }
             let deviceId = ip;

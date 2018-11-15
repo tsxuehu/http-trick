@@ -19,9 +19,9 @@ const defaultProfile = {
     "externalHttpProxy": false,
     "externalSocks5Proxy": true,
     "httpIp": '',
-    "httpPort": '',
+    "httpPort": 8888,
     "socks5Ip": '',
-    "socks5Port": ''
+    "socks5Port": 8889
 };
 /**
  * 代理运转需要的规则数据
@@ -208,6 +208,59 @@ module.exports = class ProfileService extends EventEmitter {
         return this.deviceInfo[deviceId];
     }
 
+    async setDeviceProxyInfo(deviceId, config) {
+
+        let device = this.getDeviceInfoSetDefaultIfPossible(deviceId);
+
+        device.externalProxyCanUseUserSetting = config.canUseUserSetting || false;
+        device.externalProxy = config.enable;
+
+        if (config.type) {
+            device.externalHttpProxy = config.type == 'http';
+            device.externalSocks5Proxy = config.type != 'http';
+        }
+
+        let hasIpPort = config.ip && config.port;
+        if (device.externalHttpProxy && hasIpPort) {
+            device.httpIp = config.ip || device.httpIp;
+            device.httpPort = +config.port || device.httpPort;
+        }
+        if (device.externalSocks5Proxy && hasIpPort) {
+            device.socks5Ip = config.ip || device.socks5Ip;
+            device.socks5Port = +config.port || device.socks5Port;
+        }
+
+        this.deviceInfo[deviceId] = device;
+
+        await fileUtil.writeJsonToFile(this.deviceInfoSaveFile, this.deviceInfo);
+
+        let deviceList = this.getDeviceListBindedToUserId(device.userId);
+        this.emit('data-change-deviceList', device.userId, deviceList);
+    }
+
+    getDeviceProxyInfo(deviceId) {
+        let enable = false;
+        let type = 'socks5';
+        let ip = '';
+        let port = '';
+        let device = this.getDevice(deviceId);
+
+        if (device) {
+            enable = device.externalProxy;
+            type = device.externalSocks5Proxy ? 'socks5' : 'http';
+            if (device.externalSocks5Proxy) {
+                ip = device.socks5Ip;
+                port = device.socks5Port;
+            } else {
+                ip = device.httpIp;
+                port = device.httpPort;
+            }
+        }
+        return {
+            enable, type, ip: ip + '', port : port + ''
+        }
+    }
+
     getDeviceInfoSetDefaultIfPossible(deviceId) {
         let info = this.deviceInfo[deviceId];
         if (!info) {
@@ -222,9 +275,9 @@ module.exports = class ProfileService extends EventEmitter {
                 externalHttpProxy: false,
                 externalSocks5Proxy: false,
                 httpIp: '',
-                httpPort: '',
+                httpPort: 8888,
                 socks5Ip: '',
-                socks5Port: ''
+                socks5Port: 8889
             };
         }
         return info;
@@ -277,35 +330,6 @@ module.exports = class ProfileService extends EventEmitter {
         this.emit('data-change-deviceList', info.userId, deviceList);
     }
 
-    async setDeviceExternalProxy({
-                                     deviceId,
-                                     externalProxyCanUseUserSetting = true,
-                                     externalProxy = false,
-                                     externalHttpProxy = false,
-                                     externalSocks5Proxy = false,
-                                     httpIp = '',
-                                     httpPort = '',
-                                     socks5Ip = '',
-                                     socks5Port = ''
-                                 }) {
-        let info = this.getDeviceInfoSetDefaultIfPossible(deviceId);
-
-        info.externalProxyCanUseUserSetting = externalProxyCanUseUserSetting;
-        info.externalProxy = externalProxy;
-        info.externalHttpProxy = externalHttpProxy;
-        info.externalSocks5Proxy = externalSocks5Proxy;
-        info.httpIp = httpIp;
-        info.httpPort = httpPort;
-        info.socks5Ip = socks5Ip;
-        info.socks5Port = socks5Port;
-
-        this.deviceInfo[deviceId] = info;
-
-        await fileUtil.writeJsonToFile(this.deviceInfoSaveFile, this.deviceInfo);
-
-        let deviceList = this.getDeviceListBindedToUserId(info.userId);
-        this.emit('data-change-deviceList', info.userId, deviceList);
-    }
 
     async setDisableMonitor(deviceId, disableMonitor) {
         let info = this.getDeviceInfoSetDefaultIfPossible(deviceId);
