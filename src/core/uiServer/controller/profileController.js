@@ -132,7 +132,7 @@ module.exports = class ConfigController {
             }
             ctx.body = {
                 code: 0,
-                msg: {
+                data: {
                     proxy, type, ip, port
                 }
             };
