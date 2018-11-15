@@ -124,7 +124,7 @@ module.exports = class ProfileService extends EventEmitter {
         let proxy = this.getExternalHttpProxyByDeviceInfo(device);
         if (proxy) return proxy;
         if (device && !device.externalProxyCanUseUserSetting) {
-            return;
+            return {hasExternalProxy: false};
         }
         proxy = this.getExternalHttpProxyByUserId(userId);
         return proxy || {hasExternalProxy: false};
