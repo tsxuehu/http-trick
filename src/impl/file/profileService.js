@@ -213,7 +213,7 @@ module.exports = class ProfileService extends EventEmitter {
         let device = this.getDeviceInfoSetDefaultIfPossible(deviceId);
 
         device.externalProxyCanUseUserSetting = config.canUseUserSetting || false;
-        device.externalProxy = config.enable;
+        device.externalProxy = !!config.enable;
 
         if (config.type) {
             device.externalHttpProxy = config.type == 'http';
