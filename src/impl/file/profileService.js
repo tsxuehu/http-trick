@@ -246,7 +246,7 @@ module.exports = class ProfileService extends EventEmitter {
         let device = this.getDevice(deviceId);
 
         if (device) {
-            enable = device.externalProxy;
+            enable = !!device.externalProxy;
             type = device.externalSocks5Proxy ? 'socks5' : 'http';
             if (device.externalSocks5Proxy) {
                 ip = device.socks5Ip;
