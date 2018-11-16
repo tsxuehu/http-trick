@@ -1,0 +1,468 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>iOS根证书安装说明 · zanProxy</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    
+    <link rel="prev" href="../question/" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../install/">
+            
+                <a href="../install/">
+            
+                    
+                    Proxy安装
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="../cert/">
+            
+                <a href="../cert/">
+            
+                    
+                    证书安装
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="../config/">
+            
+                <a href="../config/">
+            
+                    
+                    zanProxy 配置
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../host/">
+            
+                <a href="../host/">
+            
+                    
+                    host配置
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="../rule/">
+            
+                <a href="../rule/">
+            
+                    
+                    规则配置
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="../project/">
+            
+                <a href="../project/">
+            
+                    
+                    工程路径配置
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8" data-path="../data_manage/">
+            
+                <a href="../data_manage/">
+            
+                    
+                    自定义mock数据管理
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9" data-path="../monitor/">
+            
+                <a href="../monitor/">
+            
+                    
+                    监控窗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.10" data-path="../websocket_mock/">
+            
+                <a href="../websocket_mock/">
+            
+                    
+                    WebSocket Mock
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.11" data-path="../chrome/">
+            
+                <a href="../chrome/">
+            
+                    
+                    chrome代理配置
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12" data-path="../phone/">
+            
+                <a href="../phone/">
+            
+                    
+                    手机代理配置
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.13" data-path="../internal/">
+            
+                <a href="../internal/">
+            
+                    
+                    内部机制
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.13.1" data-path="../internal/proxy.html">
+            
+                <a href="../internal/proxy.html">
+            
+                    
+                    代理流程
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.13.2" data-path="../internal/request-flow.html">
+            
+                <a href="../internal/request-flow.html">
+            
+                    
+                    请求处理流程
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.13.3" data-path="../internal/ws-debug.html">
+            
+                <a href="../internal/ws-debug.html">
+            
+                    
+                    ws调试
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.14" data-path="../question/">
+            
+                <a href="../question/">
+            
+                    
+                    常见问题
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.15" data-path="ios.html">
+            
+                <a href="ios.html">
+            
+                    
+                    iOS根证书安装说明
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >iOS根证书安装说明</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="&#x4E00;&#x3001;&#x5B89;&#x88C5;&#x63CF;&#x8FF0;&#x6587;&#x4EF6;">&#x4E00;&#x3001;&#x5B89;&#x88C5;&#x63CF;&#x8FF0;&#x6587;&#x4EF6;</h1>
+<p>&#x9ED8;&#x8BA4;&#x5B89;&#x88C5;&#x300C;&#x6709;&#x8D5E;&#x79FB;&#x52A8;&#x300D; App &#x7684;&#x60C5;&#x51B5;&#x4E0B;&#xFF0C;&#x624B;&#x673A;&#x662F;&#x6CA1;&#x6709;&#x5B89;&#x88C5;&#x6839;&#x8BC1;&#x4E66;&#x7684;&#xFF0C;&#x8FD9;&#x4F1A;&#x5BFC;&#x81F4;&#x6293;&#x5305;&#x6216;&#x8005;&#x8FDE;&#x63A5;&#x5F39;&#x51FA;&#x9519;&#x8BEF;&#xFF0C;&#x5728;&#x4F7F;&#x7528;&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x5E94;&#x5F53;&#x5B89;&#x88C5;&#x6839;&#x8BC1;&#x4E66;&#xFF08;&#x7C7B;&#x4F3C; Charles &#x7684;&#x64CD;&#x4F5C;)</p>
+<p>&#x4F60;&#x4F1A;&#x770B;&#x89C1;&#x754C;&#x9762;&#x5982;&#x4E0B;</p>
+<p><img src="https://img.yzcdn.cn/public_files/2018/11/16/5b81a436f10ed0dc78b9fa3b56e6dbb1.png" width="500"></p>
+<p>&#x70B9;&#x51FB;&#x7EA2;&#x5B57;&#xFF0C;&#x5C31;&#x4F1A;&#x5B89;&#x88C5;&#x63CF;&#x8FF0;&#x6587;&#x4EF6;&#xFF0C;&#x4E00;&#x8DEF;&#x70B9;&#x5141;&#x8BB8;&#x5373;&#x53EF;&#x3002;</p>
+<p>&#x5B89;&#x88C5;&#x5B8C;&#x540E;&#x662F;&#x8FD9;&#x6837;&#x7684;</p>
+<p><img src="https://img.yzcdn.cn/public_files/2018/11/16/d02c1e243cfbf6ec4f51a2703660796a.png" width="500"></p>
+<p>&#x8FD9;&#x4E2A;&#x5C31;&#x662F;&#x5B89;&#x88C5;&#x5B8C;&#x6210;&#x7684;&#x72B6;&#x6001;&#x3002;</p>
+<h1 id="&#x4E8C;&#x3001;&#x4FE1;&#x4EFB;&#x8BC1;&#x4E66;">&#x4E8C;&#x3001;&#x4FE1;&#x4EFB;&#x8BC1;&#x4E66;</h1>
+<p>&#x8BC1;&#x4E66;&#x5B89;&#x88C5;&#x5B8C;&#x6210;&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x9ED8;&#x8BA4;&#x662F;&#x4E0D;&#x4FE1;&#x4EFB;&#x7684;&#xFF0C;&#x6240;&#x4EE5;&#x9700;&#x8981;&#x4FE1;&#x4EFB;&#x8BC1;&#x4E66;&#xFF0C;&#x4FE1;&#x4EFB;&#x8BC1;&#x4E66;&#x7684;&#x65B9;&#x5F0F;&#x5982;&#x4E0B;&#xFF1A;</p>
+<p>&#x300C;&#x8BBE;&#x7F6E;&#x300D;&#x2014;&#x2014;&#x300C;&#x901A;&#x7528;&#x300D;&#x2014;&#x2014;&#x300C;&#x5173;&#x4E8E;&#x672C;&#x673A;&#x300D;&#x2014;&#x2014; &#x62C9;&#x5230;&#x5E95;&#x90E8;&#x300C;&#x8BC1;&#x4E66;&#x4FE1;&#x4EFB;&#x8BBE;&#x7F6E;&#x300D; &#x2014;&#x2014; &#x628A; &#x300C;zProxy&#x300D;&#x7684;&#x5F00;&#x5173;&#x6253;&#x5F00; &#x2014;&#x2014; &#x5B8C;&#x6210;</p>
+<p><img src="https://img.yzcdn.cn/public_files/2018/11/16/2783949023fd2f9a6b1a730cfb54f204.png" width="500"></p>
+<p>&#x50CF;&#x8FD9;&#x6837;&#xFF0C;&#x5C31;&#x5B8C;&#x6210;&#x4E86;</p>
+<p>&#x597D;&#xFF0C;&#x5F00;&#x59CB;enjoy&#x6293;&#x5305;&#x5427;</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="../question/" class="navigation navigation-prev navigation-unique" aria-label="Previous page: 常见问题">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"iOS根证书安装说明","level":"1.15","depth":1,"previous":{"title":"常见问题","level":"1.14","depth":1,"path":"question/README.md","ref":"question/README.md","articles":[]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":false,"twitter":false,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":[]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"zanProxy","links":{"gitbook":false,"sharing":{"google":false,"facebook":false,"twitter":false,"all":false}},"gitbook":"*"},"file":{"path":"mobile/ios.md","mtime":"2018-11-16T10:14:18.000Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-11-16T10:10:13.168Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-livereload/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
