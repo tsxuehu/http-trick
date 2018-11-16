@@ -17,4 +17,5 @@
    * [请求处理流程](internal/request-flow.md)
    * [ws调试](internal/ws-debug.md)
 * [常见问题](question/README.md)
+* [iOS根证书安装说明](mobile/ios.md)
 
