@@ -197,9 +197,8 @@ module.exports = class Server extends EventEmitter {
                 hostName = this._dnsIpHostCache[targetIp];
             } else {
                 hostName = req.dstAddr;
-                targetIp = await this.hostService.resolveHostDirect(userId, req.dstAddr);
+                targetIp = await this.hostService.resolveHostDirect(userId, req.dstAddr, deviceId);
             }
-
             let canSocksProxy = (isIp && hostName) || !isIp;
             // 请求socket
             if (canSocksProxy && (req.dstPort == 80 || req.dstPort == 12345 )) {
@@ -231,8 +230,17 @@ module.exports = class Server extends EventEmitter {
                     handleProxyError(tlsSocket, e);
                 })
             } else {
+
                 needResume = false;
                 let targetPort = req.dstPort;
+                if (isIp && hostName) {
+                    let parsed = await this.hostService.resolveHostWithWay(userId,deviceId, hostName);
+                    targetIp = parsed.ip;
+                    if (parsed.way.indexOf('pre')> -1 || parsed.way.indexOf('qa') > -1) {
+                        targetPort = 7071;
+                    }
+                }
+
                 let dstSock = new net.Socket();
                 dstSock.setKeepAlive(false);
                 let connected = false;

@@ -37,8 +37,8 @@ module.exports = class HostService extends EventEmitter {
         });
     }
 
-    async resolveHostDirect(userId, hostname) {
-        let result = await this.resolveHostWithWay(userId, '', hostname);
+    async resolveHostDirect(userId, hostname, deviceId) {
+        let result = await this.resolveHostWithWay(userId, deviceId, hostname);
 
         return result.ip;
     }
