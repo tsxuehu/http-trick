@@ -303,8 +303,10 @@ module.exports = class Server extends EventEmitter {
         });
 
         server.on('message', (domain, send, proxy) => {
-            if (this._dnsHostIpCache[domain]) {
-                send(this._dnsHostIpCache[domain]);
+            let cachedIp = this._dnsHostIpCache[domain];
+            if (cachedIp) {
+                send(ip);
+                console.log('dns resolve : ',domain , cachedIp);
                 return;
             }
             let can = this.profileService.canSocksProxy('root', domain);
@@ -316,6 +318,7 @@ module.exports = class Server extends EventEmitter {
                         this._dnsIpHostCache[ip] = domain;
                         this._dnsHostIpCache[domain] = ip;
                         send(ip);
+                        console.log('dns resolve : ',domain , ip)
                         return;
                     }
                 }
