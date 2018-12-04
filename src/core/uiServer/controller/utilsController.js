@@ -136,6 +136,7 @@ module.exports = class TrafficController {
             let request = ctx.request.body;
             let host = request.host;
             let deviceId = request.deviceId;
+            console.log('/utils/device/usehost',deviceId, host)
             // 设置host
             await this.profileService.setDeviceHostFileName(deviceId, host);
             // 获取当前gate配置
