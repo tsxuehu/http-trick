@@ -53,6 +53,7 @@ module.exports.createServer = function (port = 53, addr) {
             });
 
             proxySoket.on('message', response => {
+                console.log('dns bypass', domain)
                 respond(response);
                 proxySoket.close()
             });
