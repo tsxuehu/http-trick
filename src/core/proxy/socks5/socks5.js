@@ -305,7 +305,7 @@ module.exports = class Server extends EventEmitter {
         server.on('message', (domain, send, proxy) => {
             let cachedIp = this._dnsHostIpCache[domain];
             if (cachedIp) {
-                send(ip);
+                send(cachedIp);
                 console.log('dns resolve : ',domain , cachedIp);
                 return;
             }
