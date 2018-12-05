@@ -242,7 +242,7 @@ module.exports = class ProfileService extends EventEmitter {
         let enable = false;
         let type = 'socks5';
         let ip = '';
-        let port = '';
+        let port = '8889';
         let device = this.getDevice(deviceId);
 
         if (device) {
@@ -250,10 +250,10 @@ module.exports = class ProfileService extends EventEmitter {
             type = device.externalSocks5Proxy ? 'socks5' : 'http';
             if (device.externalSocks5Proxy) {
                 ip = device.socks5Ip;
-                port = device.socks5Port;
+                port = device.socks5Port || 8889;
             } else {
                 ip = device.httpIp;
-                port = device.httpPort;
+                port = device.httpPort || 8888;
             }
         }
         return {
