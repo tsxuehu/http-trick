@@ -56,6 +56,7 @@ module.exports = class WsHandle {
             this.wsMock.handleUpgrade(req, socket, head, sessionId, req.headers.host + path)
         } else { // 不需要监听ws
             let ip = await this.hostService.resolveHostDirect(userId, host, clientIp);
+            console.log(ip, host, protocal, port || (protocal == 'http' ? 80 : 443))
             this.proxy.ws(req, socket, head, {
                 target: {
                     protocol: protocal,
