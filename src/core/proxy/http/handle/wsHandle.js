@@ -16,6 +16,7 @@ module.exports = class WsHandle {
     constructor() {
         this.logService = ServiceRegistry.getLogService();
         this.hostService = ServiceRegistry.getHostService();
+        this.profileService = ServiceRegistry.getProfileService();
         this.wsMockService = ServiceRegistry.getWsMockService();
         // 创建httpProxy
         this.proxy = HttpProxy.createProxyServer({
@@ -28,21 +29,37 @@ module.exports = class WsHandle {
 
     // websocket请求转发 ws测试服务器ws://echo.websocket.org/
     async handle(req, socket, head) {
+
+        let clientIp = ''; // 设备ip
+        let deviceId = '';// 设备id
+        let userId = '';// 设备绑定的用户id
+        let socks5proxy = req.socket.socks5;
+
+        if (socks5proxy) { // socks5协议
+            deviceId = req.socket.deviceId;
+            clientIp = req.socket.clientIp;
+            userId = req.socket.userId;
+        } else {// http代理协议
+            clientIp = getClientIp(req);
+            deviceId = clientIp; // 将设备的ip当做设备的id
+            userId = this.profileService.getUserIdBindDevice(deviceId);
+        }
+
         // 分配ws mock终端，没有分配到终端的和远程建立连接，分配到mock终端的和mock终端通信
         let host = req.headers.host.split(':')[0];
         let port = req.headers.host.split(':')[1];
         let path = url.parse(req.url).path;
         let protocal = (!!req.connection.encrypted && !/^http:/.test(req.url)) ? "https" : "http";
-        let clientIp = getClientIp(req);
         let sessionId = this.wsMockService.getFreeSession(clientIp, req.headers.host + path);
         if (sessionId > 0) {
             // 有监控的客户端
             this.wsMock.handleUpgrade(req, socket, head, sessionId, req.headers.host + path)
         } else { // 不需要监听ws
+            let ip = await this.hostService.resolveHostDirect(userId, host, clientIp);
             this.proxy.ws(req, socket, head, {
                 target: {
                     protocol: protocal,
-                    hostname: await this.hostService.resolveHostDirect(clientIp, host),
+                    hostname: ip,
                     port: port || (protocal == 'http' ? 80 : 443)
                 }
             });
