@@ -188,6 +188,7 @@ module.exports = class Server extends EventEmitter {
             if (!deviceId) { // 如果没有认证，则拿clientIp作为deviceId
                 deviceId = clientIp;
             }
+            console.log('socks5 connection established: ', deviceId)
             let userId = this.profileService.getUserIdBindDevice(deviceId);
             let isIp = this.hostService.isIp(req.dstAddr);
             let hostName = '';
