@@ -1,4 +1,3 @@
 # 受限于所使用的DNS服务器，当前使用root用户下的配置判断是否走socks5代理，个人配置不生效。
 # 后续会改进DNS服务器，使用个人配置判断是否走socks5
-*.youzan.com # 所有youzan的域名走socks5代理
-*.youzanyun.com # 有赞云
+*.taobao.com # 所有taobao的域名走socks5代理
