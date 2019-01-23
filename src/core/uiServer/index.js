@@ -30,29 +30,25 @@ module.exports = class UiServer {
         this.app = new koa();
         // 身份识别
         this.app.use(async (ctx, next) => {
-            // 取用户Id
-            let cookies = cookieParser.parse(ctx.request.headers.cookie || "");
-            let userId = cookies['userId'];
-            if (!userId) {
-                // 如果没有用户id
-                if (this.appInfoService.isSingle()) {
-                    // 单用户模式 则把root当做id
-                    userId = 'root';
-                } else {
+            let userId = 'root';
+            if (!this.appInfoService.isSingle()) {
+                let cookies = cookieParser.parse(ctx.request.headers.cookie || "");
+                userId = cookies['userId'];
+                if (!userId) {
                     // 多用户模式 则把用户的ip当做id
-                    let ip ;
+                    let ip;
                     // 取x-forword-for
                     ip = ctx.request.headers['x-forwarded-for'];
                     if (!ip) {
                         ip = socketIp.getRemoteIp(ctx.req.socket);
                     }
-                    if (ip.indexOf(',') > -1){
+                    if (ip.indexOf(',') > -1) {
                         ip = ip.split(',')[0];
                     }
                     userId = ip;
                     // 当前机器的ip和用户id绑定. 当机器为ip的机器发代理请求时，会使用userId用户的规则
+                    ctx.cookies.set('userId', userId, {maxAge: 1000 * 60 * 60 * 24 * 365});
                 }
-                ctx.cookies.set('userId', userId, { maxAge: 1000 * 60 * 60 * 24 * 365 });
             }
             ctx.userId = userId;
             await next();
@@ -60,7 +56,7 @@ module.exports = class UiServer {
         // query string
         koaQs(this.app);
         // body解析
-        this.app.use(koaBody({ multipart: true }));
+        this.app.use(koaBody({multipart: true}));
         // 路由
         this.app.use(router());
         // 静态资源服务
