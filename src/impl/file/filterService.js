@@ -2,7 +2,6 @@ const EventEmitter = require("events");
 const _ = require("lodash");
 const fileUtil = require("../../core/utils/file");
 const path = require('path');
-const DefaultFilters = require('./filter-default');
 
 module.exports = class FilterService extends EventEmitter {
     constructor({profileService, appInfoService}) {
@@ -42,22 +41,9 @@ module.exports = class FilterService extends EventEmitter {
         }
 
         let userFilters = this.filters[userId] || [];
-        if (userFilters.length == 0) return DefaultFilters;
 
-        let keysMap = {};
-        userFilters.forEach(f => {
-            keysMap[f.key] = 1;
-        });
-        // 取出需要的默认filter
-        let finalFilters = [];
-        DefaultFilters.forEach(f => {
-            if (!keysMap[f.key]) {
-                finalFilters.push(f);
-            }
-        });
-        finalFilters = finalFilters.concat(userFilters);
-        this._filtersCache[userId] = finalFilters;
-        return finalFilters;
+        this._filtersCache[userId] = userFilters;
+        return userFilters;
     }
 
     async save(userId, filters) {

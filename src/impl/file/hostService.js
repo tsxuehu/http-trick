@@ -6,7 +6,6 @@ const DnsResolver = require("../../core/utils/dns");
 
 const ipReg = /((?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d))/;
 
-const DefaultHost = require('./host-default');
 /**
  * Created by tsxuehu on 8/3/17.
  */
@@ -60,15 +59,10 @@ module.exports = class HostService extends EventEmitter {
             ip = hostname;
         } else if (this.profileService.enableHost(userId)) {
             // 解析host
-            let device = this.profileService.getDevice(deviceId);
-            let inUsingHosts = {};
-            if (device && device.hostFileName) {
-                way = 'device-' + device.hostFileName + ' ';
-                inUsingHosts = this.getSpecificHosts(userId, device.hostFileName)
-            } else {
-                inUsingHosts = this.getDefaultHosts(userId);
-                way = 'default-' + inUsingHosts.name + ' ';
-            }
+            let inUsingHosts;
+            inUsingHosts = this.getDefaultHosts(userId);
+            way = 'user-' + inUsingHosts.name + ' ';
+
             ip = inUsingHosts.hostMap[hostname];
             if (!ip) {
                 // 配置 *开头的host  计算属性globHostMap已经将*去除
@@ -149,9 +143,6 @@ module.exports = class HostService extends EventEmitter {
     getHostFile(userId, name) {
         // 如果找不到文件，则去默认文件里查找
         let file = (this.userHostFilesMap[userId] || {})[name];
-        if (!file) {
-            file = DefaultHost[name];
-        }
         return file;
     }
 
@@ -172,16 +163,6 @@ module.exports = class HostService extends EventEmitter {
                 description: content.description,
                 meta: content.meta
             });
-        });
-        _.forEach(DefaultHost, (content, key) => {
-            if (!nameMap[content.name]) {
-                fileList.push({
-                    name: content.name,
-                    checked: content.checked,
-                    description: content.description,
-                    meta: content.meta
-                });
-            }
         });
         return fileList;
     }
@@ -255,17 +236,6 @@ module.exports = class HostService extends EventEmitter {
                 toSaveFileName.push(name);
             }
         });
-        // 用户文件中没有找到,则在默认文件中查找
-        if (!toUseFileFinded) {
-            let toUse = DefaultHost[filename];
-            if (toUse) {
-                toUse = JSON.parse(JSON.stringify(toUse));
-                toUse.default = false;
-                toUse.checked = true;
-                toSaveFileName.push(filename);
-                this.userHostFilesMap[userId][filename] = toUse;
-            }
-        }
         // 保存文件
         for (let name of toSaveFileName) {
             let hostfileName = this._getHostFilePath(userId, name);
