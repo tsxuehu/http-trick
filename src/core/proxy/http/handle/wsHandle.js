@@ -1,9 +1,7 @@
 const url = require("url");
-const WsMock = require("../../wsmock/index");
 const HttpProxy = require("http-proxy");
 const ServiceRegistry = require("../../../service/index");
 const getClientIp = require("../../../utils/getClientIp");
-
 let wsHandle;
 module.exports = class WsHandle {
     static getInstance() {
@@ -22,8 +20,6 @@ module.exports = class WsHandle {
             secure: false // http-proxy api  在request的option里设置 rejectUnauthorized = false
         });
         this._registHandleForWSProxy(this.proxy);
-
-        this.wsMock = WsMock.getInstance();
     }
 
     // websocket请求转发 ws测试服务器ws://echo.websocket.org/
@@ -53,8 +49,9 @@ module.exports = class WsHandle {
 
         let ip = await this.hostService.resolveHostDirect(userId, host, clientIp);
         console.log(ip, host, protocal, port || (protocal == 'http' ? 80 : 443));
+
         // 转发websocket请求
-        this.proxy.ws(req, socket, head, {
+       this.proxy.ws(req, socket, head, {
             target: {
                 protocol: protocal,
                 hostname: ip,
