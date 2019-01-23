@@ -16,7 +16,6 @@ const FileHttpTrafficService = require("./impl/file/httpTrafficService");
 const FileLogService = require("./impl/file/logService");
 const FileMockDataService = require("./impl/file/mockDataService");
 const FileRuleService = require("./impl/file/ruleService");
-const FilewsMockService = require("./impl/file/wsMockService");
 
 module.exports = class Launcher {
     /**
@@ -56,7 +55,6 @@ module.exports = class Launcher {
         let logService;
         let mockDataService;
         let ruleService;
-        let wsMockService;
         if (this.serviceType == "db") {
             // 基于数据库的服务
 
@@ -82,7 +80,6 @@ module.exports = class Launcher {
             httpTrafficService = new FileHttpTrafficService(baseService);
             mockDataService = new FileMockDataService(baseService);
             ruleService = new FileRuleService({profileService, ...baseService});
-            wsMockService = new FilewsMockService(baseService);
 
         }
 
@@ -97,7 +94,6 @@ module.exports = class Launcher {
         await logService.start();
         await mockDataService.start();
         await ruleService.start();
-        await wsMockService.start();
 
         // 注册服务
         ServiceRegistry.registeServices({
@@ -110,8 +106,7 @@ module.exports = class Launcher {
             httpTrafficService,
             logService,
             mockDataService,
-            ruleService,
-            wsMockService
+            ruleService
         });
     }
 

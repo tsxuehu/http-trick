@@ -23,7 +23,6 @@ module.exports = class UiServer {
         this.mockDataService = ServiceRegistry.getMockDataService();
         this.ruleService = ServiceRegistry.getRuleService();
         this.filterService = ServiceRegistry.getFilterService();
-        this.wsMockService = ServiceRegistry.getWsMockService();
         this.appInfoService = ServiceRegistry.getAppInfoService();
         // 初始化koa
         this.app = new koa();
@@ -68,7 +67,6 @@ module.exports = class UiServer {
         // 初始化socket io
         this._initTraffic();
         this._initManager();
-        this._initWsMock();
     }
 
     async start() {
@@ -197,43 +195,6 @@ module.exports = class UiServer {
             this.managerNS.to(userId).emit('filters', filters);
         });
     }
-
-    // ws mock 相关函数
-    _initWsMock() {
-        this.wsmockNS = this.io.of('/wsmock');
-
-        this.wsmockNS.on('connection', async debugClient => {
-
-            let userId = this._getUserId(debugClient);
-            debugClient.join(userId, err => {
-            });
-            // 将websocket的id返回给浏览器
-            let connectionId = await this.wsMockService.newConnectionId(userId);
-            // 向客户端 发送 连接id
-            debugClient.emit('connection-id', connectionId);
-            // 向客户端发送当前所有的session
-            debugClient.emit('sessions', await this.wsMockService.getSessions(userId));
-
-            // 用户关闭ws界面
-            debugClient.on('disconnect', _ => {
-                this.wsMockService.connectionClosed(userId, connectionId);
-            });
-        });
-
-        this.wsMockService.on("page-connected", (userId, sessionId) => {
-            this.wsmockNS.to(userId).emit('page-connected', sessionId);
-        });
-        this.wsMockService.on("page-msg", (userId, sessionId, data) => {
-            this.wsmockNS.to(userId).emit('page-msg', sessionId, data);
-        });
-        this.wsMockService.on("page-closed", (userId, sessionId) => {
-            this.wsmockNS.to(userId).emit('page-closed', sessionId);
-        });
-        this.wsMockService.on("sessions", (userId, sessions) => {
-            this.wsmockNS.to(userId).emit('sessions', sessions);
-        });
-    }
-
 
     // 通用函数，获取web socket连接中的用户id
     _getUserId(socketIOConn) {
