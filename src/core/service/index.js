@@ -10,10 +10,6 @@ module.exports = class ServiceRegistry {
         registry = services;
     }
 
-    static getBreakpointService() {
-        return registry.breakpointService;
-    }
-
     static getProfileService() {
         return registry.profileService;
     }

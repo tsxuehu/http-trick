@@ -7,7 +7,6 @@ const WebUiServer = require("./core/uiServer");
 
 // 基于文件的service导入
 const FileAppInfoService = require("./impl/file/appInfoService");
-const FileBreakpointService = require("./impl/file/breakpointService");
 const FileCertificationService = require("./impl/file/certificationService");
 const FileProfileService = require("./impl/file/profileService");
 const FileConfigureService = require("./impl/file/configureService");
@@ -48,7 +47,6 @@ module.exports = class Launcher {
     // 初始化各种服务 并注册
     async _initService() {
         let appInfoService;
-        let breakpointService;
         let certificationService;
         let profileService;
         let configureService;
@@ -76,8 +74,6 @@ module.exports = class Launcher {
 
             let baseService = {logService, appInfoService, configureService};
 
-            // 复合服务
-            breakpointService = new FileBreakpointService(baseService);
             certificationService = new FileCertificationService(baseService);
 
             profileService = new FileProfileService(baseService);
@@ -92,7 +88,6 @@ module.exports = class Launcher {
 
         // 启动服务
         await appInfoService.start();
-        await breakpointService.start();
         await certificationService.start();
         await configureService.start();
         await profileService.start();
@@ -107,7 +102,6 @@ module.exports = class Launcher {
         // 注册服务
         ServiceRegistry.registeServices({
             appInfoService,
-            breakpointService,
             certificationService,
             profileService,
             configureService,

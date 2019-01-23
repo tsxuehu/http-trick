@@ -5,7 +5,6 @@ const requestResponseUtils = require("../../../utils/requestResponseUtils");
 const ServiceRegistry = require("../../../service/index");
 const Action = require("../action/index");
 const getClientIp = require("../../../utils/getClientIp");
-const Breakpoint = require("../breakpoint");
 const _ = require("lodash");
 const cookie = require("cookie");
 const sendSpecificToClient = require("../../../utils/sendSpecificToClient");
@@ -21,12 +20,10 @@ module.exports = class HttpHandle {
     }
 
     constructor() {
-        this.breakpoint = Breakpoint.getBreakpoint();
         this.ruleService = ServiceRegistry.getRuleService();
         this.logService = ServiceRegistry.getLogService();
         this.profileService = ServiceRegistry.getProfileService();
         this.appInfoService = ServiceRegistry.getAppInfoService();
-        this.breakpointService = ServiceRegistry.getBreakpointService();
         this.filterService = ServiceRegistry.getFilterService();
         this.httpTrafficService = ServiceRegistry.getHttpTrafficService();
     }
@@ -69,20 +66,6 @@ module.exports = class HttpHandle {
                 actualRequestQuery: {},
                 additionalRequestCookies: {},
                 actualRequestCookies: {}
-            });
-            return;
-        }
-
-        // =========================================
-        // 断点
-        let breakpointId = await this.breakpointService
-            .getBreakpointId(userId, req.method, urlObj);
-        if (breakpointId > 0) {
-            let requestContent = await this._getRequestContent(
-                req,
-                urlObj);
-            this.breakpoint.run({
-                req, res, urlObj, userId, breakpointId, requestContent
             });
             return;
         }
