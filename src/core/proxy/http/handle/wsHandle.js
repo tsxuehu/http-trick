@@ -17,7 +17,6 @@ module.exports = class WsHandle {
         this.logService = ServiceRegistry.getLogService();
         this.hostService = ServiceRegistry.getHostService();
         this.profileService = ServiceRegistry.getProfileService();
-        this.wsMockService = ServiceRegistry.getWsMockService();
         // 创建httpProxy
         this.proxy = HttpProxy.createProxyServer({
             secure: false // http-proxy api  在request的option里设置 rejectUnauthorized = false

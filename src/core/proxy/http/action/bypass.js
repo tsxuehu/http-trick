@@ -161,7 +161,12 @@ module.exports = class Bypass extends Action {
         toClientResponse.remoteIp = ip;
 
         // 日志
-        let targetUrl = protocol + '//' + hostname + ':' + port + path;
+        let targetUrl = '';
+        if ((protocol == 'https:' && port == 443) || (protocol == 'http:' && port == 80)) {
+            targetUrl = protocol + '//' + ip + pathname;
+        } else {
+            targetUrl = protocol + '//' + ip + ':' + port + pathname;
+        }
         toClientResponse.headers['proxy-content'] = encodeURI(targetUrl);
 
         // 合并header
@@ -255,7 +260,13 @@ module.exports = class Bypass extends Action {
         toClientResponse.remoteIp = ip;
 
         // 日志记录请求地址
-        let targetUrl = protocol + '//' + ip + ':' + port + pathname;
+        let targetUrl = '';
+        if ((protocol == 'https:' && port == 443) || (protocol == 'http:' && port == 80)) {
+            targetUrl = protocol + '//' + ip + pathname;
+        } else {
+            targetUrl = protocol + '//' + ip + ':' + port + pathname;
+        }
+
         toClientResponse.headers['proxy-content'] = encodeURI(targetUrl);
 
         // 合并header

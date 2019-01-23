@@ -162,7 +162,13 @@ module.exports = class Redirect extends Action {
 
         port = port || ('https:' == protocol ? 443 : 80);
 
-        let targetUrl = protocol + '//' + ip + ':' + port + path;
+        let targetUrl = '';
+        if ((protocol == 'https:' && port == 443) || (protocol == 'http:' && port == 80)) {
+            targetUrl = protocol + '//' + ip + path;
+        } else {
+            targetUrl = protocol + '//' + ip + ':' + port + path;
+        }
+
         toClientResponse.headers['proxy-content'] = encodeURI(targetUrl);
 
         Object.assign(actualRequestHeaders, req.headers);
