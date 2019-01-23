@@ -50,21 +50,18 @@ module.exports = class WsHandle {
         let port = req.headers.host.split(':')[1];
         let path = url.parse(req.url).path;
         let protocal = (!!req.connection.encrypted && !/^http:/.test(req.url)) ? "https" : "http";
-        let sessionId = this.wsMockService.getFreeSession(clientIp, req.headers.host + path);
-        if (sessionId > 0) {
-            // 有监控的客户端
-            this.wsMock.handleUpgrade(req, socket, head, sessionId, req.headers.host + path)
-        } else { // 不需要监听ws
-            let ip = await this.hostService.resolveHostDirect(userId, host, clientIp);
-            console.log(ip, host, protocal, port || (protocal == 'http' ? 80 : 443))
-            this.proxy.ws(req, socket, head, {
-                target: {
-                    protocol: protocal,
-                    hostname: ip,
-                    port: port || (protocal == 'http' ? 80 : 443)
-                }
-            });
-        }
+
+
+        let ip = await this.hostService.resolveHostDirect(userId, host, clientIp);
+        console.log(ip, host, protocal, port || (protocal == 'http' ? 80 : 443));
+        // 转发websocket请求
+        this.proxy.ws(req, socket, head, {
+            target: {
+                protocol: protocal,
+                hostname: ip,
+                port: port || (protocal == 'http' ? 80 : 443)
+            }
+        });
     }
 
     _registHandleForWSProxy(proxy) {

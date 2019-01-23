@@ -24,7 +24,6 @@ module.exports = class UiServer {
         this.ruleService = ServiceRegistry.getRuleService();
         this.filterService = ServiceRegistry.getFilterService();
         this.wsMockService = ServiceRegistry.getWsMockService();
-        this.breakpointService = ServiceRegistry.getBreakpointService();
         this.appInfoService = ServiceRegistry.getAppInfoService();
         // 初始化koa
         this.app = new koa();
@@ -70,7 +69,6 @@ module.exports = class UiServer {
         this._initTraffic();
         this._initManager();
         this._initWsMock();
-        this._initBreakpoint();
     }
 
     async start() {
@@ -236,56 +234,6 @@ module.exports = class UiServer {
         });
     }
 
-    /**
-     * break point
-     * @param socketIOConn
-     * @returns {*|string}
-     * @private
-     */
-    _initBreakpoint() {
-        this.breakpointNS = this.io.of('/breakpoint');
-        this.breakpointNS.on('connection', client => {
-            // 获取用户id，将连接加入到用户组
-            let userId = this._getUserId(client);
-            client.join(userId, err => {
-            });
-
-            let connectionId = this.breakpointService.newConnectionId(userId);
-            client.emit('connection-id', connectionId);
-
-            // 用户关闭断点界面  关闭该链接相关的所有断点
-            client.on('disconnect', _ => {
-                this.breakpointService.connectionClosed(userId, connectionId);
-            });
-            // 发送当前所有的断点
-            client.emit('breakpoints', this.breakpointService.getUserBreakPoints(userId));
-        });
-
-        this.breakpointService.on('breakpoint-save', (userId, breakpoint) => {
-            this.breakpointNS.to(userId).emit('breakpoint-save', breakpoint);
-        });
-        this.breakpointService.on('breakpoint-delete', (userId, breakpointId) => {
-            this.breakpointNS.to(userId).emit('breakpoint-delete', breakpointId);
-        });
-
-        this.breakpointService.on('instance-add', (userId, breakpointId, instance) => {
-            this.breakpointNS.to(userId).emit('instance-add', breakpointId, instance);
-        });
-
-        this.breakpointService.on('instance-delete', (userId, breakpointId, instance) => {
-            this.breakpointNS.to(userId).emit('instance-delete', breakpointId, instance);
-        });
-
-        this.breakpointService.on('instance-set-request-content', (userId, breakpointId, instanceId, content) => {
-            this.breakpointNS.to(userId).emit('client-request', breakpointId, instanceId, content);
-        });
-        this.breakpointService.on('instance-set-server-response', (userId, breakpointId, instanceId, content) => {
-            this.breakpointNS.to(userId).emit('server-response', breakpointId, instanceId, content);
-        });
-        this.breakpointService.on('instance-sended-to-client', (userId, breakpointId, instanceId) => {
-            this.breakpointNS.to(userId).emit('instance-end', breakpointId, instanceId);
-        });
-    }
 
     // 通用函数，获取web socket连接中的用户id
     _getUserId(socketIOConn) {

@@ -1,6 +1,5 @@
 const Router = require("koa-router");
 const cookieParser = require("cookie");
-let BreakpointController= require('./controller/breakpointController');
 let ConfigController= require('./controller/configController');
 let ProfileController= require('./controller/profileController');
 let HostController= require('./controller/hostController');
@@ -14,7 +13,6 @@ let AppController = require('./controller/appController');
 module.exports = function getRouter() {
     let router = new Router();
     // 注册中间件，获取用户身份
-    BreakpointController.getInstance().regist(router);
     ConfigController.getInstance().regist(router);
     ProfileController.getInstance().regist(router);
     HostController.getInstance().regist(router);
