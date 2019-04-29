@@ -1,9 +1,9 @@
 const { Resolver } = require('dns');
 const log = require("./log");
 const resolver = new Resolver();
-resolver.setServers([
-    '172.17.1.236', '172.17.1.235'
-]); // 指定解析dns的服务器
+//const dnsServer = ['192.168.50.1'];
+const dnsServer = ['172.17.1.236'];
+resolver.setServers(dnsServer); // 指定解析dns的服务器
 /**
  * node 调用getAddress会出问题
  * @param host
@@ -74,3 +74,6 @@ module.exports = class DnsResolver {
         });
     }
 };
+
+
+module.exports.dnsServer = dnsServer;

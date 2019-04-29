@@ -11,7 +11,7 @@ let createSecureContext = tls.createSecureContext || crypto.createSecureContext;
 
 const Parser = require('./server.parser');
 const ipbytes = require('./utils').ipbytes;
-
+const dnsServer = require('../../utils/dns').dnsServer;
 const HttpHandle = require("../http/handle/httpHandle");
 const WsHandle = require("../http/handle/wsHandle");
 
@@ -157,8 +157,11 @@ module.exports = class Server extends EventEmitter {
             }
         });
         parser.on('request', function (reqInfo) { // 请求数据
-            if (reqInfo.cmd !== 'connect')
+            if (reqInfo.cmd !== 'connect'){
                 return socket.end(BUF_REP_CMDUNSUPP);
+            }else{
+                socket.write(BUF_REP_INTR_SUCCESS)
+            }
             self.proxySocket(socket, reqInfo);
         });
 
@@ -188,7 +191,6 @@ module.exports = class Server extends EventEmitter {
             if (!deviceId) { // 如果没有认证，则拿clientIp作为deviceId
                 deviceId = clientIp;
             }
-            console.log('socks5 connection established: ', deviceId)
             let userId = this.profileService.getUserIdBindDevice(deviceId);
             let isIp = this.hostService.isIp(req.dstAddr);
             let hostName = '';
@@ -260,23 +262,12 @@ module.exports = class Server extends EventEmitter {
                 dstSock.connect(targetPort, targetIp);
                 socket.dstSock = dstSock;
             }
-            // 向client发送连接成功消息
-            let localbytes = ipbytes('0.0.0.0'),
-                len = localbytes.length,
-                bufrep = new Buffer(6 + len),
-                p = 4;
-            bufrep[0] = 0x05;
-            bufrep[1] = REP.SUCCESS;
-            bufrep[2] = 0x00;
-            bufrep[3] = (len === 4 ? ATYP.IPv4 : ATYP.IPv6);
-            for (let i = 0; i < len; ++i, ++p)
-                bufrep[p] = localbytes[i];
-            bufrep.writeUInt16BE(0, p, true);
-            socket.write(bufrep);
+            
             if (needResume) {
                 socket.resume();
             }
         } catch (err) {
+            console.error('socks ',err)
             handleProxyError(socket, err);
         }
     }
@@ -322,7 +313,7 @@ module.exports = class Server extends EventEmitter {
                     }
                 }
             } else {
-                proxy('172.17.1.236')
+                proxy(dnsServer[0])
             }
         });
 
