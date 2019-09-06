@@ -2,6 +2,8 @@ const net = require('net');
 const util = require('util');
 const EventEmitter = require('events');
 const http = require('http');
+const _http_server = require('_http_server');
+const _http_common = require('_http_common');
 const tls = require('tls');
 const crypto = require("crypto");
 const updns = require('../dns/index');
@@ -18,29 +20,29 @@ const ServiceRegistry = require("../../service");
 const NoneAuth = require("./auth/None");
 const UserPassword = require("./auth/UserPassword");
 
-const ATYP = require('./constants').ATYP;
-const CMD = require('./constants').CMD;
-const REP = require('./constants').REP;
-
+const {ATYP, CMD, REP} = require('./constants');
+const kServerResponse = Symbol('ServerResponse');
+const kIncomingMessage = Symbol('IncomingMessage');
 // -------------- 常量 --------------
 // 没有支持的认证
-const BUF_AUTH_NO_ACCEPT = new Buffer([0x05, 0xFF]);
+const BUF_AUTH_NO_ACCEPT = Buffer.from([0x05, 0xFF]);
 
-const BUF_REP_INTR_SUCCESS = new Buffer([0x05,
+const BUF_REP_INTR_SUCCESS = Buffer.from([0x05,
   REP.SUCCESS,
   0x00,
   0x01,
   0x00, 0x00, 0x00, 0x00,
   0x00, 0x00]);
 
-const BUF_REP_DISALLOW = new Buffer([0x05, REP.DISALLOW]);
+const BUF_REP_DISALLOW = Buffer.from([0x05, REP.DISALLOW]);
 // 命令不支持
-const BUF_REP_CMDUNSUPP = new Buffer([0x05, REP.CMDUNSUPP]);
+const BUF_REP_CMDUNSUPP = Buffer.from([0x05, REP.CMDUNSUPP]);
 
 /**
  *  forward TCP connection to a new HTTP req/res
  *
  *  解析socks5协议，根据配置信息 将连接转给http处理器，或者远端
+ *  调用socket的pause resume方法，控制数据的接受
  */
 module.exports = class Server extends EventEmitter {
   constructor({
@@ -64,9 +66,75 @@ module.exports = class Server extends EventEmitter {
     this.certificationService = ServiceRegistry.getCertificationService();
     this.dnsMockService = ServiceRegistry.getDnsMockService();
     this.configureService = ServiceRegistry.getConfigureService();
+    this.logService = ServiceRegistry.getLogService();
 
     this.useAuth(new UserPassword());
     this.useAuth(new NoneAuth());
+  }
+
+  async start() {
+
+    let logService = ServiceRegistry.getLogService();
+    // 创建socket
+    let server = this.server = new net.Server();
+    // 为server绑定ServerResponse、IncomingMessage类
+    let httpServer = http.createServer();
+    let symbolKeys = Object.getOwnPropertySymbols(httpServer);
+    for (let symbolKey of symbolKeys) {
+      if (!server[symbolKey]) {
+        server[symbolKey] = httpServer[symbolKey];
+      }
+    }
+    // server[_http_server.kServerResponse] = http.ServerResponse;
+    // server[_http_common.kIncomingMessage] = http.IncomingMessage;
+
+    server.on('connection', socket => {
+      if (this._connections >= this.maxConnections) { // 超过最大连接数拒绝连接
+        socket.destroy();
+        return;
+      }
+      ++this._connections;
+      socket.once('close', had_err => {
+        --this._connections;
+      });
+      // 处理请求链接
+      this._handleSocks5Connection(socket);
+    });
+    server.on('error', err => {
+      logService.error(err);
+    });
+    server.on('listening', err => {
+      logService.info('socks5 proxy listening');
+    });
+    server.on('close', err => {
+      logService.info('socks5 proxy closed');
+    });
+
+    server.on('request', (req, res) => {
+      this.httpHandle.handle(req, res).catch(err => {
+        logService.error('socks5 server process request error', err);
+        handleProxyError(req.socket, err);
+      });
+    });
+
+    server.on('upgrade', (req, res) => {
+      this.wsHandle.handle(req, res).catch(err => {
+        logService.error('socks5 server process upgrade error', err);
+        handleProxyError(req.socket, err);
+      });
+    });
+
+
+    server.on('error', function (err) {
+      logService.error('socks5 server error', err);
+    });
+
+    server.on('clientError', (err, socket) => {
+      logService.error('socks5 server clientError', err);
+      handleProxyError(socket, err);
+    });
+
+    server.listen(this.socks5Port);
   }
 
   /**
@@ -75,10 +143,11 @@ module.exports = class Server extends EventEmitter {
    * @private
    */
   _handleSocks5Connection(socket) {
+    let logService = ServiceRegistry.getLogService();
     let self = this;
     let parser = new Parser(socket);
     parser.on('error', function (err) {
-      console.log(err)
+      logService.error(err)
       if (socket.writable)
         socket.end();
     });
@@ -104,7 +173,7 @@ module.exports = class Server extends EventEmitter {
             socket.end();
           }
         });
-        socket.write(new Buffer([0x05, auth.METHOD]));
+        socket.write(Buffer.from([0x05, auth.METHOD]));
         socket.resume();
       } else {
         socket.end(BUF_AUTH_NO_ACCEPT);
@@ -137,9 +206,12 @@ module.exports = class Server extends EventEmitter {
    * @param req
    */
   async proxySocket(socket, req) {
+    let logService = this.logService;
+    let profileService = this.profileService;
+    let dnsMockService = this.dnsMockService;
     // 通过默认端口号判断通信协议
     try {
-      let needResume = true;// 对于透传，等远程连接建立后再resume
+      let needResume = true;// 对于透传，pipe函数会自动resume
       let clientIp = req.srcAddr;
       let deviceId = req.username;// 将认证的username当做deviceId
       if (!deviceId) { // 如果没有认证，则拿clientIp作为deviceId
@@ -150,53 +222,60 @@ module.exports = class Server extends EventEmitter {
       let hostName = '';
       let targetIp = '';
       if (isIp) {
-        targetIp = req.dstAddr;
-        hostName = this._dnsIpHostCache[targetIp];
-      } else {
-        hostName = req.dstAddr;
-        targetIp = await this.hostService.resolveHostDirect(userId, req.dstAddr, deviceId);
+        hostName = dnsMockService.resolveMockedDomain(req.dstAddr);
       }
-      let canSocksProxy = (isIp && hostName) || !isIp;
+
+      let goThroughProxy = false;
+
+      if (isIp && hostName) { // 连接代理dns的情况
+        goThroughProxy = true;
+        targetIp = await this.hostService.resolveHostDirect(userId, hostName, deviceId);
+      } else { // 未连接代理dns的情况
+        if (isIp) {
+          goThroughProxy = true;
+          targetIp = req.dstAddr;
+        } else if (profileService.shoudGoThrougProxy(userId, req.dstAddr)) {
+          hostName = req.dstAddr;
+          goThroughProxy = true;
+          targetIp = await this.hostService.resolveHostDirect(userId, req.dstAddr, deviceId);
+        } else { // 透传
+          targetIp = await this.hostService.resolveHostWithoutProfile(req.dstAddr);
+        }
+      }
+
       // 请求socket
-      if (canSocksProxy && (req.dstPort == 80 || req.dstPort == 12345)) {
-        socket.deviceId = deviceId;
-        socket.clientIp = clientIp;
-        socket.userId = userId;
-        socket.socks5 = true;
-        http._connectionListener.call(this._srv, socket);
+      if (goThroughProxy) {
+        if (req.dstPort == 443) {
+          // tls
+          let context = await this.certificationService.getCertificationForHost(hostName);
+          let tlsSocket = new tls.TLSSocket(socket, {
+            isServer: true,
+            key: context.key,
+            cert: context.cert
+          });
 
-      } else if (canSocksProxy && req.dstPort == 443) {
-        // tls
-        let context = await this.certificationService.getCertificationForHost(hostName);
-        let tlsSocket = new tls.TLSSocket(socket, {
-          isServer: true,
-          key: context.key,
-          cert: context.cert
-        });
-
-        tlsSocket.deviceId = deviceId;
-        tlsSocket.clientIp = clientIp;
-        tlsSocket.userId = userId;
-        tlsSocket.socks5 = true;
-        http._connectionListener.call(this._srv, tlsSocket);
-        /* tlsSocket.on('data', data => {
-             console.log('tlsSocket ------- ', data.toString())
-         })*/
-        tlsSocket.on('error', e => {
-          console.log(e)
-          handleProxyError(tlsSocket, e);
-        })
+          tlsSocket.deviceId = deviceId;
+          tlsSocket.clientIp = clientIp;
+          tlsSocket.userId = userId;
+          tlsSocket.socks5 = true;
+          http._connectionListener.call(this.server, tlsSocket);
+          /* tlsSocket.on('data', data => {
+               console.log('tlsSocket ------- ', data.toString())
+           })*/
+          tlsSocket.on('error', e => {
+            console.log(e)
+            handleProxyError(tlsSocket, e);
+          })
+        } else {
+          socket.deviceId = deviceId;
+          socket.clientIp = clientIp;
+          socket.userId = userId;
+          socket.socks5 = true;
+          http._connectionListener.call(this.server, socket);
+        }
       } else {
-
         needResume = false;
         let targetPort = req.dstPort;
-        if (isIp && hostName) {
-          let parsed = await this.hostService.resolveHostWithWay(userId, deviceId, hostName);
-          targetIp = parsed.ip;
-          if (parsed.way.indexOf('pre') > -1 || parsed.way.indexOf('qa') > -1) {
-            targetPort = 7071;
-          }
-        }
 
         let dstSock = new net.Socket();
         dstSock.setKeepAlive(false);
@@ -228,72 +307,10 @@ module.exports = class Server extends EventEmitter {
 
   useAuth(auth) {
     this._authMap[auth.METHOD] = auth;
-    return this;
-  }
-
-  async start() {
-
-    let self = this;
-
-    // 创建socket
-    this._srv = new net.Server(function (socket) {
-      if (self._connections >= self.maxConnections) { // 超过最大连接数拒绝连接
-        socket.destroy();
-        return;
-      }
-      ++self._connections;
-      socket.once('close', function (had_err) {
-        --self._connections;
-      });
-      // 处理请求链接
-      self._handleSocks5Connection(socket);
-    }).on('error', function (err) {
-      self.emit('error', err);
-    }).on('listening', function () {
-      self.emit('listening');
-    }).on('close', function () {
-      self.emit('close');
-    });
-
-    this._srv.on('request', (req, res) => {
-      this.httpHandle.handle(req, res).catch(e => {
-        console.error('http handle error in socks5', e);
-        handleProxyError(req.socket, e);
-      });
-    });
-
-    this._srv.on('upgrade', (req, res) => {
-      this.wsHandle.handle(req, res).catch(e => {
-        console.error('upgrade handle error in socks5', e);
-        handleProxyError(req.socket, e);
-      });
-    });
-
-
-    this._srv.on('error', function (err) {
-      console.log('socks5 server error', err);
-    });
-
-    this._srv.on('clientError', (err, socket) => {
-      console.error('clientError error in socks5', err);
-      handleProxyError(socket, err);
-    });
-
-    this._srv.listen(this.socks5Port);
-
-  }
-
-  address() {
-    return this._srv.address();
-  }
-
-  getConnections(cb) {
-    this._srv.getConnections(cb);
   }
 
   close(cb) {
-    this._srv.close(cb);
-    return this;
+    this.server.close(cb);
   }
 };
 
@@ -303,7 +320,7 @@ function onErrorNoop(err) {
 
 function handleProxyError(socket, err) {
   if (socket.writable) {
-    var errbuf = new Buffer([0x05, REP.GENFAIL]);
+    var errbuf = Buffer.from([0x05, REP.GENFAIL]);
     if (err.code) {
       switch (err.code) {
         case 'ENOENT':

@@ -33,7 +33,7 @@ module.exports = class DnsMockService {
   }
 
   // 如果是mockIp 返回mockIp对应的域名
-  resolveMockIp(mockIp) {
+  resolveMockedDomain(mockIp) {
     return this._dnsIpHostCache[mockIp];
   }
 

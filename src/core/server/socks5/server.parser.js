@@ -90,7 +90,7 @@ class Parser extends EventEmitter {
                     }
                     ++i;
                     state = STATE_METHODS;
-                    this._methods = new Buffer(nmethods);
+                    this._methods = Buffer.alloc(nmethods);
                     this._methodsp = 0;
                     break;
                 case STATE_METHODS: // 解析支持的方法
@@ -162,9 +162,9 @@ class Parser extends EventEmitter {
                     let atyp = chunk[i];
                     state = STATE_REQ_DSTADDR;
                     if (atyp === ATYP.IPv4)
-                        this._dstaddr = new Buffer(4);
+                        this._dstaddr = Buffer.alloc(4);
                     else if (atyp === ATYP.IPv6)
-                        this._dstaddr = new Buffer(16);
+                        this._dstaddr = Buffer.alloc(16);
                     else if (atyp === ATYP.NAME)
                         state = STATE_REQ_DSTADDR_VARLEN;
                     else {
@@ -190,7 +190,7 @@ class Parser extends EventEmitter {
                         state = STATE_REQ_DSTPORT;
                     break;
                 case STATE_REQ_DSTADDR_VARLEN:
-                    this._dstaddr = new Buffer(chunk[i]);
+                    this._dstaddr = Buffer.alloc(chunk[i]);
                     state = STATE_REQ_DSTADDR;
                     ++i;
                     break;

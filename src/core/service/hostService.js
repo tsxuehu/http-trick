@@ -42,6 +42,11 @@ module.exports = class HostService extends EventEmitter {
         return result.ip;
     }
 
+    async resolveHostWithoutProfile(hostname) {
+      let ip = await this.dns.resovleIp(hostname);
+      return ip;
+    }
+
     isIp(str) {
         if (ipReg.test(str)) {
             return true

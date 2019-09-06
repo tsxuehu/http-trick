@@ -8,8 +8,8 @@ const defaultConfigure = {
   "socks5ProxyPort": 8002,
   "dnsPort": 53,
   "webUiPort": 40001,
-  "startDns": true,
-  "startSocks5": false,
+  "startDns": false,
+  "startSocks5": true,
   "requestTimeoutTime": 30000,
   "remoteDnsServer": '223.5.5.5', // 远程dns解析服务器
 };

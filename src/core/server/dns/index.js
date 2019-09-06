@@ -37,7 +37,7 @@ module.exports = class DnsServer {
     const query = NDP.parse(message);
     let domain = query.question[0].name;
     // 检查domain是否需要mock
-    let can = this.profileService.canSocksProxy('root', domain);
+    let can = this.profileService.shoudGoThrougProxy('root', domain);
     if (can) { // 返回mock的Ip
 
       let ip = this.dnsMockService.getMockIp(domain);

@@ -7,8 +7,8 @@ module.exports = class LogService {
 
   }
 
-  error(msg) {
-    console.log(msg)
+  error(msg, error) {
+    console.error(msg, error)
   }
 
   log(msg) {

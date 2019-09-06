@@ -8,8 +8,8 @@ var STATE_VERSION = 0,
     STATE_STATUS = 5;
 
 // server
-var BUF_SUCCESS = new Buffer([0x01, 0x00]),
-    BUF_FAILURE = new Buffer([0x01, 0x01]);
+var BUF_SUCCESS = Buffer.from([0x01, 0x00]),
+    BUF_FAILURE = Buffer.from([0x01, 0x01]);
 
 function authHandle(user,passworld, cb) {
     cb && cb(true)
@@ -60,7 +60,7 @@ module.exports = function UserPasswordAuthHandlers() {
                             }
                             ++i;
                             ++state;
-                            user = new Buffer(ulen);
+                            user = Buffer.alloc(ulen);
                             userp = 0;
                             break;
                         case STATE_UNAME:
@@ -87,7 +87,7 @@ module.exports = function UserPasswordAuthHandlers() {
                             }
                             ++i;
                             ++state;
-                            pass = new Buffer(plen);
+                            pass = Buffer.alloc(plen);
                             passp = 0;
                             break;
                         case STATE_PASSWD:
