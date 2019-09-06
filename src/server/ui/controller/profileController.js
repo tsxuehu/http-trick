@@ -1,8 +1,8 @@
 /**
  * Created by tsxuehu on 4/11/17.
  */
-const ServiceRegistry = require("../../service");
-const socketIp = require("../../utils/socketIp");
+const ServiceRegistry = require("../../../service");
+const socketIp = require("../../../utils/socketIp");
 
 let instance;
 module.exports = class ConfigController {

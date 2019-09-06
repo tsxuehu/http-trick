@@ -1,23 +1,23 @@
 const getPort = require("get-port");
-const ServiceRegistry = require("./core/service/index");
-const HttpServer = require("./core/server/http/httpServer");
-const HttpsServer = require("./core/server/http/httpsServer");
-const Socks5Server = require("./core/server/socks5/index");
-const DnsServer = require("./core/server/dns/index");
-const WebUiServer = require("./core/uiServer");
+const ServiceRegistry = require("./service/index");
+const HttpServer = require("./server/http/httpServer");
+const HttpsServer = require("./server/http/httpsServer");
+const Socks5Server = require("./server/socks5/index");
+const DnsServer = require("./server/dns/index");
+const WebUiServer = require("./server/ui/index");
 
 // 基于文件的service导入
-const FileAppInfoService = require("./core/service/appInfoService");
-const FileCertificationService = require("./core/service/certificationService");
-const FileProfileService = require("./core/service/profileService");
-const FileConfigureService = require("./core/service/configureService");
-const FileFilterService = require("./core/service/filterService");
-const FileHostService = require("./core/service/hostService");
-const FileHttpTrafficService = require("./core/service/httpTrafficService");
-const FileLogService = require("./core/service/logService");
-const FileMockDataService = require("./core/service/mockDataService");
-const FileRuleService = require("./core/service/ruleService");
-const DnsMockService = require("./core/service/dnsMockService");
+const FileAppInfoService = require("./service/appInfoService");
+const FileCertificationService = require("./service/certificationService");
+const FileProfileService = require("./service/profileService");
+const FileConfigureService = require("./service/configureService");
+const FileFilterService = require("./service/filterService");
+const FileHostService = require("./service/hostService");
+const FileHttpTrafficService = require("./service/httpTrafficService");
+const FileLogService = require("./service/logService");
+const FileMockDataService = require("./service/mockDataService");
+const FileRuleService = require("./service/ruleService");
+const DnsMockService = require("./service/dnsMockService");
 
 module.exports = class Launcher {
   /**

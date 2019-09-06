@@ -1,7 +1,7 @@
 /**
  * Created by tsxuehu on 4/11/17.
  */
-const ServiceRegistry = require("../../service");
+const ServiceRegistry = require("../../../service");
 let instance;
 module.exports = class FilterController {
     static getInstance() {
@@ -11,16 +11,16 @@ module.exports = class FilterController {
         return instance;
     }
     constructor() {
-        this.appInfoService = ServiceRegistry.getAppInfoService();
+        this.filterService = ServiceRegistry.getFilterService();
 
     }
 
     regist(router) {
-        router.get('/app/get-info', async (ctx, next) => {
-            let appInfo = this.appInfoService.getAppInfo();
+        router.post('/filter/savefilters', async (ctx, next) => {
+            let userId = ctx.userId;
+            await this.filterService.save(userId, ctx.request.body);
             ctx.body = {
-                code: 0,
-                data: appInfo
+                code: 0
             };
         });
     }

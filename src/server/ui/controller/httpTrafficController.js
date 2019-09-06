@@ -1,4 +1,4 @@
-const ServiceRegistry = require("../../service");
+const ServiceRegistry = require("../../../service");
 
 let instance;
 module.exports = class TrafficController {

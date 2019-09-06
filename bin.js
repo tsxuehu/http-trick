@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 const program = require('commander');
 const packageInfo = require("./package.json");
-const log = require('./src/core/utils/log');
+const log = require('./src/utils/log');
 const Launcher = require('./src/launcher');
-const AppInfoService = require("./src/core/service/appInfoService");
+const AppInfoService = require("./src/service/appInfoService");
 const fs = require('fs');
 const resetDataFile = require('./resetDataFile');
 

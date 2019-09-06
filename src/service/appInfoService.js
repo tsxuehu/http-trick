@@ -23,7 +23,7 @@ module.exports = class AppInfoService extends EventEmitter {
       pcIp: "",
     };
 
-    this.appDir = path.join(__dirname, "../../../");
+    this.appDir = path.join(__dirname, "../../");
   }
 
   start() {

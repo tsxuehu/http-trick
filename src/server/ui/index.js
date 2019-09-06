@@ -7,8 +7,8 @@ const staticServe = require("koa-static");
 const router = require("./router");
 const SocketIO = require("socket.io");
 const cookieParser = require("cookie");
-const ServiceRegistry = require("../service");
-const socketIp = require("../utils/socketIp");
+const ServiceRegistry = require("../../service");
+const socketIp = require("../../utils/socketIp");
 
 module.exports = class UiServer {
 

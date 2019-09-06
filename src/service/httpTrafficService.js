@@ -5,7 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const rimraf = require("rimraf");
 const _ = require("lodash");
-const fileUtil = require("../../core/utils/file");
+const fileUtil = require("../utils/file");
 const logCountPerUser = 500;
 const EventEmitter = require("events");
 /**

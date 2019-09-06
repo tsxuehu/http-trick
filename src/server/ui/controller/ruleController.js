@@ -1,7 +1,7 @@
 /**
  * Created by tsxuehu on 4/11/17.
  */
-const ServiceRegistry = require("../../service");
+const ServiceRegistry = require("../../../service");
 
 let instance;
 module.exports = class RuleController {

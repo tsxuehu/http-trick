@@ -1,8 +1,8 @@
 const EventEmitter = require("events");
 const _ = require("lodash");
 const path = require("path");
-const fileUtil = require("../../core/utils/file");
-const DnsResolver = require("../../core/utils/dns");
+const fileUtil = require("../utils/file");
+const DnsResolver = require("../utils/dns");
 
 const ipReg = /((?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d))/;
 

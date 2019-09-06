@@ -1,5 +1,5 @@
-const fileUtils = require("./src/core/utils/file");
-const AppInfoService = require("./src/core/service/appInfoService");
+const fileUtils = require("./src/utils/file");
+const AppInfoService = require("./src/service/appInfoService");
 const path = require("path");
 /**
  * 初始化脚本

@@ -1,5 +1,5 @@
-const ServiceRegistry = require("../../service");
-const gitlab = require("../../utils/gitlab");
+const ServiceRegistry = require("../../../service");
+const gitlab = require("../../../utils/gitlab");
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs');

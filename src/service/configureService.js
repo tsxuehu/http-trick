@@ -1,6 +1,6 @@
 const EventEmitter = require("events");
 const _ = require("lodash");
-const fileUtil = require("../../core/utils/file");
+const fileUtil = require("../utils/file");
 const path = require('path');
 
 const defaultConfigure = {
