@@ -4,169 +4,113 @@ const _ = require("lodash");
 const ip = require('ip');
 module.exports = class AppInfoService extends EventEmitter {
 
-    constructor(single) {
-        super();
-        // 用户home目录
-        let userHome = process.env.HOME || process.env.USERPROFILE;
-        // proxy data存放目录
-        this.proxyDataDir = path.join(userHome, ".http-trick");
-        // app信息
-        this.appInfo = {
-            "single": single,
-            "realUiPort": "",
-            "httpProxyPort": "",
-            "httpsProxyPort": "",
-            "socks5ProxyPort": "",
-            "dnsPort": "",
-            "pcIp": ""
-        };
+  constructor(single) {
+    super();
+    // 用户home目录
+    let userHome = process.env.HOME || process.env.USERPROFILE;
+    // proxy data存放目录
+    this.proxyDataDir = path.join(userHome, ".http-trick");
+    // app信息
+    this.appInfo = {
+      single,
+      httpProxyPort: "",
+      httpsProxyPort: "",
+      socks5ProxyPort: "",
+      dnsPort: "",
+      webUiPort: "",
+      startSocks5: "",
+      startDns: "",
+      pcIp: "",
+    };
 
-        this.appDir = path.join(__dirname, "../../../");
-    }
+    this.appDir = path.join(__dirname, "../../../");
+  }
 
-    start() {
-        // 获取真实的ip
+  start() {
+    // 获取真实的ip
+    this.setAppInfo({
+      pcIp: ip.address()
+    });
+  }
 
-        this.setAppInfo({
-            pcIp: ip.address()
-        });
-    }
+  getAppDir() {
+    return this.appDir;
+  }
 
-    getAppDir() {
-        return this.appDir;
-    }
+  /**
+   * 设置app 运行信息
+   * @param info
+   */
+  setAppInfo(info) {
+    _.assign(this.appInfo, info);
+    this.emit('data-change', this.appInfo);
+  }
 
-    /**
-     * 设置app 运行信息
-     * @param info
-     */
-    setAppInfo(info) {
-        _.assign(this.appInfo, info);
-        this.emit('data-change', this.appInfo);
-    }
+  /**
+   * 是否是单用户模式
+   * @returns {boolean|*}
+   */
+  isSingle() {
+    return this.appInfo.single;
+  }
 
-    /**
-     * 是否是单用户模式
-     * @returns {boolean|*}
-     */
-    isSingle() {
-        return this.appInfo.single;
-    }
+  /**
+   * 本地存放数据的目录
+   * @returns {*}
+   */
+  getProxyDataDir() {
+    return this.proxyDataDir;
+  }
 
-    /**
-     * 本地存放数据的目录
-     * @returns {*}
-     */
-    getProxyDataDir() {
-        return this.proxyDataDir;
-    }
+  /**
+   * 真实的代理端口
+   * @returns {string}
+   */
+  getHttpProxyPort() {
+    return this.appInfo.httpProxyPort;
+  }
 
-    /**
-     * 真实的 ui 端口
-     * @returns {string}
-     */
-    getRealUiPort() {
-        return this.appInfo.realUiPort;
-    }
+  /**
+   * 真实的代理端口
+   * @returns {string}
+   */
+  getHttpsProxyPort() {
+    return this.appInfo.httpsProxyPort;
+  }
 
-    /**
-     * 设置真实的 ui 端口
-     * @param uiport
-     */
-    setRealUiPort(uiport) {
-        this.setAppInfo({
-            realUiPort: uiport
-        });
-    }
+  /**
+   * 设置正在运行的代理端口
+   * @param proxyport
+   */
+  setHttpsProxyPort(httpsProxyPort) {
+    this.setAppInfo({
+      httpsProxyPort: httpsProxyPort
+    });
+  }
 
-    /**
-     * 真实的代理端口
-     * @returns {string}
-     */
-    getHttpProxyPort() {
-        return this.appInfo.httpProxyPort;
-    }
+  /**
+   * 获取机器ip
+   * @returns {string}
+   */
+  getPcIp() {
+    return this.appInfo.pcIp;
+  }
 
-    /**
-     * 设置正在运行的代理端口
-     * @param proxyport
-     */
-    setHttpProxyPort(httpProxyPort) {
-        this.setAppInfo({
-            httpProxyPort: httpProxyPort
-        });
-    }
+  getAppInfo() {
+    return this.appInfo;
+  }
 
-    /**
-     * socks5端口
-     * @returns {*}
-     */
-    getSocks5ProxyPort() {
-        return this.appInfo.socks5ProxyPort;
-    }
+  // 是否是webui请求
+  isWebUiRequest(hostname, port) {
+    return (hostname == '127.0.0.1' || hostname == this.appInfo.pcIp)
+      && port == this.appInfo.webUiPort;
+  }
 
-    setSocks5ProxyPort(socks5ProxyPort) {
-        this.setAppInfo({
-            socks5ProxyPort: socks5ProxyPort
-        });
-    }
-
-    setDnsPortPort(dnsPort) {
-        this.setAppInfo({
-            dnsPort: dnsPort
-        });
-    }
-
-    /**
-     * 真实的代理端口
-     * @returns {string}
-     */
-    getHttpsProxyPort() {
-        return this.appInfo.httpsProxyPort;
-    }
-
-    /**
-     * 设置正在运行的代理端口
-     * @param proxyport
-     */
-    setHttpsProxyPort(httpsProxyPort) {
-        this.setAppInfo({
-            httpsProxyPort: httpsProxyPort
-        });
-    }
-
-    /**
-     * 设置机器ip
-     * @param pcIp
-     */
-    setPcIp(pcIp) {
-        this.setAppInfo({
-            pcIp: pcIp
-        });
-    }
-
-    /**
-     * 获取机器ip
-     * @returns {string}
-     */
-    getPcIp() {
-        return this.appInfo.pcIp;
-    }
-
-    getAppInfo() {
-        return this.appInfo;
-    }
-
-    // 是否是webui请求
-    isWebUiRequest(hostname, port) {
-        return (hostname == '127.0.0.1' || hostname == this.appInfo.pcIp)
-            && port == this.appInfo.realUiPort;
-    }
-
-    printRuntimeInfo() {
-        console.log(`Http Proxy Port: ${ this.appInfo.httpProxyPort}`);
-        console.log(`Socks5 Proxy Port: ${ this.appInfo.socks5ProxyPort}`);
-        console.log(`DNS Port: ${ this.appInfo.dnsPort}`);
-        console.log(`Manager: http://${this.appInfo.pcIp}:${this.appInfo.realUiPort}`);
-    }
+  printRuntimeInfo() {
+    console.log(`Http Proxy Port: ${ this.appInfo.httpProxyPort}`);
+    console.log(`Socks5 Proxy Port: ${ this.appInfo.socks5ProxyPort}`);
+    console.log(`DNS Port: ${ this.appInfo.dnsPort}`);
+    console.log(`IP: ${ this.appInfo.pcIp}`);
+    console.log(`Manager: http://${this.appInfo.pcIp}:${this.appInfo.webUiPort}`);
+  }
 };

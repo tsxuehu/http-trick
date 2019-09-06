@@ -4,53 +4,57 @@
  * 业务处理时需要使用服务时从ServiceRegistry取服务
  * @type {ServiceRegistry}
  */
-let registry ;
+let registry;
 module.exports = class ServiceRegistry {
-    static registeServices(services) {
-        registry = services;
-    }
+  static registeServices(services) {
+    registry = services;
+  }
 
-    static getProfileService() {
-        return registry.profileService;
-    }
+  static getProfileService() {
+    return registry.profileService;
+  }
 
-    static getConfigureService() {
-        return registry.configureService;
-    }
+  static getConfigureService() {
+    return registry.configureService;
+  }
 
-    static getHostService() {
-        return registry.hostService;
-    }
+  static getHostService() {
+    return registry.hostService;
+  }
 
-    static getHttpTrafficService() {
-        return registry.httpTrafficService;
-    }
+  static getHttpTrafficService() {
+    return registry.httpTrafficService;
+  }
 
-    static getMockDataService() {
-        return registry.mockDataService;
-    }
+  static getMockDataService() {
+    return registry.mockDataService;
+  }
 
-    static getRuleService() {
-        return registry.ruleService;
-    }
+  static getRuleService() {
+    return registry.ruleService;
+  }
 
-    static getFilterService() {
-        return registry.filterService;
-    }
+  static getFilterService() {
+    return registry.filterService;
+  }
 
-    static getWsMockService() {
-        return registry.wsMockService;
-    }
+  static getWsMockService() {
+    return registry.wsMockService;
+  }
 
-    static getLogService() {
-        return registry.logService;
-    }
+  static getLogService() {
+    return registry.logService;
+  }
 
-    static getCertificationService() {
-        return registry.certificationService;
-    }
+  static getCertificationService() {
+    return registry.certificationService;
+  }
 
-    static getAppInfoService() {
-        return registry.appInfoService;
-    }
+  static getAppInfoService() {
+    return registry.appInfoService;
+  }
+
+  static getDnsMockService() {
+    return registry.dnsMockService;
+  }
 }
