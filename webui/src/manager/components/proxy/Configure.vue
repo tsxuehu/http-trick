@@ -25,7 +25,7 @@
                     <el-input class="port" v-model="$dc.profile.socks5Port" placeholder="socks5 port"></el-input>
                 </div>
             </el-form-item>
-            <el-form-item label="需要代理的域名代理域名">
+            <el-form-item label="需要Http解析代理的域名">
                 <textarea class="socks-editor" :placeholder="socksProxyExample"
                           v-model="$dc.profile.goThroughProxyDomain"></textarea>
             </el-form-item>
