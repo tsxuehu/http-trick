@@ -45,7 +45,7 @@ module.exports = class TrafficController {
             let userId = ctx.userId;
             ctx.set('Content-disposition', 'attachment;filename=zproxy.mobileconfig');
 
-            ctx.body = fs.createReadStream(path.join(__dirname, '../../../../certificate/zproxy.mobileconfig'));
+            ctx.body = fs.createReadStream(path.join(this.appInfoService.getAppDir(), 'certificate/zproxy.mobileconfig'));
         });
     }
 };
