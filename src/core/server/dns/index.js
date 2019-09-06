@@ -1,10 +1,9 @@
 const dgram = require('dgram')
-const EventEmitter = require('events').EventEmitter
 const NDP = require('native-dns-packet');
 const DNSUtils = require('./utils');
 const ServiceRegistry = require("../../service/index");
-const dnsServer = require('../../utils/dns').dnsServer;
 
+// DNS服务器
 module.exports = class DnsServer {
   constructor({
                 port = 53,
@@ -12,61 +11,36 @@ module.exports = class DnsServer {
     this.port = port;
     this.profileService = ServiceRegistry.getProfileService();
     this.dnsMockService = ServiceRegistry.getDnsMockService();
+    this.configureService = ServiceRegistry.getConfigureService();
+    this.logService = ServiceRegistry.getLogService();
   }
 
   async start() {
-    let server = createServer(this.port);
-    this.server = server;
+    let server = this.server = dgram.createSocket('udp4')
     server.on('error', error => {
-      console.log(error)
+      this.logService.error(error)
     });
 
     server.on('listening', server => {
-      console.log('DNS service has started')
+      this.logService.info('DNS service has started')
     });
 
-    server.on('message', (domain, send, proxy) => {
-      let can = this.profileService.canSocksProxy('root', domain);
-      // 如果是要抓包的域名 则解析
-      if (can) {
-        let ip = this.dnsMockService.getMockIp(domain);
-        send(ip);
-      } else {
-        proxy(dnsServer[0])
-      }
+    server.on('message', (message, rinfo) => {
+      this._handleRequest(message, rinfo);
     });
 
+    this.server.bind(this.port);
   }
-};
 
-function createServer(port = 53, addr) {
-
-  let dnsServerEvent = new EventEmitter()
-  this.server = dgram.createSocket('udp4')
-
-  this.server.on('error', error => {
-
-    dnsServerEvent.emit('error', error)
-    return dnsServerEvent
-
-  })
-
-  this.server.on('listening', () => {
-
-    dnsServerEvent.emit('listening', this.server)
-    return dnsServerEvent
-
-  })
-
-  this.server.on('message', (message, rinfo) => {
+  _handleRequest(message, rinfo) {
+    const server = this.server;
     const query = NDP.parse(message);
     let domain = query.question[0].name;
+    // 检查domain是否需要mock
+    let can = this.profileService.canSocksProxy('root', domain);
+    if (can) { // 返回mock的Ip
 
-    let respond = buf => {
-      this.server.send(buf, 0, buf.length, rinfo.port, rinfo.address)
-    }
-
-    dnsServerEvent.emit('message', domain, ip => {
+      let ip = this.dnsMockService.getMockIp(domain);
       let response = new NDP();
       response.header.id = query.header.id;
       response.header.qr = 1;
@@ -76,39 +50,28 @@ function createServer(port = 53, addr) {
         address: ip,
         ttl: 600,
       }));
-      let buff = new Buffer(512);
+      let buff = Buffer.alloc(512);
       NDP.write(buff, response);
-      respond(buff);
+      // 向用户端发送数据
+      server.send(buff, 0, buff.length, rinfo.port, rinfo.address);
 
-    }, proxy => {
+    } else { // 查询远端DnsServer
 
-      let proxySoket = dgram.createSocket('udp4')
+      let remoteDnsServer = this.configureService.getRemoteDnsServer();
+      let proxySoket = dgram.createSocket('udp4');
 
       proxySoket.on('error', err => {
-        dnsServerEvent.emit('error', err)
+        this.logService.error(error)
       });
 
-      proxySoket.on('message', response => {
-        respond(response);
+      proxySoket.on('message', responseBuf => {
+        // 向用户端发送数据
+        server.send(responseBuf, 0, responseBuf.length, rinfo.port, rinfo.address);
         proxySoket.close()
       });
 
-      proxySoket.send(message, 0, message.length, 53, proxy)
+      proxySoket.send(message, 0, message.length, 53, remoteDnsServer);
 
-    });
-
-    return dnsServerEvent
-
-  });
-
-  if (addr) {
-    this.server.bind(port, addr)
-  } else {
-    this.server.bind(port)
+    }
   }
-
-  return dnsServerEvent
-
-}
-
-
+};

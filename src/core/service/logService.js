@@ -3,15 +3,19 @@
  */
 module.exports = class LogService {
 
-    start() {
+  start() {
 
-    }
+  }
 
-    error(msg) {
-        console.log(msg)
-    }
+  error(msg) {
+    console.log(msg)
+  }
 
-    log(msg) {
-        console.log(msg)
-    }
+  log(msg) {
+    console.log(msg)
+  }
+
+  info(msg) {
+    console.log(msg)
+  }
 }
