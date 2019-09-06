@@ -3,7 +3,7 @@ const program = require('commander');
 const packageInfo = require("./package.json");
 const log = require('./src/core/utils/log');
 const Launcher = require('./src/launcher');
-const AppInfoService = require("./src/impl/file/appInfoService");
+const AppInfoService = require("./src/core/service/appInfoService");
 const fs = require('fs');
 const resetDataFile = require('./resetDataFile');
 

@@ -7,17 +7,17 @@ const DnsServer = require("./core/server/dns/index");
 const WebUiServer = require("./core/uiServer");
 
 // 基于文件的service导入
-const FileAppInfoService = require("./impl/file/appInfoService");
-const FileCertificationService = require("./impl/file/certificationService");
-const FileProfileService = require("./impl/file/profileService");
-const FileConfigureService = require("./impl/file/configureService");
-const FileFilterService = require("./impl/file/filterService");
-const FileHostService = require("./impl/file/hostService");
-const FileHttpTrafficService = require("./impl/file/httpTrafficService");
-const FileLogService = require("./impl/file/logService");
-const FileMockDataService = require("./impl/file/mockDataService");
-const FileRuleService = require("./impl/file/ruleService");
-const DnsMockService = require("./impl/file/dnsMockService");
+const FileAppInfoService = require("./core/service/appInfoService");
+const FileCertificationService = require("./core/service/certificationService");
+const FileProfileService = require("./core/service/profileService");
+const FileConfigureService = require("./core/service/configureService");
+const FileFilterService = require("./core/service/filterService");
+const FileHostService = require("./core/service/hostService");
+const FileHttpTrafficService = require("./core/service/httpTrafficService");
+const FileLogService = require("./core/service/logService");
+const FileMockDataService = require("./core/service/mockDataService");
+const FileRuleService = require("./core/service/ruleService");
+const DnsMockService = require("./core/service/dnsMockService");
 
 module.exports = class Launcher {
   /**

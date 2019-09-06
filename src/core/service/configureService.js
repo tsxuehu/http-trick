@@ -10,7 +10,8 @@ const defaultConfigure = {
   "webUiPort": 40001,
   "startDns": false,
   "startSocks5": false,
-  "requestTimeoutTime": 30000
+  "requestTimeoutTime": 30000,
+  "remoteDnsServer": '223.5.5.5', // 远程dns解析服务器
 };
 /**
  * 代理运转需要的规则数据
@@ -45,24 +46,8 @@ module.exports = class ConfigureService extends EventEmitter {
   }
 
   // 获取代理端口
-  getProxyPort() {
-    return this.configure.proxyPort;
-  }
-
-  getSocks5Port() {
-    return this.configure.socks5Port;
-  }
-
-  getDnsPort() {
-    return this.configure.dnsPort;
-  }
-
-  getStartSocks5() {
-    return this.configure.startSocks5;
-  }
-
-  getStartDns() {
-    return this.configure.startDns;
+  getRemoteDnsServer() {
+    return this.configure.remoteDnsServer;
   }
 
 };
