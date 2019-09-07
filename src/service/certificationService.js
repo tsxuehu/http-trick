@@ -8,147 +8,147 @@ const path = require("path");
  */
 module.exports = class CertificationService {
 
+  /**
+   * 为指定域名创建证书 (使用自定义的根证书)
+   * @param host
+   * @returns {Promise<Certification>}
+   */
+  static createCertificate(host, root) {
+    return new Promise((resolve, reject) => {
+      pem.createCertificate({
+        serviceKey: root.key,
+        serviceCertificate: root.cert,
+        commonName: host,
+        // clientKey: clientKey,// 可忽略
+        altNames: [host],
+        days: 365 * 10
+      }, function (err, result) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({key: result.clientKey, cert: result.certificate});
+        }
+      })
+    });
+
+  }
+
+  static createSelfSignedCert(host) {
+    return new Promise((resolve, reject) => {
+      pem.createCertificate({
+        commonName: host,
+        selfSigned: true,
+        altNames: [host],
+        days: 365 * 10
+      }, function (err, result) {
+        if (err) reject(err);
+        resolve({key: result.clientKey, cert: result.certificate});
+      })
+    });
+  }
+
+  /**
+   *
+   * @param certTempDir 存放证书的目录
+   * @param root 根证书的key 和 cert
+   */
+  constructor({appInfoService}) {
+    // 存放证书的目录
+    this.appInfoService = appInfoService;
+    let proxyDataDir = this.appInfoService.getProxyDataDir();
+    // 监控数据缓存目录
+    this.certTempDir = path.join(proxyDataDir, "certificate");
+    // 根证书
+
+    // 缓存
+    this.cache = LRU({
+      max: 500,
+      length: function (n, key) {
+        return n.length
+      },
+      dispose: function (key, n) {
+      },
+      maxAge: 1000 * 60 * 60
+    });
+  }
+
+  async start() {
+    // 读取根证书
+    let appDir = this.appInfoService.getAppDir();
+
+    let key = await fileUtils.readFile(path.join(appDir, 'certificate/zproxy.key.pem'));
+    let cert = await fileUtils.readFile(path.join(appDir, 'certificate/zproxy.crt.pem'));
+    this.root = {
+      cert,
+      key
+    };
+  }
+
+  /**
+   * 为域名获取证书
+   * @param host
+   * @returns {Promise<Certification>}
+   */
+  async getCertificationForHost(host) {
+    let domain = host;
     /**
-     * 为指定域名创建证书 (使用自定义的根证书)
-     * @param host
-     * @returns {Promise<Certification>}
-     */
-    static createCertificate(host, root) {
-        return new Promise((resolve, reject) => {
-            pem.createCertificate({
-                serviceKey: root.key,
-                serviceCertificate: root.cert,
-                commonName: host,
-               // clientKey: clientKey,// 可忽略
-                altNames: [host],
-                days: 365 * 10
-            }, function (err, result) {
-                if (err){
-                    reject(err);
-                } else {
-                    resolve({key: result.clientKey, cert: result.certificate});
-                }
-            })
-        });
-
-    }
-
-    static createSelfSignedCert(host) {
-        return new Promise((resolve, reject) => {
-            pem.createCertificate({
-                commonName: host,
-                selfSigned: true,
-                altNames: [host],
-                days: 365 * 10
-            }, function (err, result) {
-                if (err) reject(err);
-                resolve({key: result.clientKey, cert: result.certificate});
-            })
-        });
-    }
-
-    /**
-     *
-     * @param certTempDir 存放证书的目录
-     * @param root 根证书的key 和 cert
-     */
-    constructor({appInfoService}) {
-        // 存放证书的目录
-        this.appInfoService = appInfoService;
-        let proxyDataDir = this.appInfoService.getProxyDataDir();
-        // 监控数据缓存目录
-        this.certTempDir = path.join(proxyDataDir, "certificate");
-        // 根证书
-
-        // 缓存
-        this.cache = LRU({
-            max: 500,
-            length: function (n, key) {
-                return n.length
-            },
-            dispose: function (key, n) {
-            },
-            maxAge: 1000 * 60 * 60
-        });
-    }
-
-    async start() {
-        // 读取根证书
-        let appDir = this.appInfoService.getAppDir();
-
-        let key = await fileUtils.readFile(path.join(appDir, 'certificate/zproxy.key.pem'));
-        let cert = await fileUtils.readFile(path.join(appDir, 'certificate/zproxy.crt.pem'));
-        this.root = {
-            cert,
-            key
-        };
-    }
-
-    /**
-     * 为域名获取证书
-     * @param host
-     * @returns {Promise<Certification>}
-     */
-    async getCertificationForHost(host) {
-        let domain = host;
-        /**
-         * 解析后 www.baidu.com
-         * {
+     * 解析后 www.baidu.com
+     * {
          *   domain: "baidu"
          *   subdomain: "www"
          *   tld: "com"
          *  }
-         * @type {*}
-         */
-        let parsed = parseDomain(host);
-        // 寻找一级域名
-        if (parsed && parsed.subdomain) {
-            let subdomainList = parsed.subdomain.split('.');
-            subdomainList.shift();
-            if (subdomainList.length > 0) {
-                domain = '*.' + subdomainList.join('.') + '.' + parsed.domain + '.' + parsed.tld;
-            }
-        }
-
-        let certKey = domain + '.crt';
-        let keykey = domain + '.key';
-
-        let cacheHit = true; // 是否命中缓存标识
-
-        // 从缓存里取数据
-        let cert = this.cache.get(certKey);
-        let key = this.cache.get(keykey);
-        try {
-            // 从存放证书的临时文件夹里取数据
-            if (!cert || !key) {
-                cert = await fileUtils.readFile(path.join(this.certTempDir, certKey));
-                key = await fileUtils.readFile(path.join(this.certTempDir, keykey));
-                cacheHit = false;
-            }
-        } catch (e) {
-            // 调用openssl生成证书，并保存到临时文件夹里
-            if (!cert || !key) {
-                ({key, cert} = await CertificationService.createCertificate(domain, this.root));
-                // 保存到文件
-                await fileUtils.writeFile(path.join(this.certTempDir, keykey), key);
-                await fileUtils.writeFile(path.join(this.certTempDir, certKey), cert);
-                cacheHit = false;
-            }
-        }
-        if (!cacheHit) {
-            // 放到缓存
-            this.cache.set(certKey, cert);
-            this.cache.set(keykey, key);
-        }
-        return {
-            cert,
-            key
-        };
+     * @type {*}
+     */
+    let parsed = parseDomain(host);
+    // 寻找一级域名
+    if (parsed && parsed.subdomain) {
+      let subdomainList = parsed.subdomain.split('.');
+      subdomainList.shift();
+      if (subdomainList.length > 0) {
+        domain = '*.' + subdomainList.join('.') + '.' + parsed.domain + '.' + parsed.tld;
+      }
     }
 
-    getRootCACertPem() {
-        return this.root.cert;
+    let certKey = domain + '.crt';
+    let keykey = domain + '.key';
+
+    let cacheHit = true; // 是否命中缓存标识
+
+    // 从缓存里取数据
+    let cert = this.cache.get(certKey);
+    let key = this.cache.get(keykey);
+    try {
+      // 从存放证书的临时文件夹里取数据
+      if (!cert || !key) {
+        cert = await fileUtils.readFile(path.join(this.certTempDir, certKey));
+        key = await fileUtils.readFile(path.join(this.certTempDir, keykey));
+        cacheHit = false;
+      }
+    } catch (e) {
+      // 调用openssl生成证书，并保存到临时文件夹里
+      if (!cert || !key) {
+        ({key, cert} = await CertificationService.createCertificate(domain, this.root));
+        // 保存到文件
+        await fileUtils.writeFile(path.join(this.certTempDir, keykey), key);
+        await fileUtils.writeFile(path.join(this.certTempDir, certKey), cert);
+        cacheHit = false;
+      }
     }
+    if (!cacheHit) {
+      // 放到缓存
+      this.cache.set(certKey, cert);
+      this.cache.set(keykey, key);
+    }
+    return {
+      cert,
+      key
+    };
+  }
+
+  getRootCACertPem() {
+    return this.root.cert;
+  }
 }
 
 const clientKey = `-----BEGIN RSA PRIVATE KEY-----
