@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Configure from 'src/manager/components/configure/Configure'
-import ProjectPath from 'src/manager/components/configure/ProjectPath'
+import RedirectPathVariable from 'src/manager/components/configure/RedirectPathVariable'
 
 import HostFileList from 'src/manager/components/host/FileList'
 import EditHost from 'src/manager/components/host/EditHost'
@@ -27,7 +27,7 @@ Vue.use(Router);
 export default new Router({
   routes: [
     {path: '/configure',component: Configure},
-    {path: '/projectpath',component: ProjectPath},
+    {path: '/redirect-path-variable',component: RedirectPathVariable},
 
     {path: '/hostfilelist',component: HostFileList},
     {path: '/edithost',component: EditHost},

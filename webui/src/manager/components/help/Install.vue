@@ -50,7 +50,7 @@ export default {
               'http://' +
               this.$dc.appInfo.pcIp +
               ':' +
-              this.$dc.appInfo.realUiPort +
+              this.$dc.appInfo.webUiPort +
               '/utils/rootCA.crt';
           return certUrl;
       },
@@ -59,7 +59,7 @@ export default {
               'http://' +
               this.$dc.appInfo.pcIp +
               ':' +
-              this.$dc.appInfo.realUiPort +
+              this.$dc.appInfo.webUiPort +
               '/utils/rootCA.crt';
           return qrcode.toDataURL(certUrl, 4);
       }

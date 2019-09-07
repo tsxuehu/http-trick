@@ -46,7 +46,7 @@
             {
               name: '转发路径变量',
               icon: 'icon-layers',
-              link: 'projectpath'
+              link: 'redirect-path-variable'
             }
           ]);
         }
