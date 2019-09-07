@@ -116,6 +116,7 @@ module.exports = class Launcher {
       webUiPort,
       startSocks5,
       startDns,
+      startHttpProxy
     } = configureService.getConfigure();
 
     if (this.httpProxyPort == undefined) {
@@ -137,6 +138,10 @@ module.exports = class Launcher {
       this.startDns = startDns;
     }
 
+    if (this.startHttpProxy == undefined) {
+      this.startHttpProxy = startHttpProxy;
+    }
+
     let appInfoService = ServiceRegistry.getAppInfoService();
 
     appInfoService.setAppInfo({
@@ -152,18 +157,18 @@ module.exports = class Launcher {
   async _startProxyServer() {
     let appInfoService = ServiceRegistry.getAppInfoService();
 
-    // 获取https代理端口，并记录
-    let httpsPort = await getPort(40005);
-    appInfoService.setHttpsProxyPort(httpsPort);
+    if (this.startHttpProxy) {
+      // 获取https代理端口，并记录
+      let httpsPort = await getPort(40005);
+      appInfoService.setHttpsProxyPort(httpsPort);
 
-    // 启动http转发服务器
-    await new HttpServer(this.httpProxyPort, httpsPort).start();
-
-    // 启动https转发服务器
-    await new HttpsServer(httpsPort).start();
+      // 启动http转发服务器
+      await new HttpServer(this.httpProxyPort, httpsPort).start();
+      // 启动https转发服务器
+      await new HttpsServer(httpsPort).start();
+    }
 
     // 启动dns服务
-
     if (this.startDns) {
       await new DnsServer({
         dnsPort: this.dnsPort
