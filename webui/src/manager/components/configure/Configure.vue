@@ -3,13 +3,13 @@
         <div class="main-content__title">基础配置修改</div>
         <el-form label-width="200px">
             <el-form-item label="是否开启Http代理">
-                <el-checkbox v-model="$dc.configure.startHttpProxy">使用</el-checkbox>
+                <el-checkbox v-model="$dc.configure.startHttpProxy">开启</el-checkbox>
             </el-form-item>
             <el-form-item label="是否开启Socks5代理">
-                <el-checkbox v-model="$dc.configure.startSocks5">使用</el-checkbox>
+                <el-checkbox v-model="$dc.configure.startSocks5">开启</el-checkbox>
             </el-form-item>
             <el-form-item label="是否开启DNS服务">
-                <el-checkbox v-model="$dc.configure.startDns">使用</el-checkbox>
+                <el-checkbox v-model="$dc.configure.startDns">开启</el-checkbox>
             </el-form-item>
             <el-form-item label="Http代理端口">
                 <el-input
