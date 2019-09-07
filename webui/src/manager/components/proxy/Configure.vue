@@ -13,16 +13,16 @@
             </el-form-item>
             <el-form-item label="External Http代理" v-if="$dc.profile.externalProxy && !socks5Proxy">
                 <div class="http-proxy">
-                    <el-input class="ip" v-model="$dc.profile.httpIp" placeholder="Http Ip"></el-input>
+                    <el-input class="ip" v-model="$dc.profile.httpProxyIp" placeholder="Http Proxy Ip"></el-input>
                     :
-                    <el-input class="port" v-model="$dc.profile.httpPort" placeholder="http port"></el-input>
+                    <el-input class="port" v-model="$dc.profile.httpProxyPort" placeholder="http Proxy port"></el-input>
                 </div>
             </el-form-item>
             <el-form-item label="External Socks代理" v-if="$dc.profile.externalProxy && socks5Proxy">
                 <div class="http-proxy">
-                    <el-input class="ip" v-model="$dc.profile.socks5Ip" placeholder="Socks5 Ip"></el-input>
+                    <el-input class="ip" v-model="$dc.profile.socks5ProxyIp" placeholder="Socks5 Proxy Ip"></el-input>
                     :
-                    <el-input class="port" v-model="$dc.profile.socks5Port" placeholder="socks5 port"></el-input>
+                    <el-input class="port" v-model="$dc.profile.socks5ProxyPort" placeholder="socks5 Proxy port"></el-input>
                 </div>
             </el-form-item>
             <el-form-item label="需要Http解析代理的域名">

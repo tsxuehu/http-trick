@@ -18,10 +18,10 @@ const defaultProfile = {
   "externalProxy": false,
   "externalHttpProxy": false,
   "externalSocks5Proxy": true,
-  "httpIp": '',
-  "httpPort": 8888,
-  "socks5Ip": '',
-  "socks5Port": 8889
+  "httpProxyIp": '',
+  "httpProxyPort": 8888,
+  "socks5ProxyIp": '',
+  "socks5ProxyPort": 8889
 };
 /**
  * 代理运转需要的规则数据
@@ -149,15 +149,15 @@ module.exports = class ProfileService extends EventEmitter {
       return {
         hasExternalProxy: true,
         proxyType: 'socks5',
-        proxyIp: profile.socks5Ip,
-        proxyPort: profile.socks5Port
+        proxyIp: profile.socks5ProxyIp,
+        proxyPort: profile.socks5ProxyPort
       }
     } else if (profile.externalHttpProxy) {
       return {
         hasExternalProxy: true,
         proxyType: 'http',
-        proxyIp: profile.httpIp,
-        proxyPort: profile.httpPort
+        proxyIp: profile.httpProxyIp,
+        proxyPort: profile.httpProxyPort
       }
     }
   }
@@ -170,15 +170,15 @@ module.exports = class ProfileService extends EventEmitter {
       return {
         hasExternalProxy: true,
         proxyType: 'socks5',
-        proxyIp: device.socks5Ip,
-        proxyPort: device.socks5Port
+        proxyIp: device.socks5ProxyIp,
+        proxyPort: device.socks5ProxyPort
       }
     } else if (device.externalHttpProxy) {
       return {
         hasExternalProxy: true,
         proxyType: 'http',
-        proxyIp: device.httpIp,
-        proxyPort: device.httpPort
+        proxyIp: device.httpProxyIp,
+        proxyPort: device.httpProxyPort
       }
     }
   }
@@ -284,10 +284,10 @@ module.exports = class ProfileService extends EventEmitter {
         externalProxy: false,
         externalHttpProxy: false,
         externalSocks5Proxy: false,
-        httpIp: '',
-        httpPort: 8888,
-        socks5Ip: '',
-        socks5Port: 8889
+        httpProxyIp: '',
+        httpProxyPort: 8888,
+        socks5ProxyIp: '',
+        socks5ProxyPort: 8889
       };
     }
     return info;
