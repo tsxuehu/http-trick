@@ -32,12 +32,12 @@
                 </el-select>
               </span>
                 <span v-if="datafileEntry" style="margin-left: 10px;">
-                <el-button type="text" @click="emit('editDataFile', datafileEntry.id)">
+                <el-button type="text" @click="$emit('edit-data-file', datafileEntry.id)">
                   编辑数据
                 </el-button>
               </span>
                 <span style="margin-left: 10px;">
-                <el-button type="text" @click="emit('newDataFile')">增加自定义数据</el-button>
+                <el-button type="text" @click="$emit('new-data-file')">增加自定义数据</el-button>
               </span>
             </div>
         </div>
@@ -115,7 +115,7 @@
 </template>
 
 <script>
-  import _ from 'lodash';
+  import find from 'lodash/find';
 
   export default {
     name: 'action-detail',
@@ -133,7 +133,7 @@
     computed: {
       datafileEntry() {
         if (this.action.type == "mockData") {
-          var finded = _.find(this.$dc.dataList, (entry) => {
+          var finded = find(this.$dc.dataList, (entry) => {
             return entry.id == this.action.data.dataId;
           });
           if (!finded) this.action.data.dataId = '';
