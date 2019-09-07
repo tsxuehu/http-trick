@@ -5,6 +5,7 @@
 
     <p>http trick是http协议代理工具，需要设置浏览器代理或者系统代理才能使用本工具。</p>
     <p>另http trick外依赖 openssl 生成证书，请先安装 openssl (版本建议在 0.9.8 以上)。</p>
+    <p>PAC: {{pacUrl}}</p>
 
     <h2 id="toc_1">二、chrome 代理插件安装(用于设置浏览器代理)</h2>
 
@@ -62,6 +63,9 @@ export default {
               this.$dc.appInfo.webUiPort +
               '/utils/rootCA.crt';
           return qrcode.toDataURL(certUrl, 4);
+      },
+      pacUrl() {
+        return `http://${this.$dc.appInfo.pcIp}:${this.$dc.appInfo.webUiPort}/profile/${this.$dc.userId}/proxy.pac`
       }
     }
 };
