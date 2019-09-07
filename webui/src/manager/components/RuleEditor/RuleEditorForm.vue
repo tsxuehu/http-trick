@@ -1,5 +1,5 @@
 <template>
-    <el-dialog title="编辑规则" :visible.sync="visible">
+    <el-dialog :title="isEditRule?'编辑规则': '新建规则'" :visible.sync="visible">
         <div style="text-align: left">
             <!-- 条件，说明 -->
             <div class="el-form demo-form-inline el-form--inline conditon">
@@ -36,6 +36,8 @@
                     <span style="width: 85%;display: inline-block">
                         <action-detail :action="action"
                                        :rule-types="ruleTypes"
+                                       :data-list="dataList"
+                                       :user-id="userId"
                                        @new-data-file="$emit('new-data-file', index)"
                                        @edit-data-file="$emit('edit-data-file', $event)"></action-detail>
                     </span>
@@ -47,7 +49,7 @@
             <!-- 按钮 -->
             <div>
                 <el-button @click="cancelEdit">取消</el-button>
-                <el-button type="primary" @click="saveRule">保存</el-button>
+                <el-button type="primary" @click="saveRule">{{isEditRule?'保存规则': '创建规则'}}</el-button>
             </div>
         </div>
     </el-dialog>
@@ -86,13 +88,15 @@
   };
   export default {
     name: "RuleEditorForm",
+    props: ['dataList', 'userId'],
     components: {
       [ActionDetail.name]: ActionDetail
     },
     data() {
       return {
         visible: false,
-        isFilterRule: false,
+        isFilterRule: false, // 是否是过滤器规则
+        isEditRule: false, // 是否编辑规则
         rule: JSON.parse(JSON.stringify(DefaultRule)),
         methodList: [
           {value: '', label: '所有'},
@@ -145,12 +149,14 @@
       },
 
       editRule(rule, isFilterRule) {
+        this.isEditRule = true;
         this.isFilterRule = isFilterRule;
         this.rule = JSON.parse(JSON.stringify(rule));
         this.visible = true;
       },
 
       createRule(isFilterRule = false) {
+        this.isEditRule = false;
         this.isFilterRule = isFilterRule;
         let rule = JSON.parse(JSON.stringify(DefaultRule));
         rule.key = uuidV4();

@@ -25,7 +25,7 @@
                 <el-select v-model="action.data.dataId"
                            style="width: 300px" size="small" filterable placeholder="请选择要返回的数据">
                   <el-option
-                          v-for="dataentry in $dc.dataList"
+                          v-for="dataentry in dataList"
                           :label="dataentry.name" :key="dataentry.id"
                           :value="dataentry.id">
                   </el-option>
@@ -119,7 +119,7 @@
 
   export default {
     name: 'action-detail',
-    props: ['action', 'ruleTypes'],
+    props: ['action', 'ruleTypes', 'dataList', 'userId'],
     data() {
       return {
         modifyResponseType: [
@@ -133,7 +133,7 @@
     computed: {
       datafileEntry() {
         if (this.action.type == "mockData") {
-          var finded = find(this.$dc.dataList, (entry) => {
+          var finded = find(this.dataList, (entry) => {
             return entry.id == this.action.data.dataId;
           });
           if (!finded) this.action.data.dataId = '';
@@ -141,22 +141,11 @@
         }
       },
       redirectPlaceholder() {
-        if (this.$dc.userId == 'root') {
+        if (this.userId == 'root') {
           return '填写转发路径(远程地址、或者本地地址。远程地址需要以http/https开头)'
         } else {
           return '填写转发路径(必须以http/https开头)'
         }
-      }
-    },
-    methods: {
-      addDataFile() {
-        // 新建数据文件，并将当前规则返回的自定义数据文件设为新建的文件
-        this.$dc.requestAddDataFile((id) => {
-          this.action.data.dataId = id;
-        });
-      },
-      editDataFile(entry) {
-        this.$dc.requestEditDataFile(entry);
       }
     },
 
