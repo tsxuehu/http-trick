@@ -1,7 +1,8 @@
 <template>
     <div>
         <div class="main-content__title">创建规则集</div>
-        <el-form :model="createFileForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" style="margin:20px;width:60%;min-width:600px;">
+        <el-form :model="createFileForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm"
+                 style="margin:20px;width:60%;min-width:600px;">
             <el-form-item label="规则集名字" prop="name">
                 <el-input v-model="createFileForm.name"></el-input>
             </el-form-item>
@@ -17,55 +18,56 @@
 </template>
 
 <script>
-    import ruleApi from '../../../api/rule'
-    export default {
-        name: 'app',
-        data() {
-            return {
-                createFileForm: {
-                    name: '',
-                    checked: true,
-                    description: ''
-                },
-                rules: {
-                    name: [
-                        { required: true, message: '请输入文件名称名称', trigger: 'blur' },
-                        { min: 2, max: 50, message: '长度在 2 到 20 个字符', trigger: 'blur' }
-                    ],
-                    description: [
-                        { required: true, message: '请填文件描述', trigger: 'blur' }
-                    ]
-                }
-            }
+  import ruleApi from '../../../api/rule'
+
+  export default {
+    name: 'app',
+    data() {
+      return {
+        createFileForm: {
+          name: '',
+          checked: true,
+          description: ''
         },
-        methods: {
-            submitForm(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        ruleApi.createFile(this.createFileForm.name, this.createFileForm.description).then((response) => {
-                            var serverData = response.data;
-                            if (serverData.code == 0) {
-                                // 判断创建成功还是失败
-                                this.$message({
-                                    showClose: true,
-                                    message: '恭喜你，创建成功',
-                                    type: 'success'
-                                });
-                              this.$router.push(`editrule?name=${this.createFileForm.name}`);
-                            } else {
-                                this.$message.error(`出错了，${serverData.msg}`);
-                            }
-                        })
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
-            },
-          back() {
-            this.$router.push('rulefilelist');
-            }
+        rules: {
+          name: [
+            {required: true, message: '请输入文件名称名称', trigger: 'blur'},
+            {min: 2, max: 50, message: '长度在 2 到 20 个字符', trigger: 'blur'}
+          ],
+          description: [
+            {required: true, message: '请填文件描述', trigger: 'blur'}
+          ]
         }
+      }
+    },
+    methods: {
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            ruleApi.createFile(this.createFileForm.name, this.createFileForm.description).then((response) => {
+              var serverData = response.data;
+              if (serverData.code == 0) {
+                // 判断创建成功还是失败
+                this.$message({
+                  showClose: true,
+                  message: '恭喜你，创建成功',
+                  type: 'success'
+                });
+                this.$router.push(`editrule?name=${this.createFileForm.name}`);
+              } else {
+                this.$message.error(`出错了，${serverData.msg}`);
+              }
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+      back() {
+        this.$router.push('rulefilelist');
+      }
     }
+  }
 
 </script>
