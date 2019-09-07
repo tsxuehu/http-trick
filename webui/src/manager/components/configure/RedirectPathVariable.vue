@@ -6,11 +6,11 @@
         </div>
         <el-table
                 :data="$dc.redirectPathVariableArray"
-                style="width: 800px;">
+                style="width:100%;">
             <el-table-column
                     prop="key"
                     label="变量名"
-                    width="180">
+                    width="250">
                 <template slot-scope="scope">
                     <el-input v-model="scope.row.key" placeholder="工程名"/>
                 </template>
