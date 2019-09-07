@@ -1,6 +1,6 @@
 <template>
-    <el-dialog :title="isEditRule?'编辑规则': '新建规则'" :visible.sync="visible">
-        <div style="text-align: left">
+    <el-dialog :title="isEditRule?'编辑规则': '新建规则'" :visible.sync="visible" width="80%">
+        <div class="rule-edit-form">
             <!-- 条件，说明 -->
             <div class="el-form demo-form-inline el-form--inline conditon">
                 <div class="el-form-item" style="margin-bottom:8px;">
@@ -47,7 +47,7 @@
                 </div>
             </div>
             <!-- 按钮 -->
-            <div>
+            <div style="text-align: right;">
                 <el-button @click="cancelEdit">取消</el-button>
                 <el-button type="primary" @click="saveRule">{{isEditRule?'保存规则': '创建规则'}}</el-button>
             </div>
@@ -57,6 +57,7 @@
 
 <script>
   import ActionDetail from './ActionDetail.vue';
+  import uuidV4  from 'uuid/v4';
   import './index.css'
 
   const DefaultRule = {
@@ -64,7 +65,7 @@
     key: '',
     method: "",
     match: "",
-    checked: true,
+    checked: false,
     actionList: []
   };
   const DefaultAction = {
@@ -87,7 +88,7 @@
     }
   };
   export default {
-    name: "RuleEditorForm",
+    name: "RuleEditForm",
     props: ['dataList', 'userId'],
     components: {
       [ActionDetail.name]: ActionDetail
@@ -98,6 +99,7 @@
         isFilterRule: false, // 是否是过滤器规则
         isEditRule: false, // 是否编辑规则
         rule: JSON.parse(JSON.stringify(DefaultRule)),
+        ruleIndex: -1, // 用来记录被编辑的rule 索引
         methodList: [
           {value: '', label: '所有'},
           {value: 'get', label: 'GET'},
@@ -147,25 +149,42 @@
       saveRule() {
         this.$emit('save', {
           isEditRule: this.isEditRule,
+          ruleIndex: this.ruleIndex,
           rule: JSON.parse(JSON.stringify(this.rule))
         });
+        this.visible = false;
       },
 
-      editRule(rule, isFilterRule) {
+      editRule({
+                 rule, isFilterRule, ruleIndex
+               }) {
         this.isEditRule = true;
+        this.ruleIndex = ruleIndex;
         this.isFilterRule = isFilterRule;
         this.rule = JSON.parse(JSON.stringify(rule));
         this.visible = true;
       },
 
-      createRule(isFilterRule = false) {
+      createRule({
+                   initialRule,
+                   isFilterRule = false
+                 }) {
+        this.ruleIndex = -1;
         this.isEditRule = false;
         this.isFilterRule = isFilterRule;
-        let rule = JSON.parse(JSON.stringify(DefaultRule));
+        let rule;
+
+        if (initialRule) {
+          rule = JSON.parse(JSON.stringify(initialRule));
+        } else {
+          rule = JSON.parse(JSON.stringify(DefaultRule));
+          let action = JSON.parse(JSON.stringify(DefaultAction));
+          action.type = this.isFilterRule ? "addRequestHeader" : "redirect";// 转发redirect
+          rule.actionList.push(action);
+        }
+
         rule.key = uuidV4();
-        let action = JSON.parse(JSON.stringify(DefaultAction));
-        action.type = this.isFilterRule ? "addRequestHeader" : "redirect";// 转发redirect
-        rule.actionList.push(action);
+
         this.rule = rule;
         this.visible = true;
       },

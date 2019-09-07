@@ -5,120 +5,136 @@
         <el-row :gutter="20" style="margin-bottom: 10px;text-align: right;">
             <el-col :span="6" :offset="18">
                 <el-button size="small" @click='addRule'>新增过滤器</el-button>
-                <el-button size="small" type="primary" @click='saveFileRightNow'>保存过滤器</el-button>
             </el-col>
         </el-row>
         <el-table border style="width: 100%" row-key="key" :stripe="true" align='center' :data="$dc.filters">
             <el-table-column prop="checked" label="启用" align="center" width="80">
                 <template scope='scope'>
-                    <el-tooltip class="item" effect="dark" content="勾选后启动这条规则" placement="left">
-                        <el-checkbox v-model="scope.row.checked" :disabled="!$dc.filterState"></el-checkbox>
-                    </el-tooltip>
+                    <el-checkbox v-model="scope.row.checked"
+                                 @change="saveFileRightNow"
+                                 :disabled="!$dc.filterState"></el-checkbox>
                 </template>
             </el-table-column>
-            <el-table-column label="规则设置" align="center">
+
+            <el-table-column label="规则名" width="150" prop="name" align="center">
+            </el-table-column>
+
+            <el-table-column label="匹配方法" width="100" align="center">
                 <template scope='scope'>
-                    <rule-filter-detail :rule="scope.row"></rule-filter-detail>
+                    {{scope.row.method ? scope.row.method : "全部"}}
                 </template>
             </el-table-column>
-            <el-table-column label="操作" :width="100" align="center" :context="_self">
+            <el-table-column label="匹配路径" prop="match" align="center">
+            </el-table-column>
+
+            <el-table-column label="操作" width="200" align="center">
                 <template scope='scope'>
                     <div class="action-panel">
-                        <div class="btn-panel">
-                            <el-tooltip class="item" effect="dark" content="复制" placement="left">
-                                <el-button icon='el-icon-document' size="mini"
-                                           @click='onDuplicateRow(scope.row,scope.$index)'>
-                                </el-button>
-                            </el-tooltip>
-                        </div>
-                        <div class="btn-panel">
-                            <el-tooltip class="item" effect="dark" content="删除" placement="top">
-                                <el-button type="danger" icon='el-icon-delete' size="mini"
-                                           @click='onDeleteRow(scope.row,scope.$index)'>
-                                </el-button>
-                            </el-tooltip>
-                        </div>
+                        <el-button type="danger" icon='el-icon-delete' size="mini"
+                                   @click='onDeleteRow(scope.row, scope.$index)'>
+                        </el-button>
+                        <el-button icon='el-icon-document' size="mini"
+                                   @click='onDuplicateRow(scope.row, scope.$index)'>
+                        </el-button>
+                        <el-button icon='el-icon-edit' size="mini"
+                                   @click='onEditRule(scope.row, scope.$index)'>
+                        </el-button>
                     </div>
                 </template>
             </el-table-column>
         </el-table>
+        <rule-edit-form :data-list="$dc.dataList"
+                        :user-id="$dc.userId"
+                        ref="ruleEditForm"
+                        @new-data-file="requestNewDataFile"
+                        @edit-data-file="requestEditDataFile"
+                        @save="saveRule"></rule-edit-form>
     </div>
 </template>
 
 <script>
-    import filtersApi from '../../../api/filter';
-    import _ from 'lodash';
-    import uuidV4  from 'uuid/v4';
-    import RuleDetail from './RuleDetail';
-    import Vue from 'vue';
-    Vue.component(RuleDetail.name, RuleDetail);
+  import filtersApi from '../../../api/filter';
+  import RuleEditForm from '../rule-edit-form/Index.vue';
 
-    export default {
-        name: 'filters',
-        methods: {
-            onDeleteRow(row, index, list) {
-                this.$confirm('此操作不可恢复, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    this.$dc.filters.splice(index, 1);
-                });
-            },
-            onDuplicateRow(row, index, list) {
-                var copy = _.cloneDeep(this.$dc.filters[index]);
-                this.$dc.filters.splice(index, 0, copy);
-            },
-            /**
-             * 立刻保存
-             */
-            async saveFileRightNow(){
-                let result = await filtersApi.saveFilters(this.$dc.filters);
-                if (result.code == 0) {
-                    this.$message({
-                        showClose: true,
-                        type: 'success',
-                        message: '保存成功!'
-                    });
-                }
-            },
-            addRule() {
-                this.$dc.filters.unshift({
-                    name: "",
-                    key: uuidV4(),
-                    method: "",
-                    match: "",
-                    checked: true,
-                    actionList: [{
-                        type: "addRequestHeader",// 转发redirect  接口转发api 使用数据文件替换data
-                        data: {
-                            target: "",// 转发目标路径
-                            dataId: '', //返回数据文件的id
-                            modifyResponseType: '',// 修改响应内容类型
-                            callbackName: "", // jsonp请求参数名
-                            cookieKey: "", // 设置到请求里的cookie key
-                            cookieValue: "", // 设置到请求里的cookie value
-                            reqHeaderKey: "", // 请求header
-                            reqHeaderValue: "",
-                            resHeaderKey: "", // 响应header
-                            resHeaderValue: "",
-                            queryKey: "", // 请求query
-                            queryValue: "",
-                            modifyRequestScript: "", // 脚本修改请求
-                            modifyResponseScript: "" // 脚本修改响应
-                        }
-                    }]
-                });
-            }
+  import './index.css'
+
+  export default {
+    name: 'filters',
+    components: {
+      [RuleEditForm.name]: RuleEditForm
+    },
+    methods: {
+
+      requestNewDataFile(actionIndex) {
+        let ruleEditForm = this.$refs.ruleEditForm;
+        this.$dc.requestAddDataFile((id) => {
+          ruleEditForm.setActionDataFileId(actionIndex, id);
+        });
+      },
+
+      requestEditDataFile(datafileEntry) {
+        this.$dc.requestEditDataFile(datafileEntry);
+      },
+
+      addRule(row, index) {
+        let ruleEditForm = this.$refs.ruleEditForm;
+        ruleEditForm.createRule({
+          isFilterRule: true
+        });
+      },
+      onDuplicateRow(row, index) {
+        let ruleEditForm = this.$refs.ruleEditForm;
+        ruleEditForm.createRule({
+          initialRule: row,
+          isFilterRule: true
+        });
+      },
+      onEditRule(row, index) {
+        let ruleEditForm = this.$refs.ruleEditForm;
+        ruleEditForm.editRule({
+          rule: row,
+          ruleIndex: index,
+          isFilterRule: true
+        })
+      },
+      onDeleteRow(row, index, list) {
+        this.$confirm('此操作不可恢复, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$dc.filters.splice(index, 1);
+          this.saveFileRightNow();
+        });
+      },
+      saveRule({
+                 isEditRule,
+                 rule,
+                 ruleIndex
+               }) {
+        if (isEditRule) {
+          // 复制属性
+          let originRule = this.$dc.filters[ruleIndex];
+          Object.assign(originRule, rule);
+        } else {
+          this.$dc.filters.push(rule);
         }
-    };
+        this.saveFileRightNow();
+      },
+      /**
+       * 立刻保存
+       */
+      async saveFileRightNow() {
+        let result = await filtersApi.saveFilters(this.$dc.filters);
+        if (result.code == 0) {
+          this.$message({
+            showClose: true,
+            type: 'success',
+            message: '保存成功!'
+          });
+        }
+      }
+    }
+  };
 
 </script>
-<style>
-    .action-panel .btn-panel {
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 10px;
-    }
-
-</style>

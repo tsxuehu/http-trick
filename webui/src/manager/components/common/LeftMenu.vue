@@ -91,7 +91,6 @@
         let defaultActive = '0';
         this.menuList.forEach((item, index1) => {
           if (hash.indexOf(item.link) !== -1) {
-            console.log(item, index1)
             defaultActive = index1 + '';
           }
         });
