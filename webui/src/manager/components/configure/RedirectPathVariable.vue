@@ -1,37 +1,45 @@
 <template>
     <div class="project-wraper">
-        <div class="main-content__title">工程路径管理</div>
-        <div class="project-path-info">http请求转发到本地文件时可以引用这里的路径。例如：将http请求转发到<%= helloworld %>/dist/hello.js，<%=
-            helloworld %>会被替换为工程名为helloworld对应的路径。
+        <div class="main-content__title">转发路径变量管理</div>
+        <div class="project-path-info">配置http转发规则时，转发路径可以引用这里的变量。例如：将http请求转发到${ helloworld }/dist/hello.js，${
+            helloworld }会被替换为变量helloworld对应的值。
         </div>
-        <el-form label-width="100px">
-            <template v-for="(obj ,index) in $dc.redirectPathVariableArray">
-                <div class="project-path">
-                    <div class="left">
-                        <el-form-item label="工程名">
-                            <el-input v-model="obj.key" placeholder="工程名"/>
-                        </el-form-item>
-                        <el-form-item label="路径">
-                            <el-input v-model="obj.value" placeholder="工程在本地的绝对路径"/>
-                        </el-form-item>
-                    </div>
-                    <div class="right">
-                        <el-button
-                                class="delete-btn"
-                                type="danger"
-                                icon='el-icon-delete'
-                                size="mini"
-                                @click='deleteParam(obj,index)'
-                        />
-                    </div>
-                </div>
-            </template>
-
-            <el-form-item>
-                <el-button @click="addParam">增加工程路径设置</el-button>
-                <el-button type="primary" @click="saveFile">保存</el-button>
-            </el-form-item>
-        </el-form>
+        <el-table
+                :data="$dc.redirectPathVariableArray"
+                style="width: 800px;">
+            <el-table-column
+                    prop="key"
+                    label="变量名"
+                    width="180">
+                <template slot-scope="scope">
+                    <el-input v-model="scope.row.key" placeholder="工程名"/>
+                </template>
+            </el-table-column>
+            <el-table-column
+                    prop="value"
+                    label="变量值">
+                <template slot-scope="scope">
+                    <el-input v-model="scope.row.value" placeholder="工程在本地的绝对路径"/>
+                </template>
+            </el-table-column>
+            <el-table-column
+                    width="60"
+                    label="操作">
+                <template slot-scope="scope">
+                    <el-button
+                            class="delete-btn"
+                            type="danger"
+                            icon='el-icon-delete'
+                            size="mini"
+                            @click='deleteParam(scope.row,scope.$index)'
+                    />
+                </template>
+            </el-table-column>
+        </el-table>
+        <div style="margin-top: 50px;text-align: right;">
+            <el-button @click="addParam">增加工程路径设置</el-button>
+            <el-button type="primary" @click="saveFile">保存</el-button>
+        </div>
     </div>
 </template>
 

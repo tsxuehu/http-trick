@@ -94,6 +94,8 @@ function getServerResponseBody(res) {
     });
 
     let stream = res;
+
+    // TODO 服务器可能返回一种nodejs不支持的压缩格式
     switch (res.headers['content-encoding']) {
         case 'gzip':
         case 'compress':

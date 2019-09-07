@@ -50,4 +50,8 @@ module.exports = class ConfigureService extends EventEmitter {
     return this.configure.remoteDnsServer;
   }
 
+  getRequestTimeout() {
+    return this.configure.requestTimeoutTime;
+  }
+
 };
