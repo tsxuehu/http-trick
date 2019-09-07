@@ -7,8 +7,8 @@ import axios from 'axios';
 var api = {
 
 
-    getRemoteRuleFile(url) {
-        return axios.get(`/utils/getGitlabFile?url=${encodeURIComponent(url)}`);
+    getRemoteFile(url) {
+        return axios.get(`/utils/getRemoteFile?url=${encodeURIComponent(url)}`);
     },
 
     getGatewayMachine() {
