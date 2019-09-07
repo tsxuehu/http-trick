@@ -95,7 +95,7 @@
         }
       },
       onShareFile(row, index) {
-        let url = `https://${this.$dc.appInfo.pcIp}:${this.$dc.appInfo.webUiPort}/rule/file/raw?name=${encodeURIComponent(row.name)}`;
+        let url = `http://${this.$dc.appInfo.pcIp}:${this.$dc.appInfo.webUiPort}/rule/file/raw?name=${encodeURIComponent(row.name)}`;
         // 复制
         copyToClipboard(url);
         this.$message(`已复制规则${encodeURIComponent(row.name)}链接`);
