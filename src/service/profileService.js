@@ -4,8 +4,8 @@ const fileUtil = require("../utils/file");
 const path = require('path');
 
 const defaultProfile = {
-  // 工程路径配置
-  "projectPath": {},
+  // 转发路劲变量
+  "redirectPathVariables": {},
   // 是否启用转发规则
   "enableRule": true,
   // 是否启用host解析
@@ -87,17 +87,22 @@ module.exports = class ProfileService extends EventEmitter {
    */
   calcPath(userId, href, match, target) {
     if (match) {
+
       let matchList = href.match(new RegExp(match));
+
       _.forEach(matchList, function (value, index) {
         if (index == 0) return;
         var reg = new RegExp('\\$' + index, 'g');
         if (value === undefined) value = '';
         target = target.replace(reg, value);
       });
-      let compiled = _.template(target);
-      let projectPath = this.getProfile(userId).projectPath;
+
+      let compiled = _.template(target, {
+      //  interpolate: /{{([\s\S]+?)}}/g
+      });
+      let redirectPathVariables = this.getProfile(userId).redirectPathVariables;
       // 解析应用的变量
-      return compiled(projectPath);
+      return compiled(redirectPathVariables);
     }
   }
 
