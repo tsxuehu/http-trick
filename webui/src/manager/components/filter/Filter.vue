@@ -73,7 +73,6 @@
              * 立刻保存
              */
             async saveFileRightNow(){
-                debugger;
                 let result = await filtersApi.saveFilters(this.$dc.filters);
                 if (result.code == 0) {
                     this.$message({
