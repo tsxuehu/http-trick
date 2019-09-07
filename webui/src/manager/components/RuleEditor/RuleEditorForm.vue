@@ -145,7 +145,10 @@
       },
 
       saveRule() {
-
+        this.$emit('save', {
+          isEditRule: this.isEditRule,
+          rule: JSON.parse(JSON.stringify(this.rule))
+        });
       },
 
       editRule(rule, isFilterRule) {
