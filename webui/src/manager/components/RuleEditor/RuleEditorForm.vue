@@ -97,10 +97,15 @@
       }
     },
     methods: {
-      editRule(rule, index) {
 
+      editRule(rule, isFilterRule) {
+        this.isFilterRule = isFilterRule;
+        this.rule = JSON.parse(JSON.stringify(rule));
+        this.visible = true;
       },
-      createRule() {
+
+      createRule(isFilterRule = false) {
+        this.isFilterRule = isFilterRule;
         this.rule = {
           name: "",
           key: uuidV4(),
@@ -127,6 +132,11 @@
             }
           }]
         };
+        this.visible = true;
+      },
+
+      setActionDataFileId(actionIndex, dataId) {
+        this.rule.actionList[actionIndex].data.dataId = dataId;
       }
     }
   }

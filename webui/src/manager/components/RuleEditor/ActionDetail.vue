@@ -14,7 +14,7 @@
         <div v-if="action.type == 'redirect'" class="inline-block right-panel">
             <div class="action-data">
                 <el-input v-model="action.data.target" size="small"
-                          :placeholder="redireactPlaceholder">
+                          :placeholder="redirectPlaceholder">
                 </el-input>
             </div>
         </div>
@@ -32,12 +32,12 @@
                 </el-select>
               </span>
                 <span v-if="datafileEntry" style="margin-left: 10px;">
-                <el-button type="text" @click="editDataFile(datafileEntry)">
+                <el-button type="text" @click="emit('editDataFile', datafileEntry.id)">
                   编辑数据
                 </el-button>
               </span>
                 <span style="margin-left: 10px;">
-                <el-button type="text" @click="addDataFile">增加自定义数据</el-button>
+                <el-button type="text" @click="emit('newDataFile')">增加自定义数据</el-button>
               </span>
             </div>
         </div>
@@ -130,6 +130,24 @@
         ]
       };
     },
+    computed: {
+      datafileEntry() {
+        if (this.action.type == "mockData") {
+          var finded = _.find(this.$dc.dataList, (entry) => {
+            return entry.id == this.action.data.dataId;
+          });
+          if (!finded) this.action.data.dataId = '';
+          return finded;
+        }
+      },
+      redirectPlaceholder() {
+        if (this.$dc.userId == 'root') {
+          return '填写转发路径(远程地址、或者本地地址。远程地址需要以http/https开头)'
+        } else {
+          return '填写转发路径(必须以http/https开头)'
+        }
+      }
+    },
     methods: {
       addDataFile() {
         // 新建数据文件，并将当前规则返回的自定义数据文件设为新建的文件
@@ -141,24 +159,7 @@
         this.$dc.requestEditDataFile(entry);
       }
     },
-    computed: {
-      datafileEntry() {
-        if (this.action.type == "mockData") {
-          var finded = _.find(this.$dc.dataList, (entry) => {
-            return entry.id == this.action.data.dataId;
-          });
-          if (!finded) this.action.data.dataId = '';
-          return finded;
-        }
-      },
-      redireactPlaceholder() {
-        if (this.$dc.userId == 'root') {
-          return '填写转发路径(远程地址、或者本地地址。远程地址需要以http/https开头)'
-        } else {
-          return '填写转发路径(必须以http/https开头)'
-        }
-      }
-    }
+
   };
 
 </script>
