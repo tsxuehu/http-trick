@@ -53,7 +53,6 @@ module.exports = class ConfigController {
 
     router.get('/profile/:userId/proxy.pac', async (ctx, next) => {
       let {userId} = ctx.params;
-      console.log('request pac');
       ctx.set('Content-Type', 'application/x-ns-proxy-autoconfig');
       ctx.set('Cache-Control', 'no-cache');
       ctx.set('Server', this.appInfoService.getAppName());
