@@ -13,7 +13,7 @@ const defaultProfile = {
   // 是否启用filter
   "enableFilter": true,
   // 需要经过代理的域名
-  "goThroughProxyDomain": '',
+  "goThroughProxyConfig": '',
   // 是否使用外部http代理
   "externalProxy": false,
   "externalHttpProxy": false,
@@ -44,18 +44,22 @@ module.exports = class ProfileService extends EventEmitter {
   }
 
   async start() {
-    defaultProfile.goThroughProxyDomain = await fileUtil.readFile(path.join(__dirname, 'go-through-proxy-example.txt'));
+    defaultProfile.goThroughProxyConfig = await fileUtil.readFile(path.resolve(__dirname, 'go-through-proxy-example.txt'));
 
     let profileMap = await fileUtil.getJsonFileContentInDir(this.profileSaveDir);
     _.forEach(profileMap, (profile, fileName) => {
       let userId = fileName.slice(0, -5);
       // 补全profile数据
-      // this.userProfileMap[userId] = _.assign({}, defaultProfile, profile);;
-      this.userProfileMap[userId] = profile;
+      this.userProfileMap[userId] = _.assign({}, defaultProfile, profile);;
+      //this.userProfileMap[userId] = profile;
 
     });
     // 加载deviceId-> userID映射
     this.deviceInfo = await fileUtil.readJsonFromFile(this.deviceInfoSaveFile);
+
+    // 加载pac文件末班
+    let pacTemplateFile = await fileUtil.readFile(path.resolve(__dirname, 'proxy.pac.template.js'));
+    this.pacTemplate = _.template(pacTemplateFile);
   }
 
   getProfile(userId) {
@@ -284,7 +288,6 @@ module.exports = class ProfileService extends EventEmitter {
     return info;
   }
 
-  // 将ip绑定至用户
   async bindDevice(userId, deviceId) {
     let info = this.getDeviceInfoSetDefaultIfPossible(deviceId);
     let originUserId = info.userId;
@@ -381,12 +384,40 @@ module.exports = class ProfileService extends EventEmitter {
     });
     return !!finded;
   }
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling/Proxy_Auto-Configuration_(PAC)_file
+  generateProxyPacFile(userId) {
+    let {
+      startSocks5,
+      startHttpProxy,
+      pcIp,
+      socks5ProxyPort,
+      httpProxyPort
+    } = this.appInfoService.getAppInfo();
+    let proxy = 'DIRECT';
+    let all = false;
+    let {hostMap, globHostArray} = this._getGoThroughProxyMap(userId);
+    if (hostMap['all']) {
+      all = true;
+    }
+    if (startSocks5) {
+      proxy = `SOCKS5 ${pcIp}:${socks5ProxyPort}`
+    } else if (startHttpProxy) {
+      proxy = `HTTP ${pcIp}:${httpProxyPort}`
+    }
+    let pac = this.pacTemplate({
+      all,
+      proxy,
+      hostMap: JSON.stringify(hostMap, null, 2),
+      globHostArray: JSON.stringify(globHostArray, null, 2)
+    });
+    return pac;
+  }
 
   _getGoThroughProxyMap(userId) {
     if (this._gothroughProxyCahce[userId]) {
       return this._gothroughProxyCahce[userId];
     }
-    let content = this.getProfile(userId).goThroughProxyDomain;
+    let content = this.getProfile(userId).goThroughProxyConfig;
     this._gothroughProxyCahce[userId] = this._parseHost(content);
     return this._gothroughProxyCahce[userId];
   }

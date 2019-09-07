@@ -40,7 +40,7 @@ module.exports = class TrafficController {
             ctx.set('Content-disposition', 'attachment;filename=zproxy.crt');
             ctx.body = await this.rootCertService.getRootCACertPem(userId);
         });
-
+        // ios证书
         router.get('/utils/rootCA.mobileconfig', async (ctx, next) => {
             let userId = ctx.userId;
             ctx.set('Content-disposition', 'attachment;filename=zproxy.mobileconfig');

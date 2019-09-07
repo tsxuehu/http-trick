@@ -27,7 +27,7 @@
             </el-form-item>
             <el-form-item label="需要Http解析代理的域名">
                 <textarea class="socks-editor" :placeholder="socksProxyExample"
-                          v-model="$dc.profile.goThroughProxyDomain"></textarea>
+                          v-model="$dc.profile.goThroughProxyConfig"></textarea>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="saveFile">保存</el-button>
@@ -44,8 +44,9 @@
         computed: {
             socksProxyExample() {
                 return `#示例
-*.youzan.com    # 所有有赞域名都会走socks5代理
-carmen.youzan.com    # carmen.youzan.com走socks5代理`
+all               # 有all 配置项，所有域名君走http解析代理
+*.domain.com      # 所有domain域名都会走Http解析代理
+www.domain.com    # www.domain.com走Http解析代理`
             },
             socks5Proxy : {
                 get: function () {

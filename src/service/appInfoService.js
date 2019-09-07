@@ -12,14 +12,16 @@ module.exports = class AppInfoService extends EventEmitter {
     this.proxyDataDir = path.join(userHome, ".http-trick");
     // app信息
     this.appInfo = {
+      appName: 'Http-Trick',
       single,
       httpProxyPort: "",
       httpsProxyPort: "",
       socks5ProxyPort: "",
       dnsPort: "",
       webUiPort: "",
-      startSocks5: "",
-      startDns: "",
+      startHttpProxy: true,
+      startSocks5: true,
+      startDns: false,
       pcIp: "",
     };
 
@@ -31,6 +33,9 @@ module.exports = class AppInfoService extends EventEmitter {
     this.setAppInfo({
       pcIp: ip.address()
     });
+  }
+  getAppName() {
+    return this.appInfo.appName;
   }
 
   getAppDir() {

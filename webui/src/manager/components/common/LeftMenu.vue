@@ -22,32 +22,6 @@
 
 <script>
     import './left-menu.pcss';
-    const menuList = [
-        /*{
-         name: '请求监控',
-         icon: 'icon-bargraph',
-         link: '/monitor.html',
-         targetBlank: true
-         },
-         {
-         name: '帮助中心',
-         icon: 'icon-security',
-         link: '/help/index.html',
-         targetBlank: true
-         }*/
-        /* {
-         name: '断点',
-         icon: 'icon-remind',
-         link: '/breakpoint.html',
-         targetBlank: true
-         },
-         {
-         name: 'WebSocket Mock',
-         icon: 'icon-hot',
-         link: '/wsmock.html',
-         targetBlank: true
-         },*/
-    ];
 
     export default {
         name: 'left-menu',
@@ -71,7 +45,7 @@
                             link: 'configure'
                         },
                         {
-                            name: '工程路径配置',
+                            name: '转发变量管理',
                             icon: 'icon-layers',
                             link: 'projectpath'
                         }

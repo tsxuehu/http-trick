@@ -14,7 +14,6 @@ async function resetData(force = false) {
     await createDir(path.join(proxyDataDir, "certificate"));
     await createDir(path.join(proxyDataDir, "host"));
     await createDir(path.join(proxyDataDir, "rule"));
-    await createDir(path.join(proxyDataDir, "breakpoint"));
     await createDir(path.join(proxyDataDir, "mock-data"));
     await createDir(path.join(proxyDataDir, "mock-list"));
     await createDir(path.join(proxyDataDir, "profile"));
