@@ -10,6 +10,7 @@ const defaultConfigure = {
   "webUiPort": 40001,
   "startDns": false,
   "startSocks5": true,
+  "startHttpProxy": true,
   "requestTimeoutTime": 30000,
   "remoteDnsServer": '223.5.5.5', // 远程dns解析服务器
 };

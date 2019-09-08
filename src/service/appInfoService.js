@@ -34,6 +34,7 @@ module.exports = class AppInfoService extends EventEmitter {
       pcIp: ip.address()
     });
   }
+
   getAppName() {
     return this.appInfo.appName;
   }
@@ -112,10 +113,23 @@ module.exports = class AppInfoService extends EventEmitter {
   }
 
   printRuntimeInfo() {
-    console.log(`Http Proxy Port: ${ this.appInfo.httpProxyPort}`);
-    console.log(`Socks5 Proxy Port: ${ this.appInfo.socks5ProxyPort}`);
-    console.log(`DNS Port: ${ this.appInfo.dnsPort}`);
-    console.log(`IP: ${ this.appInfo.pcIp}`);
-    console.log(`Manager: http://${this.appInfo.pcIp}:${this.appInfo.webUiPort}`);
+    let {
+      appName,
+      single,
+      httpProxyPort,
+      httpsProxyPort,
+      socks5ProxyPort,
+      dnsPort,
+      webUiPort,
+      startHttpProxy,
+      startSocks5,
+      startDns,
+      pcIp,
+    } = this.appInfo;
+    startHttpProxy && console.log(`Http Proxy Port: ${ httpProxyPort}`);
+    startSocks5 && console.log(`Socks5 Proxy Port: ${ socks5ProxyPort}`);
+    startDns && console.log(`DNS Port: ${ dnsPort}`);
+    console.log(`IP: ${ pcIp}`);
+    console.log(`Manager: http://${pcIp}:${webUiPort}`);
   }
 };

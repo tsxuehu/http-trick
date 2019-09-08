@@ -134,7 +134,7 @@ function createHostSecurityContext(hostname, rootSecurityContext) {
   let serialNumber = crypto.createHash('sha1')
     .update(hostname + RANDOM_SERIAL, 'binary').digest('hex');
 
-  let cert = createCert(pki.setRsaPublicKey(root_key.n, root_key.e), serialNumber, true);
+  let cert = createCert(pki.setRsaPublicKey(root_key.n, root_key.e), serialNumber, false);
 
   cert.setSubject([{
     name: 'commonName',
@@ -167,7 +167,7 @@ function createRootSecurityContext() {
   let now = Date.now() + getRandom();
   let attrs = [{
     name: 'commonName',
-    value: 'whistle.' + now
+    value: 'http-trick.' + now
   }, {
     name: 'countryName',
     value: 'CN'
@@ -179,10 +179,10 @@ function createRootSecurityContext() {
     value: 'HZ'
   }, {
     name: 'organizationName',
-    value: now + '.wproxy.org'
+    value: now + '.http-trick.org'
   }, {
     shortName: 'OU',
-    value: 'wproxy.org'
+    value: 'http-trick.org'
   }];
 
   cert.setSubject(attrs);
