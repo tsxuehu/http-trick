@@ -11,6 +11,9 @@
             <el-form-item label="是否开启DNS服务">
                 <el-checkbox v-model="$dc.configure.startDns">开启</el-checkbox>
             </el-form-item>
+            <el-form-item label="是否开启专业版">
+                <el-checkbox v-model="$dc.configure.professionalVersion">开启</el-checkbox>
+            </el-form-item>
             <el-form-item label="Http代理端口">
                 <el-input
                         v-model="$dc.configure.httpProxyPort"

@@ -50,38 +50,55 @@
             }
           ]);
         }
-        menu = menu.concat([
-          {
-            name: 'Host 管理',
-            icon: 'icon-box',
-            link: 'hostfilelist'
-          },
-          {
-            name: 'Http 过滤器',
-            icon: 'icon-beaker',
-            link: 'filter'
-          },
-          {
-            name: 'Http 转发',
-            icon: 'icon-skip',
-            link: 'rulefilelist'
-          },
-          {
-            name: '自定义 mock 数据',
-            icon: 'icon-suoding',
-            link: 'datalist'
-          },
-          {
-            name: '设备管理',
-            icon: 'icon-bargraph',
-            link: 'device'
-          },
-          {
-            name: '代理设置',
-            icon: 'icon-set',
-            link: 'proxyconfig'
-          },
-        ]);
+
+        if (this.$dc.configure.professionalVersion) {
+          menu = menu.concat([
+            {
+              name: 'Host 管理',
+              icon: 'icon-box',
+              link: 'hostfilelist'
+            },
+            {
+              name: 'Http 过滤器',
+              icon: 'icon-beaker',
+              link: 'filter'
+            },
+            {
+              name: 'Http 转发',
+              icon: 'icon-skip',
+              link: 'rulefilelist'
+            },
+            {
+              name: '自定义 mock 数据',
+              icon: 'icon-suoding',
+              link: 'datalist'
+            },
+            {
+              name: '设备管理',
+              icon: 'icon-bargraph',
+              link: 'device'
+            },
+            {
+              name: '代理设置',
+              icon: 'icon-set',
+              link: 'proxyconfig'
+            },
+          ]);
+        } else {
+          menu = menu.concat([
+            {
+              name: 'Http 转发',
+              icon: 'icon-skip',
+              link: 'rulefilelist'
+            },
+            {
+              name: '自定义 mock 数据',
+              icon: 'icon-suoding',
+              link: 'datalist'
+            },
+          ]);
+        }
+
 
         return menu;
       },

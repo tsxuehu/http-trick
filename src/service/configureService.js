@@ -4,16 +4,17 @@ const fileUtil = require("../utils/file");
 const path = require('path');
 
 const defaultConfigure = {
-  "httpProxyPort": 8001,
-  "socks5ProxyPort": 8002,
-  "dnsPort": 53,
-  "webUiPort": 40001,
-  "startDns": false,
-  "startSocks5": true,
-  "startHttpProxy": true,
-  "requestTimeoutTime": 30000,
-  "useCustomRootCA": false,
-  "remoteDnsServer": '223.5.5.5', // 远程dns解析服务器
+  professionalVersion: false, // 是否开启专业版
+  httpProxyPort: 8001,
+  socks5ProxyPort: 8002,
+  dnsPort: 53,
+  webUiPort: 40001,
+  startDns: false,
+  startSocks5: true,
+  startHttpProxy: true,
+  requestTimeoutTime: 30000,
+  useCustomRootCA: false,
+  remoteDnsServer: '223.5.5.5', // 远程dns解析服务器
 };
 /**
  * 代理运转需要的规则数据
