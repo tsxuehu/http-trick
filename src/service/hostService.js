@@ -1,10 +1,9 @@
 const EventEmitter = require("events");
+const net = require('net');
 const _ = require("lodash");
 const path = require("path");
 const fileUtil = require("../utils/file");
 const DnsResolver = require("../utils/dns");
-
-const ipReg = /((?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d))/;
 
 /**
  * Created by tsxuehu on 8/3/17.
@@ -48,7 +47,7 @@ module.exports = class HostService extends EventEmitter {
     }
 
     isIp(str) {
-        if (ipReg.test(str)) {
+        if (net.isIP(str)) {
             return true
         }
         return false;
@@ -59,7 +58,7 @@ module.exports = class HostService extends EventEmitter {
         let way = '';
         if (!hostname) return hostname;
 
-        if (ipReg.test(hostname)) {
+        if (this.isIp(hostname)) {
             way = 'hostname is ip';
             ip = hostname;
         } else if (this.profileService.enableHost(userId)) {
