@@ -150,6 +150,7 @@ module.exports = class Launcher {
       dnsPort: this.dnsPort,
       startSocks5: this.startSocks5,
       startDns: this.startDns,
+      startHttpProxy: this.startHttpProxy,
     });
   }
 

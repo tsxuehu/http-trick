@@ -7,7 +7,7 @@
     "postinstall": "node ./resetDataFile.js"
   },
   "bin": {
-    "http-trick": "./bin.js"
+    "http-trick": "./bin/index.js"
   },
   "dependencies": {
     "agent-base": "^4.2.1",

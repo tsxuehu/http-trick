@@ -19,9 +19,10 @@ module.exports = class CertificationService {
    * @param certTempDir 存放证书的目录
    * @param root 根证书的key 和 cert
    */
-  constructor({appInfoService}) {
+  constructor({appInfoService, configureService}) {
     // 存放证书的目录
     this.appInfoService = appInfoService;
+    this.configureService = configureService;
     let proxyDataDir = this.appInfoService.getProxyDataDir();
     // 监控数据缓存目录
     this.certTempDir = path.join(proxyDataDir, "certificate");
@@ -40,11 +41,21 @@ module.exports = class CertificationService {
   }
 
   async start() {
-    // 读取根证书
-    let appDir = this.appInfoService.getAppDir();
+    // 读取根证书, 如果使用自定义证书，则从 dataDir/rootca目录加载
+    let keyFilePath;
+    let certFilePath;
+    if (!this.configureService.useCustomRootCA()) {
+      let appDir = this.appInfoService.getAppDir();
+      keyFilePath = path.join(appDir, 'certificate/zproxy.key.pem');
+      certFilePath = path.join(appDir, 'certificate/zproxy.crt.pem');
+    } else {
+      let dataDir = this.appInfoService.getProxyDataDir();
+      keyFilePath = path.join(dataDir, 'rootCA/custom.key.pem');
+      certFilePath = path.join(dataDir, 'rootCA/custom.crt.pem');
+    }
 
-    let keyPem = await fileUtils.readFile(path.join(appDir, 'certificate/zproxy.key.pem'));
-    let certPem = await fileUtils.readFile(path.join(appDir, 'certificate/zproxy.crt.pem'));
+    let keyPem = await fileUtils.readFile(keyFilePath);
+    let certPem = await fileUtils.readFile(certFilePath);
     let key = pki.privateKeyFromPem(keyPem);
     let cert = pki.certificateFromPem(certPem);
     this.rootSecurityContext = {
@@ -78,7 +89,7 @@ module.exports = class CertificationService {
       if (subdomainList.length > 1) {
         subdomainList.shift();
         domain = '*.' + subdomainList.join('.') + '.' + parsed.domain + '.' + parsed.tld;
-      } else if (subdomainList.length == 1){
+      } else if (subdomainList.length == 1) {
         domain = '*.' + parsed.domain + '.' + parsed.tld;
       }
     }
@@ -161,7 +172,7 @@ function createHostSecurityContext(hostname, rootSecurityContext) {
   return hostSecurityContext;
 }
 
-function createRootSecurityContext() {
+module.exports.createRootSecurityContext = function createRootSecurityContext() {
   let keys = pki.rsa.generateKeyPair(requiredVersion ? 2048 : 1024);
   let cert = createCert(keys.publicKey);
   let now = Date.now() + getRandom();

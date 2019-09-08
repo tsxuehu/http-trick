@@ -12,6 +12,7 @@ const defaultConfigure = {
   "startSocks5": true,
   "startHttpProxy": true,
   "requestTimeoutTime": 30000,
+  "useCustomRootCA": false,
   "remoteDnsServer": '223.5.5.5', // 远程dns解析服务器
 };
 /**
@@ -55,4 +56,7 @@ module.exports = class ConfigureService extends EventEmitter {
     return this.configure.requestTimeoutTime;
   }
 
+  useCustomRootCA() {
+    return this.configure.useCustomRootCA;
+  }
 };

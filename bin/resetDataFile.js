@@ -1,5 +1,5 @@
-const fileUtils = require("./src/utils/file");
-const AppInfoService = require("./src/service/appInfoService");
+const fileUtils = require("../src/utils/file");
+const AppInfoService = require("../src/service/appInfoService");
 const path = require("path");
 /**
  * 初始化脚本
@@ -19,6 +19,7 @@ async function resetData(force = false) {
     await createDir(path.join(proxyDataDir, "profile"));
     await createDir(path.join(proxyDataDir, "filter"));
     await createDir(path.join(proxyDataDir, "traffic"));
+    await createDir(path.join(proxyDataDir, "rootCA"));
 
     await resetFile(path.join(proxyDataDir, "deviceInfo.json"), {}, force);
     await resetFile(path.join(proxyDataDir, "configure.json"), {}, force);
