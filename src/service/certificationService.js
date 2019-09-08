@@ -60,7 +60,7 @@ module.exports = class CertificationService {
    * @param host
    * @returns {Promise<Certification>}
    */
-  async getCertificationForHost(host) {
+  async getHostSecurityContext(host) {
     let domain = host;
     /**
      * 解析后 www.baidu.com

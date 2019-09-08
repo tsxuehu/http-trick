@@ -52,7 +52,7 @@ module.exports = class HttpsServer {
   }
 
   async SNIPrepareCert(serverName, SNICallback) {
-    let {certPem, keyPem} = await  this.certificationService.getCertificationForHost(serverName);
+    let {certPem, keyPem} = await  this.certificationService.getHostSecurityContext(serverName);
     let ctx = createSecureContext({
       key: keyPem,
       cert: certPem

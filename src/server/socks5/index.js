@@ -247,11 +247,11 @@ module.exports = class Server extends EventEmitter {
       if (goThroughProxy) {
         if (req.dstPort == 443) {
           // tls
-          let context = await this.certificationService.getCertificationForHost(hostName);
+          let context = await this.certificationService.getHostSecurityContext(hostName);
           let tlsSocket = new tls.TLSSocket(socket, {
             isServer: true,
-            key: context.key,
-            cert: context.cert
+            key: context.keyPem,
+            cert: context.certPem
           });
 
           tlsSocket.deviceId = deviceId;
