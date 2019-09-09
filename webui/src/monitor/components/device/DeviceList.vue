@@ -176,7 +176,7 @@
         },
         computed: {
             bindUrl() {
-                return `http://${this.$dc.appInfo.pcIp}:${this.$dc.appInfo.realUiPort}/profile/device/bind?userId=${this.$dc.userInfo.userId}`;
+                return `http://${this.$dc.appInfo.pcIp}:${this.$dc.appInfo.webUiPort}/profile/device/bind?userId=${this.$dc.userInfo.userId}`;
             },
             imgUrl() {
                 return qrcode.toDataURL(this.bindUrl, 4);
