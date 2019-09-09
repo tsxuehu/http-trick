@@ -59,19 +59,31 @@
                 <el-button type="primary" @click="finishEditDataFile">确 定</el-button>
             </div>
         </el-dialog>
+
+        <rule-edit-form
+                :data-list="dataList"
+                :user-id="userId"
+                ref="ruleEditForm"></rule-edit-form>
+
+        <rule-test-form ref="ruleTestForm"></rule-test-form>
     </div>
 </template>
 
 <script>
-  import LeftMenu from './components/common/LeftMenu';
-  import Header from './components/common/Header.vue';
+  import LeftMenu from './components/LeftMenu';
+  import Header from './components/Header.vue';
+
+  import RuleEditForm from './form-widget/rule-edit-form/Index.vue'
+  import * as RuleEditFormApi from './form-widget/rule-edit-form/index.js'
+
+  import RuleTestForm from './form-widget/rule-test-form/Index.vue'
+  import * as RuleTestFormApi from './form-widget/rule-test-form/index.js'
+
   import hostApi from '../api/host';
   import ruleApi from '../api/rule';
-  import confApi from '../api/conf';
   import profileApi from '../api/profile';
-  import Vue from 'vue';
   import $ from 'jquery';
-  import _ from 'lodash';
+  import forEach from 'lodash/forEach';
   import dataApi from '../api/data';
   import uuidV4 from 'uuid/v4';
   import CodeMirror from 'codemirror';
@@ -84,10 +96,15 @@
   import 'codemirror/mode/htmlmixed/htmlmixed';
 
   let editor = null;
-  Vue.component(LeftMenu.name, LeftMenu);
-  Vue.component(Header.name, Header);
+
   export default {
     name: 'app',
+    components: {
+      [LeftMenu.name]: LeftMenu,
+      [Header.name]: Header,
+      [RuleEditForm.name]: RuleEditForm,
+      [RuleTestForm.name]: RuleTestForm,
+    },
     data() {
       return {
         isDataCenter: true,
@@ -347,7 +364,7 @@
             this.$message.error(`出错了，${serverData.msg}`);
           }
         });
-      }
+      },
     },
 
     async created() {
@@ -369,7 +386,7 @@
       socket.on('profile', profile => {
         this.profile = profile;
         let result = [];
-        _.forEach(profile.redirectPathVariables, (value, key) => {
+        forEach(profile.redirectPathVariables, (value, key) => {
           result.push({
             key,
             value
@@ -403,6 +420,10 @@
       // 强制dialog渲染body部分, 对ele dialog hack的初始化方式，原始的dialog不提供mouted后的事件
       // 编辑器editor初始化的时候需要用到editDataFileDialog里的元素content-editor
       this.$refs.editDataFileDialog.rendered = true;
+
+      let {ruleEditForm, ruleTestForm} = this.$refs;
+      RuleEditFormApi.setInstance(ruleEditForm);
+      RuleTestFormApi.setInstance(ruleTestForm);
     }
   };
 </script>

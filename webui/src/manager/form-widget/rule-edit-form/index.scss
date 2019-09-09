@@ -1,0 +1,61 @@
+.rule-edit-form {
+  .config-row {
+    margin-bottom: 10px;
+    display: flex;
+  }
+  .config-name {
+    width: 100px;
+    text-align: right;
+    padding-right: 10px;
+    padding-top: 5px;
+  }
+  .config-value {
+    flex-grow: 1;
+  }
+  .match-rule {
+    .match-method {
+
+    }
+    .tips {
+      color: red;
+      margin-left: 10px;
+    }
+    .match-reg {
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      .el-input {
+        margin-right: 10px;
+      }
+    }
+  }
+  .rule-actions {
+    font-style: italic;
+    margin-bottom: 5px;
+  }
+  .bottom-action {
+    text-align: right;
+    margin-top: 20px;
+  }
+}
+
+.action-value-container {
+  // key - value 类型的数据配置
+  .value-key-value {
+    .row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .label {
+      width: 120px;
+      padding-right: 5px;
+    }
+    .value {
+      flex-grow: 1;
+    }
+    .row-last {
+      margin-bottom: 0;
+    }
+  }
+}

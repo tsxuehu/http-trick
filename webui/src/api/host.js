@@ -3,7 +3,7 @@
  */
 
 import axios from 'axios';
-import _ from 'lodash';
+import debounce from 'lodash/debounce';
 var api = {
     /**
      * 创建规则文件
@@ -33,7 +33,7 @@ var api = {
         return axios.post(`/host/savefile?name=${name}`,content);
     }
 };
-api.debouncedUseFile = _.debounce(function (name, callback) {
+api.debouncedUseFile = debounce(function (name, callback) {
     api.useFile(name).then((response) => {
         callback(response)
     });

@@ -8,7 +8,7 @@
     </div>
 </template>
 <script>
-    import _ from 'lodash';
+    import throttle from 'lodash/throttle';
     const TopPreserve = 20;
     const BottomPreserve = 20;
     export default  {
@@ -62,7 +62,7 @@
             }
         },
         methods: {
-            handleScroll: _.throttle(function () {
+            handleScroll: throttle(function () {
                 let scrollTop = this.$refs.container.scrollTop;
                 let itemPass = Math.floor(scrollTop / this.rowHeight);
                 if (itemPass < TopPreserve) {

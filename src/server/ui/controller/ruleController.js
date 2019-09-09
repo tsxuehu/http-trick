@@ -14,7 +14,7 @@ module.exports = class RuleController {
 
   constructor() {
     this.ruleService = ServiceRegistry.getRuleService();
-    this.configService = ServiceRegistry.getProfileService();
+    this.profileService = ServiceRegistry.getProfileService();
   }
 
   regist(router) {
@@ -87,17 +87,6 @@ module.exports = class RuleController {
       };
     });
 
-    // 导入gitlab仓库中的文件
-    router.post('/rule/importrepository', async (ctx, next) => {
-      let userId = ctx.userId;
-      let {gitlabUrl, token = ''} = ctx.request.body;
-      // 下载gitlab中的文件
-      await this.ruleService.saveRuleFile(userId, ctx.query.name, ctx.request.body.content);
-      ctx.body = {
-        code: 0
-      };
-    });
-
     // 导出规则文件
     // /rule/download?name=${name}
     router.get('/rule/download', async (ctx, next) => {
@@ -110,31 +99,34 @@ module.exports = class RuleController {
     // 测试规则
     // /rule/test
     router.post('/rule/test', async (ctx, next) => {
-      /*
-       url: '',// 请求url
-       match: '',// url匹配规则
-       targetTpl: '',// 路径模板， 会用urlReg的匹配结果来替换targetTpl $1 $2
-       matchRlt: '',// url匹配结果
-       targetRlt: ''// 路径匹配结果
-       */
       let userId = ctx.userId;
-      let match = ctx.request.body.match;
-      let url = ctx.request.body.url;
-      let matchRlt = '不匹配';
+      let {
+        requestMethod,// 请求method
+        requestUrl,// 请求url
+        matchMethod,// 匹配method
+        matchUrl,// 匹配url
+        target, // 转发末班
+      } = ctx.request.body;
 
-      if (match && (url.indexOf(match) >= 0 || (new RegExp(match)).test(url))) {
-        matchRlt = 'url匹配通过';
+      let matchResult = '不匹配';
+      let redirectResult;
+      let message = '';
+
+      let urlMatch = matchUrl && (requestUrl.indexOf(matchUrl) >= 0 || (new RegExp(matchUrl)).test(requestUrl));
+      let methodMatch = !matchMethod || (requestMethod.toLowerCase().trim()) == (matchMethod.toLowerCase().trim());
+      if (urlMatch && methodMatch) {
+        matchResult = 'url匹配通过';
       }
 
-      let targetTpl = ctx.request.body.targetTpl;
-      let targetRlt = await this.configService.calcPathbyUser(userId, url, match, targetTpl);
+      redirectResult = await this.profileService.calcPath(userId, requestUrl, matchUrl, target);
 
       // 测试规则
       ctx.body = {
         code: 0,
         data: {
-          matchRlt: matchRlt,
-          targetRlt: targetRlt
+          matchResult,
+          redirectResult,
+          message
         }
       };
     });

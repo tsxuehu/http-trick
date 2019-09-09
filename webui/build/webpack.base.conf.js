@@ -1,67 +1,70 @@
-var path = require('path')
-var utils = require('./utils')
-var config = require('../config')
-var vueLoaderConfig = require('./vue-loader.conf')
-var slugify = require('transliteration').slugify;
-function resolve (dir) {
-  return path.join(__dirname, '..', dir)
+'use strict';
+const path = require('path');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
+
+function resolve(dir) {
+  return path.join(__dirname, '..', dir);
 }
 
-var markdown = require('markdown-it')({
-  html: true,
-  breaks: true
-})
-markdown.use(require('markdown-it-anchor'), {
-              level: 2,
-              slugify: slugify,
-              permalink: true,
-              permalinkBefore: true
-            });
+let entry = {
+  manager: './src/manager/index.js',
+  monitor: './src/monitor/index.js',
+  // wsmock: './src/wsmock/index.js'
+};
+let htmlPlugins = Object.keys(entry).map(pageName => {
+  return new HtmlWebpackPlugin({
+    filename: path.resolve(__dirname, '../../site', `${pageName}.html`),
+    template: 'index.html',
+    title: pageName,
+    inject: true,
+    chunks: ['vendor', pageName],
+  })
+});
 
 module.exports = {
-  entry: {
-    manager: './src/manager/index.js',
-    monitor: './src/monitor/index.js',
-   // monitor2: './src/monitor2/index.js',
-    wsmock: './src/wsmock/index.js'
-  },
+  context: path.resolve(__dirname, '../'),
+  entry,
   output: {
-    path: config.build.assetsRoot,
+    path: path.resolve(__dirname, '../../site'),
     filename: '[name].js',
-    publicPath: process.env.NODE_ENV === 'production'
-      ? config.build.assetsPublicPath
-      : config.dev.assetsPublicPath
+    publicPath: '/'
   },
   resolve: {
     extensions: ['.js', '.vue', '.json'],
-    modules: [
-      resolve('src'),
-      resolve('node_modules')
-    ],
     alias: {
+      '@': resolve('src'),
       'src': resolve('src'),
-      'assets': resolve('src/assets'),
-      'doc':resolve('doc')
-    }
+    },
   },
   module: {
     rules: [
       {
         test: /\.vue$/,
         loader: 'vue-loader',
-        options: vueLoaderConfig
       },
       {
         test: /\.js$/,
-        loader: 'babel-loader',
-        include: [resolve('src'), resolve('test')]
+        loader: 'babel-loader'
+      },
+      {
+        test: /ss$/i,
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'sass-loader',
+        ]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        loader: 'url-loader',
-        query: {
-          limit: 10000,
-          name: utils.assetsPath('img/[name].[ext]')
+        use: {
+          loader: "url-loader",
+          options: {
+            limit: 10000,
+            name: "img/[name].[ext]"
+          }
         }
       },
       {
@@ -69,14 +72,31 @@ module.exports = {
         loader: 'url-loader',
         query: {
           limit: 10000,
-          name: utils.assetsPath('fonts/[name].[ext]')
+          name: "fonts/[name].[ext]"
         }
-      },
-      {
-        test: /\.md/,
-        loader: 'vue-markdown-loader',
-        options: markdown
       }
     ]
+  },
+  plugins: [
+    new VueLoaderPlugin(),
+    new MiniCssExtractPlugin({
+      filename: 'css/[name].css',
+    }),
+    new FriendlyErrorsWebpackPlugin()
+  ].concat(htmlPlugins),
+  optimization: {
+    splitChunks: {
+      minSize: 0,
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: "vendor",
+          enforce: true,
+          priority: 100,
+          minChunks: 1,
+          chunks: 'all'
+        },
+      },
+    },
   }
-}
+};

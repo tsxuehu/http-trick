@@ -16,8 +16,8 @@
         <list :total="$dc.total"
               :height="height - 28"
               :rowHeight="24">
-            <template scope="props">
-                <record v-for="index in props.ids" :index="index" :id="$dc.filterdRecordArray[index]" :key="index"
+            <template v-slot:default="scope">
+                <record v-for="index in scope.ids" :index="index" :id="$dc.filterdRecordArray[index]" :key="index"
                         @right-clicked="rightClicked"></record>
             </template>
         </list>
@@ -31,7 +31,6 @@
     </div>
 </template>
 <script>
-    import _ from 'lodash';
     import List from './List.vue';
     import copyToClipboard from 'copy-to-clipboard';
     import ContextMenu from '../../../context-menu/index';

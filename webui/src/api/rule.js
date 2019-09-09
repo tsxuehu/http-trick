@@ -3,7 +3,9 @@
  */
 
 import axios from 'axios';
-import _ from 'lodash';
+import debounce from 'lodash/debounce';
+import trim from 'lodash/trim';
+import keys from 'lodash/keys';
 var api = {
   /**
    * 创建规则文件
@@ -37,25 +39,21 @@ var api = {
     return axios.post('/rule/test', content);
   },
 
-  getRemoteRuleFile(url){
-    return axios.get(`/utils/getGitlabFile?url=${encodeURIComponent(url)}`);
-  },
-
   getReferenceVar(content) {
     var contentStr = JSON.stringify(content);
     var reg = RegExp("<%=(.+?)%>", 'g');
     var result;
     var varObj = {};
     while ((result = reg.exec(contentStr)) != null) {
-      varObj[_.trim(result[1])] = 1;
+      varObj[trim(result[1])] = 1;
     }
-    return _.keys(varObj);
+    return keys(varObj);
   }
 
 };
 
 // 构造debounce函数
-api.debouncedSaveFile = _.debounce(function (name, content, callback) {
+api.debouncedSaveFile = debounce(function (name, content, callback) {
     api.saveFile(name, content).then((response) => {
         callback(response)
     });
