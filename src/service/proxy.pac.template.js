@@ -12,7 +12,7 @@ function FindProxyForURL(url, host) {
     var length = globHostArray.length;
     var i;
     for (i = 0; i < length; i++) {
-      if (dnsDomainIs(host, globHostArray[i])) {
+      if (host.endsWith(globHostArray[i])) {
         shouldGoThroughProxy = true;
         break;
       }

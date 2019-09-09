@@ -96,6 +96,11 @@
               icon: 'icon-suoding',
               link: 'datalist'
             },
+            {
+              name: '代理设置',
+              icon: 'icon-set',
+              link: 'proxyconfig'
+            },
           ]);
         }
 
