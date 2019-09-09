@@ -16,8 +16,8 @@
         <list :total="$dc.total"
               :height="height - 28"
               :rowHeight="24">
-            <template scope="props">
-                <record v-for="index in props.ids" :index="index" :id="$dc.filterdRecordArray[index]" :key="index"
+            <template v-slot:default="scope">
+                <record v-for="index in scope.ids" :index="index" :id="$dc.filterdRecordArray[index]" :key="index"
                         @right-clicked="rightClicked"></record>
             </template>
         </list>

@@ -12,7 +12,7 @@
       </el-table-column>
       <el-table-column prop="description" label="描述" />
       <el-table-column label="操作" :width="136" :context="_self">
-        <template scope='scope'>
+        <template v-slot:default="scope">
           <a :href="'#/edithost?name='+scope.row.name">
             <el-button type="info" icon='el-icon-edit' size="mini">
             </el-button>
@@ -26,7 +26,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="checked" label="启用" width="85">
-        <template scope='scope'>
+        <template v-slot:default="scope">
           <el-radio v-model="selectedFileName" :label="scope.row.name" :disabled="!$dc.hostState" />
         </template>
       </el-table-column>

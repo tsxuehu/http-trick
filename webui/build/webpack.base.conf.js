@@ -18,6 +18,7 @@ let htmlPlugins = Object.keys(entry).map(pageName => {
   return new HtmlWebpackPlugin({
     filename: path.resolve(__dirname, '../../site', `${pageName}.html`),
     template: 'index.html',
+    title: pageName,
     inject: true,
     chunks: ['vendor', pageName],
   })

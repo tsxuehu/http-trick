@@ -11,21 +11,21 @@
                     prop="key"
                     label="变量名"
                     width="250">
-                <template slot-scope="scope">
+                <template v-slot:default="scope">
                     <el-input v-model="scope.row.key" placeholder="工程名"/>
                 </template>
             </el-table-column>
             <el-table-column
                     prop="value"
                     label="变量值">
-                <template slot-scope="scope">
+                <template v-slot:default="scope">
                     <el-input v-model="scope.row.value" placeholder="工程在本地的绝对路径"/>
                 </template>
             </el-table-column>
             <el-table-column
                     width="60"
                     label="操作">
-                <template slot-scope="scope">
+                <template v-slot:default="scope">
                     <el-button
                             class="delete-btn"
                             type="danger"

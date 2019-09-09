@@ -10,6 +10,7 @@
                     <!-- host文件 -->
                     <el-dropdown-item
                             v-for="hostfile in $dc.hostFileList"
+                            :key="hostfile.name"
                             :command="hostfile.name"
                     >
                         {{ hostfile.name }}
@@ -37,6 +38,7 @@
                     <!-- rule文件 -->
                     <el-dropdown-item
                             v-for="rulefile in $dc.ruleFileList"
+                            :key="rulefile.name"
                             :command="rulefile.name + '-%-' + rulefile.checked"
                     >
                         {{ rulefile.name }}

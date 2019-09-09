@@ -17,14 +17,14 @@
 
         <el-table border :data="$dc.ruleFileList">
             <el-table-column prop="name" label="名字" width="200">
-                <template scope="scope">
+                <template  v-slot:default="scope">
                     {{ scope.row.name }}
                     <el-tag type="danger" v-if="scope.row.meta.remote" close-transition>远程</el-tag>
                 </template>
             </el-table-column>
             <el-table-column prop="description" label="描述"/>
             <el-table-column label="操作" :width="230">
-                <template scope="scope">
+                <template v-slot:default="scope">
                     <div class="rule-file-op-container">
                         <el-button type="danger" icon='el-icon-delete' size="mini"
                                    @click='onDeleteFile(scope.row,scope.$index)'/>
@@ -42,7 +42,7 @@
                 </template>
             </el-table-column>
             <el-table-column label="启用" width="100">
-                <template scope='scope'>
+                <template v-slot:default="scope">
                     <el-switch
                             v-model="scope.row.checked"
                             :disabled="!$dc.ruleState"

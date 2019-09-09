@@ -9,7 +9,7 @@
         </el-row>
         <el-table border style="width: 100%" row-key="key" :stripe="true" align='center' :data="filecontent.content">
             <el-table-column label="启用" align="center" width="80">
-                <template scope='scope'>
+                <template v-slot:default="scope">
                     <el-checkbox v-model="scope.row.checked" @change="saveFileRightNow"></el-checkbox>
                 </template>
             </el-table-column>
@@ -18,7 +18,7 @@
             </el-table-column>
 
             <el-table-column label="匹配方法" width="100" align="center">
-                <template scope='scope'>
+                <template v-slot:default="scope">
                     {{scope.row.method ? scope.row.method : "全部"}}
                 </template>
             </el-table-column>
@@ -27,7 +27,7 @@
             </el-table-column>
 
             <el-table-column label="操作" :width="200" align="center">
-                <template scope='scope'>
+                <template v-slot:default="scope">
                     <div class="action-panel">
                         <el-button type="danger" icon='el-icon-delete' size="mini"
                                    @click='onDeleteRow(scope.row, scope.$index)'>

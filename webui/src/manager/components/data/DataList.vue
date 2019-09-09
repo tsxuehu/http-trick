@@ -13,7 +13,7 @@
       <el-table-column prop="contenttype" label="类型" align="center">
       </el-table-column>
       <el-table-column label="操作" :width="136" align="center" :context="_self">
-        <template scope='scope'>
+        <template v-slot:default="scope">
           <el-button type="info" icon='el-icon-edit' size="mini"
                      @click='$dc.requestEditDataFile(scope.row)'>
           </el-button>

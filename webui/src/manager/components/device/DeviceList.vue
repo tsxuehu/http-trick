@@ -21,7 +21,7 @@
             <el-table-column prop="name" label="Name" align="center" :sortable="true">
             </el-table-column>
             <el-table-column label="操作" :width="136" align="center" :context="_self">
-                <template scope='scope'>
+                <template v-slot:default="scope">
                     <el-button type="danger" icon='el-icon-delete' size="mini"
                                @click='unbind(scope.row, scope.$index )'>
                     </el-button>
