@@ -66,7 +66,11 @@
   margin-left: 10px; }
 
 .rule-edit-form .match-rule .match-reg {
-  margin-top: 5px; }
+  margin-top: 5px;
+  display: flex;
+  align-items: center; }
+  .rule-edit-form .match-rule .match-reg .el-input {
+    margin-right: 10px; }
 
 .rule-edit-form .rule-actions {
   font-style: italic;
