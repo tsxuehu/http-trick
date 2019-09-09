@@ -71,7 +71,7 @@
             </div>
 
             <!-- 按钮 -->
-            <div class="bottom-action">
+            <div class="bottom-action" >
                 <el-button @click="cancelEdit">取消</el-button>
                 <el-button type="primary" @click="addAction">新增动作</el-button>
                 <el-button type="primary" @click="saveRule">{{isEditRule?'保存规则': '创建规则'}}</el-button>
@@ -81,9 +81,9 @@
 </template>
 
 <script>
-  import ActionValue from './ActionValue.vue';
+  import RuleActionValue from './RuleActionValue.vue';
   import uuidV4 from 'uuid/v4';
-  import './index.scss'
+  import './rule-edit-form.scss'
 
   const DefaultRule = {
     name: "",
@@ -116,7 +116,7 @@
     name: "RuleEditForm",
     props: ['dataList', 'userId'],
     components: {
-      [ActionValue.name]: ActionValue
+      [RuleActionValue.name]: RuleActionValue
     },
     data() {
       return {

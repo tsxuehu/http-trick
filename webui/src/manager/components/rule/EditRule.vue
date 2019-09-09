@@ -49,39 +49,12 @@
                         @new-data-file="requestNewDataFile"
                         @edit-data-file="requestEditDataFile"
                         @save="saveRule"></rule-edit-form>
-        <!-- 测试正则匹配对话框 -->
-        <el-dialog title="匹配规则测试(只测试正则匹配，不包含请求方法)" v-model="testMatchRuleFormVisible" size="large">
-            <el-form :model="testMatchRuleForm" label-width="120px">
-                <el-form-item label="请求url">
-                    <el-input v-model="testMatchRuleForm.url"></el-input>
-                </el-form-item>
-                <el-form-item label="匹配条件">
-                    <el-input v-model="testMatchRuleForm.match"></el-input>
-                </el-form-item>
-                <el-form-item label="转发路径">
-                    <el-input v-model="testMatchRuleForm.targetTpl"></el-input>
-                </el-form-item>
-                <el-form-item label="匹配结果">
-                    <el-input v-model="testMatchRuleForm.matchRlt" :disabled="true"></el-input>
-                </el-form-item>
-                <el-form-item label="最终目标路径">
-                    <el-input v-model="testMatchRuleForm.targetRlt" :disabled="true"></el-input>
-                </el-form-item>
-                <el-form-item label="其他信息">
-                    <el-input v-model="testMatchRuleForm.msg" type="textarea" :disabled="true"></el-input>
-                </el-form-item>
-            </el-form>
-            <div slot="footer" class="dialog-footer">
-                <el-button @click="testMatchRuleFormVisible = false">关 闭</el-button>
-                <el-button type="primary" @click="testMatchRule">测 试</el-button>
-            </div>
-        </el-dialog>
     </div>
 </template>
 
 <script>
   import ruleApi from '../../../api/rule';
-  import RuleEditForm from '../rule-edit-form/Index.vue';
+  import RuleEditForm from '../form-widget/RuleEditForm.vue';
 
   export default {
     name: 'edit-rule',
@@ -93,15 +66,6 @@
         loaded: false,
         name: '',
         filecontent: {meta: {}},
-        testMatchRuleFormVisible: false,
-        testMatchRuleForm: {
-          url: '',// 请求url
-          match: '',// url匹配规则
-          targetTpl: '',// 路径模板， 会用urlReg的匹配结果来替换targetTpl $1 $2
-          matchRlt: '',// url匹配结果
-          targetRlt: '',// 路径匹配结果
-          msg: ''
-        }
       };
     },
     methods: {
@@ -216,37 +180,6 @@
           }
         });
       },
-
-
-
-      /**
-       url: '',// 请求url
-       urlMatch: '',// url匹配规则
-       urlReg: '',// url的正则，用于路径替换
-       targetTpl: '',// 路径模板， 会用urlReg的匹配结果来替换targetTpl $1 $2
-       matchRlt:'',// url匹配结果
-       targetRlt: ''// 路径匹配结果
-       * @param row
-       */
-      testMatchRuleRequest(row) {
-        this.testMatchRuleForm.match = row.match;
-        this.testMatchRuleForm.targetTpl = row.actionList[0] && row.actionList[0].data.target || '';
-        this.testMatchRuleForm.url = '';
-        this.testMatchRuleForm.matchRlt = '';
-        this.testMatchRuleForm.targetRlt = '';
-        this.testMatchRuleForm.msg = '';
-        this.testMatchRuleFormVisible = true;
-      },
-      testMatchRule() {
-        ruleApi.testRule(this.testMatchRuleForm).then((response) => {
-          var serverData = response.data;
-          if (serverData.code == 0) {
-            this.testMatchRuleForm.matchRlt = serverData.data.matchRlt;
-            this.testMatchRuleForm.targetRlt = serverData.data.targetRlt;
-            this.testMatchRuleForm.msg = serverData.data.msg;
-          }
-        });
-      }
     },
     mounted() {
       this.getFile();

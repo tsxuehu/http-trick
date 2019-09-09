@@ -48,6 +48,10 @@
     padding: 9px 12px;
     border-radius: 3px; }
 
+.test-rule-form .bottom-action {
+  text-align: right;
+  margin-top: 20px; }
+
 .view-configure {
   max-width: 500px;
 }

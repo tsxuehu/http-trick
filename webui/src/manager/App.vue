@@ -59,17 +59,17 @@
                 <el-button type="primary" @click="finishEditDataFile">确 定</el-button>
             </div>
         </el-dialog>
+        <rule-test-form></rule-test-form>
     </div>
 </template>
 
 <script>
   import LeftMenu from './components/common/LeftMenu';
   import Header from './components/common/Header.vue';
+  import RuleTestForm from './components/form-widget/RuleTestForm';
   import hostApi from '../api/host';
   import ruleApi from '../api/rule';
-  import confApi from '../api/conf';
   import profileApi from '../api/profile';
-  import Vue from 'vue';
   import $ from 'jquery';
   import forEach from 'lodash/forEach';
   import dataApi from '../api/data';
@@ -84,10 +84,14 @@
   import 'codemirror/mode/htmlmixed/htmlmixed';
 
   let editor = null;
-  Vue.component(LeftMenu.name, LeftMenu);
-  Vue.component(Header.name, Header);
+
   export default {
     name: 'app',
+    components: {
+      [LeftMenu.name]: LeftMenu,
+      [Header.name]: Header,
+      [RuleTestForm.name]: RuleTestForm,
+    },
     data() {
       return {
         isDataCenter: true,
