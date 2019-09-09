@@ -48,10 +48,6 @@
     padding: 9px 12px;
     border-radius: 3px; }
 
-.test-rule-form .bottom-action {
-  text-align: right;
-  margin-top: 20px; }
-
 .view-configure {
   max-width: 500px;
 }
@@ -163,6 +159,10 @@
 
 .action-value-container .value-key-value .row-last {
   margin-bottom: 0; }
+
+.test-rule-form .bottom-action {
+  text-align: right;
+  margin-top: 20px; }
 
 .action-panel .btn-panel {
   margin-left: auto;

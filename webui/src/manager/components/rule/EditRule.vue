@@ -48,14 +48,15 @@
                         ref="ruleEditForm"
                         @new-data-file="requestNewDataFile"
                         @edit-data-file="requestEditDataFile"
+                        @test-rule="testRule"
                         @save="saveRule"></rule-edit-form>
     </div>
 </template>
 
 <script>
   import ruleApi from '../../../api/rule';
-  import RuleEditForm from '../form-widget/RuleEditForm.vue';
-
+  import RuleEditForm from '../../form-widget/rule-edit-form/Index.vue';
+  import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
   export default {
     name: 'edit-rule',
     components: {
@@ -109,7 +110,11 @@
           };
         });
       },
-
+      testRule({rule, actionIndex}) {
+        RuleTestForm.test({
+          rule, actionIndex
+        })
+      },
       addRule() {
         let ruleEditForm = this.$refs.ruleEditForm;
         ruleEditForm.createRule({});

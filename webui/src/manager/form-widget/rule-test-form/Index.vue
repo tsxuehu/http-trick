@@ -1,5 +1,8 @@
 <template>
-    <el-dialog title="匹配-转发 测试" :visible.sync="visible" width="800px">
+    <el-dialog title="匹配-转发 测试"
+               :close-on-click-modal="false"
+               :visible.sync="visible"
+               width="800px">
         <div class="test-rule-form">
             <el-form :model="testMatchRuleForm"
                      label-width="120px">
@@ -33,7 +36,7 @@
                 </el-form-item>
                 <el-form-item label="转发路径">
                     <el-input size="small"
-                              v-model="testMatchRuleForm.redirectTpl"></el-input>
+                              v-model="testMatchRuleForm.target"></el-input>
                 </el-form-item>
                 <el-form-item label="匹配结果">
                     <el-input size="small"
@@ -57,7 +60,7 @@
 </template>
 
 <script>
-  import ruleApi from '../../../api/rule';
+  import ruleApi from 'src/api/rule';
   import './rule-test-form.scss'
 
   export default {
@@ -71,7 +74,7 @@
           requestUrl: '',// 请求url
           matchMethod: '',// 匹配method
           matchUrl: '',// 匹配url
-          redirectTpl: '', // 转发末班
+          target: '', // 转发目标
           matchResult: '', // 匹配结果
           redirectResult: '',// 转发结果
           message: '',
@@ -110,14 +113,14 @@
        * @param row
        */
       testRule({
-                 match, method, redirect
+                 match, method, target
                }) {
         this.testMatchRuleForm = {
           requestMethod: '',// 请求method
           requestUrl: '',// 请求url
           matchMethod: method,// 匹配method
           matchUrl: match,// 匹配url
-          redirectTpl: redirect, // 转发末班
+          target: target, // 转发末班
           matchResult: '', // 匹配结果
           redirectResult: '',// 转发结果
           message: '',

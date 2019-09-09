@@ -1,5 +1,8 @@
 <template>
-    <el-dialog :title="isEditRule?'编辑规则': '新建规则'" :visible.sync="visible" width="900px">
+    <el-dialog :title="isEditRule?'编辑规则': '新建规则'"
+               :close-on-click-modal="false"
+               :visible.sync="visible"
+               width="900px">
         <div class="rule-edit-form">
             <div class="config-row">
                 <span class="config-name">规则名:</span>
@@ -54,10 +57,11 @@
                     <el-table-column prop="description" label="参数">
                         <template v-slot:default="{row, $index}">
                             <action-value :action="row"
-                                           :data-list="dataList"
-                                           :allow-redirect-to-local="allowRedirectToLocal"
-                                           @new-data-file="$emit('new-data-file', $index)"
-                                           @edit-data-file="$emit('edit-data-file', $event)">
+                                          :data-list="dataList"
+                                          :allow-redirect-to-local="allowRedirectToLocal"
+                                          @new-data-file="$emit('new-data-file', $index)"
+                                          @edit-data-file="$emit('edit-data-file', $event)"
+                                          @test-rule="$emit('test-rule',{actionIndex:$index, rule})">
                             </action-value>
                         </template>
                     </el-table-column>
@@ -71,7 +75,7 @@
             </div>
 
             <!-- 按钮 -->
-            <div class="bottom-action" >
+            <div class="bottom-action">
                 <el-button @click="cancelEdit">取消</el-button>
                 <el-button type="primary" @click="addAction">新增动作</el-button>
                 <el-button type="primary" @click="saveRule">{{isEditRule?'保存规则': '创建规则'}}</el-button>
@@ -83,7 +87,7 @@
 <script>
   import RuleActionValue from './RuleActionValue.vue';
   import uuidV4 from 'uuid/v4';
-  import './rule-edit-form.scss'
+  import './index.scss'
 
   const DefaultRule = {
     name: "",
@@ -144,13 +148,13 @@
       ruleTypes() {
         if (this.isFilterRule) {
           return [
-          //  {value: 'redirect', label: '转发请求'},
-          //  {value: 'mockData', label: '返回自定义数据'},
+            //  {value: 'redirect', label: '转发请求'},
+            //  {value: 'mockData', label: '返回自定义数据'},
             {value: 'addQuery', label: '增加Query'},
             {value: 'addRequestCookie', label: '设置请求cookie'},
             {value: 'addRequestHeader', label: '增加请求头'},
             {value: 'addResponseHeader', label: '增加响应头'},
-          //  {value: 'modifyResponse', label: '修改响应内容'},
+            //  {value: 'modifyResponse', label: '修改响应内容'},
             {value: 'scriptModifyRequest', label: 'js修改请求内容'},
             {value: 'scriptModifyResponse', label: 'js修改响应内容'}
           ]

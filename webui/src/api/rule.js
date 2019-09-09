@@ -39,10 +39,6 @@ var api = {
     return axios.post('/rule/test', content);
   },
 
-  getRemoteRuleFile(url){
-    return axios.get(`/utils/getGitlabFile?url=${encodeURIComponent(url)}`);
-  },
-
   getReferenceVar(content) {
     var contentStr = JSON.stringify(content);
     var reg = RegExp("<%=(.+?)%>", 'g');

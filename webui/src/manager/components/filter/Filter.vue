@@ -54,7 +54,7 @@
 
 <script>
   import filtersApi from '../../../api/filter';
-  import RuleEditForm from '../form-widget/RuleEditForm.vue';
+  import RuleEditForm from '../../form-widget/rule-edit-form/Index.vue';
 
   import './index.css'
 

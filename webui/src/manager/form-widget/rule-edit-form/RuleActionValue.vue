@@ -2,9 +2,14 @@
     <div class="action-value-container">
         <!-- 参数设置- 请求转发 -->
         <div v-if="action.type == 'redirect'" class="value-redirect">
-            <el-input v-model="action.data.target" size="small"
+            <el-input v-model="action.data.target"
+                      size="small"
+                      style="width:500px;"
                       :placeholder="redirectPlaceholder">
             </el-input>
+            <el-button type="text" @click="$emit('test-rule')">
+                测试
+            </el-button>
         </div>
         <!-- 参数设置- 返回自定义数据 el-select的一个bug，当el-select从界面中消失的时候会解绑事件。。所以用v-show -->
         <div v-if="action.type == 'mockData'" class="value-mock-data">

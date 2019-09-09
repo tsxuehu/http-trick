@@ -59,14 +59,12 @@
                 <el-button type="primary" @click="finishEditDataFile">确 定</el-button>
             </div>
         </el-dialog>
-        <rule-test-form ref="ruleTestForm"></rule-test-form>
     </div>
 </template>
 
 <script>
   import LeftMenu from './components/common/LeftMenu';
   import Header from './components/common/Header.vue';
-  import RuleTestForm from './components/form-widget/RuleTestForm';
   import hostApi from '../api/host';
   import ruleApi from '../api/rule';
   import profileApi from '../api/profile';
@@ -83,6 +81,7 @@
   import 'codemirror/mode/javascript/javascript';
   import 'codemirror/mode/htmlmixed/htmlmixed';
 
+
   let editor = null;
 
   export default {
@@ -90,7 +89,6 @@
     components: {
       [LeftMenu.name]: LeftMenu,
       [Header.name]: Header,
-      [RuleTestForm.name]: RuleTestForm,
     },
     data() {
       return {
@@ -351,7 +349,7 @@
             this.$message.error(`出错了，${serverData.msg}`);
           }
         });
-      }
+      },
     },
 
     async created() {
@@ -407,7 +405,6 @@
       // 强制dialog渲染body部分, 对ele dialog hack的初始化方式，原始的dialog不提供mouted后的事件
       // 编辑器editor初始化的时候需要用到editDataFileDialog里的元素content-editor
       this.$refs.editDataFileDialog.rendered = true;
-      this.ruleTestForm = this.$refs.ruleTestForm;
     }
   };
 </script>
