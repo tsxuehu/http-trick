@@ -1,54 +1,79 @@
 <template>
-    <el-dialog :title="isEditRule?'编辑规则': '新建规则'" :visible.sync="visible" width="80%">
+    <el-dialog :title="isEditRule?'编辑规则': '新建规则'" :visible.sync="visible" width="900px">
         <div class="rule-edit-form">
-            <!-- 条件，说明 -->
-            <div class="el-form demo-form-inline el-form--inline conditon">
-                <div class="el-form-item" style="margin-bottom:8px;">
-                    <label class="el-form-item__label">条件</label>
-                    <div class="el-form-item__content">
-                        <el-select v-model="rule.method" style="width: 100px;" size="small" placeholder="请选择">
-                            <el-option v-for="item in methodList" :key="item.value" :label="item.label"
+            <div class="config-row">
+                <span class="config-name">规则名:</span>
+                <span class="config-value">
+                    <el-input v-model="rule.name" size="small" placeholder="方便记忆规则"></el-input>
+                </span>
+            </div>
+            <div class="config-row">
+                <span class="config-name">匹配规则:</span>
+                <span class="config-value match-rule">
+                    <div class="match-method">
+                        <el-select
+                                v-model="rule.method"
+                                size="small"
+                                placeholder="请选择">
+                            <el-option v-for="item in methodList"
+                                       :key="item.value"
+                                       :label="item.label"
                                        :value="item.value">
                             </el-option>
                         </el-select>
+                        <span class="tips">
+                            不要忘记选择匹配请求方法
+                        </span>
                     </div>
-                </div>
-                <div class="el-form-item"
-                     style="margin-bottom:8px;width: calc(100% - 170px);padding-left: 20px;margin-right: 0px">
-                    <div class="el-form-item__content" style="width: 100%">
-                        <el-input v-model="rule.match" style="width: 100%" size="small"
-                                  placeholder="填写要拦截的url中部分连续的字符串，或者匹配要拦截url的正则表达式"></el-input>
+                    <div class="match-reg">
+                        <el-input
+                                v-model="rule.match"
+                                size="small"
+                                placeholder="填写要拦截的url中部分连续的字符串，或者匹配要拦截url的正则表达式">
+                        </el-input>
                     </div>
-                </div>
-            </div>
-            <!-- 规则说明 -->
-            <div style="padding: 10px 0;">
-                <span style="width: 85%;display: inline-block">
-                    <el-input v-model="rule.name" size="small" placeholder="规则说明，写一段文字，方便记忆这个规则的作用"></el-input>
-                </span>
-                <span style="width: 10%;display: inline-block">
-                    <el-button type="text" @click="addAction">新增动作</el-button>
+
                 </span>
             </div>
-            <!-- action展示 -->
+            <div class="rule-actions">执行操作</div>
             <div>
-                <div v-for="action,index in rule.actionList" :key="index" class="dashed-border">
-                    <span style="width: 85%;display: inline-block">
-                        <action-detail :action="action"
-                                       :rule-types="ruleTypes"
-                                       :data-list="dataList"
-                                       :user-id="userId"
-                                       @new-data-file="$emit('new-data-file', index)"
-                                       @edit-data-file="$emit('edit-data-file', $event)"></action-detail>
-                    </span>
-                    <span style="width: 10%;display: inline-block;vertical-align: bottom;line-height: 107px;height: 107px;">
-                        <el-button type="text" @click="deleteAction(index)">删除动作</el-button>
-                    </span>
-                </div>
+                <el-table highlight-current-row :data="rule.actionList">
+                    <el-table-column
+                            type="index"
+                            width="50">
+                    </el-table-column>
+                    <el-table-column prop="name" label="操作" width="180">
+                        <template v-slot:default="{row, $index}">
+                            <el-select v-model="row.type" placeholder="请选择" size="small">
+                                <el-option v-for="item in ruleTypes" :key="item.value" :label="item.label"
+                                           :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="description" label="参数">
+                        <template v-slot:default="{row, $index}">
+                            <action-value :action="row"
+                                           :data-list="dataList"
+                                           :allow-redirect-to-local="allowRedirectToLocal"
+                                           @new-data-file="$emit('new-data-file', $index)"
+                                           @edit-data-file="$emit('edit-data-file', $event)">
+                            </action-value>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" :width="60" align="center">
+                        <template v-slot:default="{row, $index}">
+                            <el-button type="danger" icon='el-icon-delete' size="mini"
+                                       @click='deleteAction($index)'/>
+                        </template>
+                    </el-table-column>
+                </el-table>
             </div>
+
             <!-- 按钮 -->
-            <div style="text-align: right;">
+            <div class="bottom-action">
                 <el-button @click="cancelEdit">取消</el-button>
+                <el-button type="primary" @click="addAction">新增动作</el-button>
                 <el-button type="primary" @click="saveRule">{{isEditRule?'保存规则': '创建规则'}}</el-button>
             </div>
         </div>
@@ -56,9 +81,9 @@
 </template>
 
 <script>
-  import ActionDetail from './ActionDetail.vue';
-  import uuidV4  from 'uuid/v4';
-  import './index.css'
+  import ActionValue from './ActionValue.vue';
+  import uuidV4 from 'uuid/v4';
+  import './index.scss'
 
   const DefaultRule = {
     name: "",
@@ -91,7 +116,7 @@
     name: "RuleEditForm",
     props: ['dataList', 'userId'],
     components: {
-      [ActionDetail.name]: ActionDetail
+      [ActionValue.name]: ActionValue
     },
     data() {
       return {
@@ -113,16 +138,19 @@
     },
 
     computed: {
+      allowRedirectToLocal() {
+        return this.userId == 'root'
+      },
       ruleTypes() {
         if (this.isFilterRule) {
           return [
-            //  { value: 'redirect', label: '转发请求' },
-            //  { value: 'mockData', label: '返回自定义数据' },
-            {value: 'addRequestHeader', label: '增加请求头'},
+          //  {value: 'redirect', label: '转发请求'},
+          //  {value: 'mockData', label: '返回自定义数据'},
             {value: 'addQuery', label: '增加Query'},
-            {value: 'addResponseHeader', label: '增加响应头'},
-            //  { value: 'modifyResponse', label: '修改响应内容' },
             {value: 'addRequestCookie', label: '设置请求cookie'},
+            {value: 'addRequestHeader', label: '增加请求头'},
+            {value: 'addResponseHeader', label: '增加响应头'},
+          //  {value: 'modifyResponse', label: '修改响应内容'},
             {value: 'scriptModifyRequest', label: 'js修改请求内容'},
             {value: 'scriptModifyResponse', label: 'js修改响应内容'}
           ]
@@ -130,11 +158,11 @@
           return [
             {value: 'redirect', label: '转发请求'},
             {value: 'mockData', label: '返回自定义数据'},
-            {value: 'addRequestHeader', label: '增加请求头'},
             {value: 'addQuery', label: '增加Query'},
+            {value: 'addRequestCookie', label: '设置请求cookie'},
+            {value: 'addRequestHeader', label: '增加请求头'},
             {value: 'addResponseHeader', label: '增加响应头'},
             {value: 'modifyResponse', label: '修改响应内容'},
-            {value: 'addRequestCookie', label: '设置请求cookie'},
             {value: 'scriptModifyRequest', label: 'js修改请求内容'},
             {value: 'scriptModifyResponse', label: 'js修改响应内容'}
           ]
