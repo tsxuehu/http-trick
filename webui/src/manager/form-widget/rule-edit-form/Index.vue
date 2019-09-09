@@ -34,6 +34,9 @@
                                 size="small"
                                 placeholder="填写要拦截的url中部分连续的字符串，或者匹配要拦截url的正则表达式">
                         </el-input>
+                        <el-button type="text" @click="doTestRule(-1)">
+                            测试
+                        </el-button>
                     </div>
 
                 </span>
@@ -273,7 +276,7 @@
         }
       },
       doTestRule(index) {
-        let data = {actionIndex: index, rule};
+        let data = {actionIndex: index, rule: this.rule};
         this.$emit('test-rule', data);
         if (this.onTestRule) {
           this.onTestRule(data);
