@@ -43,59 +43,51 @@
                 </template>
             </el-table-column>
         </el-table>
-        <rule-edit-form :data-list="$dc.dataList"
-                        :user-id="$dc.userId"
-                        ref="ruleEditForm"
-                        @new-data-file="requestNewDataFile"
-                        @edit-data-file="requestEditDataFile"
-                        @save="saveRule"></rule-edit-form>
+
     </div>
 </template>
 
 <script>
   import filtersApi from '../../../api/filter';
-  import RuleEditForm from '../../form-widget/rule-edit-form/Index.vue';
+  import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
+  import * as RuleEditForm from '../../form-widget/rule-edit-form/index.js'
 
-  import './index.css'
+  import './index.scss'
 
   export default {
     name: 'filters',
-    components: {
-      [RuleEditForm.name]: RuleEditForm
-    },
     methods: {
 
-      requestNewDataFile(actionIndex) {
-        let ruleEditForm = this.$refs.ruleEditForm;
-        this.$dc.requestAddDataFile((id) => {
-          ruleEditForm.setActionDataFileId(actionIndex, id);
-        });
-      },
-
-      requestEditDataFile(datafileEntry) {
-        this.$dc.requestEditDataFile(datafileEntry);
-      },
-
-      addRule(row, index) {
-        let ruleEditForm = this.$refs.ruleEditForm;
-        ruleEditForm.createRule({
-          isFilterRule: true
+      addRule() {
+        RuleEditForm.createRule({
+          isFilterRule: true,
+          onTestRule: data => { this.testRule(data); },
+          onSaveRule: data => { this.saveRule(data); },
+          dataList: this.$dc.dataList,
+          userId: this.$dc.userId
         });
       },
       onDuplicateRow(row, index) {
-        let ruleEditForm = this.$refs.ruleEditForm;
-        ruleEditForm.createRule({
+        RuleEditForm.createRule({
           initialRule: row,
-          isFilterRule: true
+          isFilterRule: true,
+          onTestRule: data => { this.testRule(data); },
+          onSaveRule: data => { this.saveRule(data); },
+          dataList: this.$dc.dataList,
+          userId: this.$dc.userId
         });
       },
       onEditRule(row, index) {
-        let ruleEditForm = this.$refs.ruleEditForm;
-        ruleEditForm.editRule({
+
+        RuleEditForm.editRule({
           rule: row,
           ruleIndex: index,
-          isFilterRule: true
-        })
+          isFilterRule: true,
+          onTestRule: data => { this.testRule(data); },
+          onSaveRule: data => { this.saveRule(data); },
+          dataList: this.$dc.dataList,
+          userId: this.$dc.userId
+        });
       },
       onDeleteRow(row, index, list) {
         this.$confirm('此操作不可恢复, 是否继续?', '提示', {
@@ -106,6 +98,11 @@
           this.$dc.filters.splice(index, 1);
           this.saveFileRightNow();
         });
+      },
+      testRule({rule, actionIndex}) {
+        RuleTestForm.test({
+          rule, actionIndex
+        })
       },
       saveRule({
                  isEditRule,

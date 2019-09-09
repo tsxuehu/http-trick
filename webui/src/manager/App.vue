@@ -65,6 +65,8 @@
 <script>
   import LeftMenu from './components/LeftMenu';
   import Header from './components/Header.vue';
+  import * as RuleEditForm from './form-widget/rule-edit-form/index'
+
   import hostApi from '../api/host';
   import ruleApi from '../api/rule';
   import profileApi from '../api/profile';
@@ -405,6 +407,10 @@
       // 强制dialog渲染body部分, 对ele dialog hack的初始化方式，原始的dialog不提供mouted后的事件
       // 编辑器editor初始化的时候需要用到editDataFileDialog里的元素content-editor
       this.$refs.editDataFileDialog.rendered = true;
+      RuleEditForm.init({
+        dataList: this.dataList,
+        userId: this.userId
+      });
     }
   };
 </script>

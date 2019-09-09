@@ -48,6 +48,49 @@
     padding: 9px 12px;
     border-radius: 3px; }
 
+.rule-edit-form .config-row {
+  margin-bottom: 10px;
+  display: flex; }
+
+.rule-edit-form .config-name {
+  width: 100px;
+  text-align: right;
+  padding-right: 10px;
+  padding-top: 5px; }
+
+.rule-edit-form .config-value {
+  flex-grow: 1; }
+
+.rule-edit-form .match-rule .tips {
+  color: red;
+  margin-left: 10px; }
+
+.rule-edit-form .match-rule .match-reg {
+  margin-top: 5px; }
+
+.rule-edit-form .rule-actions {
+  font-style: italic;
+  margin-bottom: 5px; }
+
+.rule-edit-form .bottom-action {
+  text-align: right;
+  margin-top: 20px; }
+
+.action-value-container .value-key-value .row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px; }
+
+.action-value-container .value-key-value .label {
+  width: 120px;
+  padding-right: 5px; }
+
+.action-value-container .value-key-value .value {
+  flex-grow: 1; }
+
+.action-value-container .value-key-value .row-last {
+  margin-bottom: 0; }
+
 .view-configure {
   max-width: 500px;
 }
@@ -116,49 +159,6 @@
 .addrule-btn-wrap {
   text-align: right;
 }
-
-.rule-edit-form .config-row {
-  margin-bottom: 10px;
-  display: flex; }
-
-.rule-edit-form .config-name {
-  width: 100px;
-  text-align: right;
-  padding-right: 10px;
-  padding-top: 5px; }
-
-.rule-edit-form .config-value {
-  flex-grow: 1; }
-
-.rule-edit-form .match-rule .tips {
-  color: red;
-  margin-left: 10px; }
-
-.rule-edit-form .match-rule .match-reg {
-  margin-top: 5px; }
-
-.rule-edit-form .rule-actions {
-  font-style: italic;
-  margin-bottom: 5px; }
-
-.rule-edit-form .bottom-action {
-  text-align: right;
-  margin-top: 20px; }
-
-.action-value-container .value-key-value .row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 5px; }
-
-.action-value-container .value-key-value .label {
-  width: 120px;
-  padding-right: 5px; }
-
-.action-value-container .value-key-value .value {
-  flex-grow: 1; }
-
-.action-value-container .value-key-value .row-last {
-  margin-bottom: 0; }
 
 .test-rule-form .bottom-action {
   text-align: right;

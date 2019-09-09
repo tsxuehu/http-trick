@@ -57,11 +57,11 @@
                     <el-table-column prop="description" label="参数">
                         <template v-slot:default="{row, $index}">
                             <action-value :action="row"
-                                          :data-list="dataList"
+                                          :data-list="dataListInternal"
                                           :allow-redirect-to-local="allowRedirectToLocal"
-                                          @new-data-file="$emit('new-data-file', $index)"
-                                          @edit-data-file="$emit('edit-data-file', $event)"
-                                          @test-rule="$emit('test-rule',{actionIndex:$index, rule})">
+                                          @new-data-file="doNewDataFile($index)"
+                                          @edit-data-file="doEditDataFile($event)"
+                                          @test-rule="doTestRule($index)">
                             </action-value>
                         </template>
                     </el-table-column>
@@ -78,7 +78,7 @@
             <div class="bottom-action">
                 <el-button @click="cancelEdit">取消</el-button>
                 <el-button type="primary" @click="addAction">新增动作</el-button>
-                <el-button type="primary" @click="saveRule">{{isEditRule?'保存规则': '创建规则'}}</el-button>
+                <el-button type="primary" @click="doSaveRule">{{isEditRule?'保存规则': '创建规则'}}</el-button>
             </div>
         </div>
     </el-dialog>
@@ -118,7 +118,7 @@
   };
   export default {
     name: "RuleEditForm",
-    props: ['dataList', 'userId'],
+    props: ['dataList', 'userId', "useType"],
     components: {
       [RuleActionValue.name]: RuleActionValue
     },
@@ -126,6 +126,10 @@
       return {
         visible: false,
         isFilterRule: false, // 是否是过滤器规则
+        extraData: {
+          dataList: [],
+          userId: ''
+        },
         isEditRule: false, // 是否编辑规则
         rule: JSON.parse(JSON.stringify(DefaultRule)),
         ruleIndex: -1, // 用来记录被编辑的rule 索引
@@ -143,7 +147,18 @@
 
     computed: {
       allowRedirectToLocal() {
-        return this.userId == 'root'
+        if (this.useType == 'api') {
+          return this.extraData.userId == 'root'
+        } else {
+          return this.userId == 'root'
+        }
+      },
+      dataListInternal() {
+        if (this.useType == 'api') {
+          return this.extraData.dataList;
+        } else {
+          return this.dataList;
+        }
       },
       ruleTypes() {
         if (this.isFilterRule) {
@@ -174,32 +189,11 @@
       },
     },
     methods: {
-      cancelEdit() {
-        this.visible = false;
-      },
-
-      saveRule() {
-        this.$emit('save', {
-          isEditRule: this.isEditRule,
-          ruleIndex: this.ruleIndex,
-          rule: JSON.parse(JSON.stringify(this.rule))
-        });
-        this.visible = false;
-      },
-
-      editRule({
-                 rule, isFilterRule, ruleIndex
-               }) {
-        this.isEditRule = true;
-        this.ruleIndex = ruleIndex;
-        this.isFilterRule = isFilterRule;
-        this.rule = JSON.parse(JSON.stringify(rule));
-        this.visible = true;
-      },
-
       createRule({
                    initialRule,
-                   isFilterRule = false
+                   isFilterRule = false,
+                   onNewDataFile, onEditDataFile, onTestRule, onSaveRule,
+                   dataList, userId
                  }) {
         this.ruleIndex = -1;
         this.isEditRule = false;
@@ -214,13 +208,49 @@
           action.type = this.isFilterRule ? "addRequestHeader" : "redirect";// 转发redirect
           rule.actionList.push(action);
         }
-
         rule.key = uuidV4();
 
         this.rule = rule;
         this.visible = true;
-      },
 
+        this.onNewDataFile = onNewDataFile;
+        this.onEditDataFile = onEditDataFile;
+        this.onTestRule = onTestRule;
+        this.onSaveRule = onSaveRule;
+
+        if (this.useType == 'api') {
+          this.extraData = {
+            userId,
+            dataList
+          }
+        }
+      },
+      editRule({
+                 rule, isFilterRule, ruleIndex,
+                 onNewDataFile, onEditDataFile, onTestRule, onSaveRule,
+                 dataList, userId
+               }) {
+        this.isEditRule = true;
+        this.ruleIndex = ruleIndex;
+        this.isFilterRule = isFilterRule;
+        this.rule = JSON.parse(JSON.stringify(rule));
+        this.visible = true;
+
+        this.onNewDataFile = onNewDataFile;
+        this.onEditDataFile = onEditDataFile;
+        this.onTestRule = onTestRule;
+        this.onSaveRule = onSaveRule;
+
+        if (this.useType == 'api') {
+          this.extraData = {
+            userId,
+            dataList
+          }
+        }
+      },
+      setActionDataFileId(actionIndex, dataId) {
+        this.rule.actionList[actionIndex].data.dataId = dataId;
+      },
       addAction() {
         let action = JSON.parse(JSON.stringify(DefaultAction));
         action.type = this.isFilterRule ? "addRequestHeader" : "redirect";// 转发redirect
@@ -230,10 +260,41 @@
       deleteAction(index) {
         this.rule.actionList.splice(index, 1);
       },
+      doNewDataFile(index) {
+        this.$emit('new-data-file', index);
+        if (this.onNewDataFile) {
+          this.onNewDataFile(index);
+        }
+      },
+      doEditDataFile(dataFileEntry) {
+        this.$emit('edit-data-file', dataFileEntry);
+        if (this.onEditDataFile) {
+          this.onEditDataFile(dataFileEntry);
+        }
+      },
+      doTestRule(index) {
+        let data = {actionIndex: index, rule};
+        this.$emit('test-rule', data);
+        if (this.onTestRule) {
+          this.onTestRule(data);
+        }
+      },
+      doSaveRule() {
+        let data = {
+          isEditRule: this.isEditRule,
+          ruleIndex: this.ruleIndex,
+          rule: JSON.parse(JSON.stringify(this.rule))
+        };
+        this.$emit('save', data);
+        if (this.onSaveRule) {
+          this.onSaveRule(data);
+        }
+        this.visible = false;
+      },
+      cancelEdit() {
+        this.visible = false;
+      },
 
-      setActionDataFileId(actionIndex, dataId) {
-        this.rule.actionList[actionIndex].data.dataId = dataId;
-      }
     }
   }
 </script>

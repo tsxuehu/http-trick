@@ -41,27 +41,17 @@
                     </div>
                 </template>
             </el-table-column>
-
         </el-table>
-        <rule-edit-form :data-list="$dc.dataList"
-                        :user-id="$dc.userId"
-                        ref="ruleEditForm"
-                        @new-data-file="requestNewDataFile"
-                        @edit-data-file="requestEditDataFile"
-                        @test-rule="testRule"
-                        @save="saveRule"></rule-edit-form>
     </div>
 </template>
 
 <script>
   import ruleApi from '../../../api/rule';
-  import RuleEditForm from '../../form-widget/rule-edit-form/Index.vue';
   import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
+  import * as RuleEditForm from '../../form-widget/rule-edit-form/index.js'
   export default {
     name: 'edit-rule',
-    components: {
-      [RuleEditForm.name]: RuleEditForm
-    },
+
     data() {
       return {
         loaded: false,
@@ -110,29 +100,46 @@
           };
         });
       },
+
       testRule({rule, actionIndex}) {
         RuleTestForm.test({
           rule, actionIndex
         })
       },
       addRule() {
-        let ruleEditForm = this.$refs.ruleEditForm;
-        ruleEditForm.createRule({});
+        RuleEditForm.createRule({
+          onNewDataFile: index => { this.requestNewDataFile(index); },
+          onEditDataFile: dataFileEntry => { this.requestEditDataFile(dataFileEntry); },
+          onTestRule: data => { this.testRule(data); },
+          onSaveRule: data => { this.saveRule(data); },
+          dataList: this.$dc.dataList,
+          userId: this.$dc.userId
+        });
       },
 
       onDuplicateRow(row, index) {
-        let ruleEditForm = this.$refs.ruleEditForm;
-        ruleEditForm.createRule({
-          initialRule: row
+        RuleEditForm.createRule({
+          initialRule: row,
+          onNewDataFile: index => { this.requestNewDataFile(index); },
+          onEditDataFile: dataFileEntry => { this.requestEditDataFile(dataFileEntry); },
+          onTestRule: data => { this.testRule(data); },
+          onSaveRule: data => { this.saveRule(data); },
+          dataList: this.$dc.dataList,
+          userId: this.$dc.userId
         });
       },
 
       onEditRule(row, index) {
-        let ruleEditForm = this.$refs.ruleEditForm;
-        ruleEditForm.editRule({
+        RuleEditForm.editRule({
           rule: row,
           ruleIndex: index,
-        })
+          onNewDataFile: index => { this.requestNewDataFile(index); },
+          onEditDataFile: dataFileEntry => { this.requestEditDataFile(dataFileEntry); },
+          onTestRule: data => { this.testRule(data); },
+          onSaveRule: data => { this.saveRule(data); },
+          dataList: this.$dc.dataList,
+          userId: this.$dc.userId
+        });
       },
 
       onDeleteRow(row, index) {
