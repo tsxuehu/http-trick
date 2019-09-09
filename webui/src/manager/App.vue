@@ -59,13 +59,18 @@
                 <el-button type="primary" @click="finishEditDataFile">确 定</el-button>
             </div>
         </el-dialog>
+        <rule-edit-form
+                :data-list="dataList"
+                :user-id="userId"
+                ref="ruleEditForm"></rule-edit-form>
     </div>
 </template>
 
 <script>
   import LeftMenu from './components/LeftMenu';
   import Header from './components/Header.vue';
-  import * as RuleEditForm from './form-widget/rule-edit-form/index'
+  import * as RuleEditFormApi from './form-widget/rule-edit-form/index.js'
+  import RuleEditForm from './form-widget/rule-edit-form/Index.vue'
 
   import hostApi from '../api/host';
   import ruleApi from '../api/rule';
@@ -83,7 +88,6 @@
   import 'codemirror/mode/javascript/javascript';
   import 'codemirror/mode/htmlmixed/htmlmixed';
 
-
   let editor = null;
 
   export default {
@@ -91,6 +95,7 @@
     components: {
       [LeftMenu.name]: LeftMenu,
       [Header.name]: Header,
+      [RuleEditForm.name]: RuleEditForm,
     },
     data() {
       return {
@@ -407,10 +412,8 @@
       // 强制dialog渲染body部分, 对ele dialog hack的初始化方式，原始的dialog不提供mouted后的事件
       // 编辑器editor初始化的时候需要用到editDataFileDialog里的元素content-editor
       this.$refs.editDataFileDialog.rendered = true;
-      RuleEditForm.init({
-        dataList: this.dataList,
-        userId: this.userId
-      });
+      let ruleEditForm = this.$refs.ruleEditForm;
+      RuleEditFormApi.setInstance(ruleEditForm);
     }
   };
 </script>

@@ -61,9 +61,8 @@
     },
     methods: {
       requestNewDataFile(actionIndex) {
-        let ruleEditForm = this.$refs.ruleEditForm;
         this.$dc.requestAddDataFile((id) => {
-          ruleEditForm.setActionDataFileId(actionIndex, id);
+          RuleEditForm.setActionDataFileId(actionIndex, id);
         });
       },
 

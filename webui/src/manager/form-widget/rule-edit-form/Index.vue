@@ -60,7 +60,7 @@
                     <el-table-column prop="description" label="参数">
                         <template v-slot:default="{row, $index}">
                             <action-value :action="row"
-                                          :data-list="dataListInternal"
+                                          :data-list="dataList"
                                           :allow-redirect-to-local="allowRedirectToLocal"
                                           @new-data-file="doNewDataFile($index)"
                                           @edit-data-file="doEditDataFile($event)"
@@ -121,7 +121,7 @@
   };
   export default {
     name: "RuleEditForm",
-    props: ['dataList', 'userId', "useType"],
+    props: ['dataList', 'userId'],
     components: {
       [RuleActionValue.name]: RuleActionValue
     },
@@ -129,10 +129,6 @@
       return {
         visible: false,
         isFilterRule: false, // 是否是过滤器规则
-        extraData: {
-          dataList: [],
-          userId: ''
-        },
         isEditRule: false, // 是否编辑规则
         rule: JSON.parse(JSON.stringify(DefaultRule)),
         ruleIndex: -1, // 用来记录被编辑的rule 索引
@@ -150,18 +146,7 @@
 
     computed: {
       allowRedirectToLocal() {
-        if (this.useType == 'api') {
-          return this.extraData.userId == 'root'
-        } else {
-          return this.userId == 'root'
-        }
-      },
-      dataListInternal() {
-        if (this.useType == 'api') {
-          return this.extraData.dataList;
-        } else {
-          return this.dataList;
-        }
+        return this.userId == 'root'
       },
       ruleTypes() {
         if (this.isFilterRule) {
