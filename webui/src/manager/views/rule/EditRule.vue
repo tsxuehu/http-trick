@@ -48,7 +48,7 @@
 <script>
   import ruleApi from '../../../api/rule';
   import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
-  import * as RuleEditForm from '../../form-widget/rule-edit-form/index.js'
+  import * as RuleEditFormApi from '../../form-widget/rule-edit-form/index.js'
   export default {
     name: 'edit-rule',
 
@@ -60,9 +60,18 @@
       };
     },
     methods: {
+      setEventHandle() {
+        RuleEditFormApi.setEventHandle({
+          onNewDataFile: index => { this.requestNewDataFile(index); },
+          onEditDataFile: dataFileEntry => { this.requestEditDataFile(dataFileEntry); },
+          onTestRule: data => { this.testRule(data); },
+          onSaveRule: data => { this.saveRule(data); },
+        });
+      },
       requestNewDataFile(actionIndex) {
+
         this.$dc.requestAddDataFile((id) => {
-          RuleEditForm.setActionDataFileId(actionIndex, id);
+          RuleEditFormApi.setActionDataFileId(actionIndex, id);
         });
       },
 
@@ -106,38 +115,22 @@
         })
       },
       addRule() {
-        RuleEditForm.createRule({
-          onNewDataFile: index => { this.requestNewDataFile(index); },
-          onEditDataFile: dataFileEntry => { this.requestEditDataFile(dataFileEntry); },
-          onTestRule: data => { this.testRule(data); },
-          onSaveRule: data => { this.saveRule(data); },
-          dataList: this.$dc.dataList,
-          userId: this.$dc.userId
-        });
+        this.setEventHandle();
+        RuleEditFormApi.createRule({});
       },
 
       onDuplicateRow(row, index) {
-        RuleEditForm.createRule({
+        this.setEventHandle();
+        RuleEditFormApi.createRule({
           initialRule: row,
-          onNewDataFile: index => { this.requestNewDataFile(index); },
-          onEditDataFile: dataFileEntry => { this.requestEditDataFile(dataFileEntry); },
-          onTestRule: data => { this.testRule(data); },
-          onSaveRule: data => { this.saveRule(data); },
-          dataList: this.$dc.dataList,
-          userId: this.$dc.userId
         });
       },
 
       onEditRule(row, index) {
-        RuleEditForm.editRule({
+        this.setEventHandle();
+        RuleEditFormApi.editRule({
           rule: row,
           ruleIndex: index,
-          onNewDataFile: index => { this.requestNewDataFile(index); },
-          onEditDataFile: dataFileEntry => { this.requestEditDataFile(dataFileEntry); },
-          onTestRule: data => { this.testRule(data); },
-          onSaveRule: data => { this.saveRule(data); },
-          dataList: this.$dc.dataList,
-          userId: this.$dc.userId
         });
       },
 
@@ -151,6 +144,7 @@
           this.saveFileRightNow();
         });
       },
+
 
       saveRule({
                  isEditRule,

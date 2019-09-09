@@ -177,11 +177,17 @@
       },
     },
     methods: {
+      setEventHandle({
+                       onNewDataFile, onEditDataFile, onTestRule, onSaveRule
+                     }) {
+        this.onNewDataFile = onNewDataFile;
+        this.onEditDataFile = onEditDataFile;
+        this.onTestRule = onTestRule;
+        this.onSaveRule = onSaveRule;
+      },
       createRule({
                    initialRule,
                    isFilterRule = false,
-                   onNewDataFile, onEditDataFile, onTestRule, onSaveRule,
-                   dataList, userId
                  }) {
         this.ruleIndex = -1;
         this.isEditRule = false;
@@ -200,41 +206,15 @@
 
         this.rule = rule;
         this.visible = true;
-
-        this.onNewDataFile = onNewDataFile;
-        this.onEditDataFile = onEditDataFile;
-        this.onTestRule = onTestRule;
-        this.onSaveRule = onSaveRule;
-
-        if (this.useType == 'api') {
-          this.extraData = {
-            userId,
-            dataList
-          }
-        }
       },
       editRule({
-                 rule, isFilterRule, ruleIndex,
-                 onNewDataFile, onEditDataFile, onTestRule, onSaveRule,
-                 dataList, userId
+                 rule, isFilterRule, ruleIndex
                }) {
         this.isEditRule = true;
         this.ruleIndex = ruleIndex;
         this.isFilterRule = isFilterRule;
         this.rule = JSON.parse(JSON.stringify(rule));
         this.visible = true;
-
-        this.onNewDataFile = onNewDataFile;
-        this.onEditDataFile = onEditDataFile;
-        this.onTestRule = onTestRule;
-        this.onSaveRule = onSaveRule;
-
-        if (this.useType == 'api') {
-          this.extraData = {
-            userId,
-            dataList
-          }
-        }
       },
       setActionDataFileId(actionIndex, dataId) {
         this.rule.actionList[actionIndex].data.dataId = dataId;

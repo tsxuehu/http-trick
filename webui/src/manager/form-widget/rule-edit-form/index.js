@@ -15,3 +15,7 @@ export function createRule(data) {
 export function setActionDataFileId(data) {
   instance.setActionDataFileId(data);
 }
+
+export function setEventHandle(eventHandlerMap) {
+  instance.setEventHandle(eventHandlerMap);
+}

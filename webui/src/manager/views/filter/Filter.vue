@@ -50,43 +50,38 @@
 <script>
   import filtersApi from '../../../api/filter';
   import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
-  import * as RuleEditForm from '../../form-widget/rule-edit-form/index.js'
+  import * as RuleEditFormApi from '../../form-widget/rule-edit-form/index.js'
 
   import './index.scss'
 
   export default {
     name: 'filters',
     methods: {
-
-      addRule() {
-        RuleEditForm.createRule({
-          isFilterRule: true,
+      setEventHandle() {
+        RuleEditFormApi.setEventHandle({
           onTestRule: data => { this.testRule(data); },
           onSaveRule: data => { this.saveRule(data); },
-          dataList: this.$dc.dataList,
-          userId: this.$dc.userId
+        });
+      },
+      addRule() {
+        this.setEventHandle();
+        RuleEditFormApi.createRule({
+          isFilterRule: true,
         });
       },
       onDuplicateRow(row, index) {
-        RuleEditForm.createRule({
+        this.setEventHandle();
+        RuleEditFormApi.createRule({
           initialRule: row,
           isFilterRule: true,
-          onTestRule: data => { this.testRule(data); },
-          onSaveRule: data => { this.saveRule(data); },
-          dataList: this.$dc.dataList,
-          userId: this.$dc.userId
         });
       },
       onEditRule(row, index) {
-
-        RuleEditForm.editRule({
+        this.setEventHandle();
+        RuleEditFormApi.editRule({
           rule: row,
           ruleIndex: index,
           isFilterRule: true,
-          onTestRule: data => { this.testRule(data); },
-          onSaveRule: data => { this.saveRule(data); },
-          dataList: this.$dc.dataList,
-          userId: this.$dc.userId
         });
       },
       onDeleteRow(row, index, list) {
