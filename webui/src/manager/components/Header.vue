@@ -87,7 +87,7 @@
 
 <script>
     import './header.pcss'
-    import profileApi from '../../../api/profile';
+    import profileApi from 'src/api/profile';
     export default {
         name: 'ManagerHeader',
         methods: {

@@ -63,8 +63,8 @@
 </template>
 
 <script>
-  import LeftMenu from './components/common/LeftMenu';
-  import Header from './components/common/Header.vue';
+  import LeftMenu from './components/LeftMenu';
+  import Header from './components/Header.vue';
   import hostApi from '../api/host';
   import ruleApi from '../api/rule';
   import profileApi from '../api/profile';
