@@ -53,7 +53,6 @@
 
 <script>
   import confApi from '../../../api/conf';
-  import forEach from 'lodash/forEach';
 
   export default {
     name: 'configure',

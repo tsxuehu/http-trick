@@ -46,7 +46,6 @@
 <script>
   import profileApi from '../../../api/profile';
   import './project.pcss'
-  import forEach from 'lodash/forEach';
 
   export default {
     name: 'project-path',

@@ -32,7 +32,8 @@
 </template>
 <script>
     import $ from 'jquery';
-    import _ from 'lodash';
+    import debounce from 'lodash/debounce';
+    import forEach from 'lodash/forEach';
     import HttpTraffic from './components/traffic/HttpTraffic.vue';
     import Detail from './components/detail/Detail.vue';
     import DeviceList from './components/device/DeviceList.vue';
@@ -217,7 +218,7 @@
             receiveTraffic(rows) {
                 if (this.state.stopRecord || this.requestingClear) return;
                 let {host: hostFilter, path: pathFilter} = this.filter;
-                _.forEach(rows, (row) => {
+                forEach(rows, (row) => {
                     let id = row.id;
                     let hasRecieved = !!this.recordMap[id];
                     let record = this.recordMap[id] || {};
@@ -285,7 +286,7 @@
         watch: {
             // 监听过滤器变化
             filter: {
-                handler: _.debounce(function () {
+                handler: debounce(function () {
                     // 过滤
                     this.filterRecords();
                     trafficApi.setFilter(this.filter);
@@ -301,7 +302,7 @@
             let appInfo = await appApi.getAppInfo();
             this.appInfo = appInfo.data.data;
 
-            $(window).resize(_.debounce(this.calcSize, 200));
+            $(window).resize(debounce(this.calcSize, 200));
 
             if (!window.io) return;
             let socket = io('/httptrafic');

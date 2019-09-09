@@ -35,9 +35,7 @@
 </template>
 <script>
   import hostApi from '../../../api/host'
-  import _ from 'lodash'
-
-
+  import find from 'lodash/find'
 
   export default {
     name: 'hostlist',
@@ -46,7 +44,7 @@
       selectedFileName: {
         get(){
           // 遍历找出选择的文件
-          var selectedFile = _.find(this.$dc.hostFileList, (file) => {
+          var selectedFile = find(this.$dc.hostFileList, (file) => {
             return file.checked;
           });
           return selectedFile ? selectedFile.name : '';

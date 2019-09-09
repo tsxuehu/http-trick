@@ -71,7 +71,7 @@
   import profileApi from '../api/profile';
   import Vue from 'vue';
   import $ from 'jquery';
-  import _ from 'lodash';
+  import forEach from 'lodash/forEach';
   import dataApi from '../api/data';
   import uuidV4 from 'uuid/v4';
   import CodeMirror from 'codemirror';
@@ -369,7 +369,7 @@
       socket.on('profile', profile => {
         this.profile = profile;
         let result = [];
-        _.forEach(profile.redirectPathVariables, (value, key) => {
+        forEach(profile.redirectPathVariables, (value, key) => {
           result.push({
             key,
             value

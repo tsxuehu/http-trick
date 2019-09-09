@@ -31,7 +31,6 @@
     </div>
 </template>
 <script>
-    import _ from 'lodash';
     import List from './List.vue';
     import copyToClipboard from 'copy-to-clipboard';
     import ContextMenu from '../../../context-menu/index';
