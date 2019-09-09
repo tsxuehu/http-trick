@@ -68,7 +68,7 @@
     components: {},
     data() {
       return {
-        visible: true,
+        visible: false,
         testMatchRuleForm: {
           requestMethod: '',// 请求method
           requestUrl: '',// 请求url

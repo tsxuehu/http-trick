@@ -63,14 +63,19 @@
                 :data-list="dataList"
                 :user-id="userId"
                 ref="ruleEditForm"></rule-edit-form>
+        <rule-test-form ref="ruleTestForm"></rule-test-form>
     </div>
 </template>
 
 <script>
   import LeftMenu from './components/LeftMenu';
   import Header from './components/Header.vue';
-  import * as RuleEditFormApi from './form-widget/rule-edit-form/index.js'
+
   import RuleEditForm from './form-widget/rule-edit-form/Index.vue'
+  import * as RuleEditFormApi from './form-widget/rule-edit-form/index.js'
+
+  import RuleTestForm from './form-widget/rule-test-form/Index.vue'
+  import * as RuleTestFormApi from './form-widget/rule-test-form/index.js'
 
   import hostApi from '../api/host';
   import ruleApi from '../api/rule';
@@ -96,6 +101,7 @@
       [LeftMenu.name]: LeftMenu,
       [Header.name]: Header,
       [RuleEditForm.name]: RuleEditForm,
+      [RuleTestForm.name]: RuleTestForm,
     },
     data() {
       return {
@@ -412,8 +418,10 @@
       // 强制dialog渲染body部分, 对ele dialog hack的初始化方式，原始的dialog不提供mouted后的事件
       // 编辑器editor初始化的时候需要用到editDataFileDialog里的元素content-editor
       this.$refs.editDataFileDialog.rendered = true;
-      let ruleEditForm = this.$refs.ruleEditForm;
+
+      let {ruleEditForm, ruleTestForm} = this.$refs;
       RuleEditFormApi.setInstance(ruleEditForm);
+      RuleTestFormApi.setInstance(ruleTestForm);
     }
   };
 </script>
