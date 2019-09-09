@@ -59,10 +59,12 @@
                 <el-button type="primary" @click="finishEditDataFile">确 定</el-button>
             </div>
         </el-dialog>
+
         <rule-edit-form
                 :data-list="dataList"
                 :user-id="userId"
                 ref="ruleEditForm"></rule-edit-form>
+
         <rule-test-form ref="ruleTestForm"></rule-test-form>
     </div>
 </template>
