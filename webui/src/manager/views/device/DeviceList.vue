@@ -15,7 +15,7 @@
                 <el-button type="text" @click="copyBindUrl">点击复制绑定链接</el-button>
             </div>
         </div>
-        <el-table border align='center' style="width: 800px;" :data="this.$dc.bindedDeviceList">
+        <el-table border align='center' style="width: 800px;" :data="bindedDeviceList">
             <el-table-column prop="id" label="ID" align="center" width="150" :sortable="true">
             </el-table-column>
             <el-table-column prop="name" label="Name" align="center" :sortable="true">
@@ -32,34 +32,35 @@
 </template>
 
 <script>
-    import qrcode from 'qrcode-js';
-    import copyToClipboard from 'copy-to-clipboard';
+  import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
+  import qrcode from 'qrcode-js';
+  import copyToClipboard from 'copy-to-clipboard';
 
-    import profileApi from '../../../api/profile';
-    import './devicelist.pcss'
+  import profileApi from '../../../api/profile';
+  import './devicelist.pcss'
 
-    export default {
-        name: 'DeviceList',
+  export default {
+    name: 'DeviceList',
 
-        methods: {
-            copyBindUrl() {
-                copyToClipboard(this.bindUrl);
-                this.$message('已将设备绑定链接复制到剪切板，在设备中打开此url即可绑定设备');
-            },
-            async unbind(row, index) {
-                await profileApi.unBind(row.id);
-                this.$message('解绑成功');
-            }
-        },
-
-        computed: {
-            bindUrl() {
-                return `http://${this.$dc.appInfo.pcIp}:${this.$dc.appInfo.webUiPort}/profile/device/bind?userId=${this.$dc.userId}`;
-            },
-            imgUrl() {
-                return qrcode.toDataURL(this.bindUrl, 4);
-            }
-        }
-    };
+    computed: {
+      ...mapState(['bindedDeviceList', 'appInfo', 'userId']),
+      bindUrl() {
+        return `http://${this.appInfo.pcIp}:${this.appInfo.webUiPort}/profile/device/bind?userId=${this.userId}`;
+      },
+      imgUrl() {
+        return qrcode.toDataURL(this.bindUrl, 4);
+      }
+    },
+    methods: {
+      copyBindUrl() {
+        copyToClipboard(this.bindUrl);
+        this.$message('已将设备绑定链接复制到剪切板，在设备中打开此url即可绑定设备');
+      },
+      async unbind(row, index) {
+        await profileApi.unBind(row.id);
+        this.$message('解绑成功');
+      }
+    },
+  };
 
 </script>

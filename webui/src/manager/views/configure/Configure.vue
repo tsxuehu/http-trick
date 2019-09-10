@@ -53,7 +53,7 @@
 
 <script>
   import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
-  import confApi from '../../../api/conf';
+  import confApi from 'src/api/conf';
   import './configure.scss'
 
   export default {

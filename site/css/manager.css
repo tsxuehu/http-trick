@@ -254,32 +254,26 @@
 }
 
 .socks-configure {
-  max-width: 500px;
-}
-.socks-configure .http-proxy {
-    width: 400px;
-}
-.socks-configure .http-proxy .ip {
+  max-width: 500px; }
+  .socks-configure .http-proxy {
+    width: 400px; }
+    .socks-configure .http-proxy .ip {
       width: 200px;
       display: inline-block;
-      margin-right: 10px;
-}
-.socks-configure .http-proxy .port {
+      margin-right: 10px; }
+    .socks-configure .http-proxy .port {
       width: 150px;
       margin-left: 10px;
-      display: inline-block;
-}
-.socks-configure .el-button {
+      display: inline-block; }
+  .socks-configure .el-button {
     margin-top: 15px;
     padding: 10px 28px;
-    letter-spacing: 2px;
-}
-.socks-configure .socks-editor {
+    letter-spacing: 2px; }
+  .socks-configure .socks-editor {
     height: 200px;
     width: 760px;
     font-size: 18px;
-    padding: 10px 20px;
-}
+    padding: 10px 20px; }
 
 @font-face {
   font-family: "iconfont";

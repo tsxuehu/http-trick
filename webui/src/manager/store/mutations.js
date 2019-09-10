@@ -15,14 +15,7 @@ export function setAppInfo(state, appInfo) {
 
 export function setProfile(state, profile) {
   state.profile = profile;
-  let result = [];
-  forEach(profile.redirectPathVariables, (value, key) => {
-    result.push({
-      key,
-      value
-    });
-  });
-  state.redirectPathVariableArray = result;
+
 }
 
 export function setBindedDeviceList(state, bindedDeviceList) {

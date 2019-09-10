@@ -46,9 +46,26 @@ export default {
     socks5ProxyIp: '',
     socks5ProxyPort: 8889
   },
-  // 将工程路径配置转换为数组格式 方便编辑
-  redirectPathVariableArray: [],
-  // 关联的ip
+
+
+  // 绑定的设备
+  /**
+   * {
+        id: deviceId,
+        userId: '',
+        name: deviceId,
+        disableMonitor: false,
+        hostFileName: '',
+        externalProxyCanUseUserSetting: true,
+        externalProxy: false,
+        externalHttpProxy: false,
+        externalSocks5Proxy: false,
+        httpProxyIp: '',
+        httpProxyPort: 8888,
+        socks5ProxyIp: '',
+        socks5ProxyPort: 8889
+      }
+   */
   bindedDeviceList: [],
   // 生效的规则
   rule: [],
