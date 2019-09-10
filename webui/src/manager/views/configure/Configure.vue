@@ -90,6 +90,9 @@
           this.$message.error(`出错了，${serverData.msg}`);
         }
       }
+    },
+    mounted() {
+      this.configureFormData = JSON.parse(JSON.stringify(this.configure));
     }
   };
 </script>

@@ -15,12 +15,14 @@
                 <div class="http-proxy">
                     <el-input class="ip" v-model="profileEditForm.httpProxyIp" placeholder="Http Proxy Ip"></el-input>
                     :
-                    <el-input class="port" v-model="profileEditForm.httpProxyPort" placeholder="http Proxy port"></el-input>
+                    <el-input class="port" v-model="profileEditForm.httpProxyPort"
+                              placeholder="http Proxy port"></el-input>
                 </div>
             </el-form-item>
             <el-form-item label="External Socks代理" v-if="profileEditForm.externalProxy && socks5Proxy">
                 <div class="http-proxy">
-                    <el-input class="ip" v-model="profileEditForm.socks5ProxyIp" placeholder="Socks5 Proxy Ip"></el-input>
+                    <el-input class="ip" v-model="profileEditForm.socks5ProxyIp"
+                              placeholder="Socks5 Proxy Ip"></el-input>
                     :
                     <el-input class="port" v-model="profileEditForm.socks5ProxyPort"
                               placeholder="socks5 Proxy port"></el-input>
@@ -76,7 +78,7 @@ www.domain.com    # www.domain.com走Http解析代理`
     },
     watch: {
       profile(value) {
-        this.profileEditForm = JSON.parse(JSON.stringify(this.profile));
+        this.profileEditForm = JSON.parse(JSON.stringify(value));
       }
     },
     methods: {
@@ -93,6 +95,9 @@ www.domain.com    # www.domain.com走Http解析代理`
           this.$message.error(`出错了，${serverData.msg}`);
         }
       }
+    },
+    mounted() {
+      this.profileEditForm = JSON.parse(JSON.stringify(this.profile));
     }
   };
 </script>

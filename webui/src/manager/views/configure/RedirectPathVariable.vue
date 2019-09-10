@@ -110,6 +110,16 @@
           value: ''
         });
       }
+    },
+    mounted() {
+      let result = [];
+      forEach(this.profile.redirectPathVariables, (value, key) => {
+        result.push({
+          key,
+          value
+        });
+      });
+      this.redirectPathVariableArray = result;
     }
   };
 </script>
