@@ -132,29 +132,6 @@
         'initStore',
       ]),
 
-
-      deleteDataFile(entry, index) {
-        this.$confirm(`此操作将永久删除该数据文件: ${entry.name}, 是否继续?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.dataList.splice(index, 1);
-          dataApi.saveDataList(this.dataList).then(res => {
-            var serverData = res.data;
-            if (serverData.code == 0) {
-              this.$message({
-                showClose: true,
-                type: 'success',
-                message: '删除成功!'
-              });
-            } else {
-              this.$message.error(`出错了，${serverData.msg}`);
-            }
-          });
-        });
-      },
-
       requestAddDataFile(callback) {
         this.addDataFileForm.callback = callback;
         this.addDataFileForm.visible = true;

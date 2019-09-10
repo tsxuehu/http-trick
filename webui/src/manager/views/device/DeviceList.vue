@@ -37,7 +37,7 @@
   import copyToClipboard from 'copy-to-clipboard';
 
   import profileApi from '../../../api/profile';
-  import './devicelist.pcss'
+  import './devicelist.scss'
 
   export default {
     name: 'DeviceList',

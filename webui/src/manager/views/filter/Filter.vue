@@ -7,12 +7,12 @@
                 <el-button size="small" @click='addRule'>新增过滤器</el-button>
             </el-col>
         </el-row>
-        <el-table border style="width: 100%" row-key="key" :stripe="true" align='center' :data="$dc.filters">
+        <el-table border style="width: 100%" row-key="key" :stripe="true" align='center' :data="filters">
             <el-table-column prop="checked" label="启用" align="center" width="80">
                 <template v-slot:default="scope">
                     <el-checkbox v-model="scope.row.checked"
                                  @change="saveFileRightNow"
-                                 :disabled="!$dc.filterState"></el-checkbox>
+                                 :disabled="!enableFilter"></el-checkbox>
                 </template>
             </el-table-column>
 
@@ -48,6 +48,7 @@
 </template>
 
 <script>
+  import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
   import filtersApi from '../../../api/filter';
   import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
   import * as RuleEditFormApi from '../../form-widget/rule-edit-form/index.js'
@@ -56,11 +57,19 @@
 
   export default {
     name: 'filters',
+    computed: {
+      ...mapState(['filters']),
+      ...mapGetters(['enableFilter'])
+    },
     methods: {
       setEventHandle() {
         RuleEditFormApi.setEventHandle({
-          onTestRule: data => { this.testRule(data); },
-          onSaveRule: data => { this.saveRule(data); },
+          onTestRule: data => {
+            this.testRule(data);
+          },
+          onSaveRule: data => {
+            this.saveRule(data);
+          },
         });
       },
       addRule() {
@@ -90,8 +99,9 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$dc.filters.splice(index, 1);
-          this.saveFileRightNow();
+          let copy = JSON.parse(JSON.stringify(this.filters));
+          copy.splice(index, 1);
+          this.saveFileRightNow(copy);
         });
       },
       testRule({rule, actionIndex}) {
@@ -104,20 +114,21 @@
                  rule,
                  ruleIndex
                }) {
+        let copy = JSON.parse(JSON.stringify(this.filters));
         if (isEditRule) {
           // 复制属性
-          let originRule = this.$dc.filters[ruleIndex];
+          let originRule = copy[ruleIndex];
           Object.assign(originRule, rule);
         } else {
-          this.$dc.filters.push(rule);
+          copy.push(rule);
         }
-        this.saveFileRightNow();
+        this.saveFileRightNow(copy);
       },
       /**
        * 立刻保存
        */
-      async saveFileRightNow() {
-        let result = await filtersApi.saveFilters(this.$dc.filters);
+      async saveFileRightNow(filters) {
+        let result = await filtersApi.saveFilters(filters);
         if (result.code == 0) {
           this.$message({
             showClose: true,
