@@ -22,7 +22,7 @@
 
 <script>
   import {mapState, mapActions, mapMutations, mapGetters} from 'vuex';
-  import './left-menu.pcss';
+  import './left-menu.scss';
 
   export default {
     name: 'left-menu',

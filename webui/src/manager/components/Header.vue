@@ -87,7 +87,7 @@
 
 <script>
   import {mapState, mapActions, mapMutations, mapGetters} from 'vuex';
-  import './header.pcss'
+  import './header.scss'
   import profileApi from 'src/api/profile';
 
   export default {
