@@ -1,3 +1,5 @@
+// 数据中心
+
 export default {
   // 运行用户
   userId: 'guest',

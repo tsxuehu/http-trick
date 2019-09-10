@@ -53,15 +53,12 @@
 
 <script>
   import confApi from '../../../api/conf';
+  import './configure.scss'
 
   export default {
     name: 'configure',
     computed: {
-      socksProxyExample() {
-        return `#示例
-0.0.0.0    # 任何80 443端口的请求经过socks5时都会被解析
-4.4.4.4    # 没有0.0.0.0的情况下，socks5代理中只有4.4.4.4的80、443端口的请求被解析`
-      }
+
     },
     methods: {
       async saveFile() {
@@ -85,22 +82,3 @@
     }
   };
 </script>
-
-<style>
-    .view-configure {
-        max-width: 500px;
-
-    .el-button {
-        margin-top: 15px;
-        padding: 10px 28px;
-        letter-spacing: 2px;
-    }
-
-    }
-    .socks-editor {
-        height: 500px;
-        width: 760px;
-        font-size: 18px;
-        padding: 10px 20px;
-    }
-</style>

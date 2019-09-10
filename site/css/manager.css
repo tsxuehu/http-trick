@@ -100,19 +100,17 @@
   margin-top: 20px; }
 
 .view-configure {
-  max-width: 500px;
-}
-.view-configure .el-button {
+  max-width: 500px; }
+  .view-configure .el-button {
     margin-top: 15px;
     padding: 10px 28px;
-    letter-spacing: 2px;
-}
+    letter-spacing: 2px; }
+
 .socks-editor {
   height: 500px;
   width: 760px;
   font-size: 18px;
-  padding: 10px 20px;
-}
+  padding: 10px 20px; }
 
 .project-wraper {
   width: 100%; }
