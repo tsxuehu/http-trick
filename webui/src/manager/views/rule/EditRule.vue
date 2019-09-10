@@ -85,6 +85,7 @@
           },
         });
       },
+
       requestNewDataFile(actionIndex) {
         DataCreateFormApi.setEventHandle({
           onCreated: (id) => {
@@ -164,7 +165,6 @@
           this.saveFileRightNow(copy);
         });
       },
-
 
       saveRule({
                  isEditRule,
