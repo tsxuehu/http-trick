@@ -3878,17 +3878,6 @@ eval("var rng = __webpack_require__(/*! ./lib/rng */ \"./node_modules/uuid/lib/r
 
 /***/ }),
 
-/***/ "./node_modules/vue-data-center/lib/data-center.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/vue-data-center/lib/data-center.js ***!
-  \*********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-eval("/**\n * 将某个组件对象暴露给他的所有子组件(要暴露的组件作为一个数据中心而存在)\n * 使用方法\n * Vue.use(datacenter);\n * 要暴露的对象的data上需要定义 isDataCenter: true\n * 示例：\n * import datacenter from 'datacenter'\n * Vue.use(datacenter);\n *\n * App.vue要将自己暴露给所有子组件\n * export default {\n *   data() {\n *     return {\n *       isDataCenter: true\n *     }\n *   }\n * }\n * 在子组件中引被暴露的对象的方式为\n * this.$dc\n * 如果没有组件定义了isDataCenter字段、或者引用了数据中心组件上未定义的字段，则会在控制台上提示错误\n * Created by tsxuehu on 17/3/19.\n */\nvar hasProxy = typeof Proxy !== 'undefined' && Proxy.toString().match(/native code/);\nvar dataContainer = null;\nvar proxy = null;\nvar returnNoopFunFlag = false;\n\nfunction noop() {}\n\nif (hasProxy) {\n  proxy = new Proxy({}, {\n    get: function (target, key) {\n      if (!dataContainer) {\n        console.error('[datacenter error]没有定义datacenter，请在作为数据中心的组件上增加isDataCenter字段，值为true');\n        return;\n      }\n\n      if (typeof key === 'string' && !(key in dataContainer)) {\n        console.error('[datacenter error]datacenter组件上不存在字段: ' + key);\n        return;\n      }\n\n      if (returnNoopFunFlag) {\n        if (typeof dataContainer[key] == 'function') {\n          console.warn('[datacenter error]datacenter returnNoopFunFlag为true，返回空函数: ' + key);\n          return noop;\n        }\n      }\n\n      return dataContainer[key];\n    },\n    set: function (target, key, value, receiver) {\n      console.warn('[datacenter error]不建议对数据组件直接赋值，请通过数据组件里的method修改数据', key, value);\n      dataContainer[key] = value;\n      return true;\n    }\n  });\n}\n\nvar installed;\n\nfunction datacenterInit() {\n  // 设置dataContainer\n  if (!dataContainer && this.$data && this.$data.isDataCenter) {\n    dataContainer = this;\n  } // 给实例上添加字段\n\n\n  if (proxy) {\n    this.$dc = proxy;\n  } else {\n    this.$dc = dataContainer;\n  }\n}\n\nmodule.exports = {\n  install: function (Vue) {\n    if (installed) return;\n    installed = true;\n    Vue.mixin({\n      created: datacenterInit\n    });\n  },\n  returnNoopFun: function (flag) {\n    returnNoopFunFlag = flag;\n  }\n};\n\n//# sourceURL=webpack:///./node_modules/vue-data-center/lib/data-center.js?");
-
-/***/ }),
-
 /***/ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js":
 /*!********************************************************************!*\
   !*** ./node_modules/vue-loader/lib/runtime/componentNormalizer.js ***!

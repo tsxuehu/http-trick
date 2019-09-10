@@ -1,7 +1,7 @@
 <template>
     <div class="device"
          @contextmenu.prevent="rightClicked($event, device.id)">
-        <div class="name" key="name">Name: {{device.name}}<span v-if="$dc.currentDeviceId == device.id"
+        <div class="name" key="name">Name: {{device.name}}<span v-if="currentDeviceId == device.id"
                                                                 style="color: #eab700">(本机)</span></div>
         <div class="host" v-if="device.hostFileName" key="host">HOST: {{device.hostFileName}}</div>
         <div class="id" key="id">ID: {{device.id}}</div>
@@ -12,51 +12,55 @@
 </template>
 
 <script>
-    import './device.pcss'
+  import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
 
-    export default {
-        name: "Device",
-        props: ["device"],
-        computed: {
-            proxy() {
-                let device = this.device;
+  import './device.scss'
 
-                let proxy = device.externalProxy;;
-                let type = device.externalSocks5Proxy ? 'socks5' : 'http';
-                let ip = '';
-                let port = '';
-                let allowUseUserSetting = device.externalProxyCanUseUserSetting;
+  export default {
+    name: "Device",
+    props: ["device"],
+    computed: {
+      ...mapGetters(['currentDeviceId']),
+      proxy() {
+        let device = this.device;
 
-                if (device.externalSocks5Proxy) {
-                    ip = device.socks5Ip;
-                    port = device.socks5Port;
-                } else {
-                    ip = device.httpIp;
-                    port = device.httpPort;
-                }
+        let proxy = device.externalProxy;
 
-                if (!proxy && !allowUseUserSetting){
-                    return false;
-                }else if (proxy) {
-                    return `${type}://${ip}:${port}`;
-                } else {
-                    return '使用用户设置';
-                }
-            }
-        },
-        methods: {
-            requestRemoveDevice() {
+        let type = device.externalSocks5Proxy ? 'socks5' : 'http';
+        let ip = '';
+        let port = '';
+        let allowUseUserSetting = device.externalProxyCanUseUserSetting;
 
-            },
-            requestSetName() {
-
-            },
-            setName(deviceId, name) {
-
-            },
-            rightClicked(event, recordId) {
-                this.$emit('right-clicked', event, recordId);
-            }
+        if (device.externalSocks5Proxy) {
+          ip = device.socks5Ip;
+          port = device.socks5Port;
+        } else {
+          ip = device.httpIp;
+          port = device.httpPort;
         }
+
+        if (!proxy && !allowUseUserSetting) {
+          return false;
+        } else if (proxy) {
+          return `${type}://${ip}:${port}`;
+        } else {
+          return '使用用户设置';
+        }
+      }
+    },
+    methods: {
+      requestRemoveDevice() {
+
+      },
+      requestSetName() {
+
+      },
+      setName(deviceId, name) {
+
+      },
+      rightClicked(event, recordId) {
+        this.$emit('right-clicked', event, recordId);
+      }
     }
+  }
 </script>

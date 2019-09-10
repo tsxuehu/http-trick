@@ -3,7 +3,7 @@
         <div class="title">绑定的设备</div>
         <div class="list-wrapper">
             <device @right-clicked="rightClicked"
-                    v-for="(device, index) in $dc.bindedDeviceList" :device="device" :key="index"></device>
+                    v-for="(device, index) in bindedDeviceList" :device="device" :key="index"></device>
         </div>
         <div class="qr-code-wrapper">
             <div class="qr-code">
@@ -24,8 +24,8 @@
             <li class="ctx-item" @click="changeHost">修改host</li>
             <li class="ctx-item" @click="configExternalProxy">设置外部代理</li>
             <li class="ctx-item" @click="removeDevice">删除设备</li>
-            <li class="ctx-item" v-if="!$dc.rightClickDevice.disableMonitor" @click="disableMonitor">停止监控</li>
-            <li class="ctx-item" v-if="$dc.rightClickDevice.disableMonitor" @click="enableMonitor">开启监控</li>
+            <li class="ctx-item" v-if="!rightClickedDevice.disableMonitor" @click="disableMonitor">停止监控</li>
+            <li class="ctx-item" v-if="rightClickedDevice.disableMonitor" @click="enableMonitor">开启监控</li>
         </context-menu>
         <el-dialog
                 :title="chooseHostTitle"
@@ -34,13 +34,13 @@
                 center>
             <div class="hostfile-list">
                 <div @click="useHost('')">
-                    <el-tag :class="{'used-host': !$dc.rightClickDevice.hostFileName}">
+                    <el-tag :class="{'used-host': !rightClickedDevice.hostFileName}">
                         用户默认
                     </el-tag>
                 </div>
-                <div v-for="(hostfile, index) in $dc.hostFileList"
+                <div v-for="(hostfile, index) in hostFileList"
                      :key="hostfile.name" @click="useHost(hostfile.name)">
-                    <el-tag :class="{'used-host': hostfile.name == $dc.rightClickDevice.hostFileName}">
+                    <el-tag :class="{'used-host': hostfile.name == rightClickedDevice.hostFileName}">
                         {{hostfile.name}}
                     </el-tag>
                 </div>
@@ -86,6 +86,7 @@
 </template>
 
 <script>
+  import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
   import './devicelist.scss';
   import Device from './Device.vue';
   import ContextMenu from 'src/components/context-menu/index';
@@ -110,21 +111,24 @@
       }
     },
     computed: {
+      ...mapState(['appInfo','userInfo', 'rightClickedDeviceId','bindedDeviceList','hostFileList']),
+      ...mapGetters(['rightClickedDevice']),
       bindUrl() {
-        return `http://${this.$dc.appInfo.pcIp}:${this.$dc.appInfo.webUiPort}/profile/device/bind?userId=${this.$dc.userInfo.userId}`;
+        return `http://${this.appInfo.pcIp}:${this.appInfo.webUiPort}/profile/device/bind?userId=${this.userInfo.userId}`;
       },
       imgUrl() {
         return qrcode.toDataURL(this.bindUrl, 4);
       },
       chooseHostTitle() {
-        return `选择${this.$dc.rightClickDevice.name}使用的Host文件`;
+        return `选择${this.rightClickedDevice.name}使用的Host文件`;
       },
 
       setExternalProxyTitle() {
-        return `设置${this.$dc.rightClickDevice.name}的外部代理`;
+        return `设置${this.rightClickedDevice.name}的外部代理`;
       }
     },
     methods: {
+      ...mapMutations(['setRightClickedDeviceId']),
       copyBindUrl() {
         copyToClipboard(this.bindUrl);
         this.$message('已将设备绑定链接复制到剪切板，在设备中打开此url即可绑定设备');
@@ -136,8 +140,8 @@
 
       async useHost(hostFileName) {
         this.showChoseHostFile = false;
-        let actual = hostFileName == this.$dc.rightClickDevice.hostFileName ? '' : hostFileName
-        await profileApi.deviceUseHost(this.$dc.rightClickDeviceId, actual);
+        let actual = hostFileName == this.rightClickedDevice.hostFileName ? '' : hostFileName;
+        await profileApi.deviceUseHost(this.rightClickedDeviceId, actual);
         this.$message({
           type: 'success',
           message: actual ? '设置Host成功' : '取消Host成功'
@@ -152,7 +156,7 @@
           confirmButtonText: '确定',
           cancelButtonText: '取消',
         }).then(async ({value}) => {
-          await profileApi.setDeviceName(this.$dc.rightClickDeviceId, value);
+          await profileApi.setDeviceName(this.rightClickedDeviceId, value);
           this.$message({
             type: 'success',
             message: '设备命名成功'
@@ -167,7 +171,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(async () => {
-          await profileApi.unBind(this.$dc.rightClickDeviceId);
+          await profileApi.unBind(this.rightClickedDeviceId);
           this.$message({
             type: 'success',
             message: '删除成功!'
@@ -176,10 +180,10 @@
         });
       },
       disableMonitor() {
-        profileApi.disableMonitor(this.$dc.rightClickDeviceId);
+        profileApi.disableMonitor(this.rightClickedDeviceId);
       },
       enableMonitor() {
-        profileApi.enableMonitor(this.$dc.rightClickDeviceId);
+        profileApi.enableMonitor(this.rightClickedDeviceId);
       },
       configExternalProxy() {
         this.resetExternalProxy();
@@ -187,7 +191,7 @@
         this.showSetExternalProxy = true;
       },
       resetExternalProxy() {
-        let device = this.$dc.rightClickDevice;
+        let device = this.rightClickedDevice;
         let canUseUserSetting = device.externalProxyCanUseUserSetting;
         let enable = false;
         let type = 'socks5';
@@ -208,14 +212,14 @@
         this.currentProxy = {canUseUserSetting, enable, type, ip, port};
       },
       async submitExternalProxy() {
-        profileApi.setExternalProxy(this.$dc.rightClickDeviceId, this.currentProxy);
+        profileApi.setExternalProxy(this.rightClickedDeviceId, this.currentProxy);
         this.showSetExternalProxy = false;
         this.$message('解绑成功');
       },
       // -------------------------------右击菜单显示
       // 打开菜单
       onCtxOpen(deviceId) {
-        this.$dc.setRightClickedDeviceId(deviceId);
+        this.setRightClickedDeviceId(deviceId);
       },
       rightClicked(event, deviceId) {
         this.$refs.ctx.open(event, deviceId)
@@ -225,7 +229,7 @@
       },
       // 点击空白地方
       resetCtxLocals() {
-        this.$dc.setRightClickedDeviceId('');
+        this.setRightClickedDeviceId('');
       }
     }
   }

@@ -13,11 +13,11 @@
             <div class="cell cell-time">Time</div>
         </div>
         <!-- 列表区域 优化后的列表展示组件，只展示显示区域 -->
-        <list :total="$dc.total"
+        <list :total="recordTotalCount"
               :height="height - 28"
               :rowHeight="24">
             <template v-slot:default="scope">
-                <record v-for="index in scope.ids" :index="index" :id="$dc.filterdRecordArray[index]" :key="index"
+                <record v-for="index in scope.ids" :index="index" :id="filteredRecordArray[index]" :key="index"
                         @right-clicked="rightClicked"></record>
             </template>
         </list>
@@ -31,70 +31,78 @@
     </div>
 </template>
 <script>
-    import List from './List.vue';
-    import copyToClipboard from 'copy-to-clipboard';
-    import ContextMenu from 'src/components/context-menu/index';
-    import dataApi from 'src/api/data';
-    import './httptraffic.pcss';
-    import Record from './record.vue';
-    export default {
-        props: ['height'],
-        components: { List, ContextMenu, Record },
-        data(){
-            return {};
-        },
-        methods: {
-            // -------------------------------菜单操作
-            saveData(){
-                if (!this.$dc.rightClickRow.response) {
-                    this.$message({
-                        showClose: true,
-                        message: '服务器还没有响应',
-                        type: 'warning'
-                    });
-                    return;
-                }
-                this.$prompt('请输入数据文件名', '保存为数据文件', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消'
-                }).then(({ value }) => {
-                    dataApi.saveDataEntryFromTraffic(this.$dc.rightClickId, value
-                        , this.$dc.rightClickRow.response.headers['content-type'].split(';')[0]).then((res) => {
-                        var serverData = res.data;
-                        if (serverData.code == 0) {
-                            this.$message({
-                                showClose: true,
-                                type: 'success',
-                                message: '保存成功!'
-                            });
-                        } else {
-                            this.$message.error(`出错了，${serverData.msg}`);
-                        }
-                    });
-                });
-            },
-            // 复制url
-            copyUrl(){
-                let requset = this.$dc.rightClickRow.originRequest;
-                copyToClipboard(`${requset.protocol}//${requset.host}:${requset.port}${requset.path}`);
-                this.$message('已将url复制到剪切板');
-            },
+  import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
+  import List from './List.vue';
+  import copyToClipboard from 'copy-to-clipboard';
+  import ContextMenu from 'src/components/context-menu/index';
+  import dataApi from 'src/api/data';
+  import './httptraffic.scss';
+  import Record from './record.vue';
 
-            // -------------------------------右击菜单显示
-            // 打开菜单
-            onCtxOpen(recordId) {
-                this.$dc.setRightClickedRecordId(recordId);
-            },
-            rightClicked(event,recordId){
-                this.$refs.ctx.open(event, recordId)
-            },
-            // 点击菜单选项
-            onCtxClose(locals) {
-            },
-            // 点击空白地方
-            resetCtxLocals() {
-                this.$dc.setRightClickedRecordId('');
-            }
+  export default {
+    props: ['height'],
+    components: {List, ContextMenu, Record},
+    data() {
+      return {};
+    },
+    computed: {
+      ...mapState(['rightClickedRecordId','filteredRecordArray']),
+      ...mapGetters(['rightClickedRecord','recordTotalCount']),
+    },
+    methods: {
+      ...mapActions([]),
+      ...mapMutations(['setRightClickedRecordId']),
+      // -------------------------------菜单操作
+      saveData() {
+        if (!this.rightClickedRecord.response) {
+          this.$message({
+            showClose: true,
+            message: '服务器还没有响应',
+            type: 'warning'
+          });
+          return;
         }
-    };
+        this.$prompt('请输入数据文件名', '保存为数据文件', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        }).then(({value}) => {
+          dataApi.saveDataEntryFromTraffic(this.rightClickedRecordId, value
+            , this.rightClickedRecord.response.headers['content-type'].split(';')[0]).then((res) => {
+            var serverData = res.data;
+            if (serverData.code == 0) {
+              this.$message({
+                showClose: true,
+                type: 'success',
+                message: '保存成功!'
+              });
+            } else {
+              this.$message.error(`出错了，${serverData.msg}`);
+            }
+          });
+        });
+      },
+      // 复制url
+      copyUrl() {
+        let request = this.rightClickedRecord.originRequest;
+        copyToClipboard(`${request.protocol}//${request.host}:${request.port}${request.path}`);
+        this.$message('已将url复制到剪切板');
+      },
+
+      // -------------------------------右击菜单显示
+      // 打开菜单
+      onCtxOpen(recordId) {
+        this.setRightClickedRecordId(recordId);
+      },
+      rightClicked(event, recordId) {
+        this.$refs.ctx.open(event, recordId)
+      },
+      // 点击菜单选项
+      onCtxClose(locals) {
+      },
+      // 点击空白地方
+      resetCtxLocals() {
+        this.setRightClickedRecordId('');
+      }
+    }
+  };
 </script>
