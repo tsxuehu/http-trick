@@ -29,7 +29,7 @@
 <script>
   import dataApi from 'src/api/data';
 
-  import $ from 'jquery';
+  // import $ from 'jquery';
   import CodeMirror from 'codemirror';
   import 'codemirror/lib/codemirror.css';
 
@@ -38,6 +38,8 @@
 
   import 'codemirror/mode/javascript/javascript';
   import 'codemirror/mode/htmlmixed/htmlmixed';
+
+  import delay from 'delay';
 
   let editor = null;
 
@@ -55,9 +57,47 @@
       }
     },
     methods: {
+      async editDataFile(entry) {
+        this.editDataFileForm.entry = entry;
+        let response = await dataApi.getDataFile(entry.id);
+        let serverData = response.data;
+        if (serverData.code != 0) {
+          this.$message.error(`出错了，${serverData.msg}`);
+          return;
+        }
+        this.visible = true;
 
+        if (editor) {
+          editor.setValue(serverData.data);
+          editor.setOption('mode', entry.contenttype);
+          this.$nextTick(() => {
+            editor.refresh();
+            editor.focus();
+          });
+        } else {
+          await delay(200); //<div id="content-editor"></div> 等次元素渲染出来
+          window.editor = editor = new CodeMirror(
+            document.getElementById('content-editor'),
+            {
+              value: serverData.data,
+              mode: entry.contenttype,
+              lineNumbers: true,
+              matchBrackets: true,
+              autofocus: true,
+              extraKeys: {
+                F11: _ => {
+                  this.toggleFullScreen();
+                },
+                Esc: _ => {
+                  this.closeFullScreen();
+                }
+              }
+            }
+          );
+        }
+      },
       toggleFullScreen() {
-        if (editor.getOption('fullScreen')) {
+        /*if (editor.getOption('fullScreen')) {
           // 移除父元素上的transform属性 chrome、firefox transform元素的子元素 fixed属性会变为absolute
           $('#content-editor')
             .parents('.el-dialog')
@@ -68,7 +108,7 @@
             .parents('.el-dialog')
             .css('transform', 'initial');
           //   document.body.appendChild(document.getElementById("content-editor"));
-        }
+        }*/
         editor.setOption('fullScreen', !editor.getOption('fullScreen'));
         editor.focus();
       },
@@ -76,9 +116,9 @@
       closeFullScreen() {
         if (editor.getOption('fullScreen')) {
           editor.setOption('fullScreen', false);
-          $('#content-editor')
-            .parents('.el-dialog')
-            .css('transform', '');
+          /* $('#content-editor')
+             .parents('.el-dialog')
+             .css('transform', '');*/
           // document.getElementById('content-editor-container').appendChild(document.getElementById("content-editor"));
           editor.focus();
         }
@@ -99,47 +139,6 @@
         }
       },
 
-      async requestEditDataFile(entry) {
-        this.editDataFileForm.entry = entry;
-        let response = await dataApi.getDataFile(entry.id);
-        let serverData = response.data;
-        if (serverData.code != 0) {
-          this.$message.error(`出错了，${serverData.msg}`);
-          return;
-        }
-        this.visible = true;
-
-        if (editor) {
-          editor.setValue(serverData.data);
-          editor.setOption('mode', entry.contenttype);
-          this.$nextTick(() => {
-            editor.refresh();
-            editor.focus();
-          });
-        } else {
-          this.$nextTick(() => {
-            window.$ = $;
-            window.editor = editor = new CodeMirror(
-              document.getElementById('content-editor'),
-              {
-                value: serverData.data,
-                mode: entry.contenttype,
-                lineNumbers: true,
-                matchBrackets: true,
-                autofocus: true,
-                extraKeys: {
-                  F11: _ => {
-                    this.toggleFullScreen();
-                  },
-                  Esc: _ => {
-                    this.closeFullScreen();
-                  }
-                }
-              }
-            );
-          });
-        }
-      },
       async finishEditDataFile() {
         let entry = this.editDataFileForm.entry;
         let response = await dataApi.saveDataFile(entry.id, editor.getValue());
@@ -152,12 +151,7 @@
           this.$message.error(`出错了，${serverData.msg}`);
         }
       },
-      init() {
-        // 强制dialog渲染body部分, 对ele dialog hack的初始化方式，原始的dialog不提供mouted后的事件
-        // 编辑器editor初始化的时候需要用到editDataFileDialog里的元素content-editor
-        this.$refs.editDataFileDialog.rendered = true;
-      }
+
     }
   }
 </script>
-

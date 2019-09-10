@@ -1522,6 +1522,18 @@ eval("\n\nvar isMergeableObject = function isMergeableObject(value) {\n  return 
 
 /***/ }),
 
+/***/ "./node_modules/delay/index.js":
+/*!*************************************!*\
+  !*** ./node_modules/delay/index.js ***!
+  \*************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\n\nconst createAbortError = () => {\n  const error = new Error('Delay aborted');\n  error.name = 'AbortError';\n  return error;\n};\n\nconst createDelay = ({\n  clearTimeout: defaultClear,\n  setTimeout: set,\n  willResolve\n}) => (ms, {\n  value,\n  signal\n} = {}) => {\n  if (signal && signal.aborted) {\n    return Promise.reject(createAbortError());\n  }\n\n  let timeoutId;\n  let settle;\n  let rejectFn;\n  const clear = defaultClear || clearTimeout;\n\n  const signalListener = () => {\n    clear(timeoutId);\n    rejectFn(createAbortError());\n  };\n\n  const cleanup = () => {\n    if (signal) {\n      signal.removeEventListener('abort', signalListener);\n    }\n  };\n\n  const delayPromise = new Promise((resolve, reject) => {\n    settle = () => {\n      cleanup();\n\n      if (willResolve) {\n        resolve(value);\n      } else {\n        reject(value);\n      }\n    };\n\n    rejectFn = reject;\n    timeoutId = (set || setTimeout)(settle, ms);\n  });\n\n  if (signal) {\n    signal.addEventListener('abort', signalListener, {\n      once: true\n    });\n  }\n\n  delayPromise.clear = () => {\n    clear(timeoutId);\n    timeoutId = null;\n    cleanup();\n    settle();\n  };\n\n  return delayPromise;\n};\n\nconst delay = createDelay({\n  willResolve: true\n});\ndelay.reject = createDelay({\n  willResolve: false\n});\n\ndelay.createWithTimers = ({\n  clearTimeout,\n  setTimeout\n}) => {\n  const delay = createDelay({\n    clearTimeout,\n    setTimeout,\n    willResolve: true\n  });\n  delay.reject = createDelay({\n    clearTimeout,\n    setTimeout,\n    willResolve: false\n  });\n  return delay;\n};\n\nmodule.exports = delay; // TODO: Remove this for the next major release\n\nmodule.exports.default = delay;\n\n//# sourceURL=webpack:///./node_modules/delay/index.js?");
+
+/***/ }),
+
 /***/ "./node_modules/element-ui/lib/button-group.js":
 /*!*****************************************************!*\
   !*** ./node_modules/element-ui/lib/button-group.js ***!
