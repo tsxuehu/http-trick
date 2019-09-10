@@ -135,6 +135,18 @@
 .host-view .el-radio__label {
   display: none; }
 
+.host-list-op {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px; }
+  .host-list-op .op {
+    position: relative;
+    margin-left: 10px; }
+
+.host-file-op-container {
+  display: flex;
+  justify-content: space-around; }
+
 .host-editor {
   height: 500px;
   width: 84%;

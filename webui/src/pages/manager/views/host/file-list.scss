@@ -7,3 +7,16 @@
     display: none;
   }
 }
+.host-list-op {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+  .op {
+    position: relative;
+    margin-left: 10px;
+  }
+}
+.host-file-op-container {
+  display: flex;
+  justify-content: space-around;
+}
