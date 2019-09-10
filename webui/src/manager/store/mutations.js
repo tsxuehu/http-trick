@@ -1,4 +1,9 @@
+import forEach from 'lodash/forEach';
+
 //
+export function setUserId(state, userId) {
+  state.userId = userId;
+}
 
 export function setConfigure(state, configure) {
   state.configure = configure;

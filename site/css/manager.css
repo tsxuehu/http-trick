@@ -202,7 +202,7 @@
   line-height: 1.8;
   background-color: #fff;
 }
-.install-body__qrcode {
+.install-body __qrcode {
     display: block;
     margin-left: -15px;
 }
@@ -225,7 +225,7 @@
     font-size: 24px;
     margin-top: 30px;
 }
-.install-body h2:first-of-type {
+.install-body h2 :first-of-type {
       margin-top: 10px;
 }
 .install-body h4 {
@@ -245,7 +245,7 @@
     word-break: break-all;
     white-space: pre-wrap;
     background-color: #f5f7fa;
-    font-family: Source Code Pro,Monaco,Inconsolata,monospace;
+    font-family: Source Code Pro, Monaco, Inconsolata, monospace;
 }
 .install-body ol {
     padding-left: 20px;

@@ -1,143 +1,151 @@
 <template>
-  <div class="install-body">
-    <h1>Http Trick</h1>
-    <h2 id="toc_0">一、说明</h2>
+    <div class="install-body">
+        <h1>Http Trick</h1>
+        <h2 id="toc_0">一、说明</h2>
 
-    <p>http trick是http协议代理工具，需要设置浏览器代理或者系统代理才能使用本工具。</p>
-    <p>另http trick外依赖 openssl 生成证书，请先安装 openssl (版本建议在 0.9.8 以上)。</p>
-    <p>PAC: {{pacUrl}}</p>
+        <p>http trick是http协议代理工具，需要设置浏览器代理或者系统代理才能使用本工具。</p>
+        <p>另http trick外依赖 openssl 生成证书，请先安装 openssl (版本建议在 0.9.8 以上)。</p>
+        <p>PAC: {{pacUrl}}</p>
 
-    <h2 id="toc_1">二、chrome 代理插件安装(用于设置浏览器代理)</h2>
+        <h2 id="toc_1">二、chrome 代理插件安装(用于设置浏览器代理)</h2>
 
-    <p>推荐安装 SwitchyOmega <a
-      href="https://chrome.google.com/webstore/detail/proxy-switchyomega/padekgcemlokbadohgkifijomclgjgif?hl=en-US"
-      target="_blank">点击安装代理插件</a></p>
+        <p>推荐安装 SwitchyOmega <a
+                href="https://chrome.google.com/webstore/detail/proxy-switchyomega/padekgcemlokbadohgkifijomclgjgif?hl=en-US"
+                target="_blank">点击安装代理插件</a></p>
 
-    <h4 id="toc_2">插件使用说明</h4>
+        <h4 id="toc_2">插件使用说明</h4>
 
-    <ol>
-      <li>安装完插件后请设置插件代理地址为<code>127.0.0.1</code>，代理协议: http，端口为<code>http trick</code>代理端口(默认8001)。</li>
-      <li>如不清楚如何配置 SwitchyOmega，请参考 <a href="/help/chrome/" target="_blank">chrome 代理设置指南</a></li>
-    </ol>
+        <ol>
+            <li>安装完插件后请设置插件代理地址为<code>127.0.0.1</code>，代理协议: http，端口为<code>http trick</code>代理端口(默认8001)。</li>
+            <li>如不清楚如何配置 SwitchyOmega，请参考 <a href="/help/chrome/" target="_blank">chrome 代理设置指南</a></li>
+        </ol>
 
-    <h2 id="toc_3">三、证书安装</h2>
+        <h2 id="toc_3">三、证书安装</h2>
 
-    <h4 id="toc_4">1. 为什么需要安装证书</h4>
+        <h4 id="toc_4">1. 为什么需要安装证书</h4>
 
-    <p>由于<code>http trick</code>会代理 https 的请求，所以需要本地安装<code>http trick</code>的https 证书。</p>
+        <p>由于<code>http trick</code>会代理 https 的请求，所以需要本地安装<code>http trick</code>的https 证书。</p>
 
-    <h4 id="toc_5">2. 证书下载</h4>
+        <h4 id="toc_5">2. 证书下载</h4>
 
-    <ol>
-      <li>mac 系统请<a :href="url">点击下载到本地安装</a></li>
-      <li>手机请扫码安装证书<img class="install-body__qrcode" :src="imgUrl" ></li>
-      <li>证书信任请参考<a href="/help/cert/" target="_blank">如何信任证书</a></li>
-    </ol>
-  </div>
+        <ol>
+            <li>mac 系统请<a :href="url">点击下载到本地安装</a></li>
+            <li>手机请扫码安装证书<img class="install-body__qrcode" :src="imgUrl"></li>
+            <li>证书信任请参考<a href="/help/cert/" target="_blank">如何信任证书</a></li>
+        </ol>
+    </div>
 
 </template>
 
 <script>
-import qrcode from 'qrcode-js';
+  import {mapState, mapActions, mapMutations, mapGetters} from 'vuex';
+  import qrcode from 'qrcode-js';
 
-export default {
+  export default {
     name: 'help-info',
     data() {
       return {};
     },
     computed: {
-      url(){
-          let certUrl =
-              'http://' +
-              this.$dc.appInfo.pcIp +
-              ':' +
-              this.$dc.appInfo.webUiPort +
-              '/utils/rootCA.crt';
-          return certUrl;
+      ...mapState([
+        'appInfo', 'userId'
+      ]),
+      url() {
+        let certUrl =
+          'http://' +
+          this.appInfo.pcIp +
+          ':' +
+          this.appInfo.webUiPort +
+          '/utils/rootCA.crt';
+        return certUrl;
       },
       imgUrl() {
-          let certUrl =
-              'http://' +
-              this.$dc.appInfo.pcIp +
-              ':' +
-              this.$dc.appInfo.webUiPort +
-              '/utils/rootCA.crt';
-          return qrcode.toDataURL(certUrl, 4);
+        let certUrl =
+          'http://' +
+          this.appInfo.pcIp +
+          ':' +
+          this.appInfo.webUiPort +
+          '/utils/rootCA.crt';
+        return qrcode.toDataURL(certUrl, 4);
       },
       pacUrl() {
-        return `http://${this.$dc.appInfo.pcIp}:${this.$dc.appInfo.webUiPort}/profile/${this.$dc.userId}/proxy.pac`
+        return `http://${this.appInfo.pcIp}:${this.appInfo.webUiPort}/profile/${this.userId}/proxy.pac`
       }
     }
-};
+  };
 </script>
 
 <style>
-.install-body {
-  margin: -50px;
-  padding: 50px;
-  font-size: 14px;
-  line-height: 1.8;
-  background-color: #fff;
+    .install-body {
+        margin: -50px;
+        padding: 50px;
+        font-size: 14px;
+        line-height: 1.8;
+        background-color: #fff;
 
-  &__qrcode {
-    display: block;
-    margin-left: -15px;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5 {
-    font-weight: 400;
-    margin: 20px 0 10px;
-    color: rgba(51, 51, 51, 0.9);
-  }
-
-  h1 {
-    margin: 0;
-    font-size: 32px;
-    font-family: Dosis, Source Sans Pro, Helvetica Neue, Arial, sans-serif;
-  }
-
-  h2 {
-    color: #333;
-    font-size: 24px;
-    margin-top: 30px;
-
-    &:first-of-type {
-      margin-top: 10px;
+    &
+    __qrcode {
+        display: block;
+        margin-left: -15px;
     }
-  }
 
-  h4 {
-    font-size: 18px;
-  }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        font-weight: 400;
+        margin: 20px 0 10px;
+        color: rgba(51, 51, 51, 0.9);
+    }
 
-  code {
-    margin: 2px;
-    color: #455a64;
-    padding: 2px 7px;
-    font-size: 13px;
-    overflow-x: auto;
-    font-weight: 400;
-    line-height: 22px;
-    border-radius: 3px;
-    margin-bottom: 25px;
-    position: relative;
-    word-break: break-all;
-    white-space: pre-wrap;
-    background-color: #f5f7fa;
-    font-family: Source Code Pro,Monaco,Inconsolata,monospace;
-  }
+    h1 {
+        margin: 0;
+        font-size: 32px;
+        font-family: Dosis, Source Sans Pro, Helvetica Neue, Arial, sans-serif;
+    }
 
-  ol {
-    padding-left: 20px;
-  }
+    h2 {
+        color: #333;
+        font-size: 24px;
+        margin-top: 30px;
 
-  a {
-    color: #3498db;
-    text-decoration: none;
-  }
-}
+    &
+    :first-of-type {
+        margin-top: 10px;
+    }
+
+    }
+
+    h4 {
+        font-size: 18px;
+    }
+
+    code {
+        margin: 2px;
+        color: #455a64;
+        padding: 2px 7px;
+        font-size: 13px;
+        overflow-x: auto;
+        font-weight: 400;
+        line-height: 22px;
+        border-radius: 3px;
+        margin-bottom: 25px;
+        position: relative;
+        word-break: break-all;
+        white-space: pre-wrap;
+        background-color: #f5f7fa;
+        font-family: Source Code Pro, Monaco, Inconsolata, monospace;
+    }
+
+    ol {
+        padding-left: 20px;
+    }
+
+    a {
+        color: #3498db;
+        text-decoration: none;
+    }
+
+    }
 </style>

@@ -1,10 +1,10 @@
 //
-export const ruleState = state => {
+export const enableRule = state => {
   return state.profile.enableRule || false;
 };
-export const hostState = state => {
+export const enableHost = state => {
   return state.profile.enableHost || false;
 };
-export const filterState = state => {
+export const enableFilter = state => {
   return state.profile.enableFilter || false;
 };

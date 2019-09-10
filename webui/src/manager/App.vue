@@ -70,6 +70,8 @@
 </template>
 
 <script>
+  import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
+
   import LeftMenu from './components/LeftMenu';
   import Header from './components/Header.vue';
 
@@ -79,11 +81,8 @@
   import RuleTestForm from './form-widget/rule-test-form/Index.vue'
   import * as RuleTestFormApi from './form-widget/rule-test-form/index.js'
 
-  import hostApi from '../api/host';
-  import ruleApi from '../api/rule';
-  import profileApi from '../api/profile';
+
   import $ from 'jquery';
-  import forEach from 'lodash/forEach';
   import dataApi from '../api/data';
   import uuidV4 from 'uuid/v4';
   import CodeMirror from 'codemirror';
@@ -107,30 +106,6 @@
     },
     data() {
       return {
-        isDataCenter: true,
-        // 运行用户
-        userId: 'guest',
-        // 运行时信息
-        appInfo: {},
-        // 基本配置信息
-        configure: {},
-        // 个人配置
-        profile: {
-          projectPath: [],
-          enableRule: false
-        },
-        // 将工程路径配置转换为数组格式 方便编辑
-        redirectPathVariableArray: [],
-        // 关联的ip
-        bindedDeviceList: [],
-        // 生效的规则
-        rule: [],
-        // host文件列表
-        hostFileList: [],
-        // rule文件列表
-        ruleFileList: [],
-        filters: [],
-        dataList: [],
         // 新增数据文件对话框使用数据
         addDataFileForm: {
           visible: false,
@@ -148,67 +123,15 @@
       };
     },
     computed: {
-      ruleState() {
-        return this.profile.enableRule || false;
-      },
-      hostState() {
-        return this.profile.enableHost || false;
-      },
-      filterState() {
-        return this.profile.enableFilter || false;
-      }
+      ...mapState([
+        'dataList', 'userId'
+      ])
     },
     methods: {
-      async switchHost(value) {
-        if (this.profile.enableHost) {
-          await profileApi.disableHost();
-        } else {
-          await profileApi.enableHost();
-        }
-      },
+      ...mapActions([
+        'initStore',
+      ]),
 
-      async selectHostFile(command) {
-        let name = command;
-        hostApi.debouncedUseFile(name, response => {
-          var serverData = response.data;
-          if (serverData.code == 0) {
-            this.$message({
-              showClose: true,
-              type: 'success',
-              message: '设置成功!'
-            });
-          } else {
-            this.$message.error(`出错了,请刷新页面，${serverData.msg}`);
-          }
-        });
-      },
-
-      async switchFilter(value) {
-        if (this.profile.enableFilter) {
-          profileApi.disableFilter();
-        } else {
-          profileApi.enableFilter();
-        }
-      },
-
-      async switchRule(value) {
-        if (this.profile.enableRule) {
-          profileApi.disableRule();
-        } else {
-          profileApi.enableRule();
-        }
-      },
-
-      selectRuleFile(command) {
-        // panama-false
-        let kv = command.split('-%-');
-        ruleApi.setFileCheckStatus(kv[0], kv[1] == 'false').then(response => {
-          var serverData = response.data;
-          if (serverData.code != 0) {
-            this.$message.error(`出错了，${serverData.msg}`);
-          }
-        });
-      },
 
       deleteDataFile(entry, index) {
         this.$confirm(`此操作将永久删除该数据文件: ${entry.name}, 是否继续?`, '提示', {
@@ -368,52 +291,7 @@
     },
 
     async created() {
-      // 获取用户id
-      let result = await profileApi.getUserId();
-      this.userId = result.data.data.userId;
-
-      if (!window.io) return;
-      let socket = io('/manager');
-
-      socket.on('configure', data => {
-        this.configure = data;
-      });
-
-      socket.on('appinfo', data => {
-        this.appInfo = data;
-      });
-
-      socket.on('profile', profile => {
-        this.profile = profile;
-        let result = [];
-        forEach(profile.redirectPathVariables, (value, key) => {
-          result.push({
-            key,
-            value
-          });
-        });
-        this.redirectPathVariableArray = result;
-      });
-
-      socket.on('bindedDeviceList', deviceList => {
-        this.bindedDeviceList = deviceList;
-      });
-
-      socket.on('hostfilelist', data => {
-        this.hostFileList = data;
-      });
-
-      socket.on('rulefilelist', data => {
-        this.ruleFileList = data;
-      });
-
-      socket.on('filters', data => {
-        this.filters = data;
-      });
-
-      socket.on('datalist', data => {
-        this.dataList = data;
-      });
+      this.initStore();
     },
 
     mounted() {

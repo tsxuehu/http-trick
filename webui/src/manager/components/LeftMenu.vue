@@ -21,6 +21,7 @@
 </template>
 
 <script>
+  import {mapState, mapActions, mapMutations, mapGetters} from 'vuex';
   import './left-menu.pcss';
 
   export default {
@@ -30,13 +31,16 @@
       return {};
     },
     computed: {
+      ...mapState([
+        'configure', 'userId'
+      ]),
       menuList() {
         let menu = [{
           name: '使用说明',
           icon: 'icon-search',
           link: 'helpinstall'
         }];
-        if (this.$dc.userId == 'root') {
+        if (this.userId == 'root') {
           menu = menu.concat([
             {
               name: '基础配置',
@@ -51,7 +55,7 @@
           ]);
         }
 
-        if (this.$dc.configure.professionalVersion) {
+        if (this.configure.professionalVersion) {
           menu = menu.concat([
             {
               name: 'Host 管理',

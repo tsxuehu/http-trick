@@ -1,11 +1,14 @@
+import profileApi from 'src/api/profile';
+import hostApi from 'src/api/host';
+import ruleApi from 'src/api/rule';
 /**
  *
  */
 export async function initStore({commit, dispatch}) {
   // 获取用户id
   let result = await profileApi.getUserId();
-  this.userId = result.data.data.userId;
-
+  let userId = result.data.data.userId;
+  commit('setUserId', userId);
   if (!window.io) {
     console.error('没有websock环境');
     return;
@@ -43,4 +46,54 @@ export async function initStore({commit, dispatch}) {
   socket.on('datalist', data => {
     commit('setDataList', data);
   });
+}
+
+
+export async function selectHostFile({commit, dispatch}, name) {
+  hostApi.debouncedUseFile(name, response => {
+    var serverData = response.data;
+    if (serverData.code == 0) {
+      this.$message({
+        showClose: true,
+        type: 'success',
+        message: '设置成功!'
+      });
+    } else {
+      this.$message.error(`出错了,请刷新页面，${serverData.msg}`);
+    }
+  });
+}
+
+export async function switchHost({state}) {
+  if (state.profile.enableHost) {
+    await profileApi.disableHost();
+  } else {
+    await profileApi.enableHost();
+  }
+}
+
+export async function switchFilter({state}) {
+  if (state.profile.enableFilter) {
+    profileApi.disableFilter();
+  } else {
+    profileApi.enableFilter();
+  }
+}
+
+
+export async function switchRule({state}) {
+  if (state.profile.enableRule) {
+    profileApi.disableRule();
+  } else {
+    profileApi.enableRule();
+  }
+}
+
+export async function setFileCheckStatus({state}, {ruleFileName, check}) {
+  // panama-false
+  let response = await ruleApi.setFileCheckStatus(ruleFileName, check);
+  let serverData = response.data;
+  if (serverData.code != 0) {
+    this.$message.error(`出错了，${serverData.msg}`);
+  }
 }

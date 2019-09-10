@@ -1,22 +1,22 @@
 import "regenerator-runtime/runtime";
 // element-ui
-import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
 
 import Vue from 'vue'
+import ElementUI from 'element-ui';
+
 import App from './App'
 import router from './router'
-import DataCenter from 'vue-data-center'
-import 'regenerator-runtime/runtime'
+import store from './store/index'
+
+import 'element-ui/lib/theme-chalk/index.css';
 import './iconfont.css';
 import './index.scss';
 
 Vue.use(ElementUI);
-Vue.use(DataCenter);
-/* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
+  store,
   render: h => h(App)
 });
 document.addEventListener('keydown', function (e) {
