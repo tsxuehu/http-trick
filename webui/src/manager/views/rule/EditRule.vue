@@ -46,10 +46,15 @@
 </template>
 
 <script>
+  import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
   import ruleApi from '../../../api/rule';
   import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
   import * as RuleEditFormApi from '../../form-widget/rule-edit-form/index.js'
+  import * as DataCreateFormApi from '../../form-widget/data-create-form/index.js'
+  import * as DataEditFormApi from '../../form-widget/data-edit-form/index.js'
+
   import './edit-rule.scss'
+
   export default {
     name: 'edit-rule',
 
@@ -60,24 +65,37 @@
         filecontent: {meta: {}},
       };
     },
+    computed: {
+      ...mapState(['dataList'])
+    },
     methods: {
       setEventHandle() {
         RuleEditFormApi.setEventHandle({
-          onNewDataFile: index => { this.requestNewDataFile(index); },
-          onEditDataFile: dataFileEntry => { this.requestEditDataFile(dataFileEntry); },
-          onTestRule: data => { this.testRule(data); },
-          onSaveRule: data => { this.saveRule(data); },
+          onNewDataFile: index => {
+            this.requestNewDataFile(index);
+          },
+          onEditDataFile: dataFileEntry => {
+            this.requestEditDataFile(dataFileEntry);
+          },
+          onTestRule: data => {
+            this.testRule(data);
+          },
+          onSaveRule: data => {
+            this.saveRule(data);
+          },
         });
       },
       requestNewDataFile(actionIndex) {
-
-        this.$dc.requestAddDataFile((id) => {
-          RuleEditFormApi.setActionDataFileId(actionIndex, id);
+        DataCreateFormApi.setEventHandle({
+          onCreated: (id) => {
+            RuleEditFormApi.setActionDataFileId(actionIndex, id);
+          }
         });
+        DataCreateFormApi.create();
       },
 
       requestEditDataFile(datafileEntry) {
-        this.$dc.requestEditDataFile(datafileEntry);
+        DataEditFormApi.edit(datafileEntry);
       },
 
       getFile() {
@@ -88,7 +106,7 @@
           if (serverData.code == 0) {
             this.loaded = true;
 
-            if (this.$dc.dataList.length > 0) {
+            if (this.dataList.length > 0) {
               this.filecontent = serverData.data;
             } else {
               // element select bug， 通过此方法，避免没有option时select将model置为''，
@@ -141,8 +159,9 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.filecontent.content.splice(index, 1);
-          this.saveFileRightNow();
+          let copy = JSON.parse(JSON.stringify(this.filecontent));
+          copy.content.splice(index, 1);
+          this.saveFileRightNow(copy);
         });
       },
 
@@ -152,35 +171,34 @@
                  rule,
                  ruleIndex
                }) {
+        let copy = JSON.parse(JSON.stringify(this.filecontent));
         if (isEditRule) {
           // 复制属性
-          let originRule = this.filecontent.content[ruleIndex];
+          let originRule = copy.content[ruleIndex];
           Object.assign(originRule, rule);
         } else {
-          this.filecontent.content.push(rule);
+          copy.content.push(rule);
         }
-        this.saveFileRightNow();
+        this.saveFileRightNow(copy);
       },
 
       /**
        * 立刻保存
        */
-      saveFileRightNow() {
-        this.saveFile();
+      saveFileRightNow(ruleFile) {
+        this.saveFile(ruleFile);
         ruleApi.debouncedSaveFile.flush();
       },
 
-      saveFile(donotalert) {
-        ruleApi.debouncedSaveFile(this.name, this.filecontent, (response) => {
+      saveFile(ruleFile) {
+        ruleApi.debouncedSaveFile(this.name, ruleFile, (response) => {
           var serverData = response.data;
           if (serverData.code == 0) {
-            if (!donotalert) {
-              this.$message({
-                showClose: true,
-                type: 'success',
-                message: '保存成功!'
-              });
-            }
+            this.$message({
+              showClose: true,
+              type: 'success',
+              message: '保存成功!'
+            });
           } else {
             this.$message.error(`出错了，${serverData.msg}`);
           }
