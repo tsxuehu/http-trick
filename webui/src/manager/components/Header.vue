@@ -111,6 +111,7 @@
         'setFileCheckStatus'
       ]),
       selectRuleFile(command) {
+        // name-false
         let kv = command.split('-%-');
         this.setFileCheckStatus({
           ruleFileName: kv[0],

@@ -1,6 +1,7 @@
 import profileApi from 'src/api/profile';
 import hostApi from 'src/api/host';
 import ruleApi from 'src/api/rule';
+
 /**
  *
  */
@@ -51,15 +52,9 @@ export async function initStore({commit, dispatch}) {
 
 export async function selectHostFile({commit, dispatch}, name) {
   hostApi.debouncedUseFile(name, response => {
-    var serverData = response.data;
-    if (serverData.code == 0) {
-      this.$message({
-        showClose: true,
-        type: 'success',
-        message: '设置成功!'
-      });
-    } else {
-      this.$message.error(`出错了,请刷新页面，${serverData.msg}`);
+    let serverData = response.data;
+    if (serverData.code != 0) {
+      throw new Error(serverData.msg);
     }
   });
 }
@@ -90,10 +85,9 @@ export async function switchRule({state}) {
 }
 
 export async function setFileCheckStatus({state}, {ruleFileName, check}) {
-  // panama-false
   let response = await ruleApi.setFileCheckStatus(ruleFileName, check);
   let serverData = response.data;
   if (serverData.code != 0) {
-    this.$message.error(`出错了，${serverData.msg}`);
+    throw new Error(serverData.msg);
   }
 }
