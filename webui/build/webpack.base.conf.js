@@ -10,8 +10,8 @@ function resolve(dir) {
 }
 
 let entry = {
-  manager: './src/manager/index.js',
-  monitor: './src/monitor/index.js',
+  manager: './src/pages/manager/index.js',
+  monitor: './src/pages/monitor/index.js',
   // wsmock: './src/wsmock/index.js'
 };
 let htmlPlugins = Object.keys(entry).map(pageName => {

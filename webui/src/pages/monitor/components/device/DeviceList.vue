@@ -88,10 +88,10 @@
 <script>
   import './devicelist.scss';
   import Device from './Device.vue';
-  import ContextMenu from '../../../context-menu/index';
+  import ContextMenu from 'src/components/context-menu/index';
   import qrcode from 'qrcode-js';
   import copyToClipboard from 'copy-to-clipboard';
-  import profileApi from '../../../api/profile';
+  import profileApi from 'src/api/profile';
 
   export default {
     name: "DeviceList",

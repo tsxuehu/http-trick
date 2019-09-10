@@ -35,7 +35,7 @@
 </template>
 <script>
   import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
-  import hostApi from '../../../api/host'
+  import hostApi from 'src/api/host'
   import find from 'lodash/find'
   import './file-list.scss'
 

@@ -18,7 +18,7 @@
 </template>
 
 <script>
-  import ruleApi from '../../../api/rule'
+  import ruleApi from 'src/api/rule'
 
   export default {
     name: 'app',

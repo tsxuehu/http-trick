@@ -33,8 +33,8 @@
 <script>
     import List from './List.vue';
     import copyToClipboard from 'copy-to-clipboard';
-    import ContextMenu from '../../../context-menu/index';
-    import dataApi from '../../../api/data';
+    import ContextMenu from 'src/components/context-menu/index';
+    import dataApi from 'src/api/data';
     import './httptraffic.pcss';
     import Record from './record.vue';
     export default {

@@ -57,8 +57,8 @@
   import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
 
   import copyToClipboard from 'copy-to-clipboard';
-  import ruleApi from '../../../api/rule';
-  import utilsApi from '../../../api/utils';
+  import ruleApi from 'src/api/rule';
+  import utilsApi from 'src/api/utils';
   import find from 'lodash/find';
   import './file-list.scss';
 

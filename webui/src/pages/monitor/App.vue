@@ -37,9 +37,9 @@
     import HttpTraffic from './components/traffic/HttpTraffic.vue';
     import Detail from './components/detail/Detail.vue';
     import DeviceList from './components/device/DeviceList.vue';
-    import * as trafficApi from '../api/traffic';
-    import profileApi from '../api/profile';
-    import appApi from '../api/app';
+    import * as trafficApi from 'src/api/traffic';
+    import profileApi from 'src/api/profile';
+    import appApi from 'src/api/app';
 
     export default {
         components: {

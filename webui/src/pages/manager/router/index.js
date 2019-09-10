@@ -1,25 +1,25 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Configure from 'src/manager/views/configure/Configure'
-import RedirectPathVariable from 'src/manager/views/configure/RedirectPathVariable'
+import Configure from '../views/configure/Configure'
+import RedirectPathVariable from '../views/configure/RedirectPathVariable'
 
-import HostFileList from 'src/manager/views/host/FileList'
-import EditHost from 'src/manager/views/host/EditHost'
-import CreateHostFile from 'src/manager/views/host/CreateFile'
+import HostFileList from '../views/host/FileList'
+import EditHost from '../views/host/EditHost'
+import CreateHostFile from '../views/host/CreateFile'
 
-import RuleFileList from 'src/manager/views/rule/FileList'
-import EditRule from 'src/manager/views/rule/EditRule'
-import CreateRuleFile from 'src/manager/views/rule/CreateFile'
+import RuleFileList from '../views/rule/FileList'
+import EditRule from '../views/rule/EditRule'
+import CreateRuleFile from '../views/rule/CreateFile'
 
-import Filter from 'src/manager/views/filter/Filter'
+import Filter from '../views/filter/Filter'
 
-import DataList from 'src/manager/views/data/DataList'
+import DataList from '../views/data/DataList'
 
-import DeviceList from 'src/manager/views/device/DeviceList'
+import DeviceList from '../views/device/DeviceList'
 
-import HelpInstall from 'src/manager/views/help/Install'
+import HelpInstall from '../views/help/Install'
 
-import ProxyConfigure from 'src/manager/views/proxy/Configure'
+import ProxyConfigure from '../views/proxy/Configure'
 
 
 Vue.use(Router);

@@ -49,7 +49,7 @@
 
 <script>
   import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
-  import filtersApi from '../../../api/filter';
+  import filtersApi from 'src/api/filter';
   import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
   import * as RuleEditFormApi from '../../form-widget/rule-edit-form/index.js'
 

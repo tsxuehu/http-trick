@@ -47,7 +47,7 @@
 
 <script>
   import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
-  import ruleApi from '../../../api/rule';
+  import ruleApi from 'src/api/rule';
   import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
   import * as RuleEditFormApi from '../../form-widget/rule-edit-form/index.js'
   import * as DataCreateFormApi from '../../form-widget/data-create-form/index.js'

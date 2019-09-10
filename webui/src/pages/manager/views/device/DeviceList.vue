@@ -36,7 +36,7 @@
   import qrcode from 'qrcode-js';
   import copyToClipboard from 'copy-to-clipboard';
 
-  import profileApi from '../../../api/profile';
+  import profileApi from 'src/api/profile';
   import './devicelist.scss'
 
   export default {
