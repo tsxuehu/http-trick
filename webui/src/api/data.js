@@ -9,8 +9,12 @@ export default {
     return axios.get('/data/getdatalist');
   },
 
-  saveDataList(content){
-    return axios.post('/data/savedatalist', content);
+  removeDataFile(content){
+    return axios.post('/data/removedatafile', content);
+  },
+
+  createDataFile(content){
+    return axios.post('/data/createdatafile', content);
   },
 
   // 获取版本数据

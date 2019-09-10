@@ -14,25 +14,7 @@
             </el-container>
         </el-container>
 
-        <!-- 新增自定义mock数据文件对话框 -->
-        <el-dialog title="新建Mock数据文件" :visible.sync="addDataFileForm.visible">
-            <el-form :model="addDataFileForm" label-width="80px">
-                <el-form-item label="名称">
-                    <el-input v-model="addDataFileForm.name"></el-input>
-                </el-form-item>
-                <el-form-item label="格式">
-                    <el-select v-model="addDataFileForm.contenttype" placeholder="请选择数据文件格式">
-                        <el-option label="html" value="text/html"></el-option>
-                        <el-option label="json" value="application/json"></el-option>
-                        <el-option label="javascript" value="application/javascript"></el-option>
-                    </el-select>
-                </el-form-item>
-            </el-form>
-            <div slot="footer" class="dialog-footer">
-                <el-button @click="addDataFileForm.visible = false">取 消</el-button>
-                <el-button type="primary" @click="addDataFile">确 定</el-button>
-            </div>
-        </el-dialog>
+
 
         <!-- 编辑数据文件对话框 -->
         <el-dialog
@@ -66,6 +48,8 @@
                 ref="ruleEditForm"></rule-edit-form>
 
         <rule-test-form ref="ruleTestForm"></rule-test-form>
+
+        <data-create-form ref="dataCreateForm"></data-create-form>
     </div>
 </template>
 
@@ -81,10 +65,11 @@
   import RuleTestForm from './form-widget/rule-test-form/Index.vue'
   import * as RuleTestFormApi from './form-widget/rule-test-form/index.js'
 
+  import DataCreateForm from './form-widget/data-create-form/Index.vue'
+  import * as DataCreateFormApi from './form-widget/data-create-form/index.js'
+
 
   import $ from 'jquery';
-  import dataApi from '../api/data';
-  import uuidV4 from 'uuid/v4';
   import CodeMirror from 'codemirror';
   import 'codemirror/lib/codemirror.css';
 
@@ -103,17 +88,10 @@
       [Header.name]: Header,
       [RuleEditForm.name]: RuleEditForm,
       [RuleTestForm.name]: RuleTestForm,
+      [DataCreateForm.name]: DataCreateForm,
     },
     data() {
       return {
-        // 新增数据文件对话框使用数据
-        addDataFileForm: {
-          visible: false,
-          callback: null,
-          id: '',
-          name: '',
-          contenttype: ''
-        },
         // 编辑数据文件对话框
         editDataFileForm: {
           visible: false,
@@ -135,32 +113,6 @@
       requestAddDataFile(callback) {
         this.addDataFileForm.callback = callback;
         this.addDataFileForm.visible = true;
-      },
-
-      addDataFile() {
-        this.addDataFileForm.visible = false;
-        var id = uuidV4();
-        this.dataList.push({
-          id: id,
-          name: this.addDataFileForm.name,
-          contenttype: this.addDataFileForm.contenttype
-        });
-        dataApi.saveDataList(this.dataList).then(res => {
-          var serverData = res.data;
-          if (serverData.code == 0) {
-            this.$message({
-              showClose: true,
-              type: 'success',
-              message: '新建成功!'
-            });
-            this.addDataFileForm.name = '';
-            this.addDataFileForm.contenttype = '';
-            this.addDataFileForm.callback && this.addDataFileForm.callback(id);
-            this.addDataFileForm.callback = null;
-          } else {
-            this.$message.error(`出错了，${serverData.msg}`);
-          }
-        });
       },
 
       toggleFullScreen() {
@@ -276,9 +228,10 @@
       // 编辑器editor初始化的时候需要用到editDataFileDialog里的元素content-editor
       this.$refs.editDataFileDialog.rendered = true;
 
-      let {ruleEditForm, ruleTestForm} = this.$refs;
+      let {ruleEditForm, ruleTestForm, dataCreateForm} = this.$refs;
       RuleEditFormApi.setInstance(ruleEditForm);
       RuleTestFormApi.setInstance(ruleTestForm);
+      DataCreateFormApi.setInstance(dataCreateForm);
     }
   };
 </script>

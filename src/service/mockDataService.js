@@ -7,9 +7,8 @@ const fileUtil = require("../utils/file");
  * 数据mock
  */
 module.exports = class MockDataService extends EventEmitter {
-  constructor({userService, appInfoService}) {
+  constructor({appInfoService}) {
     super();
-    this.userService = userService;
     this.appInfoService = appInfoService;
 
     let proxyDataDir = this.appInfoService.getProxyDataDir();
@@ -78,31 +77,31 @@ module.exports = class MockDataService extends EventEmitter {
 
   /**
    * 保存数据文件列表，清除无用的数据文件
-   * @param userId
-   * @param dataList
    */
-  async saveMockDataList(userId, dataList) {
+  async createDataFile(userId, dataEntry) {
     // 找出要被被删除的数据文件, 老的数据文件里有，而新的没有
-    let newDataKeys = new Set();
-    let toRemove = [];
-    dataList.forEach(data => {
-      newDataKeys.add(data.id);
-    });
-    let originMockDataList = this.getMockDataList(userId);
-    originMockDataList.forEach(data => {
-      if (!newDataKeys.has(data.id)) {
-        toRemove.push(data.id);
-      }
-    });
-    // 设置新值
-    await this.setMockDataList(userId, dataList);
 
-    // 删除文件
-    for (let rId of toRemove) {
-      let dataPath = this._getDataFilePath(userId, rId);
+    let dataList = this.getMockDataList(userId);
+    dataList.push(dataEntry);
+
+    await this.setMockDataList(userId, dataList);
+  }
+
+  async removeDataFile(userId, rmDataEntry) {
+    // 找出要被被删除的数据文件, 老的数据文件里有，而新的没有
+
+    let dataList = this.getMockDataList(userId);
+    try {
+      let dataPath = this._getDataFilePath(userId, rmDataEntry.id);
       await fileUtil.deleteFile(dataPath);
+    } catch (e) {
     }
 
+    dataList = dataList.filter(dataEntry => {
+      return rmDataEntry.id != dataEntry.id;
+    });
+
+    await this.setMockDataList(userId, dataList);
   }
 
   /**
@@ -114,27 +113,6 @@ module.exports = class MockDataService extends EventEmitter {
   async saveDataFileContent(userId, dataFileId, content) {
     let dataFilePath = this._getDataFilePath(userId, dataFileId);
     await fileUtil.writeFile(dataFilePath, content);
-  }
-
-  /**
-   * 用户从监控窗保存一个数据文件
-   */
-  async saveDataEntryFromTraffic(userId, dataFileId, fileName, contentType, content) {
-    let dataList = this.mockDataList[userId] || [];
-    dataList.push({
-      id: dataFileId,
-      name: fileName,
-      contenttype: contentType
-    });
-    // 保存mock数据文件列表
-    let listFilePath = this._getMockEntryPath(userId);
-    fileUtil.writeJsonToFile(listFilePath, dataList);
-    // 保存数据文件
-    let dataFilePath = this._getDataFilePath(userId, dataFileId);
-    await fileUtil.writeFile(dataFilePath, content);
-
-    this.emit('data-change', userId, this.getMockDataList(userId));
-
   }
 
   /**

@@ -2,11 +2,9 @@
     <div>
         <div class="main-content__title">自定义数据文件列表</div>
         <div class="project-path-info">在http转发规则里面，可以配置将这里的mock数据返回给浏览器</div>
-        <el-row :gutter="20" style="margin-bottom: 10px">
-            <el-col :span="6" :offset="18" class="addhost-btn-wrap">
-                <el-button size="small" @click='requestAddDataFile()'>新增数据文件</el-button>
-            </el-col>
-        </el-row>
+        <div class="top-op">
+            <el-button size="small" @click='requestAddDataFile()'>新增数据文件</el-button>
+        </div>
         <el-table border align='center' :data="dataList">
             <el-table-column prop="name" label="名字" align="center" width="300" :sortable="true">
             </el-table-column>
@@ -30,6 +28,7 @@
   import * as DataCreateFormApi from '../../form-widget/data-create-form/index.js'
   import * as DataEditFormApi from '../../form-widget/data-edit-form/index.js'
   import dataApi from 'src/api/data';
+  import './datalist.scss'
 
   export default {
     name: 'mockdatalist',
@@ -51,9 +50,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(async () => {
-          let copyDataList = JSON.parse(JSON.stringify(this.dataList));
-          copyDataList.splice(index, 1);
-          let res = await dataApi.saveDataList(copyDataList);
+          let res = await dataApi.removeDataFile(dataEntry);
           let serverData = res.data;
           if (serverData.code == 0) {
             this.$message({
