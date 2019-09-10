@@ -161,14 +161,12 @@
   justify-content: space-around; }
 
 .addrule-btn-wrap {
-  text-align: right;
-}
+  text-align: right; }
 
 .action-panel .btn-panel {
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 10px;
-}
+  margin-bottom: 10px; }
 
 
 .bind-qrcode-panel {

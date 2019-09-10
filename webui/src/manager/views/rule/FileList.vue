@@ -15,9 +15,9 @@
             </div>
         </div>
 
-        <el-table border :data="$dc.ruleFileList">
+        <el-table border :data="ruleFileList">
             <el-table-column prop="name" label="名字" width="200">
-                <template  v-slot:default="scope">
+                <template v-slot:default="scope">
                     {{ scope.row.name }}
                     <el-tag type="danger" v-if="scope.row.meta.remote" close-transition>远程</el-tag>
                 </template>
@@ -45,8 +45,8 @@
                 <template v-slot:default="scope">
                     <el-switch
                             v-model="scope.row.checked"
-                            :disabled="!$dc.ruleState"
-                            @change="onSelectionChange(scope.row.name,scope.row.checked)"
+                            :disabled="!enableRule"
+                            @change="onSelectionChange(scope.row.name, scope.row.checked)"
                     />
                 </template>
             </el-table-column>
@@ -54,14 +54,20 @@
     </div>
 </template>
 <script>
+  import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
+
   import copyToClipboard from 'copy-to-clipboard';
   import ruleApi from '../../../api/rule';
   import utilsApi from '../../../api/utils';
   import find from 'lodash/find';
-  import './file-list.pcss';
+  import './file-list.scss';
 
   export default {
     name: 'rulefilelist',
+    computed: {
+      ...mapState(['ruleFileList', 'appInfo']),
+      ...mapGetters(['enableRule'])
+    },
     methods: {
       onDeleteFile(row, index) {
         this.$confirm(`此操作将永久删除该文件: ${row.name}, 是否继续?`, '提示', {
@@ -95,7 +101,7 @@
         }
       },
       onShareFile(row, index) {
-        let url = `http://${this.$dc.appInfo.pcIp}:${this.$dc.appInfo.webUiPort}/rule/file/raw?name=${encodeURIComponent(row.name)}`;
+        let url = `http://${this.appInfo.pcIp}:${this.appInfo.webUiPort}/rule/file/raw?name=${encodeURIComponent(row.name)}`;
         // 复制
         copyToClipboard(url);
         this.$message(`已复制规则${encodeURIComponent(row.name)}链接`);
@@ -235,10 +241,3 @@
     }
   };
 </script>
-<style>
-    .addrule-btn-wrap {
-        text-align: right;
-    }
-
-
-</style>

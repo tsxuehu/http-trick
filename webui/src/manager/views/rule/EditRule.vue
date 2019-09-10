@@ -49,6 +49,7 @@
   import ruleApi from '../../../api/rule';
   import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
   import * as RuleEditFormApi from '../../form-widget/rule-edit-form/index.js'
+  import './edit-rule.scss'
   export default {
     name: 'edit-rule',
 
@@ -197,10 +198,3 @@
   };
 
 </script>
-<style>
-    .action-panel .btn-panel {
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 10px;
-    }
-</style>
