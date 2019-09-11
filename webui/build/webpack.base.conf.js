@@ -15,8 +15,12 @@ let entry = {
   // wsmock: './src/wsmock/index.js'
 };
 let htmlPlugins = Object.keys(entry).map(pageName => {
+  let htmlName = pageName;
+  if (pageName == 'manager') {
+    htmlName = 'index';
+  }
   return new HtmlWebpackPlugin({
-    filename: path.resolve(__dirname, '../../site', `${pageName}.html`),
+    filename: path.resolve(__dirname, '../../site', `${htmlName}.html`),
     template: 'index.html',
     title: pageName,
     inject: true,
