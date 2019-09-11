@@ -98,6 +98,7 @@ module.exports = class HttpHandle {
       // =====================================================
       // 限流 https://github.com/tjgq/node-stream-throttle
 
+      let enableHost = this.profileService.enableHost(userId);
       // 查找匹配到的过滤规则
       let enableFilter = this.profileService.enableFilter(userId);
       let filterRuleList = await this.filterService.getMatchedRuleList(userId, deviceId, enableFilter, req.method, urlObj);
@@ -107,7 +108,7 @@ module.exports = class HttpHandle {
 
       let toClientResponse = await this._runAtions({
         req, res, urlObj, requestId, recordResponse,
-        clientIp, userId, deviceId, enableFilter, enableRule,
+        clientIp, userId, deviceId, enableFilter, enableRule, enableHost,
         rule: matchedRule, filterRuleList
       });
 
@@ -144,7 +145,7 @@ module.exports = class HttpHandle {
    */
   async _runAtions({
                      req, res, urlObj, requestId, recordResponse,
-                     clientIp, deviceId, userId, enableFilter, enableRule,
+                     clientIp, deviceId, userId, enableFilter, enableRule, enableHost,
                      rule, filterRuleList
                    }) {
     // 原始的请求头部
@@ -199,8 +200,9 @@ module.exports = class HttpHandle {
     toClientResponse.headers['proxy-deviceId'] = deviceId;
     toClientResponse.headers['proxy-clientIp'] = clientIp;
     // 记录状态信息
-    enableFilter || (toClientResponse.headers['proxy-filter-disabled'] = "true");
-    enableRule || (toClientResponse.headers['proxy-rule-disabled'] = "true");
+    toClientResponse.headers['proxy-host-disabled'] = enableHost ? "true" : "false";
+    toClientResponse.headers['proxy-filter-disabled'] = enableFilter ? "true" : "false";
+    toClientResponse.headers['proxy-rule-disabled'] = enableRule ? "true" : "false";
 
     // 合并所有匹配到的过滤器规则的action列表、请求匹配的规则的 action 列表
     // 动作分为请求前和请求后两种类型, 合并后的顺序，前置过滤器动作 -> 请求匹配到的动作 -> 后置过滤器的动作
