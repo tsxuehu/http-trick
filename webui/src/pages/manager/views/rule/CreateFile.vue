@@ -18,7 +18,7 @@
 </template>
 
 <script>
-  import ruleApi from 'src/api/rule'
+  import * as ruleApi from 'src/api/rule'
 
   export default {
     name: 'app',
@@ -53,7 +53,7 @@
                   message: '恭喜你，创建成功',
                   type: 'success'
                 });
-                this.$router.push(`editrule?name=${this.createFileForm.name}`);
+                this.$router.push(`editrule?id=${serverData.data.id}`);
               } else {
                 this.$message.error(`出错了，${serverData.msg}`);
               }

@@ -1,6 +1,6 @@
 import profileApi from 'src/api/profile';
 import hostApi from 'src/api/host';
-import ruleApi from 'src/api/rule';
+import * as ruleApi from 'src/api/rule';
 
 /**
  *
@@ -84,8 +84,8 @@ export async function switchRule({state}) {
   }
 }
 
-export async function setFileCheckStatus({state}, {ruleFileName, check}) {
-  let response = await ruleApi.setFileCheckStatus(ruleFileName, check);
+export async function setFileCheckStatus({state}, {ruleFileId, check}) {
+  let response = await ruleApi.setFileCheckStatus(ruleFileId, check);
   let serverData = response.data;
   if (serverData.code != 0) {
     throw new Error(serverData.msg);

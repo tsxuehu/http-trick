@@ -47,7 +47,7 @@
 
 <script>
   import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
-  import ruleApi from 'src/api/rule';
+  import * as ruleApi from 'src/api/rule';
   import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
   import * as RuleEditFormApi from '../../form-widget/rule-edit-form/index.js'
   import * as DataCreateFormApi from '../../form-widget/data-create-form/index.js'
@@ -101,8 +101,8 @@
 
       getFile() {
         this.loaded = false;
-        this.name = this.$route.query.name;
-        ruleApi.getFileContent(this.name).then((response) => {
+        this.ruleFileId = this.$route.query.id;
+        ruleApi.getFileContent(this.ruleFileId).then((response) => {
           var serverData = response.data;
           if (serverData.code == 0) {
             this.loaded = true;

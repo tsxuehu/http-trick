@@ -8,7 +8,7 @@ export function setRuleCheckedState(ruleId, checked) {
   return axios.get('/filter/setRuleCheckedState', {
     params: {
       ruleId,
-      checked
+      checked: checked ? 1 : 0
     }
   });
 }

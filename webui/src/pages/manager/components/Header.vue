@@ -38,8 +38,8 @@
                     <!-- rule文件 -->
                     <el-dropdown-item
                             v-for="rulefile in ruleFileList"
-                            :key="rulefile.name"
-                            :command="rulefile.name + '-%-' + rulefile.checked"
+                            :key="rulefile.id"
+                            :command="rulefile.id + '-%-' + rulefile.checked"
                     >
                         {{ rulefile.name }}
                         <i class="el-icon-check" v-if="rulefile.checked"/>
@@ -114,7 +114,7 @@
         // name-false
         let kv = command.split('-%-');
         this.setFileCheckStatus({
-          ruleFileName: kv[0],
+          ruleFileId: kv[0],
           check: kv[1] == 'false'
         });
       },

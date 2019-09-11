@@ -58,6 +58,7 @@ module.exports = class FilterService extends EventEmitter {
   }
 
   async saveRule(userId, rule) {
+    // rule内容参见 webui/src/pages/manager/form-widget/rule-edit-form/Index.vue
     let filters = this.getFilterRuleList(userId);
     if (rule.id) {
       // 修改操作

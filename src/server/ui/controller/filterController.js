@@ -20,7 +20,7 @@ module.exports = class FilterController {
     router.get('/filter/setRuleCheckedState', async (ctx, next) => {
       let userId = ctx.userId;
       let {ruleId, checked} = ctx.query;
-      await this.filterService.setRuleCheckedState(userId, ruleId, checked == 'true');
+      await this.filterService.setRuleCheckedState(userId, ruleId, checked == 1);
       ctx.body = {
         code: 0
       };

@@ -2,34 +2,8 @@ const _ = require("lodash");
 const fileUtil = require("../utils/file");
 const path = require('path');
 const EventEmitter = require("events");
-const defaultRule = {
-  name: "js",
-  id: "",
-  method: "get",
-  match: "/v2/wsc/build/js/(.+)_.+.js$",
-  checked: true,
-  actionList: [ // 执行的动作列表
-    {
-      type: "redirect", // 动作类型
-      data: {
-        target: "",// 转发目标路径
-        dataId: '', //返回数据文件的id
-        modifyResponseType: '',// 修改响应内容类型
-        callbackName: "", // jsonp请求参数名
-        cookieKey: "", // 设置到请求里的cookie key
-        cookieValue: "", // 设置到请求里的cookie value
-        reqHeaderKey: "", // 请求header
-        reqHeaderValue: "",
-        resHeaderKey: "", // 响应header
-        resHeaderValue: "",
-        queryKey: "", // 请求query
-        queryValue: "",
-        modifyRequestScript: "", // 脚本修改请求
-        modifyResponseScript: "" // 脚本修改响应
-      }
-    }
-  ]
-};
+const uuidV4 = require('uuid/v4');
+
 const PassRule = {
   "method": "",
   "match": "",
@@ -56,10 +30,10 @@ module.exports = class RuleService extends EventEmitter {
     // 读取规则文件
     let contentMap = await fileUtil.getJsonFileContentInDir(this.ruleSaveDir);
     _.forEach(contentMap, (content, fileName) => {
-      let ruleName = content.name;
-      let userId = fileName.substr(0, this._getUserIdLength(fileName, ruleName));
+      let ruleFileId = content.id;
+      let userId = content.userId;
       this.rules[userId] = this.rules[userId] || {};
-      this.rules[userId][ruleName] = content;
+      this.rules[userId][ruleFileId] = content;
     })
   }
 
@@ -68,7 +42,10 @@ module.exports = class RuleService extends EventEmitter {
     if (this.rules[userId] && this.rules[userId][name]) {
       return false;
     }
+    let ruleFileId = uuidV4();
     let ruleFile = {
+      "id": ruleFileId,
+      "userId": userId,
       "meta": {
         "remote": false,
         "url": ""
@@ -76,16 +53,16 @@ module.exports = class RuleService extends EventEmitter {
       "checked": false,
       "name": name,
       "description": description,
-      "content": []
+      "content": [] // 规则内容参见 webui/src/pages/manager/form-widget/rule-edit-form/Index.vue
     };
     this.rules[userId] = this.rules[userId] || {};
     this.rules[userId][name] = ruleFile;
     // 写文件
-    let filePath = this._getRuleFilePath(userId, name);
+    let filePath = this._getRuleFilePath(userId, ruleFileId);
     await fileUtil.writeJsonToFile(filePath, ruleFile);
     // 发送消息通知
     this.emit('data-change', userId, this.getRuleFileList(userId));
-    return true;
+    return ruleFileId;
   }
 
   // 返回用户的规则文件列表
@@ -93,35 +70,25 @@ module.exports = class RuleService extends EventEmitter {
     let ruleMap = this.rules[userId] = this.rules[userId] || {};
 
     let rulesLocal = [];
-    let rulesRemote = [];
     _.forEach(ruleMap, function (content) {
-      if (content.meta.remote) {
-        rulesRemote.push({
-          name: content.name,
-          checked: content.checked,
-          description: content.description,
-          meta: content.meta
-        });
-      } else {
-        rulesLocal.push({
-          name: content.name,
-          checked: content.checked,
-          description: content.description,
-          meta: content.meta
-        });
-      }
+      rulesLocal.push({
+        id: content.id,
+        name: content.name,
+        checked: content.checked,
+        description: content.description,
+        meta: content.meta
+      });
     });
-
-    return rulesLocal.concat(rulesRemote);
+    return rulesLocal;
   }
 
   // 删除规则文件
-  deleteRuleFile(userId, name) {
-    let rule = this.rules[userId][name];
+  deleteRuleFile(userId, ruleFileId) {
+    let rule = this.rules[userId][ruleFileId];
 
-    delete this.rules[userId][name];
+    delete this.rules[userId][ruleFileId];
 
-    let path = this._getRuleFilePath(userId, name);
+    let path = this._getRuleFilePath(userId, ruleFileId);
     fileUtil.deleteFile(path);
     // 发送消息通知
     this.emit('data-change', userId, this.getRuleFileList(userId));
@@ -132,28 +99,32 @@ module.exports = class RuleService extends EventEmitter {
   }
 
   // 设置规则文件的使用状态
-  async setRuleFileCheckStatus(userId, name, checked) {
-    this.rules[userId][name].checked = checked;
-    let path = this._getRuleFilePath(userId, name);
-    await fileUtil.writeJsonToFile(path, this.rules[userId][name]);
+  async setRuleFileCheckStatus(userId, ruleFileId, checked) {
+    this.rules[userId][ruleFileId].checked = checked;
+    let path = this._getRuleFilePath(userId, ruleFileId);
+    await fileUtil.writeJsonToFile(path, this.rules[userId][ruleFileId]);
     // 发送消息通知
     this.emit('data-change', userId, this.getRuleFileList(userId));
     delete this.usingRuleCache[userId];
   }
 
   // 获取规则文件的内容
-  getRuleFile(userId, name) {
-    return this.rules[userId][name];
+  getRuleFile(userId, ruleFileId) {
+    return this.rules[userId][ruleFileId];
   }
 
   // 保存规则文件(可能是远程、或者本地)
-  saveRuleFile(userId, name, content) {
+  saveRuleFile(userId, ruleFileId, fileContent) {
+    if (!ruleFileId) {
+      ruleFileId = uuidV4();
+      fileContent.id = ruleFileId;
+    }
     let userRuleMap = this.rules[userId] || {};
-    userRuleMap[name].content = content;
+    userRuleMap[ruleFileId] = fileContent;
     this.rules[userId] = userRuleMap;
     // 写文件
-    let filePath = this._getRuleFilePath(userId, name);
-    fileUtil.writeJsonToFile(filePath, userRuleMap[name]);
+    let filePath = this._getRuleFilePath(userId, ruleFileId);
+    fileUtil.writeJsonToFile(filePath, userRuleMap[ruleFileId]);
     // 清空缓存
     delete this.usingRuleCache[userId];
   }
@@ -192,33 +163,24 @@ module.exports = class RuleService extends EventEmitter {
     let ruleMap = this.rules[userId] || {};
     // 计算使用中的规则
     let rulesLocal = [];
-    let rulesRemote = [];
-    _.forEach(ruleMap, function (file, filename) {
-      if (!file.checked) return;
-      _.forEach(file.content, function (rule) {
+    _.forEach(ruleMap, function (fileContent, ruleFileId) {
+      if (!fileContent.checked) return;
+      _.forEach(fileContent.content, function (rule) {
         if (!rule.checked) return;
-        let copy = _.cloneDeep(rule);
-        copy.ruleFileName = filename;
-        if (file.meta.remote) {
-          rulesRemote.push(copy);
-        } else {
-          rulesLocal.push(copy);
-        }
+
+        let copy = JSON.parse(JSON.stringify(rule));
+        copy.ruleFileName = fileContent.name;
+        rulesLocal.push(copy);
       });
     });
-    let merged = rulesLocal.concat(rulesRemote);
-    this.usingRuleCache[userId] = merged;
-    return merged;
+    this.usingRuleCache[userId] = rulesLocal;
+    return rulesLocal;
   }
 
-  _getRuleFilePath(userId, ruleName) {
-    let fileName = `${userId}_${ruleName}.json`;
+  _getRuleFilePath(userId, ruleFileId) {
+    let fileName = `${userId}_${ruleFileId}.json`;
     let filePath = path.join(this.ruleSaveDir, fileName);
     return filePath;
-  }
-
-  _getUserIdLength(ruleFileName, ruleName) {
-    return ruleFileName.length - ruleName.length - 6;
   }
 
   // 请求的方法是否匹配规则

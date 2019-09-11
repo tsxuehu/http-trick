@@ -25,11 +25,14 @@ module.exports = class RuleController {
     //}
     router.post('/rule/create', async (ctx, next) => {
       let userId = ctx.userId;
-      let result = await this.ruleService.createRuleFile(userId, ctx.request.body.name
-        , ctx.request.body.description);
+      let {name, description} = ctx.request.body;
+      let ruleFileId = await this.ruleService.createRuleFile(userId, name, description);
       ctx.body = {
-        code: result ? 0 : 1,
-        msg: result ? '' : '文件已存在'
+        code: 0,
+        msg: 'ok',
+        data: {
+          id: ruleFileId
+        }
       };
     });
     // 获取规则文件列表
@@ -46,7 +49,7 @@ module.exports = class RuleController {
     // /rule/deletefile?name=${name}
     router.get('/rule/deletefile', (ctx, next) => {
       let userId = ctx.userId;
-      this.ruleService.deleteRuleFile(userId, ctx.query.name);
+      this.ruleService.deleteRuleFile(userId, ctx.query.id);
       ctx.body = {
         code: 0
       };
@@ -55,7 +58,7 @@ module.exports = class RuleController {
     // /rule/setfilecheckstatus?name=${name}&checked=${checked?1:0}
     router.get('/rule/setfilecheckstatus', (ctx, next) => {
       let userId = ctx.userId;
-      this.ruleService.setRuleFileCheckStatus(userId, ctx.query.name,
+      this.ruleService.setRuleFileCheckStatus(userId, ctx.query.id,
         ctx.query.checked == 1 ? true : false);
       ctx.body = {
         code: 0
@@ -65,7 +68,7 @@ module.exports = class RuleController {
     // /rule/getfile?name=${name}
     router.get('/rule/getfile', async (ctx, next) => {
       let userId = ctx.userId;
-      let content = await this.ruleService.getRuleFile(userId, ctx.query.name);
+      let content = this.ruleService.getRuleFile(userId, ctx.query.id);
       ctx.body = {
         code: 0,
         data: content
@@ -74,14 +77,14 @@ module.exports = class RuleController {
 
     router.get('/rule/file/raw', async (ctx, next) => {
       let userId = ctx.userId;
-      let content = await this.ruleService.getRuleFile(userId, ctx.query.name);
+      let content = await this.ruleService.getRuleFile(userId, ctx.query.id);
       ctx.body = content;
     });
     // 保存规则文件
     // /rule/savefile?name=${name} ,content
     router.post('/rule/savefile', async (ctx, next) => {
       let userId = ctx.userId;
-      await this.ruleService.saveRuleFile(userId, ctx.query.name, ctx.request.body.content);
+      await this.ruleService.saveRuleFile(userId, ctx.query.id, ctx.request.body);
       ctx.body = {
         code: 0
       };
@@ -91,9 +94,9 @@ module.exports = class RuleController {
     // /rule/download?name=${name}
     router.get('/rule/download', async (ctx, next) => {
       let userId = ctx.userId;
-      let name = ctx.query.name;
-      let content = await this.ruleService.getRuleFile(userId, name);
-      ctx.set('Content-disposition', `attachment;filename=${encodeURIComponent(name)}.json`);
+      let id = ctx.query.id;
+      let content = await this.ruleService.getRuleFile(userId, id);
+      ctx.set('Content-disposition', `attachment;filename=${encodeURIComponent(content.name)}.json`);
       ctx.body = content;
     });
     // 测试规则
