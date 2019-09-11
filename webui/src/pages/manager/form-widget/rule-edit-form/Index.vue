@@ -89,12 +89,11 @@
 
 <script>
   import RuleActionValue from './RuleActionValue.vue';
-  import uuidV4 from 'uuid/v4';
   import './index.scss'
 
   const DefaultRule = {
     name: "",
-    key: '',
+    id: '',
     method: "",
     match: "",
     checked: false,
@@ -196,13 +195,13 @@
 
         if (initialRule) {
           rule = JSON.parse(JSON.stringify(initialRule));
+          rule.id = '';
         } else {
           rule = JSON.parse(JSON.stringify(DefaultRule));
           let action = JSON.parse(JSON.stringify(DefaultAction));
           action.type = this.isFilterRule ? "addRequestHeader" : "redirect";// 转发redirect
           rule.actionList.push(action);
         }
-        rule.key = uuidV4();
 
         this.rule = rule;
         this.visible = true;

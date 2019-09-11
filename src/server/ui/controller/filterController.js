@@ -4,25 +4,42 @@
 const ServiceRegistry = require("../../../service");
 let instance;
 module.exports = class FilterController {
-    static getInstance() {
-        if (!instance) {
-            instance = new FilterController();
-        }
-        return instance;
+  static getInstance() {
+    if (!instance) {
+      instance = new FilterController();
     }
-    constructor() {
-        this.filterService = ServiceRegistry.getFilterService();
+    return instance;
+  }
 
-    }
+  constructor() {
+    this.filterService = ServiceRegistry.getFilterService();
 
-    regist(router) {
-        router.post('/filter/savefilters', async (ctx, next) => {
-            let userId = ctx.userId;
-            await this.filterService.save(userId, ctx.request.body);
-            ctx.body = {
-                code: 0
-            };
-        });
-    }
+  }
+
+  regist(router) {
+    router.get('/filter/setRuleCheckedState', async (ctx, next) => {
+      let userId = ctx.userId;
+      let {ruleId, checked} = ctx.query;
+      await this.filterService.setRuleCheckedState(userId, ruleId, checked == 'true');
+      ctx.body = {
+        code: 0
+      };
+    });
+    router.post('/filter/saveRule', async (ctx, next) => {
+      let userId = ctx.userId;
+      await this.filterService.saveRule(userId, ctx.request.body);
+      ctx.body = {
+        code: 0
+      };
+    });
+    router.get('/filter/removeRule', async (ctx, next) => {
+      let userId = ctx.userId;
+      let {ruleId} = ctx.query;
+      await this.filterService.removeRule(userId, ruleId);
+      ctx.body = {
+        code: 0
+      };
+    });
+  }
 
 }

@@ -1,9 +1,7 @@
 /**
  * Created by tsxuehu on 8/3/17.
  */
-const fs = require("fs");
 const path = require("path");
-const rimraf = require("rimraf");
 const _ = require("lodash");
 const fileUtil = require("../utils/file");
 const logCountPerUser = 500;

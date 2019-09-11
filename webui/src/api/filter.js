@@ -3,10 +3,24 @@
  */
 
 import axios from "axios";
-var api = {
-    saveFilters(filters){
-        return axios.post('/filter/savefilters', filters);
-    }
 
-};
-export default api;
+export function setRuleCheckedState(ruleId, checked) {
+  return axios.get('/filter/setRuleCheckedState', {
+    params: {
+      ruleId,
+      checked
+    }
+  });
+}
+
+export function saveRule(filter) {
+  return axios.post('/filter/saveRule', filter);
+}
+
+export function removeRule(ruleId) {
+  return axios.get('/filter/removeRule', {
+    params: {
+      ruleId
+    }
+  });
+}

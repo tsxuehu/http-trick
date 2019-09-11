@@ -40,6 +40,6 @@ module.exports = class AddRequestCookie extends Action {
                   toClientResponse, //响应内容
                   last = true
               }) {
-        additionalRequestHeaders[action.data.cookieKey] = action.data.cookieValue;
+      additionalRequestCookies[action.data.cookieKey] = action.data.cookieValue;
     }
 }

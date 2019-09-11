@@ -7,11 +7,11 @@
                 <el-button size="small" @click='addRule'>新增过滤器</el-button>
             </el-col>
         </el-row>
-        <el-table border style="width: 100%" row-key="key" :stripe="true" align='center' :data="filters">
+        <el-table border style="width: 100%" row-key="id" :stripe="true" align='center' :data="filters">
             <el-table-column prop="checked" label="启用" align="center" width="80">
                 <template v-slot:default="scope">
-                    <el-checkbox v-model="scope.row.checked"
-                                 @change="saveFileRightNow"
+                    <el-checkbox :value="scope.row.checked"
+                                 @input="toggleRuleCheckState(scope.row)"
                                  :disabled="!enableFilter"></el-checkbox>
                 </template>
             </el-table-column>
@@ -49,7 +49,7 @@
 
 <script>
   import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
-  import filtersApi from 'src/api/filter';
+  import * as filtersApi from 'src/api/filter';
   import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
   import * as RuleEditFormApi from '../../form-widget/rule-edit-form/index.js'
 
@@ -93,36 +93,49 @@
           isFilterRule: true,
         });
       },
-      onDeleteRow(row, index, list) {
-        this.$confirm('此操作不可恢复, 是否继续?', '提示', {
+      async onDeleteRow(rule) {
+        await this.$confirm('此操作不可恢复, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
-        }).then(() => {
-          let copy = JSON.parse(JSON.stringify(this.filters));
-          copy.splice(index, 1);
-          this.saveFileRightNow(copy);
         });
+        const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        filtersApi.removeRule(rule.id);
+        loading.close();
       },
       testRule({rule, actionIndex}) {
         RuleTestForm.test({
           rule, actionIndex
         })
       },
+      toggleRuleCheckState(rule) {
+        const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        filtersApi.setRuleCheckedState(rule.id, !rule.checked);
+        loading.close();
+      },
       saveRule({
                  isEditRule,
                  rule,
                  ruleIndex
                }) {
-        let copy = JSON.parse(JSON.stringify(this.filters));
-        if (isEditRule) {
-          // 复制属性
-          let originRule = copy[ruleIndex];
-          Object.assign(originRule, rule);
-        } else {
-          copy.push(rule);
-        }
-        this.saveFileRightNow(copy);
+        const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        filtersApi.saveRule(rule);
+        loading.close();
       },
       /**
        * 立刻保存
