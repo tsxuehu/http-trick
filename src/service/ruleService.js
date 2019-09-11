@@ -128,7 +128,43 @@ module.exports = class RuleService extends EventEmitter {
     // 清空缓存
     delete this.usingRuleCache[userId];
   }
+  /*
+  // 保存规则
+  async setRuleCheckedState(userId, ruleId, checked) {
+    let filters = this.getFilterRuleList(userId)
+    for (let rule of filters) {
+      if (rule.id == ruleId) {
+        rule.checked = checked;
+      }
+    }
+    await this.saveFilters(userId, filters);
+  }
 
+  async saveRule(userId, rule) {
+    // rule内容参见 webui/src/pages/manager/form-widget/rule-edit-form/Index.vue
+    let filters = this.getFilterRuleList(userId);
+    if (rule.id) {
+      // 修改操作
+      let findedRule = filters.find(el => {
+        return el.id == rule.id;
+      });
+      Object.assign(findedRule, rule);
+    } else {
+      rule.id = uuidV4();
+      filters.push(rule);
+    }
+    await this.saveFilters(userId, filters);
+  }
+
+  async removeRule(userId, ruleId) {
+    let filters = this.getFilterRuleList(userId);
+    filters = filters.filter(rule => {
+      return rule.id != ruleId;
+    });
+    await this.saveFilters(userId, filters);
+  }
+
+*/
   /**
    * 根据请求,获取处理请求的规则
    * @param method

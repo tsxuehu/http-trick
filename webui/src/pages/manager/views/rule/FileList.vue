@@ -63,6 +63,7 @@
       ...mapGetters(['enableRule'])
     },
     methods: {
+      ...mapActions(['setFileCheckStatus']),
       onDeleteFile(row, index) {
         this.$confirm(`此操作将永久删除该文件: ${row.name}, 是否继续?`, '提示', {
           confirmButtonText: '确定',
@@ -95,18 +96,11 @@
         }
       },
       onSelectionChange(ruleFile) {
-        ruleApi.setFileCheckStatus(ruleFile.id, !ruleFile.checked).then(response => {
-          var serverData = response.data;
-          if (serverData.code == 0) {
-            this.$message({
-              showClose: true,
-              type: 'success',
-              message: '设置成功!'
-            });
-          } else {
-            this.$message.error(`出错了，${serverData.msg}`);
-          }
-        });
+
+        this.setFileCheckStatus({
+          ruleFileId: ruleFile.id,
+          check: !ruleFile.checked
+        })
       },
 
       onShareFile(row, index) {
