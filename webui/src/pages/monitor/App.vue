@@ -32,7 +32,6 @@
 </template>
 <script>
   import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
-  import $ from 'jquery';
   import debounce from 'lodash/debounce';
   import HttpTraffic from './components/traffic/HttpTraffic.vue';
   import Detail from './components/detail/Detail.vue';
@@ -64,8 +63,8 @@
       ]),
 
       calcSize() {
-        this.width = $(window).width();
-        this.contentHeight = $(window).height() - 28;
+        this.width = window.innerWidth;
+        this.contentHeight = window.innerHeight - 28;
       }
 
     },
@@ -93,7 +92,7 @@
     async created() {
       this.initStore();
       this.calcSize();
-      $(window).resize(debounce(this.calcSize, 200));
+      window.οnresize = debounce(this.calcSize, 200)
     }
   };
 </script>
