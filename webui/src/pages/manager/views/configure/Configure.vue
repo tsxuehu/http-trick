@@ -75,8 +75,10 @@
       async saveFile() {
         let configureFormData = this.configureFormData;
         configureFormData.requestTimeoutTime = +configureFormData.requestTimeoutTime;
-        configureFormData.proxyPort = +configureFormData.proxyPort;
-        configureFormData.socks5Port = +configureFormData.socks5Port;
+        configureFormData.httpProxyPort = +configureFormData.httpProxyPort;
+        configureFormData.socks5ProxyPort = +configureFormData.socks5ProxyPort;
+        configureFormData.dnsPort = +configureFormData.dnsPort;
+        configureFormData.webUiPort = +configureFormData.webUiPort;
 
         let response = await confApi.saveFile(configureFormData);
         let serverData = response.data;
