@@ -1,10 +1,10 @@
 {
   "name": "http-trick",
-  "version": "v1.0.2",
+  "version": "v1.0.3",
   "description": "Http Trick - 拦截http(s)请求拦截，修改请求数据，修改响应内容",
   "scripts": {
     "start": "node bin.js",
-    "postinstall": "node ./resetDataFile.js"
+    "postinstall": "node ./bin/resetDataFile.js"
   },
   "bin": {
     "http-trick": "./bin/index.js"
