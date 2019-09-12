@@ -35,8 +35,34 @@ export function getFileContent(id) {
   return axios.get(`/rule/getfile?id=${id}`);
 }
 
-export function saveFile(id, content) {
-  return axios.post(`/rule/savefile?id=${id}`, content);
+export function removeRule(ruleFileId, ruleId) {
+  return axios.get(`/rule/removeRule`, {
+    params: {
+      ruleFileId, ruleId
+    }
+  });
+}
+
+export function setRuleCheckedState(ruleFileId, ruleId, checked) {
+  return axios.get(`/rule/setRuleCheckedState`, {
+    params: {
+      ruleFileId,
+      ruleId,
+      checked: checked ? 1 : 0
+    }
+  });
+}
+
+export function saveRule(ruleFileId, rule) {
+  return axios.post(`/rule/saveRule`, rule, {
+    params: {
+      ruleFileId
+    }
+  });
+}
+
+export function saveRuleFile(id, content) {
+  return axios.post(`/rule/saveRuleFile?id=${id}`, content);
 }
 
 export function testRule(content) {

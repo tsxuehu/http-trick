@@ -53,10 +53,10 @@ module.exports = class RuleService extends EventEmitter {
       "checked": false,
       "name": name,
       "description": description,
-      "content": [] // 规则内容参见 webui/src/pages/manager/form-widget/rule-edit-form/Index.vue
+      "ruleList": [] // 规则内容参见 webui/src/pages/manager/form-widget/rule-edit-form/Index.vue
     };
     this.rules[userId] = this.rules[userId] || {};
-    this.rules[userId][name] = ruleFile;
+    this.rules[userId][ruleFileId] = ruleFile;
     // 写文件
     let filePath = this._getRuleFilePath(userId, ruleFileId);
     await fileUtil.writeJsonToFile(filePath, ruleFile);
@@ -119,6 +119,7 @@ module.exports = class RuleService extends EventEmitter {
       ruleFileId = uuidV4();
       fileContent.id = ruleFileId;
     }
+    fileContent.userId = userId;
     let userRuleMap = this.rules[userId] || {};
     userRuleMap[ruleFileId] = fileContent;
     this.rules[userId] = userRuleMap;
@@ -128,43 +129,43 @@ module.exports = class RuleService extends EventEmitter {
     // 清空缓存
     delete this.usingRuleCache[userId];
   }
-  /*
+
   // 保存规则
-  async setRuleCheckedState(userId, ruleId, checked) {
-    let filters = this.getFilterRuleList(userId)
-    for (let rule of filters) {
+  async setRuleCheckedState(userId, ruleFileId, ruleId, checked) {
+    let ruleFileContent = this.getRuleFile(userId, ruleFileId);
+    for (let rule of ruleFileContent.ruleList) {
       if (rule.id == ruleId) {
         rule.checked = checked;
       }
     }
-    await this.saveFilters(userId, filters);
+    await this.saveRuleFile(userId, ruleFileId, ruleFileContent);
   }
 
-  async saveRule(userId, rule) {
+
+  async saveRule(userId, ruleFileId, rule) {
     // rule内容参见 webui/src/pages/manager/form-widget/rule-edit-form/Index.vue
-    let filters = this.getFilterRuleList(userId);
+    let ruleFileContent = this.getRuleFile(userId, ruleFileId);
     if (rule.id) {
       // 修改操作
-      let findedRule = filters.find(el => {
+      let findedRule = ruleFileContent.ruleList.find(el => {
         return el.id == rule.id;
       });
       Object.assign(findedRule, rule);
     } else {
       rule.id = uuidV4();
-      filters.push(rule);
+      ruleFileContent.ruleList.push(rule);
     }
-    await this.saveFilters(userId, filters);
+    await this.saveRuleFile(userId, ruleFileId, ruleFileContent);
   }
 
-  async removeRule(userId, ruleId) {
-    let filters = this.getFilterRuleList(userId);
-    filters = filters.filter(rule => {
+  async removeRule(userId, ruleFileId, ruleId) {
+    let ruleFileContent = this.getRuleFile(userId, ruleFileId);
+    ruleFileContent.ruleList = ruleFileContent.ruleList.filter(rule => {
       return rule.id != ruleId;
     });
-    await this.saveFilters(userId, filters);
+    await this.saveRuleFile(userId, ruleFileId, ruleFileContent);
   }
 
-*/
   /**
    * 根据请求,获取处理请求的规则
    * @param method
@@ -201,7 +202,7 @@ module.exports = class RuleService extends EventEmitter {
     let rulesLocal = [];
     _.forEach(ruleMap, function (fileContent, ruleFileId) {
       if (!fileContent.checked) return;
-      _.forEach(fileContent.content, function (rule) {
+      _.forEach(fileContent.ruleList, function (rule) {
         if (!rule.checked) return;
 
         let copy = JSON.parse(JSON.stringify(rule));

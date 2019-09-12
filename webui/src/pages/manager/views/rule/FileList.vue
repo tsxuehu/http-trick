@@ -157,7 +157,7 @@
           callback: action => {
             if (action == 'confirm') {
               // 创建文件
-              ruleApi.saveFile(content.id, content).then(response => {
+              ruleApi.saveRuleFile(content.id, content).then(response => {
                 var serverData = response.data;
                 if (serverData.code == 0) {
                   // 判断创建成功还是失败

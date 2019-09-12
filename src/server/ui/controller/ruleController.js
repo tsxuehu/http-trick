@@ -80,15 +80,43 @@ module.exports = class RuleController {
       let content = await this.ruleService.getRuleFile(userId, ctx.query.id);
       ctx.body = content;
     });
+
+    router.post('/rule/saveRule', async (ctx, next) => {
+      let userId = ctx.userId;
+      await this.ruleService.saveRule(userId, ctx.query.ruleFileId, ctx.request.body);
+      ctx.body = {
+        code: 0
+      };
+    });
+
+    router.get('/rule/setRuleCheckedState', async (ctx, next) => {
+      let userId = ctx.userId;
+      let {ruleFileId, ruleId, checked} = ctx.query;
+      await this.ruleService.setRuleCheckedState(userId, ruleFileId, ruleId, checked == 1);
+      ctx.body = {
+        code: 0
+      };
+    });
+
+    router.get('/rule/removeRule', async (ctx, next) => {
+      let userId = ctx.userId;
+      let {ruleFileId, ruleId} = ctx.query;
+      await this.ruleService.removeRule(userId, ruleFileId, ruleId);
+      ctx.body = {
+        code: 0
+      };
+    });
+
     // 保存规则文件
-    // /rule/savefile?name=${name} ,content
-    router.post('/rule/savefile', async (ctx, next) => {
+    // /rule/savefile?id=${id} ,content
+    router.post('/rule/saveRuleFile', async (ctx, next) => {
       let userId = ctx.userId;
       await this.ruleService.saveRuleFile(userId, ctx.query.id, ctx.request.body);
       ctx.body = {
         code: 0
       };
     });
+
 
     // 导出规则文件
     // /rule/download?name=${name}

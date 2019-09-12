@@ -7,10 +7,10 @@
                 <el-button size="small" @click='addRule'>新增规则</el-button>
             </el-col>
         </el-row>
-        <el-table border style="width: 100%" row-key="key" :stripe="true" align='center' :data="filecontent.content">
+        <el-table border style="width: 100%" row-key="id" :stripe="true" align='center' :data="filecontent.ruleList">
             <el-table-column label="启用" align="center" width="80">
                 <template v-slot:default="scope">
-                    <el-checkbox v-model="scope.row.checked" @change="saveFileRightNow"></el-checkbox>
+                    <el-checkbox :value="scope.row.checked" @input="toggleRuleCheckState(scope.row)"></el-checkbox>
                 </template>
             </el-table-column>
 
@@ -46,6 +46,7 @@
 </template>
 
 <script>
+  import delay from 'delay'
   import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
   import * as ruleApi from 'src/api/rule';
   import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
@@ -99,34 +100,19 @@
         DataEditFormApi.edit(datafileEntry);
       },
 
-      getFile() {
+      async getFile() {
         this.loaded = false;
         this.ruleFileId = this.$route.query.id;
-        ruleApi.getFileContent(this.ruleFileId).then((response) => {
-          var serverData = response.data;
-          if (serverData.code == 0) {
-            this.loaded = true;
+        let response = await  ruleApi.getFileContent(this.ruleFileId);
+        var serverData = response.data;
 
-            if (this.dataList.length > 0) {
-              this.filecontent = serverData.data;
-            } else {
-              // element select bug， 通过此方法，避免没有option时select将model置为''，
-              // 延迟1s，等待option数据加载
-              setTimeout(() => {
-                this.filecontent = serverData.data;
-              }, 1000);
-            }
+        if (serverData.code == 0) {
+          this.filecontent = serverData.data;
+          this.loaded = true;
+        } else {
+          this.$message.error(`出错了，${serverData.msg}`);
+        }
 
-          } else {
-            this.$message.error(`出错了，${serverData.msg}`);
-          }
-        }).catch((error) => {
-          // 便于本地开发使用 npm run dev
-          this.filecontent = {
-            meta: {},
-            "content": []
-          };
-        });
       },
 
       testRule({rule, actionIndex}) {
@@ -146,63 +132,61 @@
         });
       },
 
-      onEditRule(row, index) {
+      onEditRule(rule, index) {
         this.setEventHandle();
         RuleEditFormApi.editRule({
-          rule: row,
+          rule: rule,
           ruleIndex: index,
         });
       },
 
-      onDeleteRow(row, index) {
-        this.$confirm('此操作不可恢复, 是否继续?', '提示', {
+      async onDeleteRow(rule, index) {
+        await this.$confirm('此操作不可恢复, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
-        }).then(() => {
-          let copy = JSON.parse(JSON.stringify(this.filecontent));
-          copy.content.splice(index, 1);
-          this.saveFileRightNow(copy);
         });
-      },
-
-      saveRule({
-                 isEditRule,
-                 rule,
-                 ruleIndex
-               }) {
-        let copy = JSON.parse(JSON.stringify(this.filecontent));
-        if (isEditRule) {
-          // 复制属性
-          let originRule = copy.content[ruleIndex];
-          Object.assign(originRule, rule);
-        } else {
-          copy.content.push(rule);
-        }
-        this.saveFileRightNow(copy);
-      },
-
-      /**
-       * 立刻保存
-       */
-      saveFileRightNow(ruleFile) {
-        this.saveFile(ruleFile);
-        ruleApi.debouncedSaveFile.flush();
-      },
-
-      saveFile(ruleFile) {
-        ruleApi.debouncedSaveFile(this.name, ruleFile, (response) => {
-          var serverData = response.data;
-          if (serverData.code == 0) {
-            this.$message({
-              showClose: true,
-              type: 'success',
-              message: '保存成功!'
-            });
-          } else {
-            this.$message.error(`出错了，${serverData.msg}`);
-          }
+        const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
         });
+        await ruleApi.removeRule(this.filecontent.id, rule.id);
+        await this.getFile();
+        await delay(500);
+        loading.close();
+      },
+      async toggleRuleCheckState(rule) {
+        const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        await ruleApi.setRuleCheckedState(
+          this.filecontent.id,
+          rule.id,
+          !rule.checked);
+        await this.getFile();
+        await delay(500);
+        loading.close();
+      },
+      async saveRule({
+                       isEditRule,
+                       rule,
+                       ruleIndex
+                     }) {
+        const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        await ruleApi.saveRule(this.filecontent.id, rule);
+        await this.getFile();
+        await delay(500);
+        loading.close();
       },
     },
     mounted() {
