@@ -1,0 +1,35 @@
+.device {
+  background-color: #fafafa;
+  border: 1px solid #eaeefb;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  padding: 5px;
+  cursor: pointer;
+  position: relative;
+  .name {
+    margin-bottom: 5px;
+  }
+  .host {
+    font-style: italic;
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+  .id {
+    font-style: italic;
+    font-size: 12px;
+  }
+  .status {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    top: calc(50% - 4px);
+    right: 10px;
+  }
+  .online {
+    background-color: #67C23A;
+  }
+  .offline {
+    background-color: #F56C6C;
+  }
+}

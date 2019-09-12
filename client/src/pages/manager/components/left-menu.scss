@@ -1,0 +1,40 @@
+.left-menu {
+  height: 100vh;
+  user-select: none;
+  position: relative;
+  overflow-x: hidden;
+  background-image: linear-gradient(#3b3e8f, #6f73d7);
+
+  h2 {
+    color: #fff;
+    font-size: 20px;
+    line-height: 72px;
+    padding-left: 22px;
+    font-weight: normal;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font-family: Dosis, Source Sans Pro, Helvetica Neue, Arial, sans-serif;
+  }
+
+  .iconfont {
+    width: 28px;
+    display: inline-block;
+  }
+
+  .el-menu {
+    background-color: transparent;
+    border-right: none;
+  }
+
+  .el-menu-item {
+    color: #fff;
+    height: 52px;
+    line-height: 52px;
+    border-left: 3px solid transparent;
+
+    &.is-active,
+    &:hover {
+      background-color: #393c89;
+      border-color: #32e7d7;
+    }
+  }
+}

@@ -1,0 +1,66 @@
+.device-list {
+  border-right: 1px solid #ccc;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  .title {
+    background-color: #fafafa;
+    border: 1px solid #eaeefb;
+    font-size: 14px;
+    height: 27px;
+    line-height: 27px;
+    text-align: center;
+  }
+
+  .list-wrapper {
+    overflow-y: auto;
+    height: calc(100% - 313px);
+    padding-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .qr-code-wrapper {
+    width: 100%;
+    padding: 10px;
+    height: 285px;
+  }
+  .qr-code {
+    background-color: #eee;
+    padding-top: 10px;
+    border-radius: 5px;
+    .title {
+      margin-bottom: 20px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 200px;
+    }
+    .qrcode {
+      text-align: center;
+    }
+    .bottom {
+      margin-left: 5px;
+    }
+  }
+  .hostfile-list {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .el-tag {
+    width: 100px;
+    text-align: center;
+    background-color: white;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .fake-tag {
+    width: 100px;
+    display: inline-block;
+    text-align: center;
+    background-color: white;
+    margin-bottom: 10px;
+  }
+  .used-host {
+    background-color: rgba(64, 158, 255, .1);
+  }
+}
