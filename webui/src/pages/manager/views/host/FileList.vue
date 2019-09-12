@@ -7,7 +7,7 @@
             <el-button size="small" @click='importRemoteHostFile'>导入远程规则</el-button>
         </div>
 
-        <el-table border align='center' :data="hostFileList">
+        <el-table border align='center' :data="hostFileList" row-key="id">
             <el-table-column prop="name" label="名字" width="150">
             </el-table-column>
             <el-table-column prop="description" label="描述"/>
@@ -18,22 +18,22 @@
                                 type="danger"
                                 icon='el-icon-delete'
                                 size="mini"
-                                @click="onDeleteFile(scope.row,scope.$index,user_list)"
+                                @click="onDeleteFile(scope.row)"
                         />
-                        <a :href="'#/edithost?name='+scope.row.name">
+                        <a :href="'#/edithost?id='+scope.row.id">
                             <el-button type="info" icon='el-icon-edit' size="mini">
                             </el-button>
                         </a>
                         <span>
                             <el-button type="info" icon='el-icon-share' size="mini"
-                                       @click='onShareFile(scope.row, scope.$index)'/>
+                                       @click='onShareFile(scope.row)'/>
                         </span>
                     </div>
                 </template>
             </el-table-column>
             <el-table-column prop="checked" label="启用" width="85">
                 <template v-slot:default="scope">
-                    <el-radio v-model="selectedFileName" :label="scope.row.name" :disabled="!enableHost"/>
+                    <el-radio v-model="selectedFileId" :label="scope.row.id" :disabled="!enableHost"/>
                 </template>
             </el-table-column>
         </el-table>
@@ -42,7 +42,7 @@
 <script>
   import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
   import copyToClipboard from 'copy-to-clipboard';
-  import hostApi from 'src/api/host'
+  import * as hostApi from 'src/api/host'
   import find from 'lodash/find'
   import './file-list.scss'
   import utilsApi from 'src/api/utils';
@@ -53,13 +53,13 @@
     computed: {
       ...mapState(['hostFileList', 'appInfo']),
       ...mapGetters(['enableHost']),
-      selectedFileName: {
+      selectedFileId: {
         get() {
           // 遍历找出选择的文件
           var selectedFile = find(this.hostFileList, (file) => {
             return file.checked;
           });
-          return selectedFile ? selectedFile.name : '';
+          return selectedFile ? selectedFile.id : '';
         },
         set(value) {
           this.useFile(value);
@@ -67,13 +67,13 @@
       }
     },
     methods: {
-      onDeleteFile(row, index, list) {
+      onDeleteFile(row) {
         this.$confirm(`此操作将永久删除该文件: ${row.name}, 是否继续?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          hostApi.deleteFile(row.name).then((response) => {
+          hostApi.deleteFile(row.id).then((response) => {
             var serverData = response.data;
             if (serverData.code == 0) {
               this.$message({
@@ -87,33 +87,32 @@
           });
         })
       },
-      useFile(name) {
+      async useFile(id) {
         const loading = this.$loading({
           lock: true,
           text: 'Loading',
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         });
-        hostApi.debouncedUseFile(name, (response) => {
-          loading.close();
-          var serverData = response.data;
-          if (serverData.code == 0) {
-            this.$message({
-              showClose: true,
-              type: 'success',
-              message: '设置成功!'
-            });
-          } else {
-            this.$message.error(`出错了,请刷新页面，${serverData.msg}`);
-          }
-        });
+        let response = await hostApi.useFile(id);
+        loading.close();
+        var serverData = response.data;
+        if (serverData.code == 0) {
+          this.$message({
+            showClose: true,
+            type: 'success',
+            message: '设置成功!'
+          });
+        } else {
+          this.$message.error(`出错了,请刷新页面，${serverData.msg}`);
+        }
       },
       addNewHostFile() {
         this.$router.push('createhostfile');
       },
 
       onShareFile(row, index) {
-        let url = `http://${this.appInfo.pcIp}:${this.appInfo.webUiPort}/host/file/raw?name=${encodeURIComponent(row.name)}`;
+        let url = `http://${this.appInfo.pcIp}:${this.appInfo.webUiPort}/host/file/raw?id=${encodeURIComponent(row.id)}`;
         // 复制
         copyToClipboard(url);
         this.$message(`已复制Host ${encodeURIComponent(row.name)}链接`);
@@ -130,7 +129,6 @@
         );
 
         let url = result.value;
-        console.log(url);
         let response = await utilsApi.getRemoteFile(url);
 
         let remoteFileResponse = response.data;

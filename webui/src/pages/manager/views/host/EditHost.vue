@@ -11,7 +11,7 @@
 </template>
 
 <script>
-  import hostApi from 'src/api/host';
+  import * as hostApi from 'src/api/host';
   import forEach from 'lodash/forEach';
   import './edit-host.scss'
 
@@ -37,7 +37,7 @@
     methods: {
       getFile() {
         this.loaded = false;
-        hostApi.getFileContent(this.$route.query.name).then((response) => {
+        hostApi.getFileContent(this.$route.query.id).then((response) => {
           var serverData = response.data;
           if (serverData.code == 0) {
             this.loaded = true;
@@ -56,7 +56,7 @@
         });
       },
       saveFile() {
-        hostApi.saveFile(this.$route.query.name, this.filecontent).then((response) => {
+        hostApi.saveFile(this.$route.query.id, this.filecontent).then((response) => {
           var serverData = response.data;
           if (serverData.code == 0) {
             this.$message({

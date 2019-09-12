@@ -1,5 +1,5 @@
 import profileApi from 'src/api/profile';
-import hostApi from 'src/api/host';
+import * as hostApi from 'src/api/host';
 import * as ruleApi from 'src/api/rule';
 
 /**
@@ -50,13 +50,12 @@ export async function initStore({commit, dispatch}) {
 }
 
 
-export async function selectHostFile({commit, dispatch}, name) {
-  hostApi.debouncedUseFile(name, response => {
-    let serverData = response.data;
-    if (serverData.code != 0) {
-      throw new Error(serverData.msg);
-    }
-  });
+export async function selectHostFile({commit, dispatch}, id) {
+  let response = await hostApi.useFile(id);
+  let serverData = response.data;
+  if (serverData.code != 0) {
+    throw new Error(serverData.msg);
+  }
 }
 
 export async function switchHost({state}) {

@@ -10,8 +10,8 @@
                     <!-- host文件 -->
                     <el-dropdown-item
                             v-for="hostfile in hostFileList"
-                            :key="hostfile.name"
-                            :command="hostfile.name"
+                            :key="hostfile.id"
+                            :command="hostfile.id"
                     >
                         {{ hostfile.name }}
                         <i class="el-icon-check" v-if="hostfile.checked"/>

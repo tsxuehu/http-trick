@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import hostApi from 'src/api/host'
+  import * as hostApi from 'src/api/host'
 
   export default {
     name: 'app',
@@ -53,7 +53,7 @@
                   message: '恭喜你，创建成功',
                   type: 'success'
                 });
-                this.$router.push(`edithost?name=${this.createFileForm.name}`);
+                this.$router.push(`edithost?id=${serverData.data.id}`);
               } else {
                 this.$message.error(`出错了，${serverData.msg}`);
               }
