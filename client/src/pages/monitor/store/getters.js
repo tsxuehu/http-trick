@@ -22,12 +22,12 @@ export const currentSelectRecord = state => {
 };
 
 export const rightClickedRecord = state => {
-  return state.recordMap[state.rightClickRecordId];
+  return state.recordMap[state.rightClickedRecordId];
 };
 
 export const rightClickedDevice = state => {
   let device = state.bindedDeviceList.find(d => {
-    return d.id == state.rightClickDeviceId;
+    return d.id == state.rightClickedDeviceId;
   })
   return device || {};
 };

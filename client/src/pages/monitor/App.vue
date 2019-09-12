@@ -63,6 +63,7 @@
       ]),
 
       calcSize() {
+        console.log("resize")
         this.width = window.innerWidth;
         this.contentHeight = window.innerHeight - 28;
       }
@@ -92,7 +93,9 @@
     async created() {
       this.initStore();
       this.calcSize();
-      window.οnresize = debounce(this.calcSize, 200)
+      window.addEventListener("resize", debounce(_ => {
+        this.calcSize();
+      }, 200));
     }
   };
 </script>

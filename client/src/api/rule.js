@@ -71,10 +71,14 @@ export function testRule(content) {
 
 export function getReferenceVar(content) {
   var contentStr = JSON.stringify(content);
-  var reg = RegExp("<%=(.+?)%>", 'g');
+  var reg1 = RegExp("<%=(.+?)%>", 'g');
+  var reg2 = RegExp("\\$\\{(.+?)\\}", 'g');
   var result;
   var varObj = {};
-  while ((result = reg.exec(contentStr)) != null) {
+  while ((result = reg1.exec(contentStr)) != null) {
+    varObj[trim(result[1])] = 1;
+  }
+  while ((result = reg2.exec(contentStr)) != null) {
     varObj[trim(result[1])] = 1;
   }
   return keys(varObj);

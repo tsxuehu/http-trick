@@ -23,7 +23,16 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="匹配路径" prop="match" align="center">
+            <el-table-column label="匹配路径" width="300" prop="match" align="center">
+            </el-table-column>
+            <el-table-column label="执行操作" prop="match" align="center">
+                <template v-slot:default="scope">
+                    <div>
+                        <action-view v-for="action, index in scope.row.actionList"
+                                     :action="action"
+                                     :data-list="dataList" :key="index"></action-view>
+                    </div>
+                </template>
             </el-table-column>
 
             <el-table-column label="操作" :width="200" align="center">
@@ -48,6 +57,8 @@
 <script>
   import delay from 'delay'
   import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
+  import ActionView from '../../components/ActionView';
+
   import * as ruleApi from 'src/api/rule';
   import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
   import * as RuleEditFormApi from '../../form-widget/rule-edit-form/index.js'
@@ -58,7 +69,9 @@
 
   export default {
     name: 'edit-rule',
-
+    components: {
+      [ActionView.name]: ActionView
+    },
     data() {
       return {
         loaded: false,

@@ -24,7 +24,16 @@
                     {{scope.row.method ? scope.row.method : "全部"}}
                 </template>
             </el-table-column>
-            <el-table-column label="匹配路径" prop="match" align="center">
+            <el-table-column label="匹配路径" width="300" prop="match" align="center">
+            </el-table-column>
+            <el-table-column label="执行操作" prop="match" align="center">
+                <template v-slot:default="scope">
+                    <div>
+                        <action-view v-for="action, index in scope.row.actionList"
+                                     :action="action"
+                                     :data-list="dataList" :key="index"></action-view>
+                    </div>
+                </template>
             </el-table-column>
 
             <el-table-column label="操作" width="200" align="center">
@@ -48,6 +57,7 @@
 </template>
 
 <script>
+  import ActionView from '../../components/ActionView';
   import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
   import * as filtersApi from 'src/api/filter';
   import * as RuleTestForm from '../../form-widget/rule-test-form/index.js'
@@ -57,7 +67,11 @@
 
   export default {
     name: 'filters',
+    components: {
+      [ActionView.name]: ActionView
+    },
     computed: {
+      ...mapState(['dataList']),
       ...mapState(['filters']),
       ...mapGetters(['enableFilter'])
     },
