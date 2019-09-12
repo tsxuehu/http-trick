@@ -120,7 +120,7 @@
           }
         );
         let nameResult = await this.$prompt(
-          '请输入到如规则的文件名',
+          '请输入导入规则的文件名',
           '导入远程规则',
           {
             confirmButtonText: '确定',

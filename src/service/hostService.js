@@ -207,15 +207,14 @@ module.exports = class HostService extends EventEmitter {
     await fileUtil.writeJsonToFile(hostfileName, content);
 
     this.emit("data-change", userId, this.getHostFileList(userId));
-    this.emit("host-saved", userId, name, content);
+    // this.emit("host-saved", userId, name, content);
     return hostFileId;
   }
 
-  deleteHostFile(userId, id) {
-    let fileContent = this.userHostFilesMap[userId][id];
-    if (fileContent.default) {
-      throw new Error('默认文件不允许删除');
-    }
+  async deleteHostFile(userId, id) {
+    let path = this._getHostFilePath(userId, id);
+    await fileUtil.deleteFile(path);
+
     delete this.userHostFilesMap[userId][id];
     this._userHostsCache[userId] && delete this._userHostsCache[userId].currentUsingHosts;
     this._userHostsCache[userId] && delete this._userHostsCache[userId][id];
@@ -223,7 +222,7 @@ module.exports = class HostService extends EventEmitter {
      * 删除文件
      */
     this.emit("data-change", userId, this.getHostFileList(userId));
-    this.emit("host-deleted", userId, id);
+    // this.emit("host-deleted", userId, id);
   }
 
   async setUseHost(userId, hostFileId) {
@@ -254,12 +253,14 @@ module.exports = class HostService extends EventEmitter {
 
 
   async saveHostFile(userId, hostFileId, content) {
+    let needNotify = false;
     if (!hostFileId) {
+      needNotify = true;
       hostFileId = uuidV4();
       content.id = hostFileId;
       content.userId = userId;
     }
-
+    this.userHostFilesMap[userId] = this.userHostFilesMap[userId] || {};
     this.userHostFilesMap[userId][hostFileId] = content;
 
     // 删除缓存
@@ -267,7 +268,10 @@ module.exports = class HostService extends EventEmitter {
 
     let hostfileName = this._getHostFilePath(userId, hostFileId);
     await fileUtil.writeJsonToFile(hostfileName, content);
-    this.emit("host-saved", userId, hostFileId, content);
+    if (needNotify) {
+      this.emit("data-change", userId, this.getHostFileList(userId));
+    }
+    // this.emit("host-saved", userId, hostFileId, content);
   }
 
   _getHostFilePath(userId, hostFileId) {

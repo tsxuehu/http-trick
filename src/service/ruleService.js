@@ -115,7 +115,9 @@ module.exports = class RuleService extends EventEmitter {
 
   // 保存规则文件(可能是远程、或者本地)
   saveRuleFile(userId, ruleFileId, fileContent) {
+    let needNotify = false;
     if (!ruleFileId) {
+      needNotify = true;
       ruleFileId = uuidV4();
       fileContent.id = ruleFileId;
     }
@@ -128,6 +130,9 @@ module.exports = class RuleService extends EventEmitter {
     fileUtil.writeJsonToFile(filePath, userRuleMap[ruleFileId]);
     // 清空缓存
     delete this.usingRuleCache[userId];
+    if (needNotify) {
+      this.emit('data-change', userId, this.getRuleFileList(userId));
+    }
   }
 
   // 保存规则

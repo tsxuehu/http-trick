@@ -23,7 +23,7 @@ module.exports = class TrafficController {
     router.get('/utils/getRemoteFile', async (ctx, next) => {
       let url = ctx.query.url;
       let response = await axios.get(url);
-      this.body = {
+      ctx.body = {
         code: 0,
         data: response.data
       };

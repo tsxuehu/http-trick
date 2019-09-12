@@ -119,7 +119,7 @@
       },
 
       async importRemoteHostFile() {
-        let result = await this.$prompt(
+        let rulResult = await this.$prompt(
           '请输入远程Host文件的url',
           '导入远程规则',
           {
@@ -127,8 +127,17 @@
             cancelButtonText: '取消'
           }
         );
+        let nameResult = await this.$prompt(
+          '请输入导入Host的文件名',
+          '导入远程规则',
+          {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消'
+          }
+        );
+        let url = rulResult.value;
+        let name = nameResult.value;
 
-        let url = result.value;
         let response = await utilsApi.getRemoteFile(url);
 
         let remoteFileResponse = response.data;
@@ -137,10 +146,10 @@
           remote: true,
           url: url,
         };
-        content.name = content.name + '-remote';
+        content.name = name;
         content.checked = false;
 
-        let saveRes = await ruleApi.saveFile(content.name, content);
+        let saveRes = await hostApi.saveFile('', content);
 
         var serverData = saveRes.data;
         if (serverData.code == 0) {

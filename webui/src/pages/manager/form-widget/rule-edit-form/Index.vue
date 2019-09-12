@@ -96,7 +96,7 @@
     id: '',
     method: "",
     match: "",
-    checked: false,
+    checked: true,
     actionList: []
   };
   const DefaultAction = {
