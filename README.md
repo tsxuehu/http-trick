@@ -8,7 +8,7 @@
 4. 修改响应header、内容
 
 ## 安装
-npm i -g http-trick
+npm --registry=https://registry.npm.taobao.org i -g http-trick
 
 ## 运行
 http-trick
