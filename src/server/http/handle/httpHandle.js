@@ -135,13 +135,6 @@ module.exports = class HttpHandle {
 
   /**
    * 运行规则
-   * @param req
-   * @param res
-   * @param urlObj
-   * @param clientIp
-   * @param rule 请求匹配到的规则
-   * @returns {Promise.<void>}
-   * @private
    */
   async _runAtions({
                      req, res, urlObj, requestId, recordResponse,
@@ -200,9 +193,9 @@ module.exports = class HttpHandle {
     toClientResponse.headers['proxy-deviceId'] = deviceId;
     toClientResponse.headers['proxy-clientIp'] = clientIp;
     // 记录状态信息
-    toClientResponse.headers['proxy-host-disabled'] = enableHost ? "true" : "false";
-    toClientResponse.headers['proxy-filter-disabled'] = enableFilter ? "true" : "false";
-    toClientResponse.headers['proxy-rule-disabled'] = enableRule ? "true" : "false";
+    toClientResponse.headers['proxy-host-enable'] = enableHost ? "true" : "false";
+    toClientResponse.headers['proxy-filter-enable'] = enableFilter ? "true" : "false";
+    toClientResponse.headers['proxy-rule-enable'] = enableRule ? "true" : "false";
 
     // 合并所有匹配到的过滤器规则的action列表、请求匹配的规则的 action 列表
     // 动作分为请求前和请求后两种类型, 合并后的顺序，前置过滤器动作 -> 请求匹配到的动作 -> 后置过滤器的动作
