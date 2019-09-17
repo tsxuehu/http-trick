@@ -4,7 +4,8 @@
         <h2 id="toc_0">一、说明</h2>
 
         <p>http trick是http协议代理工具，需要设置浏览器代理或者系统代理才能使用本工具。</p>
-        <p>PAC: {{pacUrl}}</p>
+        <p>远程PAC: {{remotePacUrl}}</p>
+        <p>本地PAC: {{localPacUrl}}</p>
 
         <h2 id="toc_1">二、chrome 代理插件安装(用于设置浏览器代理)</h2>
 
@@ -68,8 +69,11 @@
           '/utils/rootCA.crt';
         return qrcode.toDataURL(certUrl, 4);
       },
-      pacUrl() {
+      remotePacUrl() {
         return `http://${this.appInfo.pcIp}:${this.appInfo.webUiPort}/profile/${this.userId}/proxy.pac`
+      },
+      localPacUrl() {
+        return `http://127.0.0.1:${this.appInfo.webUiPort}/profile/${this.userId}/proxy.pac`
       }
     }
   };
