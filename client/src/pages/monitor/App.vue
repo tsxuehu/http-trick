@@ -16,7 +16,7 @@
                 <i class="iconfont icon-sousuo search"></i>
             </span>
             <div class="placeholder"></div>
-            <a class="goto-manager" href="/manager.html" target="_blank">
+            <a class="goto-manager" href="/index.html" target="_blank">
                 <el-button type="text">管理</el-button>
             </a>
             <a href="javascript:void(0)" v-if="!appInfo.single" class="username">
