@@ -60,7 +60,7 @@
 </template>
 
 <script>
-  import ruleApi from 'src/api/rule';
+  import * as ruleApi from 'src/api/rule';
   import './rule-test-form.scss'
 
   export default {
