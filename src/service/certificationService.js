@@ -8,8 +8,6 @@ const path = require("path");
 
 const RANDOM_SERIAL = '.' + Date.now() + '.' + Math.floor(Math.random() * 10000);
 const pki = forge.pki;
-const CUR_VERSION = process.version;
-const requiredVersion = parseInt(CUR_VERSION.slice(1), 10) >= 6;
 /**
  * 证书管理
  */
@@ -173,7 +171,7 @@ function createHostSecurityContext(hostname, rootSecurityContext) {
 }
 
 module.exports.createRootSecurityContext = function createRootSecurityContext() {
-  let keys = pki.rsa.generateKeyPair(requiredVersion ? 2048 : 1024);
+  let keys = pki.rsa.generateKeyPair(2048);
   let cert = createCert(keys.publicKey);
   let now = Date.now() + getRandom();
   let attrs = [{
@@ -234,7 +232,7 @@ module.exports.createRootSecurityContext = function createRootSecurityContext() 
     keyPem: pki.privateKeyToPem(keys.privateKey),
     certPem: pki.certificateToPem(cert)
   };
-}
+};
 
 function createCert(publicKey, serialNumber, isShortPeriod) {
   let cert = pki.createCertificate();

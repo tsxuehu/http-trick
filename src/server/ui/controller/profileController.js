@@ -57,7 +57,8 @@ module.exports = class ConfigController {
       ctx.set('Cache-Control', 'no-cache');
       ctx.set('Server', this.appInfoService.getAppName());
       ctx.set('Connection', 'Close');
-      let content = await this.profileService.generateProxyPacFile(userId);
+      let proxyIp = ctx.query['proxy-ip'];
+      let content = await this.profileService.generateProxyPacFile(userId, proxyIp);
       ctx.body = content;
     });
 

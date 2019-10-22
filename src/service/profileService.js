@@ -390,7 +390,7 @@ module.exports = class ProfileService extends EventEmitter {
     return !!finded;
   }
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling/Proxy_Auto-Configuration_(PAC)_file
-  generateProxyPacFile(userId) {
+  generateProxyPacFile(userId, proxyIp) {
     let {
       startSocks5,
       startHttpProxy,
@@ -405,9 +405,9 @@ module.exports = class ProfileService extends EventEmitter {
       all = true;
     }
     if (startSocks5) {
-      proxy = `SOCKS5 ${pcIp}:${socks5ProxyPort}`
+      proxy = `SOCKS5 ${proxyIp || pcIp}:${socks5ProxyPort}`
     } else if (startHttpProxy) {
-      proxy = `HTTP ${pcIp}:${httpProxyPort}`
+      proxy = `HTTP ${proxyIp || pcIp}:${httpProxyPort}`
     }
     let pac = this.pacTemplate({
       all,

@@ -70,10 +70,10 @@
         return qrcode.toDataURL(certUrl, 4);
       },
       remotePacUrl() {
-        return `http://${this.appInfo.pcIp}:${this.appInfo.webUiPort}/profile/${this.userId}/proxy.pac`
+        return `http://${this.appInfo.pcIp}:${this.appInfo.webUiPort}/profile/${this.userId}/proxy.pac?proxy-ip=${this.appInfo.pcIp}`
       },
       localPacUrl() {
-        return `http://127.0.0.1:${this.appInfo.webUiPort}/profile/${this.userId}/proxy.pac`
+        return `http://127.0.0.1:${this.appInfo.webUiPort}/profile/${this.userId}/proxy.pac?proxy-ip=127.0.0.1`
       }
     }
   };
