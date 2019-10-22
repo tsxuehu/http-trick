@@ -44,8 +44,8 @@ module.exports = class CertificationService {
     let certFilePath;
     if (!this.configureService.useCustomRootCA()) {
       let appDir = this.appInfoService.getAppDir();
-      keyFilePath = path.join(appDir, 'certificate/zproxy.key.pem');
-      certFilePath = path.join(appDir, 'certificate/zproxy.crt.pem');
+      keyFilePath = path.join(appDir, 'certificate/root.key.pem');
+      certFilePath = path.join(appDir, 'certificate/root.crt.pem');
     } else {
       let dataDir = this.appInfoService.getProxyDataDir();
       keyFilePath = path.join(dataDir, 'rootCA/custom.key.pem');
@@ -194,9 +194,7 @@ module.exports.createRootSecurityContext = function createRootSecurityContext() 
     value: 'http-trick.org'
   }];
 
-  cert.setSubject(attrs);
-  cert.setIssuer(attrs);
-  cert.setExtensions([{
+  let extensions = [{
     name: 'basicConstraints',
     cA: true
   }, {
@@ -222,7 +220,11 @@ module.exports.createRootSecurityContext = function createRootSecurityContext() 
     sslCA: true,
     emailCA: true,
     objCA: true
-  }]);
+  }];
+
+  cert.setSubject(attrs);
+  cert.setIssuer(attrs);
+  cert.setExtensions(extensions);
 
   cert.sign(keys.privateKey, forge.md.sha256.create());
 
