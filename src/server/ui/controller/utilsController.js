@@ -32,15 +32,8 @@ module.exports = class TrafficController {
     // 下载证书
     router.get('/utils/rootCA.crt', async (ctx, next) => {
       let userId = ctx.userId;
-      ctx.set('Content-disposition', 'attachment;filename=zproxy.crt');
+      ctx.set('Content-disposition', 'attachment;filename=http-trick.crt');
       ctx.body = await this.rootCertService.getRootCACertPem(userId);
-    });
-    // ios证书
-    router.get('/utils/rootCA.mobileconfig', async (ctx, next) => {
-      let userId = ctx.userId;
-      ctx.set('Content-disposition', 'attachment;filename=zproxy.mobileconfig');
-
-      ctx.body = fs.createReadStream(path.join(this.appInfoService.getAppDir(), 'certificate/zproxy.mobileconfig'));
     });
   }
 };

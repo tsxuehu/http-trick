@@ -5,7 +5,7 @@ let {keyPem, certPem} = createRootSecurityContext();
 
 
 // 写文件
-fileUtils.writeFile('root.key', keyPem)
-fileUtils.writeFile('root.cert', certPem)
+fileUtils.writeFile('root.crt.pem', keyPem);
+fileUtils.writeFile('root.key.pem', certPem);
 
 
