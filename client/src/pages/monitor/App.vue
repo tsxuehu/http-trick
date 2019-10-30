@@ -6,7 +6,9 @@
                 <i class="el-icon-video-pause zanting" v-if="!monitorState.stopRecord"></i>
                 <i class="el-icon-video-play bofang" v-else></i>
             </span>
-            <i class="iconfont icon-qingchu icon-btn" @click="clearMonitorData"></i>
+            <span class="icon-btn">
+                <i class="el-icon-delete zanting" @click="clearMonitorData"></i>
+            </span>
             <span class="tips " :style="{visibility: monitorState.overflow? 'initial' : 'hidden'}">记录已满，请清除历史记录</span>
             <span class="filters">
                 Filter:

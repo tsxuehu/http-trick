@@ -98,10 +98,16 @@ function getServerResponseBody(res) {
     // TODO 服务器可能返回一种nodejs不支持的压缩格式
     switch (res.headers['content-encoding']) {
         case 'gzip':
-        case 'compress':
-        case 'deflate':
-            stream = stream.pipe(zlib.createUnzip());
+            stream = stream.pipe(zlib.createGunzip());
             break;
+        case 'deflate':
+            stream = stream.pipe(zlib.createInflate());
+            break;
+        case 'br':
+            stream = stream.pipe(zlib.createBrotliDecompress());
+            break;
+        default:
+           // stream = stream.pipe(zlib.createUnzip());
     }
 
     let responseBuffer = [];
