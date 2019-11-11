@@ -86,14 +86,15 @@ module.exports = class CertificationService {
       let subdomainList = parsed.subdomain.split('.');
       if (subdomainList.length > 1) {
         subdomainList.shift();
-        domain = '+.' + subdomainList.join('.') + '.' + parsed.domain + '.' + parsed.tld;
+        domain = '*.' + subdomainList.join('.') + '.' + parsed.domain + '.' + parsed.tld;
       } else if (subdomainList.length == 1) {
-        domain = '+.' + parsed.domain + '.' + parsed.tld;
+        domain = '*.' + parsed.domain + '.' + parsed.tld;
       }
     }
 
-    let certKey = domain + '.crt';
-    let keykey = domain + '.key';
+    let nomalizedDomain = domain.replace('*','+');
+    let certKey = nomalizedDomain + '.crt';
+    let keykey = nomalizedDomain + '.key';
 
     let cacheHit = true; // 是否命中缓存标识
 
