@@ -144,7 +144,7 @@ function createHostSecurityContext(hostname, rootSecurityContext) {
   let serialNumber = crypto.createHash('sha1')
     .update(hostname + RANDOM_SERIAL, 'binary').digest('hex');
 
-  let cert = createCert(pki.setRsaPublicKey(root_key.n, root_key.e), serialNumber, false);
+  let cert = createCert(pki.setRsaPublicKey(root_key.n, root_key.e), serialNumber, true);
 
   cert.setSubject([{
     name: 'commonName',
