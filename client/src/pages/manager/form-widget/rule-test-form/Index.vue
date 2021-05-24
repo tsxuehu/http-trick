@@ -86,7 +86,7 @@
           {value: 'put', label: 'PUT'},
           {value: 'patch', label: 'PATCH'},
           {value: 'delete', label: 'DELETE'},
-          {value: 'option', label: 'OPTION'}
+          {value: 'options', label: 'OPTIONS'}
         ],
         requestMethodList: [
           {value: 'get', label: 'GET'},
@@ -94,7 +94,7 @@
           {value: 'put', label: 'PUT'},
           {value: 'patch', label: 'PATCH'},
           {value: 'delete', label: 'DELETE'},
-          {value: 'option', label: 'OPTION'}
+          {value: 'options', label: 'OPTIONS'}
         ]
       }
     },
