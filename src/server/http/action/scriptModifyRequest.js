@@ -46,6 +46,7 @@ module.exports = class ScriptModifyRequest extends Action {
               }) {
         const sandbox = {
             clientIp,
+            urlObj,
             requestContent, // 请求内容
             additionalRequestHeaders,// 请求附加头
             additionalRequestQuery,
