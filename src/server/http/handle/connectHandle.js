@@ -61,11 +61,30 @@ module.exports = class ConnectHandle {
         conn.on("error", e => {
             this.logService.error("err when connect to + " + proxyHost + " : " + proxyPort);
             this.logService.error(e);
+            if (!socket.destroyed) {
+                socket.write('HTTP/' + req.httpVersion + ' 200 OK\r\n\r\n', 'UTF-8', function() {
+                    socket.destroy(`链接${proxyHost} ${proxyPort}服务端错误`);
+                });
+            }
             delete connectionClientIpMap[requestPort];
         });
         conn.on("close", e => {
+            if (!socket.destroyed) {
+                socket.destroy(`链接${proxyHost} ${proxyPort}服务端关闭`);
+            }
             delete connectionClientIpMap[requestPort];
         });
+        socket.on("error", e => {
+            if (!conn.destroyed) {
+                conn.destroy(`链接${proxyHost} ${proxyPort} 客户端出错`);
+            }
+        })
+        socket.on("close", e => {
+            if (!conn.destroyed) {
+                conn.destroy(`链接${proxyHost} ${proxyPort} 客户端关闭`);
+            }
+        })
+
     }
 
     static getProxyRequestPortMapedClientIp(requestPort) {
