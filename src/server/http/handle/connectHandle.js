@@ -39,15 +39,18 @@ module.exports = class ConnectHandle {
         // connect请求时 如何判断连到的目标机器是不是https协议？
         // ws、wss、https协议都会发送connect请求
         let [host, targetPort] = req.url.split(":");
+        
         if (targetPort == 443) {
-            proxyPort = this.httpsProxyPort;
+            proxyPort = +this.httpsProxyPort;
         } else { // 非443则放行,连到http服务器上
             proxyHost = host;// ws协议直接和远程服务器链接
-            proxyPort = targetPort;
+            proxyPort =+ targetPort;
         }
         let requestPort = '';
+        let timeoutCheck;
         // 和远程建立链接 并告诉客户端
         let conn = net.connect(proxyPort, proxyHost, () => {
+            clearTimeout(timeoutCheck);
             // 记录发出请求端口 和 远程ip的映射关系
             let { port } = conn.address();
             requestPort = port;
@@ -58,30 +61,44 @@ module.exports = class ConnectHandle {
             });
         });
 
+        timeoutCheck = setTimeout(() => {
+            this.logService.error("connect to + " + proxyHost + " : " + proxyPort+ " timeout");
+            if (!socket.destroyed) {
+                socket.write('HTTP/' + req.httpVersion + ' 403 OK\r\n\r\n', 'UTF-8', function() {
+                    socket.destroy();
+             });
+            }
+            if (!conn.destroyed) {
+                conn.destroy();
+            }
+        }, 1000);
+
         conn.on("error", e => {
+            clearTimeout(timeoutCheck);
             this.logService.error("err when connect to + " + proxyHost + " : " + proxyPort);
             this.logService.error(e);
             if (!socket.destroyed) {
-                socket.write('HTTP/' + req.httpVersion + ' 200 OK\r\n\r\n', 'UTF-8', function() {
-                    socket.destroy(`链接${proxyHost} ${proxyPort}服务端错误`);
+                socket.write('HTTP/' + req.httpVersion + ' 403 OK\r\n\r\n', 'UTF-8', function() {
+                    socket.destroy();
                 });
             }
             delete connectionClientIpMap[requestPort];
         });
         conn.on("close", e => {
             if (!socket.destroyed) {
-                socket.destroy(`链接${proxyHost} ${proxyPort}服务端关闭`);
+                socket.destroy();
             }
             delete connectionClientIpMap[requestPort];
         });
         socket.on("error", e => {
+            clearTimeout(timeoutCheck);
             if (!conn.destroyed) {
-                conn.destroy(`链接${proxyHost} ${proxyPort} 客户端出错`);
+                conn.destroy();
             }
         })
         socket.on("close", e => {
             if (!conn.destroyed) {
-                conn.destroy(`链接${proxyHost} ${proxyPort} 客户端关闭`);
+                conn.destroy();
             }
         })
 
