@@ -79,7 +79,6 @@ module.exports = class Remote {
         } catch (e) {
             let href = `${protocol}//${hostname}:${port}${path}`;
             toClientResponseUtils.setError(toClientResponse, href, e);
-            log.error(hostname, href, e);
         }
     }
 
@@ -137,7 +136,6 @@ module.exports = class Remote {
         } catch (e) {
             let href = `${protocol}//${hostname}:${port}${path}`;
             toClientResponseUtils.setError(toClientResponse, href, e);
-            log.error(hostname, href, e);
         }
     }
 
@@ -183,7 +181,6 @@ module.exports = class Remote {
         } catch (e) {
             let href = `${protocol}//${hostname}:${port}${pathname}?${queryString.stringify(query)}`;
             toClientResponseUtils.setError(toClientResponse, href, e);
-            log.error(hostname, href, e);
         }
     }
 
