@@ -1,6 +1,6 @@
 module.exports.error = function () {
 
-  console.error(Date.now(), ' ', arguments);
+  console.error('废弃的日志 ',Date.now(), ' ', arguments);
 }
 
 module.exports.info = function () {

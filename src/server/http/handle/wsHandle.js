@@ -46,8 +46,12 @@ module.exports = class WsHandle {
     let path = url.parse(req.url).path;
     let protocal = (!!req.connection.encrypted && !/^http:/.test(req.url)) ? "https" : "http";
 
-
-    let ip = await this.hostService.resolveHostDirect(userId, host, clientIp);
+    let ip;
+    try {
+      ip = await this.hostService.resolveHostDirect(userId, host, clientIp);
+    } catch(err) {
+      this.logService.error('websocket connect error', host);
+    }
     //console.log(ip, host, protocal, port || (protocal == 'http' ? 80 : 443));
 
     // 转发websocket请求
@@ -71,7 +75,7 @@ module.exports = class WsHandle {
 
     });
     proxy.on('error', (err, req, socket) => {
-      this.logService.error(err);
+      this.logService.error('websocket proxy server error',err.message);
     });
   }
 }

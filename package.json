@@ -1,6 +1,6 @@
 {
   "name": "http-trick",
-  "version": "v2.0.6",
+  "version": "v2.0.7",
   "description": "Http Trick - 拦截http(s)请求拦截，修改请求数据，修改响应内容",
   "scripts": {
     "start": "node bin.js",
