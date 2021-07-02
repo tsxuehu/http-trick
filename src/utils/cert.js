@@ -1,6 +1,7 @@
 const crypto = require("crypto");
 const net = require('net');
 const forge = require('node-forge');
+const pki = forge.pki;
 
 const RANDOM_SERIAL = '.' + Date.now() + '.' + Math.floor(Math.random() * 10000);
 
