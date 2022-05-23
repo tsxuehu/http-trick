@@ -22,6 +22,7 @@ module.exports = class Bypass extends Action {
     super();
     this.hostService = ServiceRegistry.getHostService();
     this.profileService = ServiceRegistry.getProfileService();
+    this.configService = ServiceRegistry.getConfigureService();
     this.remote = Remote.getInstance();
   }
 
@@ -186,6 +187,7 @@ module.exports = class Bypass extends Action {
       // 运行信息可以在下一个proxy中查看
       Object.assign(actualRequestHeaders, toClientResponse.headers);
     }
+    const timeout = + this.configService.getRequestTimeout();
 
     if (!last) {
       await this.remote.cache({
@@ -195,6 +197,7 @@ module.exports = class Bypass extends Action {
         method: req.method,
         protocol,
         hostname,
+        timeout,
         ip,
         path,
         port,
@@ -213,6 +216,7 @@ module.exports = class Bypass extends Action {
         recordResponse,
         method: req.method,
         hostname,
+        timeout,
         ip,
         headers: actualRequestHeaders,
         hasExternalProxy, proxyType, proxyIp, proxyPort
@@ -290,7 +294,7 @@ module.exports = class Bypass extends Action {
       // 运行信息可以在下一个proxy中查看
       Object.assign(actualRequestHeaders, toClientResponse.headers);
     }
-
+    const timeout = + this.configService.getRequestTimeout();
     await this.remote.cacheFromRequestContent({
       requestContent: {
         protocol,
@@ -300,6 +304,7 @@ module.exports = class Bypass extends Action {
         pathname,
         actualRequestQuery,
         port,
+        timeout,
         headers: actualRequestHeaders,
         body,
         hasExternalProxy, proxyType, proxyIp, proxyPort
@@ -308,14 +313,14 @@ module.exports = class Bypass extends Action {
       toClientResponse
     });
 
-    if (last) {
-      toClientResponse.sendedToClient = true;
-      await sendSpecificToClient({
-        res,
-        statusCode: toClientResponse.statusCode,
-        headers: toClientResponse.headers,
-        content: toClientResponse.body
-      });
-    }
+    // if (last) {
+    //   toClientResponse.sendedToClient = true;
+    //   await sendSpecificToClient({
+    //     res,
+    //     statusCode: toClientResponse.statusCode,
+    //     headers: toClientResponse.headers,
+    //     content: toClientResponse.body
+    //   });
+    // }
   }
 };

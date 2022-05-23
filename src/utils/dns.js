@@ -35,7 +35,9 @@ module.exports = class DnsResolver {
     }
     if (host && cacheTime < this.MAX_CACHE_TIME) {
       if (cacheTime > this.CACHE_TIME) {
-        this.lookupDNSAndCache(host.hostname);
+        this.lookupDNSAndCache(host.hostname).catch(err => {
+          // 记录出错
+        });
       }
       return host.ip;
     }

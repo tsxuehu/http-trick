@@ -11,7 +11,7 @@ process.on("SIGINT", function () {
   process.exit();
 });
 process.on("uncaughtException", function (err) {
-  log.error(err);
+  log.error('uncaughtException', err);
 });
 process.on('unhandledRejection', (reason, p) => {
   log.error("Unhandled Rejection at: Promise ", p, " reason: ", reason);

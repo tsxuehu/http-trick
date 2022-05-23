@@ -76,7 +76,6 @@ module.exports = class ConnectHandle {
         conn.on("error", e => {
             clearTimeout(timeoutCheck);
             this.logService.error("err when connect to + " + proxyHost + " : " + proxyPort);
-            this.logService.error(e);
             if (!socket.destroyed) {
                 socket.write('HTTP/' + req.httpVersion + ' 403 OK\r\n\r\n', 'UTF-8', function() {
                     socket.destroy();

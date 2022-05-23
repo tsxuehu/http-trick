@@ -236,6 +236,10 @@ module.exports = class Remote {
             proxyRequest.on('error', (e) => {
                 reject(e);
             });
+            proxyRequest.on('timeout', () => {
+                reject(new Error(`timeout ${requestHostname} ${timeout}`));
+                proxyRequest.destroy();
+            });
             if (req) {
                 req.pipe(proxyRequest);
             } else {

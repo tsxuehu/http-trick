@@ -1,6 +1,7 @@
 const queryString = require("query-string");
 const _ = require("lodash");
 const zlib = require('zlib');
+const stream = require('stream');
 
 //获取请求body 同一个请求，返回同一个Promise
 function getClientRequestBody(req) {
@@ -18,21 +19,27 @@ function getClientRequestBody(req) {
 
     let method = req.method.toLowerCase();
     if (['post', 'put', 'patch'].indexOf(method) > -1) {
-        let stream = req;
+        // TODO 需要判断流，可不可读
+        if (req) {
 
-        let requestBuffer = [];
-        stream.on('data', function handleStreamData(chunk) {
-            requestBuffer.push(chunk);
-        });
+        } else {
+            let stream = req;
 
-        stream.on('error', function handleStreamError(err) {
-            reject(err);
-        });
-
-        stream.on('end', function handleStreamEnd() {
-            let requestData = Buffer.concat(requestBuffer);
-            resolve(requestData);
-        });
+            let requestBuffer = [];
+            stream.on('data', function handleStreamData(chunk) {
+                requestBuffer.push(chunk);
+            });
+    
+            stream.on('error', function handleStreamError(err) {
+                reject(err);
+            });
+    
+            stream.on('end', function handleStreamEnd() {
+                let requestData = Buffer.concat(requestBuffer);
+                resolve(requestData);
+            });
+        }
+        
     } else {
         resolve("");
     }
