@@ -73,7 +73,7 @@ module.exports = class Remote {
             if (recordResponse) {
                 toClientResponse.remoteResponseStartTime = Date.now();
                 toClientResponse.statusCode = proxyResponse.statusCode;
-                let reqData = await streamMonitor.getAllDataAsync()
+                let reqData = await streamMonitor.getAllDataAsync();
                 // http://cpro.baidustatic.com:80/cpro/ui/c.js 这个资源获取返回内容会出错
                 let resData = await resMonitorStream.getAllDataAsync();
                 toClientResponse.remoteResponseEndTime = Date.now();
@@ -107,22 +107,24 @@ module.exports = class Remote {
         try {
             toClientResponse.remoteRequestBeginTime = Date.now();
 
+            let wrapperReq = req;
+            let streamMonitor;
+            if (recordResponse) {
+                streamMonitor = new StreamMonitor();
+                wrapperReq = req.pipe(streamMonitor);
+            }
+
             let proxyResponsePromise = await this._requestServer({
-                req, ip, hostname,
+                req: wrapperReq, ip, hostname,
                 protocol, method, port, path,
                 headers, timeout,
                 hasExternalProxy, proxyType, proxyIp, proxyPort
             });
 
-            // 记录日志
-            let clientRequestPromise;
-            if (recordResponse) {
-                clientRequestPromise = requestResponseUtils.getClientRequestBody(req);
-            }
-
             let proxyResponse = await proxyResponsePromise;
 
             toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
+            delete toClientResponse.headers['content-length'];
             delete toClientResponse.headers['content-encoding'];
             delete toClientResponse.headers['transfer-encoding'];
 
@@ -134,7 +136,7 @@ module.exports = class Remote {
             toClientResponse.hasContent = true;
 
             if (recordResponse) {
-                let reqData = await clientRequestPromise;
+                let reqData = await streamMonitor.getAllDataAsync();
                 toClientResponse.requestData = {
                     method,
                     protocol,
@@ -170,6 +172,7 @@ module.exports = class Remote {
             });
 
             toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
+            delete toClientResponse.headers['content-length'];
             delete toClientResponse.headers['content-encoding'];
             delete toClientResponse.headers['transfer-encoding'];
 

@@ -157,6 +157,7 @@ function monitorResponseStream(res) {
   finalStream = finalStream.pipe(streamMonitor)
   const headers = {...res.headers}
   if (unzipFlag) {
+    delete headers['content-length'];
     delete headers['content-encoding'];
     delete headers['transfer-encoding'];
   }
