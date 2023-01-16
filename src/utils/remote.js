@@ -7,6 +7,7 @@ const https = require('https');
 const toClientResponseUtils = require('./toClientResponseUtils');
 const requestResponseUtils = require('./requestResponseUtils');
 const SocksProxyAgent = require('./socksAgent');
+const StreamMonitor = require('./stream-monitor');
 /**
  * 从远程服务器上获取响应内容
  */
@@ -38,32 +39,43 @@ module.exports = class Remote {
             if (recordResponse) {
                 toClientResponse.remoteRequestBeginTime = Date.now();
             }
-
+            let wrapperReq = req;
+            let streamMonitor;
+            if (recordResponse) {
+                streamMonitor = new StreamMonitor();
+                wrapperReq = req.pipe(streamMonitor);
+            }
             let proxyResponsePromise = this._requestServer({
-                req, ip, hostname,
+                req: wrapperReq, ip, hostname,
                 protocol, method, port, path,
                 headers, timeout,
                 hasExternalProxy, proxyType, proxyIp, proxyPort
             });
-            // 记录日志
-            let clientRequestPromise;
-            if (recordResponse) {
-                clientRequestPromise = requestResponseUtils.getClientRequestBody(req);
-            }
             let proxyResponse = await proxyResponsePromise;
-            toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
+            // 记录日志
+            let wrappedStream;
+            let resMonitorStream;
+            if (recordResponse) {
+                const {headers, monitoredStream} = requestResponseUtils.monitorResponseStream(proxyResponse);
+                toClientResponse.headers = _.assign({}, headers, toClientResponse.headers);
+                wrappedStream = monitoredStream
+                resMonitorStream = monitoredStream
+            } else {
+                toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
+                wrappedStream = proxyResponse
+            }
 
             res.writeHead(proxyResponse.statusCode, toClientResponse.headers);
             // 向服务器返回发送给浏览器
-            proxyResponse.pipe(res);
+            wrappedStream.pipe(res);
             toClientResponse.sendedToClient = true;
 
             if (recordResponse) {
                 toClientResponse.remoteResponseStartTime = Date.now();
                 toClientResponse.statusCode = proxyResponse.statusCode;
-                let reqData = await clientRequestPromise;
+                let reqData = await streamMonitor.getAllDataAsync()
                 // http://cpro.baidustatic.com:80/cpro/ui/c.js 这个资源获取返回内容会出错
-                let resData = await requestResponseUtils.getServerResponseBody(proxyResponse);
+                let resData = await resMonitorStream.getAllDataAsync();
                 toClientResponse.remoteResponseEndTime = Date.now();
                 toClientResponse.body = resData;
                 toClientResponse.hasContent = true;
