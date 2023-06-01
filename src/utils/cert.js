@@ -8,7 +8,7 @@ const RANDOM_SERIAL = '.' + Date.now() + '.' + Math.floor(Math.random() * 10000)
 exports.createRootSecurityContext = function createRootSecurityContext() {
   let keys = pki.rsa.generateKeyPair(2048);
   let cert = createCert(keys.publicKey);
-  let now = Date.now() + getRandom();
+  let now = '2023-06-01';
   let attrs = [{
     name: 'commonName',
     value: 'http-trick.' + now
