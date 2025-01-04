@@ -8,7 +8,7 @@ const defaultConfigure = {
   httpProxyPort: 8001,
   socks5ProxyPort: 8002,
   dnsPort: 53,
-  webUiPort: 40001,
+  webUiPort: 40010,
   startDns: false,
   startSocks5: true,
   startHttpProxy: true,
