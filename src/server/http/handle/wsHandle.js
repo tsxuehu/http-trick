@@ -17,7 +17,8 @@ module.exports = class WsHandle {
     this.profileService = ServiceRegistry.getProfileService();
     // 创建httpProxy
     this.proxy = HttpProxy.createProxyServer({
-      secure: false // http-proxy api  在request的option里设置 rejectUnauthorized = false
+      secure: false, // http-proxy api  在request的option里设置 rejectUnauthorized = false
+      ws: true,
     });
     this._registHandleForWSProxy(this.proxy);
   }
@@ -43,7 +44,8 @@ module.exports = class WsHandle {
     // 分配ws mock终端，没有分配到终端的和远程建立连接，分配到mock终端的和mock终端通信
     let host = req.headers.host.split(':')[0];
     let port = req.headers.host.split(':')[1];
-    let path = url.parse(req.url).path;
+    const parsedUrl = url.parse(req.url);
+    let path = parsedUrl.path;
     let protocal = (!!req.connection.encrypted && !/^http:/.test(req.url)) ? "https" : "http";
 
     let ip;
@@ -53,13 +55,19 @@ module.exports = class WsHandle {
       this.logService.error('websocket connect error', host);
     }
     //console.log(ip, host, protocal, port || (protocal == 'http' ? 80 : 443));
-
+   const queryString = req.url.split('?')[1] || '';
+   const params = new URLSearchParams(queryString);
+   const queryObj = Object.fromEntries(params);
+    console.log(queryObj, protocal,'...........................')
     // 转发websocket请求
     this.proxy.ws(req, socket, head, {
       target: {
         protocol: protocal,
         hostname: ip,
         port: port || (protocal == 'http' ? 80 : 443)
+      },
+      headers: {
+        ...queryObj
       }
     });
   }

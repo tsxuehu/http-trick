@@ -43,8 +43,8 @@ module.exports = class ConnectHandle {
         if (targetPort == 443) {
             proxyPort = +this.httpsProxyPort;
         } else { // 非443则放行,连到http服务器上
-            proxyHost = host;// ws协议直接和远程服务器链接
-            proxyPort =+ targetPort;
+            //proxyHost = host;// ws协议直接和远程服务器链接
+            proxyPort = +this.httpProxyPort;
         }
         let requestPort = '';
         let timeoutCheck;

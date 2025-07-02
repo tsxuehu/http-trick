@@ -43,8 +43,8 @@ module.exports = class HttpServer {
 
         });
         // websocket 请求处理
-        this.httpProxyServer.on('upgrade', (req, res) => {
-            that.wsHandle.handle(req, res).catch(e => {
+        this.httpProxyServer.on('upgrade', (req, socket, head) => {
+            that.wsHandle.handle(req, socket, head).catch(e => {
                 console.error(e);
             });
 
