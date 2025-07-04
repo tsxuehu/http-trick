@@ -10,11 +10,16 @@ import glob from 'fast-glob';
 import AppInfoService from "service/AppInfoService";
 import HostService from "service/manage/HostService";
 import ProfileService from "service/manage/ProfileService";
+import FilterService from "service/manage/FilterService";
+import {RuleService} from "service/manage/RuleService";
+import MockDataService from "service/manage/MockDataService";
+import ConfigureService from "service/manage/ConfigureService";
+import CertificationService from "service/manage/CertificationService";
 
 async function main() {
-    initAsyncContext()
-    configureLogger()
-    registerGlobalExceptionHandler()
+    initAsyncContext();
+    configureLogger();
+    registerGlobalExceptionHandler();
 
     // 初始化容器
     const container = new Container();
@@ -40,15 +45,25 @@ async function main() {
     }
 
     // 挂载到全局
-    setContainer(container)
+    setContainer(container);
     // 初始化服务
-    const appInfo = await container.getServiceInstance<AppInfoService>(AppInfoService)
-    const profileService = await container.getServiceInstance<ProfileService>(ProfileService)
-    const hostService = await container.getServiceInstance<HostService>(HostService)
+    const configureService = await container.getServiceInstance<ConfigureService>(ConfigureService);
+    const appInfo = await container.getServiceInstance<AppInfoService>(AppInfoService);
+    const profileService = await container.getServiceInstance<ProfileService>(ProfileService);
+    const hostService = await container.getServiceInstance<HostService>(HostService);
+    const filterService = await container.getServiceInstance<FilterService>(FilterService);
+    const ruleService = await container.getServiceInstance<RuleService>(RuleService);
+    const mockDataService = await container.getServiceInstance<MockDataService>(MockDataService);
+    const certificationService = await container.getServiceInstance<CertificationService>(CertificationService);
     // ========================================================================================
-    await appInfo.start()
-    await profileService.start()
-    await hostService.start()
+    await configureService.start();
+    await appInfo.start();
+    await profileService.start();
+    await hostService.start();
+    await filterService.start();
+    await ruleService.start();
+    await mockDataService.start();
+    await certificationService.start();
 }
 
 main()
