@@ -41,7 +41,7 @@ export default class ProfileService extends EventEmitter {
         // 加载deviceId-> userID映射
         this.deviceInfo = await this.fileService.readJsonFromFile(this.deviceInfoSaveFile);
 
-        // 加载pac文件末班
+        // 加载pac文件模版
         let pacTemplateFile = await this.fileService.readFile(path.resolve(appDir, 'assets/proxy.pac.template.js'));
         this.pacTemplate = template(pacTemplateFile);
     }

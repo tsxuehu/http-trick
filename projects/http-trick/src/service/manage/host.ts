@@ -21,3 +21,15 @@ export interface Meta {
     local: boolean;
 }
 
+export interface IHostFileCacheItem {
+    name: string
+    hostMap: Record<string, string>
+    globHostMap: Record<string, string>
+}
+export interface IHostFileListItem {
+    id: string
+    name: string
+    checked: boolean
+    description: string
+    meta: Meta
+}

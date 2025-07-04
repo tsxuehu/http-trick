@@ -9,6 +9,7 @@ import {setContainer} from "utils/global-var";
 import glob from 'fast-glob';
 import AppInfoService from "service/AppInfoService";
 import HostService from "service/manage/HostService";
+import ProfileService from "service/manage/ProfileService";
 
 async function main() {
     initAsyncContext()
@@ -42,8 +43,11 @@ async function main() {
     setContainer(container)
     // 初始化服务
     const appInfo = await container.getServiceInstance<AppInfoService>(AppInfoService)
+    const profileService = await container.getServiceInstance<ProfileService>(ProfileService)
     const hostService = await container.getServiceInstance<HostService>(HostService)
+    // ========================================================================================
     await appInfo.start()
+    await profileService.start()
     await hostService.start()
 }
 
