@@ -43,7 +43,7 @@ export default class ConnectHandle {
             const {port} = conn.address() as AddressInfo;
             requestPort = port;
             const clientIp = socket.remoteAddress;
-            this.hostResolveService.setConnectInfo(requestPort, {
+            this.hostResolveService.setHttpProxyConnectInfo(requestPort, {
                 clientIp,
                 deviceId: clientIp,
                 userId: this.profileService.getUserIdBindDevice(clientIp),
@@ -76,13 +76,13 @@ export default class ConnectHandle {
                     socket.destroy();
                 });
             }
-            this.hostResolveService.removeConnectInfo(requestPort);
+            this.hostResolveService.removeHttpProxyConnectInfo(requestPort);
         });
         conn.on("close", e => {
             if (!socket.destroyed) {
                 socket.destroy();
             }
-            this.hostResolveService.removeConnectInfo(requestPort);
+            this.hostResolveService.removeHttpProxyConnectInfo(requestPort);
         });
         socket.on("error", e => {
             clearTimeout(timeoutCheck);

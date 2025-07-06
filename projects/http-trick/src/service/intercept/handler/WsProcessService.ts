@@ -10,6 +10,7 @@ import net from "net";
 import HostResolveService from "service/intercept/HostResolveService";
 import ConnectHandle from "service/intercept/handler/ConnectProcessService";
 import tls from "tls";
+import {IConnectInfo} from "service/intercept/host-resolve";
 
 const logger = log4js.getLogger('WsProcessService')
 
@@ -33,20 +34,18 @@ export default class WsProcessService {
     // websocket请求转发 ws测试服务器ws://echo.websocket.org/
     async handle(req: IncomingMessage, socket: net.Socket | tls.TLSSocket, head: Buffer) {
 
-        const socks5proxy = req.socket.socks5;
-        let userId: string;
-        let targetHost: string;
-        let targetPort: string;
-        let deviceId: string
-        if (socks5proxy) { // socks5协议
+        const socks5Id = (socket as any).socks5Id;
+        let connectInfo: IConnectInfo;
+        if (socks5Id) { // socks5协议
             // 通过socks5信息 获取
+            connectInfo = this.hostResolveService.getHttpProxyConnectInfo(socket.remotePort)
         } else {// http代理协议
-            const info = this.hostResolveService.getConnectInfo(socket.remotePort)
-            targetHost = info.targetHost
-            targetPort = info.targetPort
-            deviceId = info.deviceId
-            userId = info.userId
+            connectInfo = this.hostResolveService.getHttpProxyConnectInfo(socket.remotePort)
         }
+        const targetHost = connectInfo.targetHost
+        const targetPort = connectInfo.targetPort
+        const deviceId = connectInfo.deviceId
+        const userId = connectInfo.userId
         const isTls = (socket as tls.TLSSocket).encrypted
 
         let ip;

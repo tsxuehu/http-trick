@@ -19,16 +19,28 @@ export default class HostResolveService {
     private socks5ProxyConnectInfoMap: Record<number, IConnectInfo> = {};
 
 
-    getConnectInfo(port: number): IConnectInfo {
+    getHttpProxyConnectInfo(port: number): IConnectInfo {
         return this.httpProxyConnectInfoMap[port];
     }
 
-    setConnectInfo(port: number, info: IConnectInfo): void {
+    setHttpProxyConnectInfo(port: number, info: IConnectInfo): void {
         this.httpProxyConnectInfoMap[port] = info;
     }
 
-    removeConnectInfo(port: number): void {
+    removeHttpProxyConnectInfo(port: number): void {
         delete this.httpProxyConnectInfoMap[port];
+    }
+
+    getSocks5ProxyConnectInfo(id: number): IConnectInfo {
+        return this.socks5ProxyConnectInfoMap[id];
+    }
+
+    setSocks5ProxyConnectInfo(id: number, info: IConnectInfo): void {
+        this.socks5ProxyConnectInfoMap[id] = info;
+    }
+
+    removeSocks5ProxyConnectInfo(id: number): void {
+        delete this.socks5ProxyConnectInfoMap[id];
     }
 
     // ======================================================================

@@ -36,14 +36,23 @@ export default class HttpProcessService {
         let deviceId = '';// 设备id
         let userId = '';// 设备绑定的用户id
         let urlObj: URL;
-        const socks5proxy = req.socket.socks5;
+        const socket = req.socket
+        const socks5Id = (socket as any).socks5Id;
 
-        if (socks5proxy) { // socks5协议
+        const isTls = (socket as tls.TLSSocket).encrypted
+
+
+        if (socks5Id) { // socks5协议
             // 通过socks5信息 获取
+            const info = this.hostResolveService.getSocks5ProxyConnectInfo(socks5Id)
+            clientIp = info.targetPort
+            deviceId = info.deviceId
+            userId = info.userId
+            urlObj = new URL(`${isTls ? 'https' : 'http'}://${info.targetHost}:${info.targetPort}${req.url}`)
         } else {// http代理协议
             const socket = req.socket
             if ((socket as tls.TLSSocket).encrypted) {
-                const info = this.hostResolveService.getConnectInfo(socket.remotePort)
+                const info = this.hostResolveService.getHttpProxyConnectInfo(socket.remotePort)
                 clientIp = info.targetPort
                 deviceId = info.deviceId
                 userId = info.userId
