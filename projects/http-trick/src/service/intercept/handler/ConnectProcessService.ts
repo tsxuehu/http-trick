@@ -3,7 +3,6 @@ import AppInfoService from "service/AppInfoService";
 import log4js from "log4js";
 import net, {AddressInfo} from "net";
 import {IncomingMessage} from "http";
-import {IConnectInfo} from "service/intercept/handler/connect";
 import HostResolveService from "service/intercept/HostResolveService";
 import ProfileService from "service/manage/ProfileService";
 
