@@ -10,17 +10,17 @@ import path from "path";
 import net from 'net';
 import {IHostFile, IHostFileCacheItem, IHostFileListItem} from "service/manage/host";
 import EventEmitter from "events";
-import { v4 as uuidV4 } from 'uuid';
+import {v4 as uuidV4} from 'uuid';
 
 @Service()
-export default class HostService extends EventEmitter {
+export default class HostDataService extends EventEmitter {
     @Resource() private fileService: FileService
     @Resource() private appInfoService: AppInfoService
-    @Resource() private profileService: ProfileService
-    @Resource() private dnsService: DnsService
+
 
     private userHostFilesMap: Record<string, Record<string, IHostFile>> = {} // userId -> { file id -> content}
     private _userHostsCache: Record<string, Record<string, IHostFileCacheItem>> = {} // userId, {globHostMap, hostMap}
+
     private hostSaveDir: string
 
     async start() {
@@ -37,58 +37,7 @@ export default class HostService extends EventEmitter {
         });
     }
 
-    isIp(str: string) {
-        if (net.isIP(str)) {
-            return true
-        }
-        return false;
-    }
-
-    async resolveHostDirect(userId: string, hostname: string, deviceId: string) {
-        let result = await this.resolveHostWithWay(userId, deviceId, hostname);
-        return result.ip;
-    }
-
-    async resolveHostWithoutProfile(hostname: string): Promise<string> {
-        const ip = await this.dnsService.resolveIp(hostname);
-        return ip;
-    }
-
-    async resolveHostWithWay(userId: string, deviceId: string, hostname: string) {
-        let ip = '';
-        let way = '';
-        if (!hostname) return undefined;
-
-        if (this.isIp(hostname)) {
-            way = 'hostname is ip';
-            ip = hostname;
-        } else if (this.profileService.enableHost(userId)) {
-            // 解析host
-            let inUsingHosts;
-            inUsingHosts = this.getCurrentUsingHosts(userId);
-            way = 'user-' + encodeURIComponent(inUsingHosts.name) + ' ';
-
-            ip = inUsingHosts.hostMap[hostname];
-            if (!ip) {
-                // 配置 *开头的host  计算属性globHostMap已经将*去除
-                ip = find(inUsingHosts.globHostMap, (value, host) => {
-                    return hostname.endsWith(host);
-                });
-            }
-        }
-
-        if (!ip) {
-            way += 'dns';
-            // 调用dns解析
-            ip = await this.dnsService.resolveIp(hostname);
-        }
-
-        return {
-            way, ip
-        };
-    }
-
-    getCurrentUsingHosts(userId: string) {
+    getCurrentUsingHosts(userId: string): IHostFileCacheItem {
         if (!this._userHostsCache[userId]) {
             this._userHostsCache[userId] = {};
         }
@@ -159,8 +108,6 @@ export default class HostService extends EventEmitter {
         }
         return result;
     }
-
-    // ===================================================================================================================
 
     getHostFileList(userId: string) {
         // 添加默认文件
@@ -271,7 +218,7 @@ export default class HostService extends EventEmitter {
         // this.emit("host-saved", userId, hostFileId, content);
     }
 
-    _getHostFilePath(userId:string, hostFileId:string) {
+    _getHostFilePath(userId: string, hostFileId: string) {
         const fileName = `${userId}_${hostFileId}.json`;
         return path.join(this.hostSaveDir, fileName);
     }

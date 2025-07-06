@@ -8,10 +8,10 @@ import {Container} from "di/container";
 import {setContainer} from "utils/global-var";
 import glob from 'fast-glob';
 import AppInfoService from "service/AppInfoService";
-import HostService from "service/manage/HostService";
+import HostDataService from "service/manage/HostDataService";
 import ProfileService from "service/manage/ProfileService";
 import FilterService from "service/manage/FilterService";
-import {RuleService} from "service/manage/RuleService";
+import {RuleDataService} from "service/manage/RuleDataService";
 import MockDataService from "service/manage/MockDataService";
 import ConfigureService from "service/manage/ConfigureService";
 import CertificationService from "service/manage/CertificationService";
@@ -50,9 +50,9 @@ async function main() {
     const configureService = await container.getServiceInstance<ConfigureService>(ConfigureService);
     const appInfo = await container.getServiceInstance<AppInfoService>(AppInfoService);
     const profileService = await container.getServiceInstance<ProfileService>(ProfileService);
-    const hostService = await container.getServiceInstance<HostService>(HostService);
+    const hostService = await container.getServiceInstance<HostDataService>(HostDataService);
     const filterService = await container.getServiceInstance<FilterService>(FilterService);
-    const ruleService = await container.getServiceInstance<RuleService>(RuleService);
+    const ruleService = await container.getServiceInstance<RuleDataService>(RuleDataService);
     const mockDataService = await container.getServiceInstance<MockDataService>(MockDataService);
     const certificationService = await container.getServiceInstance<CertificationService>(CertificationService);
     // ========================================================================================

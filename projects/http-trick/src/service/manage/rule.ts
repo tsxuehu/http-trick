@@ -7,6 +7,7 @@ export interface IRuleFile {
     description: string;
     ruleList: IRule[];
 }
+
 export interface IRuleFileSimple {
     id: string;
     meta: IRuleFileMeta;
@@ -52,10 +53,14 @@ export interface IActionData {
     modifyResponseScript?: string;
 }
 
-export const PassRule = {
+export const PassRule: IRule = {
     "method": "",
     "match": "",
     "actionList": [{
         "type": "bypass",
-    }]
+        data: {}
+    }],
+    name: "",
+    id: "",
+    checked: true
 };

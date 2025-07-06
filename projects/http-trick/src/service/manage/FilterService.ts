@@ -16,7 +16,6 @@ export default class FilterService extends EventEmitter {
     @Resource() private appInfoService: AppInfoService
     @Resource() private fileService: FileService
 
-    private _filtersCache: Record<string, IRule[]> = {}
     private filters: Record<string, IRule[]> = {} // user -> filters 映射
     private filterSaveDir: string
 
@@ -31,26 +30,8 @@ export default class FilterService extends EventEmitter {
         });
     }
 
-    async getMatchedRuleList(userId: string, deviceId: string, enable: boolean, method: string, urlObj: url.URL) {
-        if (!enable) {
-            return [];
-        }
-        let ruleLists = this.getFilterRuleList(userId);
-        return filter(ruleLists, rule => {
-            return rule.checked && this._isMethodMatch(method, rule.method)
-                && this._isUrlMatch(urlObj.href, rule.match)
-        })
-    }
-
     getFilterRuleList(userId: string): IRule[] {
-        if (this._filtersCache[userId]) {
-            return this._filtersCache[userId];
-        }
-
-        let userFilters = this.filters[userId] || [];
-
-        this._filtersCache[userId] = userFilters;
-        return userFilters;
+        return this.filters[userId] || [];
     }
 
     async setRuleCheckedState(userId: string, ruleId: string, checked: boolean) {
@@ -89,25 +70,9 @@ export default class FilterService extends EventEmitter {
 
     async saveFilters(userId: string, filters: IRule[]) {
         this.filters[userId] = filters;
-        delete this._filtersCache[userId];
         let filePath = path.join(this.filterSaveDir, `${userId}.json`);
         // 将数据写入文件
         await this.fileService.writeJsonToFile(filePath, filters);
         this.emit("data-change", userId, filters);
-    }
-
-    // 请求的方法是否匹配规则
-    _isMethodMatch(reqMethod: string, ruleMethod: string) {
-        let loweredReqMethod = lowerCase(reqMethod);
-        let loweredRuleMethod = lowerCase(ruleMethod);
-        return !ruleMethod
-            || loweredReqMethod == loweredRuleMethod
-            || loweredReqMethod == 'option';
-    }
-
-    // 请求的url是否匹配规则
-    _isUrlMatch(reqUrl: string, ruleMatchStr: string) {
-        return !ruleMatchStr || reqUrl.indexOf(ruleMatchStr) >= 0
-            || (new RegExp(ruleMatchStr)).test(reqUrl);
     }
 }
