@@ -1,10 +1,11 @@
 import {Resource, Service} from "di/annotation";
 import ProfileService from "service/manage/ProfileService";
 import HostDataService from "service/manage/HostDataService";
-import {IHostFileCacheItem} from "service/manage/host";
 import find from "lodash/find";
 import net from "net";
 import DnsService from "service/infra/DnsService";
+import {IConnectInfo} from "service/intercept/host-resolve";
+import {IncomingMessage} from "http";
 
 @Service()
 export default class HostResolveService {
@@ -12,6 +13,25 @@ export default class HostResolveService {
     @Resource() private hostDataService: HostDataService
     @Resource() private dnsService: DnsService
 
+    // 记录proxy 请求内部https server链接 和 client的ip 之间的映射关系
+    // 方便 https server 处理请求时，能够找出对应的client ip
+    private httpProxyConnectInfoMap: Record<number, IConnectInfo> = {};
+    private socks5ProxyConnectInfoMap: Record<number, IConnectInfo> = {};
+
+
+    getConnectInfo(port: number): IConnectInfo {
+        return this.httpProxyConnectInfoMap[port];
+    }
+
+    setConnectInfo(port: number, info: IConnectInfo): void {
+        this.httpProxyConnectInfoMap[port] = info;
+    }
+
+    removeConnectInfo(port: number): void {
+        delete this.httpProxyConnectInfoMap[port];
+    }
+
+    // ======================================================================
 
     async resolveHostDirect(userId: string, hostname: string, deviceId: string) {
         let result = await this.resolveHostWithWay(userId, deviceId, hostname);

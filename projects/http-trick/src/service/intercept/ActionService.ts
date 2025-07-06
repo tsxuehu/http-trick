@@ -5,9 +5,8 @@ import FilterService from "service/manage/FilterService";
 import {RuleDataService} from "service/manage/RuleDataService";
 import filter from "lodash/filter";
 import lowerCase from "lodash/lowerCase";
-import {IAction, IRule, PassRule} from "service/manage/rule";
+import {IAction, IActionInfo, IRule, PassRule} from "service/manage/rule";
 import forEach from "lodash/forEach";
-import _ from "lodash";
 
 /**
  *
@@ -18,7 +17,10 @@ export default class ActionService {
     @Resource() private filterService: FilterService
     @Resource() private ruleDataService: RuleDataService
 
-    getWillRunActionList(userId: string, deviceId: string, method: string, urlObj: url.URL) {
+    // 合并所有匹配到的过滤器规则的action列表、请求匹配的规则的 action 列表
+    // 动作分为请求前和请求后两种类型, 合并后的顺序，前置过滤器动作 -> 请求匹配到的动作 -> 后置过滤器的动作
+    // 合并后的数组 item 格式 {action, rule}， action: 要执行的动作，rule: 动作所属的rule
+    getWillRunActionList(userId: string, deviceId: string, method: string, urlObj: url.URL): IActionInfo[] {
         const enableFilter = this.profileService.enableFilter(userId);
         const enableRule = this.profileService.enableRule(userId);
         let fRuleLists: IRule[] = []
@@ -48,12 +50,12 @@ export default class ActionService {
 
     // 合并过滤规则，和请求处理规则
     // 生成要执行的action列表
-    _mergeToRunAction(filterRules: IRule[], processRule: IRule): IAction[] {
-        let beforeFilterActionsInfo: IAction[] = [];
-        let afterFilterActionsInfo: IAction[] = [];
+    _mergeToRunAction(filterRules: IRule[], processRule: IRule): IActionInfo[] {
+        let beforeFilterActionsInfo: IActionInfo[] = [];
+        let afterFilterActionsInfo: IActionInfo[] = [];
 
-        _.forEach(filterRules, rule => {
-            _.forEach(rule.actionList, action => {
+        forEach(filterRules, rule => {
+            forEach(rule.actionList, action => {
                 let actionHandler = Action.getAction(action.type);
                 if (actionHandler.needResponse()) {
                     afterFilterActionsInfo.push({
@@ -69,8 +71,8 @@ export default class ActionService {
             });
         });
 
-        const ruleActionsInfo: IAction[] = [];
-        _.forEach(processRule.actionList, action => {
+        const ruleActionsInfo: IActionInfo[] = [];
+        forEach(processRule.actionList, action => {
             ruleActionsInfo.push({
                 action: action,
                 rule: processRule

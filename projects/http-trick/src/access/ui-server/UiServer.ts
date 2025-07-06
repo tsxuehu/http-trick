@@ -6,10 +6,10 @@ import Koa, {Context} from 'koa'
 import SocketIO from 'socket.io'
 import koa from "koa";
 import {createLazyResource} from "di/annotation";
-import {getContainer} from "../utils/global-var";
+import {getContainer} from "../../utils/global-var";
 import AppInfoService from "service/AppInfoService";
 import cookie from 'cookie'
-import {getRemoteIp} from "../utils/socket-ip";
+import {getRemoteIp} from "../../utils/socket-ip";
 import koaQs from "koa-qs"
 import staticServe from "koa-static";
 import path from "path";

@@ -15,6 +15,10 @@ import {RuleDataService} from "service/manage/RuleDataService";
 import MockDataService from "service/manage/MockDataService";
 import ConfigureService from "service/manage/ConfigureService";
 import CertificationService from "service/manage/CertificationService";
+import HttpTrafficService from "service/intercept/HttpTrafficService";
+import ConnectHandle from "service/intercept/handler/ConnectProcessService";
+import HttpProcessService from "service/intercept/handler/HttpProcessService";
+import WsProcessService from "service/intercept/handler/WsProcessService";
 
 async function main() {
     initAsyncContext();
@@ -47,6 +51,7 @@ async function main() {
     // 挂载到全局
     setContainer(container);
     // 初始化服务
+    // ========================================================================================
     const configureService = await container.getServiceInstance<ConfigureService>(ConfigureService);
     const appInfo = await container.getServiceInstance<AppInfoService>(AppInfoService);
     const profileService = await container.getServiceInstance<ProfileService>(ProfileService);
@@ -55,7 +60,7 @@ async function main() {
     const ruleService = await container.getServiceInstance<RuleDataService>(RuleDataService);
     const mockDataService = await container.getServiceInstance<MockDataService>(MockDataService);
     const certificationService = await container.getServiceInstance<CertificationService>(CertificationService);
-    // ========================================================================================
+
     await configureService.start();
     await appInfo.start();
     await profileService.start();
@@ -64,6 +69,15 @@ async function main() {
     await ruleService.start();
     await mockDataService.start();
     await certificationService.start();
+
+    // =======================================================================================
+    const connectHandle = await container.getServiceInstance<ConnectHandle>(ConnectHandle);
+    const httpProcessService = await container.getServiceInstance<HttpProcessService>(HttpProcessService);
+    const wsProcessService = await container.getServiceInstance<WsProcessService>(WsProcessService);
+    const httpTrafficService = await container.getServiceInstance<HttpTrafficService>(HttpTrafficService);
+
+    await wsProcessService.start();
+    await httpTrafficService.start();
 }
 
 main()

@@ -1,7 +1,17 @@
-import {Service} from "di/annotation";
+import {Resource, Service} from "di/annotation";
 import path from "path";
-import _ from "lodash";
+import url from 'url'
 import EventEmitter from "events";
+import AppInfoService from "service/AppInfoService";
+import {
+    IActualRequestInfo,
+    IFilter,
+    IRequestBeginInfo,
+    IServerReturnInfo,
+    IStatus
+} from "service/intercept/http-trafific";
+import forEach from "lodash/forEach";
+import FileService from "service/infra/FileService";
 
 const logCountPerUser = 500;
 /**
@@ -11,22 +21,23 @@ const logCountPerUser = 500;
  */
 @Service()
 export default class HttpTrafficService extends EventEmitter {
+    @Resource() private appInfoService: AppInfoService
+    @Resource() private fileService: FileService
 
-    constructor({appInfoService}) {
-        super();
-        this.appInfoService = appInfoService;
-        // http请求缓存数据 userId - > [{record}，{record}，{record}]
-        this.cache = {};
-        // 用户的请求id  一个用户可以关联多个请求设备，用户的请求分配唯一个一个请求id
-        this.userRequestPointer = {};
-        // 记录用户的监视窗数量
-        this.userMonitorCount = {};
+    private cache: Record<string, any[]> = {} // http请求缓存数据 userId - > [{record}，{record}，{record}]
+    private userRequestPointer: Record<string, number> = {} // 用户的请求id  一个用户可以关联多个请求设备，用户的请求分配唯一个一个请求id
+    private userMonitorCount: Record<string, number> = {} // 记录用户的监视窗数量
+    private filterMap: Record<string, IFilter> = {}
+    private stopRecord: Record<string, boolean> = {}
 
+    private trafficDir: string // 监控数据缓存目录
+
+    async start() {
+        // 删除缓存
+        /* rimraf.sync(this.trafficDir);
+         fs.mkdirSync(this.trafficDir);*/
         let proxyDataDir = this.appInfoService.getProxyDataDir();
-        // 监控数据缓存目录
         this.trafficDir = path.join(proxyDataDir, "traffic");
-        this.filterMap = {};
-        this.stopRecord = {};
 
         // 创建定时任务，推送日志记录
         setInterval(_ => {
@@ -34,36 +45,29 @@ export default class HttpTrafficService extends EventEmitter {
         }, 2000);
     }
 
-    start() {
-        // 删除缓存
-        /* rimraf.sync(this.trafficDir);
-         fs.mkdirSync(this.trafficDir);*/
+    getFilter(userId: string): IFilter {
+        return this.filterMap[userId] || {host: '', path: ''};
     }
 
-    getFilter(userId) {
-        let filters = this.filterMap[userId] || {host: '', path: ''};
-        return filters;
-    }
-
-    setFilter(userId, filter) {
+    setFilter(userId: string, filter: IFilter) {
         this.filterMap[userId] = filter;
         this.emit("filter", userId, filter);
     }
 
-    getStatus(userId) {
+    getStatus(userId: string): IStatus {
         return {
             stopRecord: this.stopRecord[userId] || false,
             overflow: this.userRequestPointer[userId] > logCountPerUser
         };
     }
 
-    setStopRecord(userId, stop) {
+    setStopRecord(userId: string, stop: boolean) {
         this.stopRecord[userId] = stop;
         // 发送通知
         this.emit("state-change", userId, this.getStatus(userId));
     }
 
-    clear(userId) {
+    clear(userId: string) {
         this.userRequestPointer[userId] = 0;
         // 发送通知
         this.emit("clear", userId);
@@ -71,14 +75,14 @@ export default class HttpTrafficService extends EventEmitter {
 
     // 将缓存数据发送给用户
     sendCachedData() {
-        _.forEach(this.cache, (rows, userId) => {
+        forEach(this.cache, (rows, userId) => {
             this.emit("traffic", userId, rows);
         });
         this.cache = {};
     }
 
     // 为请求分配id
-    getRequestId(userId, urlObj) {
+    getRequestId(userId: string, urlObj: url.URL) {
         // 处于停止记录状态 则不返回id
         if (this.stopRecord[userId]) return -1;
 
@@ -105,18 +109,18 @@ export default class HttpTrafficService extends EventEmitter {
         return -1;
     }
 
-    resetRequestId(userId) {
+    resetRequestId(userId: string) {
         this.userRequestPointer[userId] = 0;
     }
 
     // 获取监控窗口的数量，没有监控窗口 则不做记录
-    hasMonitor(userId) {
+    hasMonitor(userId: string) {
         let cnt = this.userMonitorCount[userId] || 0;
         return cnt > 0;
     }
 
     // 用户监控窗数加1
-    incMonitor(userId) {
+    incMonitor(userId: string) {
         let cnt = this.userMonitorCount[userId] || 0;
         if (cnt == 0) {
             this.resetRequestId(userId);
@@ -126,14 +130,15 @@ export default class HttpTrafficService extends EventEmitter {
     }
 
     // 用户监控窗数减一
-    decMonitor(userId) {
+    decMonitor(userId: string) {
         let cnt = this.userMonitorCount[userId] || 0;
         cnt--;
         this.userMonitorCount[userId] = cnt;
     }
 
     // 记录请求
-    async requestBegin({id, userId, clientIp, deviceId, method, httpVersion, urlObj, headers}) {
+    requestBegin(info: IRequestBeginInfo) {
+        const {id, userId, clientIp, deviceId, method, httpVersion, urlObj, headers} = info
         let queue = this.cache[userId] || [];
         // 原始请求信息
         queue.push({
@@ -151,7 +156,8 @@ export default class HttpTrafficService extends EventEmitter {
     }
 
     // 记录请求body
-    async actualRequest({userId, id, requestData, originBody}) {
+    async actualRequest(info: IActualRequestInfo) {
+        const {userId, id, requestData, originBody} = info
         // 将body写文件
 
         let body = requestData.body;
@@ -166,16 +172,17 @@ export default class HttpTrafficService extends EventEmitter {
 
         if (body) {
             let bodyPath = this.getRequestBodyPath(userId, id);
-            await fileUtil.writeFile(bodyPath, body);
+            await this.fileService.writeFile(bodyPath, body);
         }
         if (originBody) {
             let bodyPath = this.getOriginRequestBodyPath(userId, id);
-            await fileUtil.writeFile(bodyPath, originBody);
+            await this.fileService.writeFile(bodyPath, originBody);
         }
     }
 
     // 记录响应
-    async serverReturn({userId, id, toClientResponse}) {
+    async serverReturn(info: IServerReturnInfo) {
+        const {userId, id, toClientResponse} = info
         let queue = this.cache[userId] || [];
         let {
             statusCode,
@@ -208,7 +215,7 @@ export default class HttpTrafficService extends EventEmitter {
 
         if (body) {
             let bodyPath = this.getResponseBodyPath(userId, id);
-            await fileUtil.writeFile(bodyPath, body);
+            await this.fileService.writeFile(bodyPath, body);
         }
     }
 
@@ -217,9 +224,9 @@ export default class HttpTrafficService extends EventEmitter {
      * @param userId
      * @param requestId
      */
-    async getRequestBody(userId, requestId) {
+    async getRequestBody(userId: string, requestId: number): Promise<string> {
         let saveRequestPath = this.getRequestBodyPath(userId, requestId);
-        return await fileUtil.readFile(saveRequestPath);
+        return await this.fileService.readFile(saveRequestPath);
     }
 
     /**
@@ -227,22 +234,22 @@ export default class HttpTrafficService extends EventEmitter {
      * @param userId
      * @param requestId
      */
-    async getResponseBody(userId, requestId) {
+    async getResponseBody(userId: string, requestId: number): Promise<string> {
         let saveResponsePath = this.getResponseBodyPath(userId, requestId);
-        return await fileUtil.readFile(saveResponsePath);
+        return await this.fileService.readFile(saveResponsePath);
     }
 
     // 获取请求记录path
-    getRequestBodyPath(userId, requestId) {
+    getRequestBodyPath(userId: string, requestId: number): string {
         return path.join(this.trafficDir, userId + '_' + requestId + '_req_body');
     }
 
-    getOriginRequestBodyPath() {
+    getOriginRequestBodyPath(userId: string, requestId: number): string {
         return path.join(this.trafficDir, userId + '_' + requestId + '_req_body_origin');
     }
 
     // 获取响应记录path
-    getResponseBodyPath(userId, requestId) {
+    getResponseBodyPath(userId: string, requestId: number): string {
         return path.join(this.trafficDir, userId + '_' + requestId + '_res_body');
     }
 }

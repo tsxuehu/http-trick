@@ -78,7 +78,7 @@ export default class AppInfoService extends StateBase<IAppInfo> {
     }
 
     // 是否是webui请求
-    isWebUiRequest(hostname: string, port: number) {
+    isWebUiRequest(hostname: string, port: number | string) {
         return (hostname == '127.0.0.1' || hostname == this.getState().pcIp)
             && port == this.getState().webUiPort;
     }

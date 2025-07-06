@@ -36,6 +36,11 @@ export interface IAction {
     data: IActionData;
 }
 
+export interface IActionInfo {
+    action: IAction,
+    rule: IRule
+}
+
 export interface IActionData {
     target?: string;
     dataId?: string;
