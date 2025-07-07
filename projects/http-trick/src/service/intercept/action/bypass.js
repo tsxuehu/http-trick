@@ -1,4 +1,4 @@
-const Action = require("./action");
+const Action = require("./BaseAction");
 const Remote = require("../../../utils/remote");
 const _ = require("lodash");
 const ServiceRegistry = require("../../../service");
@@ -10,7 +10,7 @@ const toClientResponseUtils = require("../../../utils/toClientResponseUtils");
 const queryString = require("query-string");
 
 let bypass;
-module.exports = class Bypass extends Action {
+module.exports = class Bypass extends BaseAction {
   static getInstance() {
     if (!bypass) {
       bypass = new Bypass();
@@ -26,88 +26,6 @@ module.exports = class Bypass extends Action {
     this.remote = Remote.getInstance();
   }
 
-  needRequestContent() {
-    return false;
-  }
-
-  needResponse() {
-    return false;
-  }
-
-  willGetContent() {
-    return true;
-  }
-
-  /**
-   * 运行处理动作
-   */
-  async run({
-              req,
-              res,
-              recordResponse,
-              urlObj,
-              clientIp,
-              deviceId,
-              userId,
-              rule, // 规则
-              action, // 规则里的一个动作
-              requestContent, // 请求内容
-              additionalRequestHeaders, // 请求头
-              actualRequestHeaders,
-              additionalRequestQuery, // query
-              actualRequestQuery,
-              additionalRequestCookies, // cookie
-              actualRequestCookies,
-              toClientResponse, //响应内容
-              last = true
-            }) {
-    // 查找当前用户是否有流量监控窗
-    // 若有监控窗，则将返回浏览器的内容放入 toClientResponse
-
-    if (requestContent.hasContent) {
-      await this.bypassWithRequestContent({
-        req,
-        res,
-        recordResponse,
-        urlObj,
-        clientIp,
-        deviceId,
-        userId,
-        rule, // 规则
-        action, // 规则里的一个动作
-        requestContent, // 请求内容
-        additionalRequestHeaders, // 请求头
-        actualRequestHeaders,
-        additionalRequestQuery, // query
-        actualRequestQuery,
-        additionalRequestCookies, // cookie
-        actualRequestCookies,
-        toClientResponse, //响应内容
-        last
-      });
-    } else {
-      await this.bypass({
-        req,
-        res,
-        recordResponse,
-        urlObj,
-        clientIp,
-        deviceId,
-        userId,
-        rule, // 规则
-        action, // 规则里的一个动作
-        requestContent, // 请求内容
-        additionalRequestHeaders, // 请求头
-        actualRequestHeaders,
-        additionalRequestQuery, // query
-        actualRequestQuery,
-        additionalRequestCookies, // cookie
-        actualRequestCookies,
-        toClientResponse, //响应内容
-        last
-      });
-    }
-  }
 
   async bypass({
                  req,
@@ -130,18 +48,6 @@ module.exports = class Bypass extends Action {
                  last = true
                }) {
     // 构造url
-    let {protocol, hostname, path, pathname, port, query} = urlObj;
-
-    // 构造path
-    try {
-      let originQuery = queryString.parse(query);
-      Object.assign(actualRequestQuery, originQuery);
-      if (Object.keys(additionalRequestQuery).length > 0) {
-        Object.assign(actualRequestQuery, additionalRequestQuery);
-        path = `${pathname}?${queryString.stringify(actualRequestQuery)}`;
-      }
-    } catch (e) {
-    }
 
 
     // dns解析

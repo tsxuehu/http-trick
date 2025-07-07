@@ -15,6 +15,7 @@ export interface IProcessContext {
     userId: string
 
     originRequestContent: IOriginRequestData // 原始请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
+
     additionalRequestHeaders: Record<string, string> // 请求头
     actualRequestHeaders: Record<string, string>
     additionalRequestQuery: Record<string, string>
@@ -27,9 +28,9 @@ export interface IProcessContext {
     toClientResponse: IToClientResponse
 }
 
-export interface ActionRunExtraContext {
-    rule: IRule
-    action: IAction
+export interface ActionRunExtraInfo {
+    rule?: IRule
+    action?: IAction
     last: boolean
 }
 
@@ -161,34 +162,3 @@ export function getDefaultProcessContext(options: IOptions): IProcessContext {
     }
 }
 
-export function parseUrl(req: IncomingMessage): url.URL {
-    let host = req.headers.host;
-    let protocol = '';
-    if (!req.socket.encrypted) {
-        // http协议接收到请求,如果没有指明使用https协议代理访问则使用http
-        if (/^https:/.test(req.url)) {
-            protocol = "https";
-        } else {
-            protocol = "http";
-        }
-    } else {
-        // https协议接收到请求,如果没有指明使用http协议代理访问则使用https
-        if (!/^http:/.test(req.url)) {
-            protocol = "https";
-        } else {
-            protocol = "http";
-        }
-    }
-    let fullUrl = "";
-    // 没有指明详细的url，则拼接url
-    if (req.url.startsWith('http')) {
-        fullUrl = req.url;
-    } else {
-        fullUrl = protocol + '://' + host + req.url;
-    }
-
-    let urlObj = new URL(fullUrl);
-    urlObj.port = urlObj.port || (protocol == 'https' ? '443' : '80');
-
-    return urlObj;
-}

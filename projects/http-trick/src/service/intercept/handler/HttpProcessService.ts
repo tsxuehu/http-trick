@@ -9,7 +9,6 @@ import {
     getDefaultProcessContext,
     getDefaultRequestContent,
     IProcessContext,
-    parseUrl
 } from "../http";
 import {IAction, IActionInfo} from "service/manage/rule";
 import HostResolveService from "service/intercept/HostResolveService";

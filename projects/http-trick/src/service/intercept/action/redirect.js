@@ -1,4 +1,4 @@
-const Action = require("./action");
+const Action = require("./BaseAction");
 const _ = require("lodash");
 const ServiceRegistry = require("../../../service");
 const Local = require("../../../utils/local");
@@ -14,7 +14,7 @@ const cookie = require("cookie");
  * 重定向 本地 或者 远程
  */
 let redirect;
-module.exports = class Redirect extends Action {
+module.exports = class Redirect extends BaseAction {
   static getInstance() {
     if (!redirect) {
       redirect = new Redirect();
