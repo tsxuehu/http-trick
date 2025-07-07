@@ -1,38 +1,36 @@
-const axios = require("axios");
-const queryString = require("query-string");
-const log = require("./log");
-const _ = require("lodash");
-const http = require('http');
-const https = require('https');
-const toClientResponseUtils = require('./toClientResponseUtils');
-const requestResponseUtils = require('./requestResponseUtils');
-const SocksProxyAgent = require('./socksAgent');
-const StreamMonitor = require('./stream-monitor');
-/**
- * 从远程服务器上获取响应内容
- */
+import {Service} from "di/annotation";
+import {IActualRequestData, IToClientResponse} from "service/intercept/http";
+import {IProxyConfig} from "service/manage/profile";
+import {IncomingMessage, ServerResponse} from "http";
 
-let remote;
 
-module.exports = class Remote {
-    static getInstance() {
-        if (!remote) {
-            remote = new Remote();
-        }
-        return remote;
-    }
+export interface IPipeParam {
+    req: IncomingMessage
+    res: ServerResponse
+    actualRequestData: IActualRequestData
+    toClientResponse: IToClientResponse
+    proxyInfo: IProxyConfig
+}
 
-    constructor() {
-    }
+export interface ICacheParam {
+    req: IncomingMessage
+    actualRequestData: IActualRequestData
+    toClientResponse: IToClientResponse
+    proxyInfo: IProxyConfig
+}
+
+@Service()
+export default class RemoteContentService {
 
     /**
      * 将请求远程的响应内容直接返回给浏览器
      */
-    async pipe({
-                   req, res, recordResponse,
-                   method, protocol, ip, hostname, path, port, headers, timeout, toClientResponse,
-                   hasExternalProxy, proxyType, proxyIp, proxyPort
-               }) {
+    async pipe(param: IPipeParam) {
+        const {
+            req1, res, recordResponse,
+            method, protocol, ip, hostname, path, port, headers, timeout, toClientResponse,
+
+        } = req
         // http.request 解析dns时，偶尔会出错
         // pipe流 获取远程数据 并做记录
         try {
@@ -97,13 +95,13 @@ module.exports = class Remote {
     /**
      * 将请求远程的响应内容
      */
-    async cache({
-                    req, res, recordResponse, method,
-                    protocol, ip, hostname, path, port,
-                    headers, toClientResponse, timeout,
-                    hasExternalProxy, proxyType, proxyIp, proxyPort
-                }) {
+    async cache(param: ICacheParam) {
+        const {
+            req, res, recordResponse, method,
+            protocol, ip, hostname, path, port,
+            headers, toClientResponse, timeout,
 
+        } = req
         try {
             toClientResponse.remoteRequestBeginTime = Date.now();
 
@@ -158,7 +156,7 @@ module.exports = class Remote {
      */
     async cacheFromRequestContent({
                                       requestContent, recordResponse, toClientResponse, timeout,
-                                      hasExternalProxy, proxyType, proxyIp, proxyPort
+
                                   }) {
         let {protocol, hostname, ip, pathname, port, query, method, headers, body} = requestContent;
         try {
@@ -202,7 +200,7 @@ module.exports = class Remote {
     // 请求远程服务器，并将响应流通过promise的方式返回
     _requestServer({
                        req, body, protocol, method, ip, hostname, port, path, headers, timeout = 10000,
-                       hasExternalProxy = false, proxyType, proxyIp, proxyPort
+
                    }) {
         let proxyRequestPromise = new Promise((resolve, reject) => {
             let requestPath = '';
@@ -263,4 +261,4 @@ module.exports = class Remote {
         });
         return proxyRequestPromise;
     }
-};
+}

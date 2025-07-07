@@ -12,6 +12,7 @@ import {
 } from "service/intercept/http-trafific";
 import forEach from "lodash/forEach";
 import FileService from "service/infra/FileService";
+import {IOriginRequestData} from "service/intercept/http";
 
 const logCountPerUser = 500;
 /**
@@ -82,7 +83,7 @@ export default class HttpTrafficService extends EventEmitter {
     }
 
     // 为请求分配id
-    getRequestId(userId: string, urlObj: url.URL) {
+    getRequestId(userId: string, originRequestData: IOriginRequestData): number {
         // 处于停止记录状态 则不返回id
         if (this.stopRecord[userId]) return -1;
 
@@ -95,8 +96,8 @@ export default class HttpTrafficService extends EventEmitter {
         }
 
         let filter = this.getFilter(userId);
-        let {path, host} = urlObj;
-        if (path.indexOf(filter.path) > -1 && host.indexOf(filter.host) > -1) {
+        let {path, hostname} = originRequestData;
+        if (path.indexOf(filter.path) > -1 && hostname.indexOf(filter.host) > -1) {
             id++;
             this.userRequestPointer[userId] = id;
             if (id > logCountPerUser) {
@@ -138,7 +139,7 @@ export default class HttpTrafficService extends EventEmitter {
 
     // 记录请求
     requestBegin(info: IRequestBeginInfo) {
-        const {id, userId, clientIp, deviceId, method, httpVersion, urlObj, headers} = info
+        const {id, userId, clientIp, deviceId, method, httpVersion, originRequestData} = info
         let queue = this.cache[userId] || [];
         // 原始请求信息
         queue.push({
@@ -148,8 +149,7 @@ export default class HttpTrafficService extends EventEmitter {
                 method,
                 deviceId,
                 httpVersion,
-                headers
-            }, urlObj)
+            }, originRequestData)
         });
 
         this.cache[userId] = queue;

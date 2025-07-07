@@ -23,7 +23,6 @@ export default class FileService {
 
     async readFile(path: string): Promise<string> {
         return await fs.readFile(path, {encoding: 'utf-8'})
-
     }
 
     async writeFile(path: string, content: string) {

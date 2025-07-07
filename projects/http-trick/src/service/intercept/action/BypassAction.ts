@@ -1,9 +1,16 @@
-import BaseAction from "service/intercept/action/BaseAction";
 import {Resource, Service} from "di/annotation";
-import {ActionRunExtraInfo, IProcessContext} from "service/intercept/http";
+import {
+    ActionRunExtraInfo,
+    generateHeadersInActualRequestData, getTargetUrl,
+    IProcessContext,
+    setError
+} from "service/intercept/http";
 import ProfileService from "service/manage/ProfileService";
 import HostResolveService from "service/intercept/HostResolveService";
 import ConfigureService from "service/manage/ConfigureService";
+import RemoteContentService from "service/infra/RemoteContentService";
+import cookie from "cookie";
+import {BaseAction} from "service/action";
 
 
 @Service()
@@ -12,6 +19,7 @@ export class BypassAction extends BaseAction {
     @Resource() private profileService: ProfileService
     @Resource() private hostResolveService: HostResolveService
     @Resource() private configureService: ConfigureService
+    @Resource() private remoteContentService: RemoteContentService
 
     needRequestContent() {
         return false;
@@ -26,35 +34,48 @@ export class BypassAction extends BaseAction {
     }
 
     async run(context: IProcessContext, extraInfo: ActionRunExtraInfo) {
-        // 查找当前用户是否有流量监控窗
-        // 若有监控窗，则将返回浏览器的内容放入 toClientResponse
-        if (context.toClientResponse.hasContent) {
-            await this.bypassWithRequestContent(context, extraInfo);
+        const {
+            req, res,
+            actualRequestData,
+            originRequestData,
+            additionalRequestQuery,
+            toClientResponse,
+            userId,
+            deviceId
+        } = context
+        const {last} = extraInfo
+        actualRequestData.protocol = originRequestData.protocol;
+        actualRequestData.port = originRequestData.port;
+
+        await this.hostResolveService.resolveHostAndSetInfoToContext(originRequestData.hostname, context);
+
+        if (Object.keys(additionalRequestQuery).length > 0) {
+            let actualRequestQuery: Record<string, any> = {...originRequestData.query}
+            Object.assign(actualRequestQuery, additionalRequestQuery);
+            const newParams = new URLSearchParams(actualRequestQuery)
+            actualRequestData.path = `${originRequestData.pathname}?${newParams.toString()}`;
         } else {
-            await this.bypass(context, extraInfo);
+            actualRequestData.path = originRequestData.path
         }
-    }
 
-    async bypass(context: IProcessContext, extraInfo: ActionRunExtraInfo) {
-        const {urlObj, actualRequestQuery, additionalRequestQuery} = context;
-        const {protocol, hostname, pathname, port, search} = urlObj;
+        generateHeadersInActualRequestData(context)
 
-        // 构造path
-        let finialPath: string = pathname;
-        try {
-            const params = new URLSearchParams(search)
-            for (const [key, value] of params.entries()) {
-                actualRequestQuery[key] = value;
-            }
-            if (Object.keys(additionalRequestQuery).length > 0) {
-                Object.assign(actualRequestQuery, additionalRequestQuery);
-                const newParams = new URLSearchParams(actualRequestQuery)
-                finialPath = `${pathname}?${newParams.toString()}`;
-            }
-        } catch (e) {
+        actualRequestData.timeout = +this.configureService.getRequestTimeout();
+        actualRequestData.body = originRequestData.body
+
+        const proxyInfo = this.profileService.getExternalProxy(userId, deviceId);
+
+
+        const targetUrl = getTargetUrl(context)
+        toClientResponse.headers['proxy-content'] = encodeURI(targetUrl);
+        if (last) {
+            await this.remoteContentService.pipe({
+                req, res, actualRequestData, toClientResponse, proxyInfo
+            })
+        } else {
+            await this.remoteContentService.cache({
+                req, actualRequestData, toClientResponse, proxyInfo
+            })
         }
-    }
-
-    async bypassWithRequestContent(context: IProcessContext, extraInfo: ActionRunExtraInfo) {
     }
 }

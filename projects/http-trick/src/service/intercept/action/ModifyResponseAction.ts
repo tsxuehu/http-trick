@@ -1,7 +1,7 @@
-import BaseAction from "service/intercept/action/BaseAction";
 import {Service} from "di/annotation";
 import {ActionRunExtraInfo, IProcessContext} from "service/intercept/http";
 import lowerCase from "lodash/lowerCase";
+import {BaseAction} from "service/action";
 
 // =============  js css请求加时间戳
 function addTimestampToJsCss(body: string): string {
@@ -41,7 +41,7 @@ export class ModifyResponseAction extends BaseAction {
     }
 
     async run(context: IProcessContext, extraInfo: ActionRunExtraInfo) {
-        const {additionalRequestQuery, toClientResponse, urlObj, req} = context;
+        const {additionalRequestQuery, toClientResponse, originRequestData, req} = context;
         const {action} = extraInfo;
         const body = toClientResponse.body;
 
@@ -52,8 +52,7 @@ export class ModifyResponseAction extends BaseAction {
         } else if (action.data.modifyResponseType == "returnDataInJsonpStyle") {
 
             // jsonp请求 替换callback
-            let parsed = new URLSearchParams(urlObj.search);
-            let cbName = parsed.get(action.data.callbackName);
+            let cbName = originRequestData.query[action.data.callbackName];
             toClientResponse.body = `${cbName}(${body})`;
             toClientResponse.headers['Content-Type'] = 'application/javascript;charset=utf-8';
 

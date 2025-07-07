@@ -6,13 +6,13 @@ import log4js from "log4js";
 import {IncomingMessage, ServerResponse} from "http";
 import HttpTrafficService from "service/intercept/HttpTrafficService";
 import {
-    getDefaultProcessContext,
-    getDefaultRequestContent,
+    getDefaultProcessContext, IOriginRequestData,
     IProcessContext,
 } from "../http";
 import {IAction, IActionInfo} from "service/manage/rule";
 import HostResolveService from "service/intercept/HostResolveService";
 import tls from "tls";
+import {ClientService} from "service/infra/ClientService";
 
 const logger = log4js.getLogger('HttpProcessService')
 
@@ -24,6 +24,7 @@ export default class HttpProcessService {
     @Resource() private actionService: ActionService
     @Resource() private httpTrafficService: HttpTrafficService
     @Resource() private hostResolveService: HostResolveService
+    @Resource() private clientService: ClientService
 
     /**
      * 正常的http请求处理流程，
@@ -34,20 +35,26 @@ export default class HttpProcessService {
         let clientIp = ''; // 设备ip
         let deviceId = '';// 设备id
         let userId = '';// 设备绑定的用户id
-        let urlObj: URL;
         const socket = req.socket
         const socks5Id = (socket as any).socks5Id;
 
         const isTls = (socket as tls.TLSSocket).encrypted
 
-
+        /**
+         * 客户端原始请求href
+         */
+        let href: string
         if (socks5Id) { // socks5协议
             // 通过socks5信息 获取
             const info = this.hostResolveService.getSocks5ProxyConnectInfo(socks5Id)
             clientIp = info.targetPort
             deviceId = info.deviceId
             userId = info.userId
-            urlObj = new URL(`${isTls ? 'https' : 'http'}://${info.targetHost}:${info.targetPort}${req.url}`)
+            if ((isTls && info.targetPort == '443') || (!isTls && info.targetPort == '80')) {
+                href = `https://${info.targetHost}${req.url}`
+            } else {
+                href = `http://${info.targetHost}:${info.targetPort}${req.url}`
+            }
         } else {// http代理协议
             const socket = req.socket
             if ((socket as tls.TLSSocket).encrypted) {
@@ -55,40 +62,44 @@ export default class HttpProcessService {
                 clientIp = info.targetPort
                 deviceId = info.deviceId
                 userId = info.userId
-                urlObj = new URL(`https://${info.targetHost}:${info.targetPort}${req.url}`)
+                if (info.targetPort === '443') {
+                    href = `https://${info.targetHost}${req.url}`
+                } else {
+                    href = `https://${info.targetHost}:${info.targetPort}${req.url}`
+                }
             } else {
                 clientIp = socket.remoteAddress;
                 deviceId = clientIp; // 将设备的ip当做设备的id
                 userId = this.profileService.getUserIdBindDevice(deviceId);
-                urlObj = new URL(req.url);
-            }
-        }
-
-
-        let recordResponse: boolean = false
-        let requestId: number = -1;
-
-        const isWebUiRequest = this.appInfoService.isWebUiRequest(urlObj.hostname, urlObj.port)
-        if (!isWebUiRequest) {
-            const hasMonitor = this.httpTrafficService.hasMonitor(userId)
-            const isDeviceEnable = this.profileService.isDeviceEnableMonitor(deviceId);
-            if (hasMonitor && isDeviceEnable) {
-                requestId = this.httpTrafficService.getRequestId(userId, urlObj);
-                if (requestId > -1) {
-                    recordResponse = true;
-                }
+                // TODO 移除80端口号
+                href = req.url
             }
         }
 
         // 解析请求参数
         const context = getDefaultProcessContext({
-            req, res, urlObj, recordResponse,
+            req, res, href,
             clientIp, deviceId, userId
         })
 
+        let requestId: number = -1;
+
+        const isWebUiRequest = this.appInfoService.isWebUiRequest(context.originRequestData)
+        if (!isWebUiRequest) {
+            const hasMonitor = this.httpTrafficService.hasMonitor(userId)
+            const isDeviceEnable = this.profileService.isDeviceEnableMonitor(deviceId);
+            if (hasMonitor && isDeviceEnable) {
+                requestId = this.httpTrafficService.getRequestId(userId, context.originRequestData);
+                if (requestId > -1) {
+                    context.recordResponse = true;
+                }
+            }
+        }
+
+
         let willRunActionList: IActionInfo[] = []
         if (!isWebUiRequest) {
-            willRunActionList = this.actionService.getWillRunActionList(userId, deviceId, req.method, urlObj)
+            willRunActionList = this.actionService.getWillRunActionList(userId, deviceId, req.method, context.originRequestData)
         }
 
         if (context.recordResponse) {
@@ -97,10 +108,9 @@ export default class HttpProcessService {
                 clientIp,
                 deviceId,
                 id: requestId,
-                urlObj,
+                originRequestData: context.originRequestData,
                 method: req.method,
                 httpVersion: req.httpVersion,
-                headers: req.headers
             });
         }
 
@@ -115,8 +125,8 @@ export default class HttpProcessService {
             await this.httpTrafficService.actualRequest({
                 id: requestId,
                 userId,
-                requestData: context.requestRemoteData,
-                originBody: context.originRequestContent.body
+                requestData: context.actualRequestData,
+                originBody: context.originRequestData.body
             });
             await this.httpTrafficService.serverReturn({
                 userId,
@@ -131,13 +141,11 @@ export default class HttpProcessService {
      */
     async _runAtions(context: IProcessContext, willRunActionList: IActionInfo[]) {
         // 原始的请求头部
-        const {toClientResponse, userId, deviceId, clientIp, res, urlObj} = context
+        const {toClientResponse, userId, deviceId, clientIp, res, originRequestData} = context
 
-        let requestContent = getDefaultRequestContent()
-
-        let enableHost = this.profileService.enableHost(userId);
-        let enableFilter = this.profileService.enableHost(userId);
-        let enableRule = this.profileService.enableHost(userId);
+        const enableHost = this.profileService.enableHost(userId);
+        const enableFilter = this.profileService.enableHost(userId);
+        const enableRule = this.profileService.enableHost(userId);
 
         // 记录设备新信息
         toClientResponse.headers['proxy-userId'] = userId;
@@ -148,7 +156,7 @@ export default class HttpProcessService {
         toClientResponse.headers['proxy-filter-enable'] = enableFilter ? "true" : "false";
         toClientResponse.headers['proxy-rule-enable'] = enableRule ? "true" : "false";
 
-        let willRunActionListLength = willRunActionList.length;
+        const willRunActionListLength = willRunActionList.length;
 
         // 执行前置动作
         for (let i = 0; i < willRunActionListLength; i++) {
@@ -161,7 +169,7 @@ export default class HttpProcessService {
             // 对每一个规则 执行action
             let action = actionInfo.action;
             let rule = actionInfo.rule;
-            let actionHandler = Action.getAction(action.type);
+            let actionHandler = this.actionService.getAction(action.type);
 
             // 若action handle不存在，则处理下一个
             if (!actionHandler) {
@@ -178,13 +186,12 @@ export default class HttpProcessService {
 
             // 动作需要返回内容，但是当前却没有返回内容
             if (actionHandler.needResponse() && !toClientResponse.hasContent) {
-                await Action.getBypassAction().run(context, {last: false});
+                await this.actionService.getBypassAction().run(context, {last: false});
             }
             // 动作需要请求内容，但是当前却没有请求内容
-            if (actionHandler.needRequestContent() && !requestContent.hasContent) {
-                context.originRequestContent = await requestResponseUtils.getClientRequestContent(
-                    req,
-                    urlObj);
+            if (actionHandler.needRequestContent() && !originRequestData.hasContent) {
+                originRequestData.hasContent = true;
+                context.originRequestData.body = await this.clientService.getClientRequestBody(req);
             }
             // 运行action
             await actionHandler.run(context,
@@ -199,19 +206,19 @@ export default class HttpProcessService {
         if (!toClientResponse.sendedToClient && !res.writableEnded) {
             if (toClientResponse.hasContent) {
                 try {
-                    sendSpecificToClient({
+                    this.clientService.sendSpecificToClient({
                         res,
                         statusCode: toClientResponse.statusCode,
                         headers: toClientResponse.headers,
                         content: toClientResponse.body
                     });
                 } catch (err) {
-                    logger.error(err, urlObj, toClientResponse);
+                    logger.error(err, context, toClientResponse);
                 }
             } else {
                 // 自定请求
                 toClientResponse.headers['proxy-rule-add'] = 'bypass';
-                await Action.getBypassAction().run(context, {last: true});
+                await this.actionService.getBypassAction().run(context, {last: true});
             }
 
         }

@@ -30,9 +30,9 @@ export interface IDeviceInfo {
 }
 export interface IProxyConfig {
     hasExternalProxy: boolean,
-    proxyType: 'socks5' | 'http',
-    proxyIp: string,
-    proxyPort: number
+    proxyType?: 'socks5' | 'http',
+    proxyIp?: string,
+    proxyPort?: number
 }
 
 export const defaultProfile: IUserProfile = {

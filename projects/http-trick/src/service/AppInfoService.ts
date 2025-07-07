@@ -1,16 +1,23 @@
 import {Service} from "di/annotation";
 import {IAppInfo} from "./app-info";
 import path from "path";
-import StateBase from "../utils/StateBase";
+import assign from "lodash/assign";
 import ip from 'ip';
+import EventEmitter from "events";
+import {IOriginRequestData} from "service/intercept/http";
 
 @Service()
-export default class AppInfoService extends StateBase<IAppInfo> {
+export default class AppInfoService extends EventEmitter {
     private appDir: string
     private proxyDataDir: string // 本地存放数据的目录
+    private appInfo: IAppInfo
 
     constructor() {
-        super({
+        super();
+        const userHome = (process.env.HOME || process.env.USERPROFILE) as string;
+        this.proxyDataDir = path.join(userHome, ".http-trick");
+        this.appDir = path.join(__dirname, "../../");
+        this.appInfo = {
             appName: 'Http-Trick',
             single: true,
             httpProxyPort: 0,
@@ -22,20 +29,17 @@ export default class AppInfoService extends StateBase<IAppInfo> {
             startSocks5: true,
             startDns: false,
             pcIp: "",
-        })
-        const userHome = (process.env.HOME || process.env.USERPROFILE) as string;
-        this.proxyDataDir = path.join(userHome, ".http-trick");
-        this.appDir = path.join(__dirname, "../../");
+        }
     }
 
     async start() {
-        this.setState({
+        this.setAppInfo({
             pcIp: ip.address()
         })
     }
 
     getAppName() {
-        return this.getState().appName;
+        return this.appInfo.appName;
     }
 
     getAppDir() {
@@ -43,12 +47,12 @@ export default class AppInfoService extends StateBase<IAppInfo> {
     }
 
     setAppInfo(info: Partial<IAppInfo>) {
-        this.setState(info)
+        assign(this.appInfo, info);
+        this.emit('data-change', this.appInfo);
     }
 
     isSingle(): boolean {
-        const state = this.getState()
-        return state.single
+        return this.appInfo.single
     }
 
     getProxyDataDir() {
@@ -56,31 +60,32 @@ export default class AppInfoService extends StateBase<IAppInfo> {
     }
 
     getHttpProxyPort() {
-        return this.getState().httpProxyPort;
+        return this.appInfo.httpProxyPort;
     }
 
     getHttpsProxyPort() {
-        return this.getState().httpsProxyPort;
+        return this.appInfo.httpsProxyPort;
     }
 
     setHttpsProxyPort(httpsProxyPort: number) {
-        this.setState({
+        this.setAppInfo({
             httpsProxyPort: httpsProxyPort
         });
     }
 
     getPcIp() {
-        return this.getState().pcIp;
+        return this.appInfo.pcIp;
     }
 
     getAppInfo() {
-        return this.getState();
+        return this.appInfo;
     }
 
     // 是否是webui请求
-    isWebUiRequest(hostname: string, port: number | string) {
-        return (hostname == '127.0.0.1' || hostname == this.getState().pcIp)
-            && port == this.getState().webUiPort;
+    isWebUiRequest(originRequestData: IOriginRequestData): boolean {
+        const {hostname, port} = originRequestData
+        return (hostname == '127.0.0.1' || hostname == this.appInfo.pcIp)
+            && +port == this.appInfo.webUiPort;
     }
 
     printRuntimeInfo() {
@@ -96,7 +101,7 @@ export default class AppInfoService extends StateBase<IAppInfo> {
             startSocks5,
             startDns,
             pcIp,
-        } = this.getState();
+        } = this.appInfo;
         startHttpProxy && console.log(`Http Proxy Port: ${httpProxyPort}`);
         startSocks5 && console.log(`Socks5 Proxy Port: ${socks5ProxyPort}`);
         startDns && console.log(`DNS Port: ${dnsPort}`);

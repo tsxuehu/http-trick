@@ -1,8 +1,8 @@
-import BaseAction from "service/intercept/action/BaseAction";
 import {Service} from "di/annotation";
 import {ActionRunExtraInfo, IProcessContext} from "service/intercept/http";
 import lowerCase from "lodash/lowerCase";
 import cookie from "cookie";
+import {BaseAction} from "service/action";
 
 
 @Service()

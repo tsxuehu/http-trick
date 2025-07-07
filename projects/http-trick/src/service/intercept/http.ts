@@ -1,6 +1,9 @@
 import {IncomingMessage, ServerResponse} from "http";
 import url from 'url'
+import util from 'util'
 import {IAction, IRule} from "service/manage/rule";
+import cookie from "cookie";
+import {cookiesToStr} from "../../utils/cookie-2-str";
 
 /**
  * http请求处理上下文
@@ -8,22 +11,19 @@ import {IAction, IRule} from "service/manage/rule";
 export interface IProcessContext {
     req: IncomingMessage
     res: ServerResponse
-    recordResponse: boolean //
-    urlObj: url.URL
     clientIp: string
     deviceId: string
     userId: string
 
-    originRequestContent: IOriginRequestData // 原始请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
+    recordResponse: boolean //
+
+    originRequestData: IOriginRequestData // 原始请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
 
     additionalRequestHeaders: Record<string, string> // 请求头
-    actualRequestHeaders: Record<string, string>
     additionalRequestQuery: Record<string, string>
-    actualRequestQuery: Record<string, string>
     additionalRequestCookies: Record<string, string>// cookie
-    actualRequestCookies: Record<string, string>
 
-    requestRemoteData: IRequestRemoteData// 发送请求时使用的数据
+    actualRequestData: IActualRequestData// 发送请求时使用的数据
 
     toClientResponse: IToClientResponse
 }
@@ -35,22 +35,37 @@ export interface ActionRunExtraInfo {
 }
 
 export interface IOriginRequestData {
-    hasContent: false,
-    method: '',
-    protocol: '',
-    hostname: '',
-    path: '',
-    query: {}, // query对象
-    port: '',
-    headers: {},
-    body: ''
+    hasContent: boolean
+    href: string
+    method: string
+    protocol: string
+    hostname: string
+    path: string
+    pathname: string
+    port: string
+    headers: Record<string, any>
+    body?: string
+    query: Record<string, string> // query对象
+    cookie: Record<string, string>
+}
+
+export interface IActualRequestData {
+    originHostname?: string
+    method?: string
+    protocol?: string
+    hostname?: string // ip地址
+    port?: string
+    path?: string
+    headers?: Record<string, string>
+    body?: string
+    timeout?: number
 }
 
 export interface IToClientResponse {
     hasContent: boolean// 是否存在要发送给浏览器的内容
     sendedToClient: boolean// 已经向浏览器发送响应内容
     stopRunAction: boolean // 停止运行action
-    remoteIp: ''// 远程服务器器ip
+    remoteIp: string// 远程服务器器ip
     receiveRequestTime: number // 接收到请求的时间
     dnsResolveBeginTime: number// dns解析开始时间
     remoteRequestBeginTime: number// 请求开始时间
@@ -62,70 +77,50 @@ export interface IToClientResponse {
     body: string// 要发送给浏览器的body
 }
 
-export interface IRequestRemoteData {
-    method: ''
-    protocol: ''
-    port: ''
-    path: ''
-    headers: {}
-    body: ''
-}
-
-export function getDefaultRequestContent(): IOriginRequestData {
-    return {
-        hasContent: false,
-        method: '',
-        protocol: '',
-        hostname: '',
-        path: '',
-        query: {}, // query对象
-        port: '',
-        headers: {},
-        body: ''
-    }
-}
 
 export interface IOptions {
     req: IncomingMessage
     res: ServerResponse
-    recordResponse: boolean //
-    urlObj: url.URL
+    href: string
     clientIp: string
     deviceId: string
     userId: string
 }
 
 export function getDefaultProcessContext(options: IOptions): IProcessContext {
+    const {req, href} = options;
+    const urlObj = new URL(href);
     // 额外发送的头部
     let additionalRequestHeaders = {};
-    let actualRequestHeaders = {}; // 实际发出的请求的header
     // 额外发送的query
     let additionalRequestQuery = {};
-    let actualRequestQuery = {}; // 实际发出的请求的query
     // 额外发送的cookie
     let additionalRequestCookies = {};
-    let actualRequestCookies = {}; // 实际发出的请求的cookies
     const originRequestContent: IOriginRequestData = {
+        href,
         hasContent: false,
-        method: '',
-        protocol: '',
-        hostname: '',
-        path: '',
+        method: req.method,
+        protocol: urlObj.protocol,
+        hostname: urlObj.hostname,
+        path: `${urlObj.pathname}${urlObj.search}`,// 需要计算
+        port: urlObj.port ? urlObj.port : (urlObj.protocol === "https:" ? '443' : '80'),
+        headers: {...req.headers},
+        // 计算得到的
+        pathname: urlObj.pathname,
         query: {}, // query对象
-        port: '',
-        headers: {},
-        body: ''
+        cookie: {},
     }
-    const requestRemoteData: IRequestRemoteData = {// 发送远端请求时使用的数据
-        method: '',
-        protocol: '',
-        port: '',
-        path: '',
-        headers: {},
-        body: ''
-    };
-    const toClientResponse: IToClientResponse = {
+    const requestRemoteData: IActualRequestData = {};// 发送远端请求时使用的数据
 
+    // 初始化 originRequestContent
+    const params = new URLSearchParams(urlObj.search)
+    for (const [key, value] of params.entries()) {
+        originRequestContent.query[key] = value;
+    }
+    const originCookies = cookie.parse(req.headers.cookie || "");
+    Object.assign(originRequestContent.cookie, originCookies, additionalRequestCookies);
+
+    const toClientResponse: IToClientResponse = {
         hasContent: false,// 是否存在要发送给浏览器的内容
         sendedToClient: false, // 已经向浏览器发送响应内容
         stopRunAction: false, // 停止运行action
@@ -144,21 +139,52 @@ export function getDefaultProcessContext(options: IOptions): IProcessContext {
     return {
         req: options.req,
         res: options.res,
-        recordResponse: options.recordResponse,
-        urlObj: options.urlObj,
+        recordResponse: false,
         clientIp: options.clientIp,
         deviceId: options.deviceId,
         userId: options.userId,
 
-        originRequestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
+        originRequestData: originRequestContent, // 请求内容 , 动作使用这个参数 需要让needRequestContent函数返回true
         additionalRequestHeaders, // 请求头
-        actualRequestHeaders,
         additionalRequestQuery,
-        actualRequestQuery,
         additionalRequestCookies, // cookie
-        actualRequestCookies,
-        requestRemoteData,
+        actualRequestData: requestRemoteData,
         toClientResponse, //响应内容,  动作使用这个参数 需要让needResponse函数返回true
     }
 }
 
+export function generateHeadersInActualRequestData(context: IProcessContext) {
+    const {
+        originRequestData,
+        additionalRequestCookies,
+        additionalRequestHeaders,
+        actualRequestData
+    } = context;
+    // 生成header
+    actualRequestData.headers = {}
+    Object.assign(actualRequestData.headers, originRequestData.headers);
+    Object.assign(actualRequestData.headers, additionalRequestHeaders);
+    // 处理cookie
+    if (Object.entries(additionalRequestCookies).length > 0) {
+        const cookieObj = {}
+        Object.assign(cookieObj, originRequestData.cookie);
+        Object.assign(cookieObj, additionalRequestCookies);
+        actualRequestData.headers.cookie = cookiesToStr(cookieObj);
+    } else {
+        actualRequestData.headers.cookie = originRequestData.headers.cookie || "";
+    }
+}
+
+export function getTargetUrl(context: IProcessContext): string {
+    const {protocol, originHostname, port, path} = context.actualRequestData
+    return protocol + '//' + originHostname + (port ? ':' + port : '') + path
+}
+
+export function setError(toClientResponse: IToClientResponse, msg: string = "", error?: Error) {
+    toClientResponse.statusCode = 600;
+    toClientResponse.hasContent = true;
+    toClientResponse.stopRunAction = true;
+    // pipe类型的响应 sendedToClient为true
+    toClientResponse.sendedToClient = false;
+    toClientResponse.body = msg + "\n\n" + util.inspect(toClientResponse.headers) + "\n\n" + (error && error.message || "") + "\n\n" + error && util.inspect(error);
+};

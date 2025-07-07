@@ -1,4 +1,4 @@
-import BaseAction from "service/intercept/action/BaseAction";
+import {BaseAction} from "service/action";
 import {Service} from "di/annotation";
 import {ActionRunExtraInfo, IProcessContext} from "service/intercept/http";
 

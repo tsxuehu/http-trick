@@ -1,7 +1,7 @@
-import BaseAction from "service/intercept/action/BaseAction";
 import {Resource, Service} from "di/annotation";
 import {ActionRunExtraInfo, IProcessContext} from "service/intercept/http";
 import MockDataService from "service/manage/MockDataService";
+import {BaseAction} from "service/action";
 
 
 @Service()

@@ -5,7 +5,7 @@ import find from "lodash/find";
 import net from "net";
 import DnsService from "service/infra/DnsService";
 import {IConnectInfo} from "service/intercept/host-resolve";
-import {IncomingMessage} from "http";
+import {IProcessContext} from "service/intercept/http";
 
 @Service()
 export default class HostResolveService {
@@ -53,6 +53,17 @@ export default class HostResolveService {
     async resolveHostWithoutProfile(hostname: string): Promise<string> {
         const ip = await this.dnsService.resolveIp(hostname);
         return ip;
+    }
+
+    async resolveHostAndSetInfoToContext(hostname: string, context: IProcessContext) {
+        const {userId, deviceId, actualRequestData, toClientResponse} = context;
+        toClientResponse.dnsResolveBeginTime = Date.now();
+        const resolved = await this.resolveHostWithWay(userId, deviceId, hostname);
+        actualRequestData.originHostname = hostname
+        actualRequestData.hostname = resolved.ip
+        toClientResponse.headers['proxy-remote-ip'] = resolved.ip;
+        toClientResponse.headers['proxy-resolve-way'] = resolved.way;
+        toClientResponse.remoteIp = resolved.ip;
     }
 
     async resolveHostWithWay(userId: string, deviceId: string, hostname: string) {

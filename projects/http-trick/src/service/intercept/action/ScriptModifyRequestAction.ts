@@ -1,7 +1,7 @@
-import BaseAction from "service/intercept/action/BaseAction";
 import {Service} from "di/annotation";
 import {ActionRunExtraInfo, IProcessContext} from "service/intercept/http";
 import vm from "vm";
+import {BaseAction} from "service/action";
 
 
 @Service()
@@ -21,24 +21,22 @@ export class ScriptModifyRequestAction extends BaseAction {
     async run(context: IProcessContext, extraInfo: ActionRunExtraInfo) {
         const {
             clientIp,
-            urlObj,
-            originRequestContent,
+            originRequestData,
             additionalRequestQuery,
             additionalRequestHeaders,
             additionalRequestCookies,
-            requestRemoteData,
+            actualRequestData,
             toClientResponse
         } = context;
         const {action} = extraInfo;
 
         const sandbox = {
             clientIp,
-            urlObj,
-            originRequestContent, // 请求内容
+            originRequestContent: originRequestData, // 请求内容
             additionalRequestHeaders,// 请求附加头
             additionalRequestQuery,
             additionalRequestCookies,// 请求附加cookie
-            requestRemoteData,
+            requestRemoteData: actualRequestData,
             toClientResponse, // 记录返回给浏览器的信息
             console
         };

@@ -237,7 +237,7 @@ export default class ProfileService extends EventEmitter {
         }
     }
 
-    getExternalProxy(userId: string, deviceId: string) {
+    getExternalProxy(userId: string, deviceId: string): IProxyConfig {
         const device = this.getDevice(deviceId);
         let proxy = this.getExternalHttpProxyByDeviceInfo(device);
         if (proxy) return proxy;

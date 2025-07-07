@@ -7,6 +7,18 @@ import filter from "lodash/filter";
 import lowerCase from "lodash/lowerCase";
 import {IAction, IActionInfo, IRule, PassRule} from "service/manage/rule";
 import forEach from "lodash/forEach";
+import {IOriginRequestData} from "service/intercept/http";
+import {BaseAction, EAction} from "service/action";
+import {AddQueryAction} from "service/intercept/action/AddQueryAction";
+import {AddRequestCookieAction} from "service/intercept/action/AddRequestCookieAction";
+import {AddRequestHeaderAction} from "service/intercept/action/AddRequestHeaderAction";
+import {AddResponseHeaderAction} from "service/intercept/action/AddResponseHeaderAction";
+import {MockDataAction} from "service/intercept/action/MockDataAction";
+import {ModifyResponseAction} from "service/intercept/action/ModifyResponseAction";
+import {BypassAction} from "service/intercept/action/BypassAction";
+import {RedirectAction} from "service/intercept/action/RedirectAction";
+import {ScriptModifyRequestAction} from "service/intercept/action/ScriptModifyRequestAction";
+import {ScriptModifyResponseAction} from "service/intercept/action/ScriptModifyResponseAction";
 
 /**
  *
@@ -17,10 +29,51 @@ export default class ActionService {
     @Resource() private filterService: FilterService
     @Resource() private ruleDataService: RuleDataService
 
+    @Resource() private addQueryAction: AddQueryAction
+    @Resource() private addRequestCookieAction: AddRequestCookieAction
+    @Resource() private addRequestHeaderAction: AddRequestHeaderAction
+    @Resource() private addResponseHeaderAction: AddResponseHeaderAction
+    @Resource() private bypassAction: BypassAction
+    @Resource() private mockDataAction: MockDataAction
+    @Resource() private modifyResponseAction: ModifyResponseAction
+    @Resource() private redirectAction: RedirectAction
+    @Resource() private scriptModifyRequestAction: ScriptModifyRequestAction
+    @Resource() private scriptModifyResponseAction: ScriptModifyResponseAction
+
+
+    private actionMap: Record<string, BaseAction> = {}
+
+    async start() {
+        this.actionMap = {
+            [EAction.addQuery]: this.addQueryAction,
+            [EAction.addRequestCookie]: this.addRequestCookieAction,
+            [EAction.addRequestHeader]: this.addRequestHeaderAction,
+            [EAction.addResponseHeader]: this.addResponseHeaderAction,
+            [EAction.bypass]: this.bypassAction,
+            [EAction.mockData]: this.mockDataAction,
+            [EAction.modifyResponse]: this.modifyResponseAction,
+            [EAction.redirect]: this.redirectAction,
+            [EAction.scriptModifyRequest]: this.scriptModifyRequestAction,
+            [EAction.scriptModifyResponse]: this.scriptModifyResponseAction,
+        }
+    }
+
+    getAction(actionName: string): BaseAction {
+        return this.actionMap[actionName];
+    }
+
+    getBypassAction() {
+        return this.bypassAction;
+    }
+
+    async getActionMap() {
+        return this.actionMap
+    }
+
     // 合并所有匹配到的过滤器规则的action列表、请求匹配的规则的 action 列表
     // 动作分为请求前和请求后两种类型, 合并后的顺序，前置过滤器动作 -> 请求匹配到的动作 -> 后置过滤器的动作
     // 合并后的数组 item 格式 {action, rule}， action: 要执行的动作，rule: 动作所属的rule
-    getWillRunActionList(userId: string, deviceId: string, method: string, urlObj: url.URL): IActionInfo[] {
+    getWillRunActionList(userId: string, deviceId: string, method: string, originRequestData: IOriginRequestData): IActionInfo[] {
         const enableFilter = this.profileService.enableFilter(userId);
         const enableRule = this.profileService.enableRule(userId);
         let fRuleLists: IRule[] = []
@@ -28,7 +81,7 @@ export default class ActionService {
             const allRuleLists = this.filterService.getFilterRuleList(userId);
             fRuleLists = filter(allRuleLists, rule => {
                 return rule.checked && this._isMethodMatch(method, rule.method)
-                    && this._isUrlMatch(urlObj.href, rule.match)
+                    && this._isUrlMatch(originRequestData.href, rule.match)
             })
         }
         let candidateRule: IRule = PassRule;
@@ -37,7 +90,7 @@ export default class ActionService {
             for (let i = 0; i < inusingRules.length; i++) {
                 let rule = inusingRules[i];
                 // 捕获规则
-                if (this._isUrlMatch(urlObj.href, rule.match)
+                if (this._isUrlMatch(originRequestData.href, rule.match)
                     && this._isMethodMatch(method, rule.method)) {
                     candidateRule = rule;
                     break
@@ -56,7 +109,7 @@ export default class ActionService {
 
         forEach(filterRules, rule => {
             forEach(rule.actionList, action => {
-                let actionHandler = Action.getAction(action.type);
+                let actionHandler = this.actionMap[action.type];
                 if (actionHandler.needResponse()) {
                     afterFilterActionsInfo.push({
                         action: action, // 动作
