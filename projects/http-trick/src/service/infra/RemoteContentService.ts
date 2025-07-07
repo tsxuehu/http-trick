@@ -2,11 +2,14 @@ import {Service} from "di/annotation";
 import {IActualRequestData, IToClientResponse} from "service/intercept/http";
 import {IProxyConfig} from "service/manage/profile";
 import {IncomingMessage, ServerResponse} from "http";
-
+import http from "http"
+import https from "https"
+import Future from "../../lib/concurrent/Future";
 
 export interface IPipeParam {
     req: IncomingMessage
     res: ServerResponse
+    recordResponse: boolean
     actualRequestData: IActualRequestData
     toClientResponse: IToClientResponse
     proxyInfo: IProxyConfig
@@ -26,17 +29,62 @@ export default class RemoteContentService {
      * 将请求远程的响应内容直接返回给浏览器
      */
     async pipe(param: IPipeParam) {
+        const {req, res, recordResponse, toClientResponse, actualRequestData} = param;
+        const requestFuture = new Future<IncomingMessage>()
+        toClientResponse.remoteRequestBeginTime = Date.now();
+
+
+        const client = actualRequestData.protocol === 'https:' ? https : http;
+        const remoteReq = client.request({
+            method: actualRequestData.method,
+            port: actualRequestData.port,
+            path: actualRequestData.path,
+            hostname: actualRequestData.hostname,
+            headers: actualRequestData.headers,
+            timeout: actualRequestData.timeout,
+            rejectUnauthorized: false,
+            setHost: false,
+            agent: undefined
+        }, res => {
+            requestFuture.resolve(res)
+        });
+        remoteReq.on('error', (err) => {
+            requestFuture.reject(err);
+        });
+        remoteReq.on('timeout', () => {
+            requestFuture.reject(new Error(`timeout ${actualRequestData.originHostname} ${timeout}`));
+            remoteReq.destroy();
+        });
+        if (actualRequestData.body) {
+            remoteReq.end(actualRequestData.body);
+        } else {
+            if (recordResponse) {
+
+            } else {
+
+            }
+            req.pipe(remoteReq);
+        }
+
+        const remoteRes = await requestFuture.get();
+
+        Object.assign(toClientResponse.headers, remoteRes.headers)
+
+        res.writeHead(remoteRes.statusCode, toClientResponse.headers);
+
+
+
+
+
         const {
             req1, res, recordResponse,
-            method, protocol, ip, hostname, path, port, headers, timeout, toClientResponse,
+            method, protocol, ip, hostname, path, port, headers, timeout,
 
         } = req
         // http.request 解析dns时，偶尔会出错
         // pipe流 获取远程数据 并做记录
         try {
-            if (recordResponse) {
-                toClientResponse.remoteRequestBeginTime = Date.now();
-            }
+
             let wrapperReq = req;
             let streamMonitor;
             if (recordResponse) {
@@ -261,4 +309,6 @@ export default class RemoteContentService {
         });
         return proxyRequestPromise;
     }
+
+
 }
