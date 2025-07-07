@@ -5,6 +5,9 @@ import {IncomingMessage, ServerResponse} from "http";
 import http from "http"
 import https from "https"
 import Future from "../../lib/concurrent/Future";
+import StreamMonitor from "../../utils/stream-monitor";
+import stream from 'stream'
+import zlib from 'zlib'
 
 export interface IPipeParam {
     req: IncomingMessage
@@ -17,6 +20,7 @@ export interface IPipeParam {
 
 export interface ICacheParam {
     req: IncomingMessage
+    recordResponse: boolean
     actualRequestData: IActualRequestData
     toClientResponse: IToClientResponse
     proxyInfo: IProxyConfig
@@ -29,11 +33,85 @@ export default class RemoteContentService {
      * 将请求远程的响应内容直接返回给浏览器
      */
     async pipe(param: IPipeParam) {
-        const {req, res, recordResponse, toClientResponse, actualRequestData} = param;
-        const requestFuture = new Future<IncomingMessage>()
+        const {req, res, recordResponse, toClientResponse, actualRequestData, proxyInfo} = param;
         toClientResponse.remoteRequestBeginTime = Date.now();
 
+        const {
+            reqStreamPromise,
+            reqMonitor,
+            remoteRes
+        } = await this._request(req, recordResponse, toClientResponse, proxyInfo)
 
+        toClientResponse.remoteResponseStartTime = Date.now();
+
+        await reqStreamPromise;
+
+        toClientResponse.statusCode = remoteRes.statusCode;
+        Object.assign(toClientResponse.headers, remoteRes.headers)
+        res.writeHead(remoteRes.statusCode, toClientResponse.headers);
+
+        let resStreamPromise: Promise<void>
+        const resMonitor = new StreamMonitor()
+        if (recordResponse) {
+            resStreamPromise = stream.promises.pipeline([remoteRes, resMonitor, res])
+        } else {
+            resStreamPromise = stream.promises.pipeline([remoteRes, res])
+        }
+        toClientResponse.sendedToClient = true;
+
+        if (recordResponse) {
+            await Promise.all([reqStreamPromise, resStreamPromise]);
+
+            toClientResponse.remoteResponseEndTime = Date.now();
+            toClientResponse.hasContent = true;
+            const resBuffer = resMonitor.getAllDataSync()
+            toClientResponse.body = '' // 解压
+            actualRequestData.body = '' //
+        }
+    }
+
+    /**
+     * 将请求远程的响应内容
+     */
+    async cache(param: ICacheParam) {
+        const {req, recordResponse, toClientResponse, actualRequestData, proxyInfo} = param;
+
+
+        toClientResponse.remoteRequestBeginTime = Date.now();
+
+        const {
+            reqStreamPromise,
+            reqMonitor,
+            remoteRes
+        } = await this._request(req, recordResponse, toClientResponse, proxyInfo)
+
+        toClientResponse.remoteResponseStartTime = Date.now();
+
+        toClientResponse.statusCode = remoteRes.statusCode;
+        Object.assign(toClientResponse.headers, remoteRes.headers)
+        delete toClientResponse.headers['content-length'];
+        delete toClientResponse.headers['content-encoding'];
+        delete toClientResponse.headers['transfer-encoding'];
+        // 获取返回流数据
+        const contentEncoding = toClientResponse.headers["content-encoding"]
+        toClientResponse.body = '' // 解压
+        toClientResponse.hasContent = true;
+        toClientResponse.remoteResponseEndTime = Date.now();
+
+        if (recordResponse && !actualRequestData.body) {
+            const reqBuffer = reqMonitor.getAllDataSync()
+            actualRequestData.body = reqBuffer.toString()
+        }
+    }
+
+    private async _request(req: IncomingMessage,
+                           recordResponse: boolean,
+                           actualRequestData: IActualRequestData, proxyInfo: IProxyConfig): Promise<{
+        reqStreamPromise: Promise<void>
+        reqMonitor: StreamMonitor
+        remoteRes: IncomingMessage
+    }> {
+        const requestFuture = new Future<IncomingMessage>();
         const client = actualRequestData.protocol === 'https:' ? https : http;
         const remoteReq = client.request({
             method: actualRequestData.method,
@@ -52,263 +130,52 @@ export default class RemoteContentService {
             requestFuture.reject(err);
         });
         remoteReq.on('timeout', () => {
-            requestFuture.reject(new Error(`timeout ${actualRequestData.originHostname} ${timeout}`));
+            requestFuture.reject(new Error(`timeout ${actualRequestData.originHostname}`));
             remoteReq.destroy();
         });
+        const reqMonitor = new StreamMonitor()
+        let reqStreamPromise: Promise<void>
         if (actualRequestData.body) {
             remoteReq.end(actualRequestData.body);
         } else {
             if (recordResponse) {
-
+                reqStreamPromise = stream.promises.pipeline([req, reqMonitor, remoteReq])
             } else {
-
+                reqStreamPromise = stream.promises.pipeline([req, remoteReq])
             }
-            req.pipe(remoteReq);
         }
-
         const remoteRes = await requestFuture.get();
 
-        Object.assign(toClientResponse.headers, remoteRes.headers)
-
-        res.writeHead(remoteRes.statusCode, toClientResponse.headers);
-
-
-
-
-
-        const {
-            req1, res, recordResponse,
-            method, protocol, ip, hostname, path, port, headers, timeout,
-
-        } = req
-        // http.request 解析dns时，偶尔会出错
-        // pipe流 获取远程数据 并做记录
-        try {
-
-            let wrapperReq = req;
-            let streamMonitor;
-            if (recordResponse) {
-                streamMonitor = new StreamMonitor();
-                wrapperReq = req.pipe(streamMonitor);
-            }
-            let proxyResponsePromise = this._requestServer({
-                req: wrapperReq, ip, hostname,
-                protocol, method, port, path,
-                headers, timeout,
-                hasExternalProxy, proxyType, proxyIp, proxyPort
-            });
-            let proxyResponse = await proxyResponsePromise;
-            // 记录日志
-            let wrappedStream;
-            let resMonitorStream;
-            if (recordResponse) {
-                const {headers, monitoredStream} = requestResponseUtils.monitorResponseStream(proxyResponse);
-                toClientResponse.headers = _.assign({}, headers, toClientResponse.headers);
-                wrappedStream = monitoredStream
-                resMonitorStream = monitoredStream
-            } else {
-                toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
-                wrappedStream = proxyResponse
-            }
-
-            res.writeHead(proxyResponse.statusCode, toClientResponse.headers);
-            // 向服务器返回发送给浏览器
-            wrappedStream.pipe(res);
-            toClientResponse.sendedToClient = true;
-
-            if (recordResponse) {
-                toClientResponse.remoteResponseStartTime = Date.now();
-                toClientResponse.statusCode = proxyResponse.statusCode;
-                let reqData = await streamMonitor.getAllDataAsync();
-                // http://cpro.baidustatic.com:80/cpro/ui/c.js 这个资源获取返回内容会出错
-                let resData = await resMonitorStream.getAllDataAsync();
-                toClientResponse.remoteResponseEndTime = Date.now();
-                toClientResponse.body = resData;
-                toClientResponse.hasContent = true;
-                toClientResponse.requestData = {
-                    method,
-                    protocol,
-                    port,
-                    path,
-                    headers,
-                    body: reqData
-                };
-            }
-        } catch (e) {
-            let href = `${protocol}//${hostname}:${port}${path}`;
-            toClientResponseUtils.setError(toClientResponse, href, e);
+        return {
+            reqStreamPromise,
+            reqMonitor,
+            remoteRes,
         }
     }
 
-    /**
-     * 将请求远程的响应内容
-     */
-    async cache(param: ICacheParam) {
-        const {
-            req, res, recordResponse, method,
-            protocol, ip, hostname, path, port,
-            headers, toClientResponse, timeout,
-
-        } = req
-        try {
-            toClientResponse.remoteRequestBeginTime = Date.now();
-
-            let wrapperReq = req;
-            let streamMonitor;
-            if (recordResponse) {
-                streamMonitor = new StreamMonitor();
-                wrapperReq = req.pipe(streamMonitor);
+    // res.headers["content-encoding"]
+    private async _unCompress(buf: Buffer, contentEncoding: string): Promise<string> {
+        const future = new Future<string>()
+        const unCompressCb = (err: Error, decompressedBuffer: Buffer) => {
+            if (err) {
+                future.reject(err);
+                return;
             }
-
-            let proxyResponsePromise = await this._requestServer({
-                req: wrapperReq, ip, hostname,
-                protocol, method, port, path,
-                headers, timeout,
-                hasExternalProxy, proxyType, proxyIp, proxyPort
-            });
-
-            let proxyResponse = await proxyResponsePromise;
-
-            toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
-            delete toClientResponse.headers['content-length'];
-            delete toClientResponse.headers['content-encoding'];
-            delete toClientResponse.headers['transfer-encoding'];
-
-            toClientResponse.remoteResponseStartTime = Date.now();
-            toClientResponse.statusCode = proxyResponse.statusCode;
-            let resData = await requestResponseUtils.getServerResponseBody(proxyResponse);
-            toClientResponse.remoteResponseEndTime = Date.now();
-            toClientResponse.body = resData;
-            toClientResponse.hasContent = true;
-
-            if (recordResponse) {
-                let reqData = await streamMonitor.getAllDataAsync();
-                toClientResponse.requestData = {
-                    method,
-                    protocol,
-                    port,
-                    path,
-                    headers,
-                    body: reqData
-                };
-            }
-
-        } catch (e) {
-            let href = `${protocol}//${hostname}:${port}${path}`;
-            toClientResponseUtils.setError(toClientResponse, href, e);
+            future.resolve(decompressedBuffer.toString())
         }
-    }
-
-    /**
-     * 根据RequestContent
-     */
-    async cacheFromRequestContent({
-                                      requestContent, recordResponse, toClientResponse, timeout,
-
-                                  }) {
-        let {protocol, hostname, ip, pathname, port, query, method, headers, body} = requestContent;
-        try {
-            toClientResponse.remoteRequestBeginTime = Date.now();
-            let path = `${pathname}?${queryString.stringify(query)}`;
-            let proxyResponse = await this._requestServer({
-                body: requestContent.body,
-                protocol, method, port, path,
-                ip, hostname, headers, timeout,
-                hasExternalProxy, proxyType, proxyIp, proxyPort
-            });
-
-            toClientResponse.headers = _.assign({}, proxyResponse.headers, toClientResponse.headers);
-            delete toClientResponse.headers['content-length'];
-            delete toClientResponse.headers['content-encoding'];
-            delete toClientResponse.headers['transfer-encoding'];
-
-            toClientResponse.remoteResponseStartTime = Date.now();
-
-            toClientResponse.statusCode = proxyResponse.statusCode;
-            let resData = await requestResponseUtils.getServerResponseBody(proxyResponse);
-            toClientResponse.remoteResponseEndTime = Date.now();
-            toClientResponse.body = resData;
-            toClientResponse.hasContent = true;
-            if (recordResponse) {
-                toClientResponse.requestData = {
-                    method,
-                    protocol,
-                    port,
-                    path,
-                    headers,
-                    body: requestContent.body
-                };
-            }
-        } catch (e) {
-            let href = `${protocol}//${hostname}:${port}${pathname}?${queryString.stringify(query)}`;
-            toClientResponseUtils.setError(toClientResponse, href, e);
+        switch (contentEncoding) {
+            case "gzip":
+                zlib.gunzip(buf, unCompressCb);
+                break;
+            case "deflate":
+                zlib.inflate(buf, unCompressCb);
+                break;
+            case "br":
+                zlib.brotliDecompress(buf, unCompressCb);
+                break;
+            default:
+                future.resolve(buf.toString());
         }
+        return await future.get();
     }
-
-    // 请求远程服务器，并将响应流通过promise的方式返回
-    _requestServer({
-                       req, body, protocol, method, ip, hostname, port, path, headers, timeout = 10000,
-
-                   }) {
-        let proxyRequestPromise = new Promise((resolve, reject) => {
-            let requestPath = '';
-            let requestProtocol = '';
-            let requestPort = '';
-            let requestHostname = '';
-            let agent = null;
-            if (!hasExternalProxy) {
-                requestPath = path;
-                requestProtocol = protocol;
-                requestPort = port;
-                requestHostname = ip || hostname;
-            } else if (proxyType == 'http') {
-                requestPath = `${protocol}//${ip}:${port}${path}`;
-                requestProtocol = 'http:';
-                requestPort = proxyPort;
-                requestHostname = proxyIp;
-            } else if (proxyType == 'socks5') {
-                requestPath = path;
-                requestProtocol = protocol;
-                requestPort = port;
-                requestHostname = hostname;
-                agent = new SocksProxyAgent({
-                    protocol: 'socks:',
-                    hostname: proxyIp,
-                    port: +proxyPort
-                });
-            }
-            let client = requestProtocol === 'https:' ? https : http;
-            let proxyRequest = client.request({
-                protocol: requestProtocol,
-                method,
-                port: requestPort,
-                path: requestPath,
-                hostname: requestHostname,
-                desIp: ip,
-                headers,
-                timeout,
-                rejectUnauthorized: false,
-                setHost: false,
-                agent
-            }, (proxyResponse) => {
-                // 有响应时返回promise
-                resolve(proxyResponse);
-            });
-            proxyRequest.on('error', (e) => {
-                reject(e);
-            });
-            proxyRequest.on('timeout', () => {
-                reject(new Error(`timeout ${requestHostname} ${timeout}`));
-                proxyRequest.destroy();
-            });
-            if (req) {
-                req.pipe(proxyRequest);
-            } else {
-                proxyRequest.end(body);
-            }
-        });
-        return proxyRequestPromise;
-    }
-
-
 }

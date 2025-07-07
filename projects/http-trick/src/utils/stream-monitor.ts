@@ -1,7 +1,7 @@
 import {Transform, TransformCallback, TransformOptions} from 'stream';
 import Future from "../lib/concurrent/Future";
 
-module.exports = class StreamMonitor extends Transform {
+export default class StreamMonitor extends Transform {
     private dataBuffer: Buffer[] = []
     private future: Future<Buffer> = new Future()
 
@@ -14,8 +14,12 @@ module.exports = class StreamMonitor extends Transform {
         callback(null, chunk)
     }
 
-    async getAllDataAsync() {
+    async getAllDataAsync(): Promise<Buffer> {
         return await this.future.get()
+    }
+
+    getAllDataSync(): Buffer {
+        return Buffer.concat(this.dataBuffer)
     }
 
     _final(callback: (error?: Error | null) => void) {
