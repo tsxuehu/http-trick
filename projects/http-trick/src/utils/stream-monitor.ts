@@ -2,7 +2,7 @@ import {Transform, TransformCallback, TransformOptions} from 'stream';
 import Future from "../lib/concurrent/Future";
 
 export default class StreamMonitor extends Transform {
-    private dataBuffer: Buffer[] = []
+    private dataBuffers: Buffer[] = []
     private future: Future<Buffer> = new Future()
 
     constructor(opts?: TransformOptions) {
@@ -10,7 +10,7 @@ export default class StreamMonitor extends Transform {
     }
 
     _transform(chunk: any, encoding: BufferEncoding, callback: TransformCallback) {
-        this.dataBuffer.push(chunk)
+        this.dataBuffers.push(chunk)
         callback(null, chunk)
     }
 
@@ -19,11 +19,11 @@ export default class StreamMonitor extends Transform {
     }
 
     getAllDataSync(): Buffer {
-        return Buffer.concat(this.dataBuffer)
+        return Buffer.concat(this.dataBuffers)
     }
 
     _final(callback: (error?: Error | null) => void) {
-        let data = Buffer.concat(this.dataBuffer);
+        let data = Buffer.concat(this.dataBuffers);
         this.future.resolve(data)
         super._final(callback)
     }

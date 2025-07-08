@@ -141,7 +141,7 @@ export default class HttpProcessService {
      */
     async _runAtions(context: IProcessContext, willRunActionList: IActionInfo[]) {
         // 原始的请求头部
-        const {toClientResponse, userId, deviceId, clientIp, res, originRequestData} = context
+        const {req, toClientResponse, userId, deviceId, clientIp, res, originRequestData} = context
 
         const enableHost = this.profileService.enableHost(userId);
         const enableFilter = this.profileService.enableHost(userId);

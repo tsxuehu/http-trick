@@ -1,12 +1,14 @@
 import {Service} from "di/annotation";
 import forEach from "lodash/forEach";
 import Future from "../../lib/concurrent/Future";
-import {IncomingMessage} from "http";
+import {IncomingMessage, ServerResponse} from "http";
 
 @Service()
 export class ClientService {
-    sendSpecificToClient({res, statusCode, headers, content}) {
-        if (res.finished) return;
+    sendSpecificToClient({res, statusCode, headers, content}: {
+        res: ServerResponse; statusCode: number; headers: Record<string, any>; content: string | Buffer;
+    }) {
+        if (res.writableEnded) return;
         res.statusCode = statusCode || 200;
 
         let buffer = null;
@@ -28,37 +30,29 @@ export class ClientService {
 
 
     async getClientRequestBody(req: IncomingMessage): Promise<string> {
-
-
-        if (req.future) {
-            return await req.future.get();
-        }
-
         const future = new Future<string>()
-
 
         let method = req.method.toLowerCase();
         if (["post", "put", "patch"].indexOf(method) > -1) {
-            let stream = req;
+            let readStream = req;
 
-            let requestBuffer = [];
-            stream.on("data", function handleStreamData(chunk) {
-                requestBuffer.push(chunk);
-            });
+            const future = new Future()
+            let data = ''
+            readStream.on('data', (chunk) => {
+                data += chunk
+            })
 
-            stream.on("error", function handleStreamError(err) {
-                future.reject(err);
-            });
-
-            stream.on("end", function handleStreamEnd() {
-                let requestData = Buffer.concat(requestBuffer);
-                future.resolve(requestData);
-            });
+            readStream.on('end', () => {
+                future.resolve()
+            })
+            readStream.on('error', (err) => {
+                future.reject(err)
+            })
+            await future.get()
+            return data
         } else {
             future.resolve("");
         }
-
-        req.future = future;
         return await future.get()
     }
 }

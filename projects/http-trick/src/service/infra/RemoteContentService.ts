@@ -26,6 +26,14 @@ export interface ICacheParam {
     proxyInfo: IProxyConfig
 }
 
+export interface IRequestParam {
+    req: IncomingMessage
+    recordResponse: boolean
+    actualRequestData: IActualRequestData
+    toClientResponse: IToClientResponse
+    proxyInfo: IProxyConfig
+}
+
 @Service()
 export default class RemoteContentService {
 
@@ -33,18 +41,9 @@ export default class RemoteContentService {
      * 将请求远程的响应内容直接返回给浏览器
      */
     async pipe(param: IPipeParam) {
-        const {req, res, recordResponse, toClientResponse, actualRequestData, proxyInfo} = param;
-        toClientResponse.remoteRequestBeginTime = Date.now();
+        const {res, recordResponse, toClientResponse} = param;
 
-        const {
-            reqStreamPromise,
-            reqMonitor,
-            remoteRes
-        } = await this._request(req, recordResponse, toClientResponse, proxyInfo)
-
-        toClientResponse.remoteResponseStartTime = Date.now();
-
-        await reqStreamPromise;
+        const remoteRes = await this._request(param)
 
         toClientResponse.statusCode = remoteRes.statusCode;
         Object.assign(toClientResponse.headers, remoteRes.headers)
@@ -60,13 +59,13 @@ export default class RemoteContentService {
         toClientResponse.sendedToClient = true;
 
         if (recordResponse) {
-            await Promise.all([reqStreamPromise, resStreamPromise]);
+            await resStreamPromise;
 
             toClientResponse.remoteResponseEndTime = Date.now();
             toClientResponse.hasContent = true;
-            const resBuffer = resMonitor.getAllDataSync()
-            toClientResponse.body = '' // 解压
-            actualRequestData.body = '' //
+            const contentEncoding = toClientResponse.headers["content-encoding"];
+            const resBuffer = resMonitor.getAllDataSync();
+            toClientResponse.body = await unCompressBuffer(resBuffer, contentEncoding);
         }
     }
 
@@ -74,18 +73,9 @@ export default class RemoteContentService {
      * 将请求远程的响应内容
      */
     async cache(param: ICacheParam) {
-        const {req, recordResponse, toClientResponse, actualRequestData, proxyInfo} = param;
+        const {toClientResponse} = param;
 
-
-        toClientResponse.remoteRequestBeginTime = Date.now();
-
-        const {
-            reqStreamPromise,
-            reqMonitor,
-            remoteRes
-        } = await this._request(req, recordResponse, toClientResponse, proxyInfo)
-
-        toClientResponse.remoteResponseStartTime = Date.now();
+        const remoteRes = await this._request(param)
 
         toClientResponse.statusCode = remoteRes.statusCode;
         Object.assign(toClientResponse.headers, remoteRes.headers)
@@ -93,24 +83,19 @@ export default class RemoteContentService {
         delete toClientResponse.headers['content-encoding'];
         delete toClientResponse.headers['transfer-encoding'];
         // 获取返回流数据
-        const contentEncoding = toClientResponse.headers["content-encoding"]
-        toClientResponse.body = '' // 解压
+        const contentEncoding = toClientResponse.headers["content-encoding"];
+        const resBuffer = await getAllContentFromStream(remoteRes);
+        toClientResponse.body = await unCompressBuffer(resBuffer, contentEncoding);
         toClientResponse.hasContent = true;
         toClientResponse.remoteResponseEndTime = Date.now();
-
-        if (recordResponse && !actualRequestData.body) {
-            const reqBuffer = reqMonitor.getAllDataSync()
-            actualRequestData.body = reqBuffer.toString()
-        }
     }
 
-    private async _request(req: IncomingMessage,
-                           recordResponse: boolean,
-                           actualRequestData: IActualRequestData, proxyInfo: IProxyConfig): Promise<{
-        reqStreamPromise: Promise<void>
-        reqMonitor: StreamMonitor
-        remoteRes: IncomingMessage
-    }> {
+    private async _request(param: IRequestParam): Promise<IncomingMessage> {
+        const {req, recordResponse, toClientResponse, actualRequestData, proxyInfo} = param;
+
+        toClientResponse.remoteRequestBeginTime = Date.now();
+
+
         const requestFuture = new Future<IncomingMessage>();
         const client = actualRequestData.protocol === 'https:' ? https : http;
         const remoteReq = client.request({
@@ -146,36 +131,60 @@ export default class RemoteContentService {
         }
         const remoteRes = await requestFuture.get();
 
-        return {
-            reqStreamPromise,
-            reqMonitor,
-            remoteRes,
-        }
-    }
+        toClientResponse.remoteResponseStartTime = Date.now();
 
-    // res.headers["content-encoding"]
-    private async _unCompress(buf: Buffer, contentEncoding: string): Promise<string> {
-        const future = new Future<string>()
-        const unCompressCb = (err: Error, decompressedBuffer: Buffer) => {
-            if (err) {
-                future.reject(err);
-                return;
+
+        await reqStreamPromise;
+
+        if (recordResponse) {
+            if (!actualRequestData.body) {
+                const reqBuffer = reqMonitor.getAllDataSync()
+                actualRequestData.body = reqBuffer.toString()
             }
-            future.resolve(decompressedBuffer.toString())
+            // TODO 通知monitor 请求body
         }
-        switch (contentEncoding) {
-            case "gzip":
-                zlib.gunzip(buf, unCompressCb);
-                break;
-            case "deflate":
-                zlib.inflate(buf, unCompressCb);
-                break;
-            case "br":
-                zlib.brotliDecompress(buf, unCompressCb);
-                break;
-            default:
-                future.resolve(buf.toString());
-        }
-        return await future.get();
+        return remoteRes
     }
+}
+
+export async function getAllContentFromStream(readStream: stream.Readable): Promise<Buffer> {
+    const future = new Future()
+    const dataBuffers: Buffer[] = []
+    readStream.on('data', (chunk) => {
+        dataBuffers.push(chunk)
+    })
+
+    readStream.on('end', () => {
+        future.resolve()
+    })
+    readStream.on('error', (err) => {
+        future.reject(err)
+    })
+    await future.get()
+    return Buffer.concat(dataBuffers)
+}
+
+async function unCompressBuffer(buf: Buffer, contentEncoding: string): Promise<string> {
+    const future = new Future<string>()
+    const unCompressCb = (err: Error, decompressedBuffer: Buffer) => {
+        if (err) {
+            future.reject(err);
+            return;
+        }
+        future.resolve(decompressedBuffer.toString())
+    }
+    switch (contentEncoding) {
+        case "gzip":
+            zlib.gunzip(buf, unCompressCb);
+            break;
+        case "deflate":
+            zlib.inflate(buf, unCompressCb);
+            break;
+        case "br":
+            zlib.brotliDecompress(buf, unCompressCb);
+            break;
+        default:
+            future.resolve(buf.toString());
+    }
+    return await future.get();
 }
