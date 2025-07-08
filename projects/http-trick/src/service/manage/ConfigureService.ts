@@ -20,7 +20,7 @@ export default class ConfigureService extends EventEmitter {
 
     async start() {
         const dataDir = this.appInfoService.getProxyDataDir();
-        this.configureFile = path.resolve(dataDir, "filter");
+        this.configureFile = path.resolve(dataDir, "configure.json");
 
         let customConfigure = await this.fileService.readJsonFromFile(this.configureFile);
         this.configure = assign({}, DefaultConfigure, customConfigure);

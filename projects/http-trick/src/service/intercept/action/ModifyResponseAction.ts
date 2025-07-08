@@ -27,7 +27,7 @@ function addTimestampToElement(element: string, reg: RegExp, timestamp: number) 
 
 
 @Service()
-export class ModifyResponseAction extends BaseAction {
+export default class ModifyResponseAction extends BaseAction {
     needRequestContent() {
         return false;
     }

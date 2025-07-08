@@ -6,7 +6,6 @@ import SocketIO from 'socket.io'
 import koa from "koa";
 import {Resource, Service} from "di/annotation";
 import AppInfoService from "service/AppInfoService";
-import cookie from 'cookie'
 import {getRemoteIp} from "../../utils/socket-ip";
 import koaQs from "koa-qs"
 import staticServe from "koa-static";
@@ -17,7 +16,7 @@ import ConfigureService from "service/manage/ConfigureService";
 import ProfileService from "service/manage/ProfileService";
 import HostDataService from "service/manage/HostDataService";
 import FilterService from "service/manage/FilterService";
-import {RuleDataService} from "service/manage/RuleDataService";
+import RuleDataService from "service/manage/RuleDataService";
 import MockDataService from "service/manage/MockDataService";
 import {runInAsyncContext} from "utils/trace";
 import {getContainer} from "../../utils/global-var";
@@ -61,7 +60,7 @@ export default class UiServer {
         this.app.use(async (ctx, next) => {
             let userId = 'root';
             if (!this.appInfoService.isSingle()) {
-                let cookies = cookie.parse(ctx.request.headers.cookie || "");
+                let cookies = cookieParser.parse(ctx.request.headers.cookie || "");
                 userId = cookies['userId']!;
                 if (!userId) {
                     // 多用户模式 则把用户的ip当做id

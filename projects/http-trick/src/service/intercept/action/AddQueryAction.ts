@@ -4,7 +4,7 @@ import {BaseAction} from "service/action";
 
 
 @Service()
-export class AddQueryAction extends BaseAction {
+export default class AddQueryAction extends BaseAction {
     needRequestContent() {
         return false;
     }

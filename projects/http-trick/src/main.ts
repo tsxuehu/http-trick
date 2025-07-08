@@ -11,7 +11,7 @@ import AppInfoService from "service/AppInfoService";
 import HostDataService from "service/manage/HostDataService";
 import ProfileService from "service/manage/ProfileService";
 import FilterService from "service/manage/FilterService";
-import {RuleDataService} from "service/manage/RuleDataService";
+import RuleDataService from "service/manage/RuleDataService";
 import MockDataService from "service/manage/MockDataService";
 import ConfigureService from "service/manage/ConfigureService";
 import CertificationService from "service/manage/CertificationService";
@@ -22,6 +22,7 @@ import HttpsProxyServer from "./access/http-proxy/HttpsProxyServer";
 import HttpProxyServer from "./access/http-proxy/HttpProxyServer";
 import UiServer from "./access/ui-server/UiServer";
 import getPort from "get-port";
+import isObject from "lodash/isObject";
 
 export interface IStartOptions {
     httpProxyPort: number
@@ -41,6 +42,7 @@ export async function startProxy(options: IStartOptions) {
     const dirList = [
         path.resolve(__dirname, 'controller'),
         path.resolve(__dirname, 'service'),
+        path.resolve(__dirname, 'access'),
     ];
     for (const dir of dirList) {
         const jsFileList: string[] = await glob(['**/*.js'], {
@@ -114,5 +116,7 @@ export async function startProxy(options: IStartOptions) {
     await httpProxyServer.start();
     await httpsProxyServer.start();
     await uiServer.start();
+
+    appInfo.printRuntimeInfo();
 }
 

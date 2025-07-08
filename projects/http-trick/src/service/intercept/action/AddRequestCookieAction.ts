@@ -4,7 +4,7 @@ import {ActionRunExtraInfo, IProcessContext} from "service/intercept/http";
 
 
 @Service()
-export class AddRequestCookieAction extends BaseAction {
+export default class AddRequestCookieAction extends BaseAction {
     needRequestContent() {
         return false;
     }

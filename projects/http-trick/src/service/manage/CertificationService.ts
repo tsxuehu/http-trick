@@ -26,6 +26,7 @@ export default class CertificationService {
         this.certTempDir = path.resolve(dataDir, "certificate");
         this.cache = new LRUCache<string, string>({
             max: 500,
+            maxSize: 5 * 1024 * 1024,
             sizeCalculation: (v: string, key: string) => {
                 return v.length
             },

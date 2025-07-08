@@ -12,7 +12,7 @@ import {
 import {IAction, IActionInfo} from "service/manage/rule";
 import HostResolveService from "service/intercept/HostResolveService";
 import tls from "tls";
-import {ClientService} from "service/infra/ClientService";
+import ClientService from "service/infra/ClientService";
 
 const logger = log4js.getLogger('HttpProcessService')
 

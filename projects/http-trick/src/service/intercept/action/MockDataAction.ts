@@ -5,7 +5,7 @@ import {BaseAction} from "service/action";
 
 
 @Service()
-export class MockDataAction extends BaseAction {
+export default class MockDataAction extends BaseAction {
     @Resource() private mockDataService: MockDataService
 
     needRequestContent() {

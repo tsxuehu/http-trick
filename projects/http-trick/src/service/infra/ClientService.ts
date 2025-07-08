@@ -4,7 +4,7 @@ import Future from "../../lib/concurrent/Future";
 import {IncomingMessage, ServerResponse} from "http";
 
 @Service()
-export class ClientService {
+export default class ClientService {
     sendSpecificToClient({res, statusCode, headers, content}: {
         res: ServerResponse; statusCode: number; headers: Record<string, any>; content: string | Buffer;
     }) {

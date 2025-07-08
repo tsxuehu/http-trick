@@ -11,7 +11,7 @@ import EventEmitter from "events";
 import url from 'url'
 
 @Service()
-export class RuleDataService extends EventEmitter {
+export default class RuleDataService extends EventEmitter {
     @Resource() private fileService: FileService
     @Resource() private appInfoService: AppInfoService
 

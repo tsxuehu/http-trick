@@ -34,19 +34,22 @@ export default class AppInfoService extends EventEmitter {
         this.appDir = path.join(__dirname, "../../");
 
         const proxyDataDir = this.proxyDataDir;
-        await this.fileService.makeDir(proxyDataDir);
-        await this.fileService.makeDir(path.join(proxyDataDir, "certificate"));
-        await this.fileService.makeDir(path.join(proxyDataDir, "host"));
-        await this.fileService.makeDir(path.join(proxyDataDir, "rule"));
-        await this.fileService.makeDir(path.join(proxyDataDir, "mock-data"));
-        await this.fileService.makeDir(path.join(proxyDataDir, "mock-list"));
-        await this.fileService.makeDir(path.join(proxyDataDir, "profile"));
-        await this.fileService.makeDir(path.join(proxyDataDir, "filter"));
-        await this.fileService.makeDir(path.join(proxyDataDir, "traffic"));
-        await this.fileService.makeDir(path.join(proxyDataDir, "rootCA"));
+        const exists = await this.fileService.exists(proxyDataDir);
+        if (!exists) {
+            await this.fileService.makeDir(proxyDataDir);
+            await this.fileService.makeDir(path.join(proxyDataDir, "certificate"));
+            await this.fileService.makeDir(path.join(proxyDataDir, "host"));
+            await this.fileService.makeDir(path.join(proxyDataDir, "rule"));
+            await this.fileService.makeDir(path.join(proxyDataDir, "mock-data"));
+            await this.fileService.makeDir(path.join(proxyDataDir, "mock-list"));
+            await this.fileService.makeDir(path.join(proxyDataDir, "profile"));
+            await this.fileService.makeDir(path.join(proxyDataDir, "filter"));
+            await this.fileService.makeDir(path.join(proxyDataDir, "traffic"));
+            await this.fileService.makeDir(path.join(proxyDataDir, "rootCA"));
 
-        await this.fileService.writeJsonToFile(path.join(proxyDataDir, "deviceInfo.json"), {});
-        await this.fileService.writeJsonToFile(path.join(proxyDataDir, "configure.json"), {});
+            await this.fileService.writeJsonToFile(path.join(proxyDataDir, "deviceInfo.json"), {});
+            await this.fileService.writeJsonToFile(path.join(proxyDataDir, "configure.json"), {});
+        }
     }
 
     getAppName() {

@@ -51,7 +51,7 @@ export const ControllerInfoRegistry: Record<string, RouterInfo> = {} // serviceN
 export function setServiceInfo(clazz: any, name?: string) {
     let serviceName = name || camelCase(clazz.name)
     let serviceInfo: ServiceInfo = DiServiceInfoRegistry[clazz.name] || {serviceName: '', dependencyList: []}
-    if (typeof serviceInfo.serviceName !== 'undefined') {
+    if (serviceInfo.serviceName) {
         throw new Error(`服务被重复设置 class: ${clazz.name} origin: ${serviceInfo.serviceName} new: ${serviceName}`)
     }
     serviceInfo.serviceName = serviceName

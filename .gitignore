@@ -15,5 +15,6 @@ node_modules
 .vscode
 tep/*
 projects/http-trick/dist
+projects/http-trick/logs
 .idea
 npm-debug.log

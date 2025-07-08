@@ -6,7 +6,7 @@ import {BaseAction} from "service/action";
 
 
 @Service()
-export class AddRequestHeaderAction extends BaseAction {
+export default class AddRequestHeaderAction extends BaseAction {
     needRequestContent() {
         return false;
     }

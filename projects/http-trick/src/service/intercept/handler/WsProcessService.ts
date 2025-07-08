@@ -16,9 +16,6 @@ const logger = log4js.getLogger('WsProcessService')
 
 @Service()
 export default class WsProcessService {
-    @Resource() private appInfoService: AppInfoService
-    @Resource() private connectHandle: ConnectHandle
-    @Resource() private profileService: ProfileService
     @Resource() private hostResolveService: HostResolveService
 
     private proxy: HttpProxy

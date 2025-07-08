@@ -2,7 +2,7 @@ import {Controller, Path, Resource} from "di/annotation";
 import {HttpMethod} from "di/meta-utils";
 import {Context, Next} from "koa";
 import ProfileService from "service/manage/ProfileService";
-import {RuleDataService} from "service/manage/RuleDataService";
+import RuleDataService from "service/manage/RuleDataService";
 
 @Controller('/rule/')
 export default class RuleController {

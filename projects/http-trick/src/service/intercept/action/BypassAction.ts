@@ -14,7 +14,7 @@ import {BaseAction} from "service/action";
 
 
 @Service()
-export class BypassAction extends BaseAction {
+export default class BypassAction extends BaseAction {
 
     @Resource() private profileService: ProfileService
     @Resource() private hostResolveService: HostResolveService

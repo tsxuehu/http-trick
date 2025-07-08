@@ -5,7 +5,7 @@ import {BaseAction} from "service/action";
 
 
 @Service()
-export class ScriptModifyResponseAction extends BaseAction {
+export default class ScriptModifyResponseAction extends BaseAction {
     needRequestContent() {
         return false;
     }

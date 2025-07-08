@@ -10,7 +10,7 @@ import {BaseAction} from "service/action";
 
 
 @Service()
-export class RedirectAction extends BaseAction {
+export default class RedirectAction extends BaseAction {
     @Resource() private profileService: ProfileService
     @Resource() private hostResolveService: HostResolveService
     @Resource() private configureService: ConfigureService
