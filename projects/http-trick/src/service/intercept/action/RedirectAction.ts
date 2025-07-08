@@ -77,6 +77,7 @@ export class RedirectAction extends BaseAction {
             toClientResponse,
             req,
             res,
+            recordResponse,
             actualRequestData,
             additionalRequestQuery,
             originRequestData
@@ -111,11 +112,11 @@ export class RedirectAction extends BaseAction {
 
         if (last) {
             await this.remoteContentService.pipe({
-                req, res, actualRequestData, toClientResponse, proxyInfo
+                req, res, recordResponse, actualRequestData, toClientResponse, proxyInfo
             })
         } else {
             await this.remoteContentService.cache({
-                req, actualRequestData, toClientResponse, proxyInfo
+                req, recordResponse, actualRequestData, toClientResponse, proxyInfo
             })
         }
     }

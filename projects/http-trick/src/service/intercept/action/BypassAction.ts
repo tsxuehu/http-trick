@@ -40,6 +40,7 @@ export class BypassAction extends BaseAction {
             originRequestData,
             additionalRequestQuery,
             toClientResponse,
+            recordResponse,
             userId,
             deviceId
         } = context
@@ -70,11 +71,11 @@ export class BypassAction extends BaseAction {
         toClientResponse.headers['proxy-content'] = encodeURI(targetUrl);
         if (last) {
             await this.remoteContentService.pipe({
-                req, res, actualRequestData, toClientResponse, proxyInfo
+                req, res,recordResponse, actualRequestData, toClientResponse, proxyInfo
             })
         } else {
             await this.remoteContentService.cache({
-                req, actualRequestData, toClientResponse, proxyInfo
+                req, recordResponse, actualRequestData, toClientResponse, proxyInfo
             })
         }
     }
