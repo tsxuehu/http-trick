@@ -11,7 +11,7 @@ import koaQs from "koa-qs"
 import staticServe from "koa-static";
 import path from "path";
 import koaBody from "koa-body";
-import cookieParser from "cookie";
+import {parse as cookieParser } from "cookie";
 import ConfigureService from "service/manage/ConfigureService";
 import ProfileService from "service/manage/ProfileService";
 import HostDataService from "service/manage/HostDataService";
@@ -60,7 +60,7 @@ export default class UiServer {
         this.app.use(async (ctx, next) => {
             let userId = 'root';
             if (!this.appInfoService.isSingle()) {
-                let cookies = cookieParser.parse(ctx.request.headers.cookie || "");
+                let cookies = cookieParser(ctx.request.headers.cookie || "");
                 userId = cookies['userId']!;
                 if (!userId) {
                     // 多用户模式 则把用户的ip当做id
@@ -259,7 +259,7 @@ export default class UiServer {
     }
 
     _getUserId(socketIOConn: SocketIO.Socket) {
-        let cookies = cookieParser.parse(socketIOConn.request.headers.cookie || "");
+        let cookies = cookieParser(socketIOConn.request.headers.cookie || "");
         return cookies['userId'] || 'root';
     }
 
