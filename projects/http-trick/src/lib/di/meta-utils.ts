@@ -50,7 +50,7 @@ export const ControllerInfoRegistry: Record<string, RouterInfo> = {} // serviceN
  */
 export function setServiceInfo(clazz: any, name?: string) {
     let serviceName = name || camelCase(clazz.name)
-    let serviceInfo: ServiceInfo = DiServiceInfoRegistry[clazz.name] || {dependencyList: []}
+    let serviceInfo: ServiceInfo = DiServiceInfoRegistry[clazz.name] || {serviceName: '', dependencyList: []}
     if (typeof serviceInfo.serviceName !== 'undefined') {
         throw new Error(`服务被重复设置 class: ${clazz.name} origin: ${serviceInfo.serviceName} new: ${serviceName}`)
     }
@@ -66,7 +66,7 @@ export function getServiceInfo(clazz: any): ServiceInfo {
  * 依赖
  */
 export function setServiceDependencyByName(clazz: any, propertyName: string, serviceName: string) {
-    let serviceInfo: ServiceInfo = DiServiceInfoRegistry[clazz.name] || {dependencyList: []}
+    let serviceInfo: ServiceInfo = DiServiceInfoRegistry[clazz.name] || {serviceName: '', dependencyList: []}
     serviceInfo.dependencyList.push({
         propertyName,
         type: DependencyType.Name,
@@ -76,7 +76,7 @@ export function setServiceDependencyByName(clazz: any, propertyName: string, ser
 }
 
 export function setServiceDependencyByFun(clazz: any, propertyName: string, fun: () => string) {
-    let serviceInfo: ServiceInfo = DiServiceInfoRegistry[clazz.name] || {dependencyList: []}
+    let serviceInfo: ServiceInfo = DiServiceInfoRegistry[clazz.name] || {serviceName: '', dependencyList: []}
     serviceInfo.dependencyList.push({
         propertyName,
         type: DependencyType.fun,
@@ -94,7 +94,7 @@ export function getDependencyList(clazz: any): PropertyDependency[] {
  * 初始化
  */
 export function setServicePreStartDependencyByNames(clazz: any, startFunctionName: string, dependencyList: string[]) {
-    const serviceInfo = DiServiceInfoRegistry[clazz.name] || {dependencyList: []}
+    const serviceInfo = DiServiceInfoRegistry[clazz.name] || {serviceName: '', dependencyList: []}
     serviceInfo.preStartInfo = {
         functionName: startFunctionName,
         type: DependencyType.Name,
@@ -103,7 +103,7 @@ export function setServicePreStartDependencyByNames(clazz: any, startFunctionNam
 }
 
 export function setServicePreStartDependencyByFun(clazz: any, startFunctionName: string, fun: () => string[]) {
-    const serviceInfo = DiServiceInfoRegistry[clazz.name] || {dependencyList: []}
+    const serviceInfo = DiServiceInfoRegistry[clazz.name] || {serviceName: '', dependencyList: []}
 
     serviceInfo.preStartInfo = {
         functionName: startFunctionName,
@@ -146,11 +146,11 @@ export enum HttpMethod {
 export function setControllerInfo(clazz: any, path: string) {
     let serviceName = `controller_${camelCase(clazz.name)}`
 
-    let routerInfo: RouterInfo = ControllerInfoRegistry[serviceName] || {requestMapList: []}
+    let routerInfo: RouterInfo = ControllerInfoRegistry[serviceName] || {path: '', requestMapList: []}
     routerInfo.path = path
     ControllerInfoRegistry[serviceName] = routerInfo
 
-    let serviceInfo = DiServiceInfoRegistry[clazz.name] || {dependencyList: []}
+    let serviceInfo = DiServiceInfoRegistry[clazz.name] || {serviceName: '', dependencyList: []}
     serviceInfo.serviceName = serviceName
     DiServiceInfoRegistry[clazz.name] = serviceInfo
 }
@@ -161,7 +161,7 @@ export function getControllerServiceNameList(): string[] {
 
 export function setRouterInfo(clazz: any, functionName: string, method: HttpMethod, path: string) {
     let serviceName = `controller_${camelCase(clazz.name)}`
-    let routerInfo: RouterInfo = ControllerInfoRegistry[serviceName] || {requestMapList: []}
+    let routerInfo: RouterInfo = ControllerInfoRegistry[serviceName] || {path: '', requestMapList: []}
     routerInfo.requestMapList.push({
         functionName,
         method,

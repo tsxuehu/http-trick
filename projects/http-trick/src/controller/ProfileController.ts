@@ -60,7 +60,7 @@ export default class ProfileController {
     async getUserInfo(ctx: Context, next: Next) {
         // 用户id
         let userId = ctx.userId;
-        let ip = ctx.request.headers['x-forwarded-for'];
+        let ip: string = ctx.request.headers['x-forwarded-for'] as string;
         if (!ip) {
             ip = ctx.request.socket.remoteAddress;
             // ip = socketIp.getRemoteIp(ctx.request.socket);
@@ -85,12 +85,12 @@ export default class ProfileController {
     }
 
     @Path('setUserId', HttpMethod.GET)
-    async getUserId(ctx: Context, next: Next) {
-        let userId = ctx.query.userId;
+    async setUserId(ctx: Context, next: Next) {
+        let userId: string = ctx.query.userId as string;
 
-        let ip = ctx.ip;
-        if (ip.substr(0, 7) == "::ffff:") {
-            ip = ip.substr(7)
+        let ip: string = ctx.ip;
+        if (ip.substring(0, 7) == "::ffff:") {
+            ip = ip.substring(7)
         }
 
         if (!userId) {
@@ -114,16 +114,16 @@ export default class ProfileController {
         ctx.set('Cache-Control', 'no-cache');
         ctx.set('Server', this.appInfoService.getAppName());
         ctx.set('Connection', 'Close');
-        let proxyIp = ctx.query['proxy-ip'];
+        let proxyIp = ctx.query['proxy-ip'] as string;
         ctx.body = this.profileService.generateProxyPacFile(userId, proxyIp);
     }
 
     @Path('device/bind', HttpMethod.GET)
     async deviceBind(ctx: Context, next: Next) {
-        let userId = ctx.query.userId;
-        let deviceId = ctx.query.deviceId;
+        let userId = ctx.query.userId as string;
+        let deviceId = ctx.query.deviceId as string;
         if (!deviceId) { // 没传设备id，则将设备的ip作为设备id
-            let ip = ctx.request.headers['x-forwarded-for'];
+            let ip = ctx.request.headers['x-forwarded-for'] as string;
             if (!ip) {
                 ip = ctx.request.socket.remoteAddress;
                 // ip = socketIp.getRemoteIp(ctx.request.socket);
@@ -140,8 +140,8 @@ export default class ProfileController {
     @Path('device/unbind', HttpMethod.GET)
     async deviceUnbind(ctx: Context, next: Next) {
         let userId = ctx.userId;
-        let deviceId = ctx.query.deviceId;
-        this.profileService.unbindDevice(deviceId);
+        let deviceId = ctx.query.deviceId as string;
+        await this.profileService.unbindDevice(deviceId);
         ctx.body = {
             code: 0,
             msg: '解绑成功'
@@ -161,7 +161,7 @@ export default class ProfileController {
 
     @Path('device/externalProxy', HttpMethod.GET)
     async getDeviceExternalProxy(ctx: Context, next: Next) {
-        let deviceId = ctx.query.deviceId;
+        let deviceId = ctx.query.deviceId as string;
         let info = this.profileService.getDeviceProxyInfo(deviceId);
         ctx.body = {
             code: 0,
@@ -172,8 +172,8 @@ export default class ProfileController {
     @Path('device/setName', HttpMethod.GET)
     async deviceSetName(ctx: Context, next: Next) {
         let userId = ctx.userId;
-        let deviceId = ctx.query.deviceId;
-        let name = ctx.query.name;
+        let deviceId = ctx.query.deviceId as string;
+        let name = ctx.query.name as string;
         try {
             await this.profileService.setDeviceName(deviceId, name);
             ctx.body = {
@@ -191,8 +191,8 @@ export default class ProfileController {
     @Path('device/usehost', HttpMethod.GET)
     async deviceUsehost(ctx: Context, next: Next) {
         let userId = ctx.userId;
-        let deviceId = ctx.query.deviceId;
-        let hostname = ctx.query.hostname;
+        let deviceId = ctx.query.deviceId as string;
+        let hostname = ctx.query.hostname as string;
         try {
             await this.profileService.setDeviceHostFileName(deviceId, hostname);
             ctx.body = {
@@ -210,7 +210,7 @@ export default class ProfileController {
     @Path('device/enableMonitor', HttpMethod.GET)
     async deviceEnableMonitor(ctx: Context, next: Next) {
         let userId = ctx.userId;
-        let deviceId = ctx.query.deviceId;
+        let deviceId = ctx.query.deviceId as string;
         try {
             await this.profileService.setDisableMonitor(deviceId, false);
             ctx.body = {
@@ -228,7 +228,7 @@ export default class ProfileController {
     @Path('deviceDisableMonitor', HttpMethod.GET)
     async deviceDisableMonitor(ctx: Context, next: Next) {
         let userId = ctx.userId;
-        let deviceId = ctx.query.deviceId;
+        let deviceId = ctx.query.deviceId as string;
         try {
             await this.profileService.setDisableMonitor(deviceId, true);
             ctx.body = {

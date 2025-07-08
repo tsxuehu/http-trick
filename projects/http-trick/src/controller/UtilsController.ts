@@ -12,7 +12,7 @@ export default class UtilsController {
 
     @Path('getRemoteFile', HttpMethod.GET)
     async getRemoteFile(ctx: Context, next: Next) {
-        let url = ctx.query.url;
+        let url = ctx.query.url as string;
         let response = await axios.get(url);
         ctx.body = {
             code: 0,
@@ -22,8 +22,7 @@ export default class UtilsController {
 
     @Path('rootCA.crt', HttpMethod.GET)
     async rootCA(ctx: Context, next: Next) {
-        let userId = ctx.userId;
         ctx.set('Content-disposition', 'attachment;filename=http-trick.crt');
-        ctx.body = this.certificationService.getRootCACertPem(userId);
+        ctx.body = this.certificationService.getRootCACertPem();
     }
 }

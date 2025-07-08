@@ -36,7 +36,8 @@ export default class RuleController {
     @Path('deletefile', HttpMethod.GET)
     async deletefile(ctx: Context, next: Next) {
         let userId = ctx.userId;
-        await this.ruleDataService.deleteRuleFile(userId, ctx.query.id);
+        const id = ctx.query.id as string;
+        await this.ruleDataService.deleteRuleFile(userId, id);
         ctx.body = {
             code: 0
         };
@@ -45,8 +46,9 @@ export default class RuleController {
     @Path('setfilecheckstatus', HttpMethod.GET)
     async setfilecheckstatus(ctx: Context, next: Next) {
         let userId = ctx.userId;
-        this.ruleDataService.setRuleFileCheckStatus(userId, ctx.query.id,
-            ctx.query.checked == 1 ? true : false);
+        const id = ctx.query.id as string;
+        await this.ruleDataService.setRuleFileCheckStatus(userId, id,
+            ctx.query.checked as string == "1");
         ctx.body = {
             code: 0
         };
@@ -55,7 +57,8 @@ export default class RuleController {
     @Path('getfile', HttpMethod.GET)
     async getfile(ctx: Context, next: Next) {
         let userId = ctx.userId;
-        let content = this.ruleDataService.getRuleFile(userId, ctx.query.id);
+        const id = ctx.query.id as string;
+        let content = this.ruleDataService.getRuleFile(userId, id);
         ctx.body = {
             code: 0,
             data: content
@@ -65,13 +68,15 @@ export default class RuleController {
     @Path('file/raw', HttpMethod.GET)
     async fileFaw(ctx: Context, next: Next) {
         let userId = ctx.userId;
-        ctx.body = this.ruleDataService.getRuleFile(userId, ctx.query.id);
+        const id = ctx.query.id as string;
+        ctx.body = this.ruleDataService.getRuleFile(userId, id);
     }
 
     @Path('saveRule', HttpMethod.POST)
     async saveRule(ctx: Context, next: Next) {
         let userId = ctx.userId;
-        await this.ruleDataService.saveRule(userId, ctx.query.ruleFileId, ctx.request.body);
+        const ruleFileId = ctx.query.ruleFileId as string;
+        await this.ruleDataService.saveRule(userId, ruleFileId, ctx.request.body);
         ctx.body = {
             code: 0
         };
@@ -80,7 +85,7 @@ export default class RuleController {
     @Path('setRuleCheckedState', HttpMethod.GET)
     async setRuleCheckedState(ctx: Context, next: Next) {
         let userId = ctx.userId;
-        let {ruleFileId, ruleId, checked} = ctx.query;
+        let {ruleFileId, ruleId, checked} = ctx.query as any;
         await this.ruleDataService.setRuleCheckedState(userId, ruleFileId, ruleId, checked == 1);
         ctx.body = {
             code: 0
@@ -90,7 +95,7 @@ export default class RuleController {
     @Path('removeRule', HttpMethod.GET)
     async removeRule(ctx: Context, next: Next) {
         let userId = ctx.userId;
-        let {ruleFileId, ruleId} = ctx.query;
+        let {ruleFileId, ruleId} = ctx.query as any;
         await this.ruleDataService.removeRule(userId, ruleFileId, ruleId);
         ctx.body = {
             code: 0
@@ -101,7 +106,8 @@ export default class RuleController {
     @Path('saveRuleFile', HttpMethod.POST)
     async saveRuleFile(ctx: Context, next: Next) {
         let userId = ctx.userId;
-        await this.ruleDataService.saveRuleFile(userId, ctx.query.id, ctx.request.body);
+        const id = ctx.query.id as string;
+        await this.ruleDataService.saveRuleFile(userId, id, ctx.request.body);
         ctx.body = {
             code: 0
         };
@@ -110,7 +116,7 @@ export default class RuleController {
     @Path('download', HttpMethod.GET)
     async download(ctx: Context, next: Next) {
         let userId = ctx.userId;
-        let id = ctx.query.id;
+        const id = ctx.query.id as string;
         let content = this.ruleDataService.getRuleFile(userId, id);
         ctx.set('Content-disposition', `attachment;filename=${encodeURIComponent(content.name)}.json`);
         ctx.body = content;
