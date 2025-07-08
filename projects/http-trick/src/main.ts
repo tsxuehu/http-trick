@@ -16,14 +16,22 @@ import MockDataService from "service/manage/MockDataService";
 import ConfigureService from "service/manage/ConfigureService";
 import CertificationService from "service/manage/CertificationService";
 import HttpTrafficService from "service/intercept/HttpTrafficService";
-import ConnectHandle from "service/intercept/handler/ConnectProcessService";
-import HttpProcessService from "service/intercept/handler/HttpProcessService";
+import ip from 'ip';
 import WsProcessService from "service/intercept/handler/WsProcessService";
 import HttpsProxyServer from "./access/http-proxy/HttpsProxyServer";
 import HttpProxyServer from "./access/http-proxy/HttpProxyServer";
 import UiServer from "./access/ui-server/UiServer";
+import getPort from "get-port";
 
-async function main() {
+export interface IStartOptions {
+    httpProxyPort: number
+    socks5ProxyPort: number
+    dnsPort: number
+    webUiPort: number
+    userMode: string
+}
+
+export async function startProxy(options: IStartOptions) {
     initAsyncContext();
     configureLogger();
     registerGlobalExceptionHandler();
@@ -53,10 +61,11 @@ async function main() {
 
     // 挂载到全局
     setContainer(container);
+
     // 初始化服务
     // ========================================================================================
-    const configureService = await container.getServiceInstance<ConfigureService>(ConfigureService);
     const appInfo = await container.getServiceInstance<AppInfoService>(AppInfoService);
+    const configureService = await container.getServiceInstance<ConfigureService>(ConfigureService);
     const profileService = await container.getServiceInstance<ProfileService>(ProfileService);
     const hostService = await container.getServiceInstance<HostDataService>(HostDataService);
     const filterService = await container.getServiceInstance<FilterService>(FilterService);
@@ -64,14 +73,31 @@ async function main() {
     const mockDataService = await container.getServiceInstance<MockDataService>(MockDataService);
     const certificationService = await container.getServiceInstance<CertificationService>(CertificationService);
 
+
+    await appInfo.start(); // 初始化配置目录
     await configureService.start();
-    await appInfo.start();
     await profileService.start();
     await hostService.start();
     await filterService.start();
     await ruleService.start();
     await mockDataService.start();
     await certificationService.start();
+
+    // =======================================================================================
+    const httpProxyPort = options.httpProxyPort || configureService.getConfigure().httpProxyPort;
+    const socks5ProxyPort = options.socks5ProxyPort || configureService.getConfigure().socks5ProxyPort;
+    const webUiPort = options.webUiPort || configureService.getConfigure().webUiPort;
+    const dnsPort = options.dnsPort || configureService.getConfigure().dnsPort;
+    const httpsProxyPort = await getPort({port: 40005});
+    appInfo.setAppInfo({
+        single: options.userMode != 'multi',
+        pcIp: ip.address(),
+        httpProxyPort,
+        socks5ProxyPort,
+        dnsPort,
+        httpsProxyPort,
+        webUiPort,
+    })
 
     // =======================================================================================
 
@@ -90,4 +116,3 @@ async function main() {
     await uiServer.start();
 }
 
-main()

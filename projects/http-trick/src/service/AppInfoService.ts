@@ -1,41 +1,52 @@
-import {Service} from "di/annotation";
+import {Resource, Service} from "di/annotation";
 import {IAppInfo} from "./app-info";
 import path from "path";
 import assign from "lodash/assign";
-import ip from 'ip';
 import EventEmitter from "events";
 import {IOriginRequestData} from "service/intercept/http";
+import FileService from "service/infra/FileService";
 
 @Service()
 export default class AppInfoService extends EventEmitter {
+
+    @Resource() private fileService: FileService
+
     private appDir: string
     private proxyDataDir: string // 本地存放数据的目录
-    private appInfo: IAppInfo
-
-    constructor() {
-        super();
-        const userHome = (process.env.HOME || process.env.USERPROFILE) as string;
-        this.proxyDataDir = path.join(userHome, ".http-trick");
-        this.appDir = path.join(__dirname, "../../");
-        this.appInfo = {
-            appName: 'Http-Trick',
-            single: true,
-            httpProxyPort: 0,
-            httpsProxyPort: 0,
-            socks5ProxyPort: 0,
-            dnsPort: 0,
-            webUiPort: 0,
-            startHttpProxy: true,
-            startSocks5: true,
-            startDns: false,
-            pcIp: "",
-        }
+    private appInfo: IAppInfo = {
+        appName: 'Http-Trick',
+        single: true,
+        httpProxyPort: 0,
+        httpsProxyPort: 0,
+        socks5ProxyPort: 0,
+        dnsPort: 0,
+        webUiPort: 0,
+        startHttpProxy: true,
+        startSocks5: true,
+        startDns: false,
+        pcIp: "",
     }
 
     async start() {
-        this.setAppInfo({
-            pcIp: ip.address()
-        })
+        // 初始化
+        const userHome = (process.env.HOME || process.env.USERPROFILE) as string;
+        this.proxyDataDir = path.join(userHome, ".http-trick");
+        this.appDir = path.join(__dirname, "../../");
+
+        const proxyDataDir = this.proxyDataDir;
+        await this.fileService.makeDir(proxyDataDir);
+        await this.fileService.makeDir(path.join(proxyDataDir, "certificate"));
+        await this.fileService.makeDir(path.join(proxyDataDir, "host"));
+        await this.fileService.makeDir(path.join(proxyDataDir, "rule"));
+        await this.fileService.makeDir(path.join(proxyDataDir, "mock-data"));
+        await this.fileService.makeDir(path.join(proxyDataDir, "mock-list"));
+        await this.fileService.makeDir(path.join(proxyDataDir, "profile"));
+        await this.fileService.makeDir(path.join(proxyDataDir, "filter"));
+        await this.fileService.makeDir(path.join(proxyDataDir, "traffic"));
+        await this.fileService.makeDir(path.join(proxyDataDir, "rootCA"));
+
+        await this.fileService.writeJsonToFile(path.join(proxyDataDir, "deviceInfo.json"), {});
+        await this.fileService.writeJsonToFile(path.join(proxyDataDir, "configure.json"), {});
     }
 
     getAppName() {
@@ -66,6 +77,7 @@ export default class AppInfoService extends EventEmitter {
     getHttpsProxyPort() {
         return this.appInfo.httpsProxyPort;
     }
+
     getWebUiPort() {
         return this.appInfo.webUiPort;
     }
