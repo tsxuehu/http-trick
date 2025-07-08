@@ -1,12 +1,10 @@
 import log4js from 'log4js'
 import Router from '@koa/router'
-import {Container} from 'di/container'
 import http, {Server} from "http";
-import Koa, {Context} from 'koa'
+import Koa, {Context, Next} from 'koa'
 import SocketIO from 'socket.io'
 import koa from "koa";
-import {createLazyResource} from "di/annotation";
-import {getContainer} from "../../utils/global-var";
+import {Resource, Service} from "di/annotation";
 import AppInfoService from "service/AppInfoService";
 import cookie from 'cookie'
 import {getRemoteIp} from "../../utils/socket-ip";
@@ -15,29 +13,50 @@ import staticServe from "koa-static";
 import path from "path";
 import koaBody from "koa-body";
 import cookieParser from "cookie";
+import ConfigureService from "service/manage/ConfigureService";
+import ProfileService from "service/manage/ProfileService";
+import HostDataService from "service/manage/HostDataService";
+import FilterService from "service/manage/FilterService";
+import {RuleDataService} from "service/manage/RuleDataService";
+import MockDataService from "service/manage/MockDataService";
+import {runInAsyncContext} from "utils/trace";
+import {getContainer} from "../../utils/global-var";
+import HttpTrafficService from "service/intercept/HttpTrafficService";
 
 const logger = log4js.getLogger('UiServer')
 
-const LazyResource = createLazyResource(getContainer)
 
+@Service()
 export default class UiServer {
-    private container: Container
-    private port: number
-    private server?: Server
-    private app?: Koa
-    private io?: SocketIO.Server
+    @Resource() private appInfoService: AppInfoService
+    @Resource() private configureService: ConfigureService
+    @Resource() private profileService: ProfileService
+    @Resource() private hostDataService: HostDataService
+    @Resource() private filterService: FilterService
+    @Resource() private ruleDataService: RuleDataService
+    @Resource() private mockDataService: MockDataService
+    @Resource() private httpTrafficService: HttpTrafficService
 
-    // @ts-ignore
-    @LazyResource() private appInfoService: AppInfoService
-
-    constructor({container, port}: { container: Container; port: number }) {
-        this.container = container
-        this.port = port
-    }
+    private server: Server
+    private app: Koa
+    private io: SocketIO.Server
 
     async start() {
         this.app = new koa();
-
+        this.app.use(async (ctx: Context, next: Next) => {
+            await runInAsyncContext('ui-server', async () => {
+                const startTime = Date.now()
+                logger.info(`收到请求 ${ctx.method} ${ctx.href}`)
+                try {
+                    await next();
+                } catch (err) {
+                    logger.error(`请求出错`, err)
+                } finally {
+                    const endTime = Date.now()
+                    logger.info(`处理完成 耗时 ${(endTime - startTime) / 1000}s`)
+                }
+            })
+        });
         // 身份识别
         this.app.use(async (ctx, next) => {
             let userId = 'root';
@@ -77,17 +96,18 @@ export default class UiServer {
         this._initManager();
 
         // 启动server
-        this.server.listen(this.port);
+        const port = this.appInfoService.getWebUiPort();
+        this.server.listen(port);
     }
 
     async assembleRouter() {
         let router = new Router()
-
-        let routerList = this.container.getRouterInfo()
+        const container = getContainer()
+        let routerList = container.getRouterInfo()
         for (let routerInfo of routerList) {
             let {httpMethod, requestPath, serviceName, functionName} = routerInfo
             logger.info(`注册路由 ${httpMethod} ${requestPath}`)
-            let instance = await this.container.getServiceInstance(serviceName)
+            let instance = await container.getServiceInstance(serviceName)
             // @ts-ignore
             router[httpMethod](requestPath, async (ctx: Context) => {
                 try {
@@ -121,20 +141,19 @@ export default class UiServer {
 
     // http流量监控界面
     _initTraffic() {
-        const httpTraficMonitorNS = this.io!.of('/httptrafic');
+        const httpTraficMonitorNS = this.io.of('/httptrafic');
         // 客户端发起连接请求
         httpTraficMonitorNS.on('connection', async client => {
 
             let userId = this._getUserId(client);
-            client.join(userId, err => {
-            });
+            client.join(userId);
 
             this.httpTrafficService.incMonitor(userId);
 
-            let deviceList = await this.profileService.getDeviceListBindedToUserId(userId);
+            let deviceList = this.profileService.getDeviceListBindedToUserId(userId);
             client.emit('bindedDeviceList', deviceList);
             // host文件列表
-            let hostFileList = await this.hostService.getHostFileList(userId);
+            let hostFileList = this.hostDataService.getHostFileList(userId);
             client.emit('hostfilelist', hostFileList);
 
             // 推送过滤器，状态
@@ -150,30 +169,30 @@ export default class UiServer {
 
         // 监听logRespository事件
         this.httpTrafficService.on('traffic', (userId, rows) => {
-            this.httpTraficMonitorNS.to(userId).emit('rows', rows);
+            httpTraficMonitorNS.to(userId).emit('rows', rows);
         });
         // 过滤器改变
         this.httpTrafficService.on('filter', (userId, filter) => {
-            this.httpTraficMonitorNS.to(userId).emit('filter', filter);
+            httpTraficMonitorNS.to(userId).emit('filter', filter);
         });
         // 状态改变
         this.httpTrafficService.on('state-change', (userId, state) => {
-            this.httpTraficMonitorNS.to(userId).emit('state', state);
+            httpTraficMonitorNS.to(userId).emit('state', state);
         });
         // 清空
         this.httpTrafficService.on('clear', (userId) => {
-            this.httpTraficMonitorNS.to(userId).emit('clear');
+            httpTraficMonitorNS.to(userId).emit('clear');
             let state = this.httpTrafficService.getStatus(userId);
-            this.httpTraficMonitorNS.to(userId).emit('state', state);
+            httpTraficMonitorNS.to(userId).emit('state', state);
         });
         // 推送设备列表信息
         this.profileService.on("data-change-deviceList", (userId, deviceList) => {
-            this.httpTraficMonitorNS.to(userId).emit('bindedDeviceList', deviceList);
+            httpTraficMonitorNS.to(userId).emit('bindedDeviceList', deviceList);
         });
 
         // host文件变化
-        this.hostService.on("data-change", (userId, hostFilelist) => {
-            this.httpTraficMonitorNS.to(userId).emit('hostfilelist', hostFilelist);
+        this.hostDataService.on("data-change", (userId, hostFilelist) => {
+            httpTraficMonitorNS.to(userId).emit('hostfilelist', hostFilelist);
         });
     }
 
@@ -185,59 +204,58 @@ export default class UiServer {
         managerNS.on('connection', async client => {
             // 监听内部状态的客户端,这些客户端获取当前生效的host、rule
             let userId = this._getUserId(client);
-            client.join(userId, err => {
-            });
+            client.join(userId);
             // 推送最新数据
             // 运行信息
             let appInfo = this.appInfoService.getAppInfo();
             client.emit('appinfo', appInfo);
             // proxy配置
-            let config = await this.configureService.getConfigure();
+            let config = this.configureService.getConfigure();
             client.emit('configure', config);
             // 个人配置
-            let profile = await this.profileService.getProfile(userId);
+            let profile = this.profileService.getProfile(userId);
             client.emit('profile', profile);
-            let deviceList = await this.profileService.getDeviceListBindedToUserId(userId);
+            let deviceList = this.profileService.getDeviceListBindedToUserId(userId);
             client.emit('bindedDeviceList', deviceList);
             // host文件列表
-            let hostFileList = await this.hostService.getHostFileList(userId);
+            let hostFileList = this.hostDataService.getHostFileList(userId);
             client.emit('hostfilelist', hostFileList);
             // 规则列表
-            let ruleFileList = await this.ruleService.getRuleFileList(userId);
+            let ruleFileList = this.ruleDataService.getRuleFileList(userId);
             client.emit('rulefilelist', ruleFileList);
             // 数据文件列表
-            let dataList = await this.mockDataService.getMockDataList(userId);
+            let dataList = this.mockDataService.getMockDataList(userId);
             client.emit('datalist', dataList);
             // 过滤器
-            let filters = await this.filterService.getFilterRuleList(userId);
+            let filters = this.filterService.getFilterRuleList(userId);
             client.emit('filters', filters);
         });
         // proxy配置信息
         this.configureService.on("data-change", (userId, configure) => {
-            this.managerNS.to(userId).emit('configure', configure);
+            managerNS.to(userId).emit('configure', configure);
         });
         // 个人配置信息
         this.profileService.on("data-change-profile", (userId, profile) => {
-            this.managerNS.to(userId).emit('profile', profile);
+            managerNS.to(userId).emit('profile', profile);
         });
         this.profileService.on("data-change-deviceList", (userId, deviceList) => {
-            this.managerNS.to(userId).emit('bindedDeviceList', deviceList);
+            managerNS.to(userId).emit('bindedDeviceList', deviceList);
         });
         // host文件变化
-        this.hostService.on("data-change", (userId, hostFilelist) => {
-            this.managerNS.to(userId).emit('hostfilelist', hostFilelist);
+        this.hostDataService.on("data-change", (userId, hostFilelist) => {
+            managerNS.to(userId).emit('hostfilelist', hostFilelist);
         });
         // 规则文件列表
-        this.ruleService.on("data-change", (userId, ruleFilelist) => {
-            this.managerNS.to(userId).emit('rulefilelist', ruleFilelist);
+        this.ruleDataService.on("data-change", (userId, ruleFilelist) => {
+            managerNS.to(userId).emit('rulefilelist', ruleFilelist);
         });
         // mock文件列表
         this.mockDataService.on("data-change", (userId, dataFilelist) => {
-            this.managerNS.to(userId).emit('datalist', dataFilelist);
+            managerNS.to(userId).emit('datalist', dataFilelist);
         });
         // 过滤器
         this.filterService.on("data-change", (userId, filters) => {
-            this.managerNS.to(userId).emit('filters', filters);
+            managerNS.to(userId).emit('filters', filters);
         });
     }
 

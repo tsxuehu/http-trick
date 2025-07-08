@@ -66,6 +66,9 @@ export default class AppInfoService extends EventEmitter {
     getHttpsProxyPort() {
         return this.appInfo.httpsProxyPort;
     }
+    getWebUiPort() {
+        return this.appInfo.webUiPort;
+    }
 
     setHttpsProxyPort(httpsProxyPort: number) {
         this.setAppInfo({

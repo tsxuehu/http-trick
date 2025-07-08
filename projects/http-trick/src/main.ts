@@ -19,6 +19,9 @@ import HttpTrafficService from "service/intercept/HttpTrafficService";
 import ConnectHandle from "service/intercept/handler/ConnectProcessService";
 import HttpProcessService from "service/intercept/handler/HttpProcessService";
 import WsProcessService from "service/intercept/handler/WsProcessService";
+import HttpsProxyServer from "./access/http-proxy/HttpsProxyServer";
+import HttpProxyServer from "./access/http-proxy/HttpProxyServer";
+import UiServer from "./access/ui-server/UiServer";
 
 async function main() {
     initAsyncContext();
@@ -71,13 +74,20 @@ async function main() {
     await certificationService.start();
 
     // =======================================================================================
-    const connectHandle = await container.getServiceInstance<ConnectHandle>(ConnectHandle);
-    const httpProcessService = await container.getServiceInstance<HttpProcessService>(HttpProcessService);
+
     const wsProcessService = await container.getServiceInstance<WsProcessService>(WsProcessService);
     const httpTrafficService = await container.getServiceInstance<HttpTrafficService>(HttpTrafficService);
 
     await wsProcessService.start();
     await httpTrafficService.start();
+
+    // =======================================================================================
+    const httpProxyServer = await container.getServiceInstance<HttpProxyServer>(HttpProxyServer);
+    const httpsProxyServer = await container.getServiceInstance<HttpsProxyServer>(HttpsProxyServer);
+    const uiServer = await container.getServiceInstance<UiServer>(UiServer);
+    await httpProxyServer.start();
+    await httpsProxyServer.start();
+    await uiServer.start();
 }
 
 main()

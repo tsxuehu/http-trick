@@ -10,7 +10,7 @@ const logger = log4js.getLogger("ConnectHandle");
 
 // https ws wss 都会发送connect请求
 @Service()
-export default class ConnectHandle {
+export default class ConnectProcessService {
 
     @Resource() private appInfoService: AppInfoService
     @Resource() private hostResolveService: HostResolveService
