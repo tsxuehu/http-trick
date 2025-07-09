@@ -33,6 +33,11 @@ export function configureLogger() {
     log4js.configure({
         appenders: {
             console: {type: 'console', layout: LayoutConfig, level: 'error'},
+            errorConsole: {
+                type: 'logLevelFilter',
+                appender: 'console',
+                level: 'error'
+            },
             outgoing: {
                 type: 'file',
                 filename: clientLogFilePath,
@@ -59,10 +64,10 @@ export function configureLogger() {
             }
         },
         categories: {
-            default: {appenders: ['console', 'proxy'], level: 'info'},
-            outgoing: {appenders: ['console', 'outgoing'], level: 'info'},
-            ui: {appenders: ['console', 'ui'], level: 'info'},
-            proxy: {appenders: ['console', 'proxy'], level: 'info'},
+            default: {appenders: ['errorConsole', 'proxy'], level: 'info'},
+            outgoing: {appenders: ['errorConsole', 'outgoing'], level: 'info'},
+            ui: {appenders: ['errorConsole', 'ui'], level: 'info'},
+            proxy: {appenders: ['errorConsole', 'proxy'], level: 'info'},
         }
     });
 }
