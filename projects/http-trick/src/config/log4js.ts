@@ -32,7 +32,7 @@ export function configureLogger() {
 
     log4js.configure({
         appenders: {
-            console: {type: 'console', layout: LayoutConfig},
+            console: {type: 'console', layout: LayoutConfig, level: 'error'},
             outgoing: {
                 type: 'file',
                 filename: clientLogFilePath,
@@ -41,7 +41,7 @@ export function configureLogger() {
                 layout: LayoutConfig,
                 compress: true
             },
-            middleware: {
+            ui: {
                 type: 'file',
                 filename: middlewareLogFilePath,
                 maxLogSize: MaxLogSize,
@@ -49,7 +49,7 @@ export function configureLogger() {
                 layout: LayoutConfig,
                 compress: true
             },
-            main: {
+            proxy: {
                 type: 'file',
                 filename: mainLogFilePath,
                 maxLogSize: MaxLogSize,
@@ -59,10 +59,10 @@ export function configureLogger() {
             }
         },
         categories: {
-            default: {appenders: env.isDev ? ['console', 'main'] : ['main'], level: 'info'},
-            outgoing: {appenders: env.isDev ? ['console', 'outgoing'] : ['outgoing'], level: 'info'},
-            middleware: {appenders: env.isDev ? ['console', 'middleware'] : ['middleware'], level: 'info'},
-            main: {appenders: env.isDev ? ['console', 'main'] : ['main'], level: 'info'},
+            default: {appenders: ['console', 'proxy'], level: 'info'},
+            outgoing: {appenders: ['console', 'outgoing'], level: 'info'},
+            ui: {appenders: ['console', 'ui'], level: 'info'},
+            proxy: {appenders: ['console', 'proxy'], level: 'info'},
         }
     });
 }
