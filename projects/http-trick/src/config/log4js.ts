@@ -25,10 +25,10 @@ const LayoutConfig = {
 const MaxLogSize = '10M'
 const Backups = 3
 
-export function configureLogger() {
-    const clientLogFilePath = path.join(__dirname, '../../logs/outgoing.log')
-    const middlewareLogFilePath = path.join(__dirname, '../../logs/middleware.log')
-    const mainLogFilePath = path.join(__dirname, '../../logs/main.log')
+export function configureLogger(logDir: string) {
+    const clientLogFilePath = path.join(logDir, 'outgoing.log')
+    const middlewareLogFilePath = path.join(logDir, 'middleware.log')
+    const mainLogFilePath = path.join(logDir, 'main.log')
 
     log4js.configure({
         appenders: {

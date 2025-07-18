@@ -33,10 +33,7 @@ export interface IStartOptions {
 }
 
 export async function startProxy(options: IStartOptions) {
-    initAsyncContext();
-    configureLogger();
-    registerGlobalExceptionHandler();
-
+    // =======================================================================================
     // 初始化容器
     const container = new Container();
     const dirList = [
@@ -64,9 +61,19 @@ export async function startProxy(options: IStartOptions) {
     // 挂载到全局
     setContainer(container);
 
-    // 初始化服务
+    // =======================================================================================
+    // 运行状态信息
+    const appInfoService = await container.getServiceInstance<AppInfoService>(AppInfoService);
+    await appInfoService.start(); // 初始化配置目录
+
+    // 初始化 日志，上下文，全局异常处理
+    configureLogger(path.resolve(appInfoService.getProxyDataDir(), 'logs'));
+    initAsyncContext();
+    registerGlobalExceptionHandler();
+
+
     // ========================================================================================
-    const appInfo = await container.getServiceInstance<AppInfoService>(AppInfoService);
+    // 初始化服务
     const configureService = await container.getServiceInstance<ConfigureService>(ConfigureService);
     const profileService = await container.getServiceInstance<ProfileService>(ProfileService);
     const hostService = await container.getServiceInstance<HostDataService>(HostDataService);
@@ -75,8 +82,6 @@ export async function startProxy(options: IStartOptions) {
     const mockDataService = await container.getServiceInstance<MockDataService>(MockDataService);
     const certificationService = await container.getServiceInstance<CertificationService>(CertificationService);
 
-
-    await appInfo.start(); // 初始化配置目录
     await configureService.start();
     await profileService.start();
     await hostService.start();
@@ -86,12 +91,13 @@ export async function startProxy(options: IStartOptions) {
     await certificationService.start();
 
     // =======================================================================================
+    // 初始化代理服务器信息
     const httpProxyPort = options.httpProxyPort || configureService.getConfigure().httpProxyPort;
     const socks5ProxyPort = options.socks5ProxyPort || configureService.getConfigure().socks5ProxyPort;
     const webUiPort = options.webUiPort || configureService.getConfigure().webUiPort;
     const dnsPort = options.dnsPort || configureService.getConfigure().dnsPort;
     const httpsProxyPort = await getPort({port: 40005});
-    appInfo.setAppInfo({
+    appInfoService.setAppInfo({
         single: options.userMode != 'multi',
         pcIp: ip.address(),
         httpProxyPort,
@@ -102,14 +108,14 @@ export async function startProxy(options: IStartOptions) {
     })
 
     // =======================================================================================
-
+    // 初始化server处理器
     const wsProcessService = await container.getServiceInstance<WsProcessService>(WsProcessService);
     const httpTrafficService = await container.getServiceInstance<HttpTrafficService>(HttpTrafficService);
 
     await wsProcessService.start();
     await httpTrafficService.start();
 
-    // =======================================================================================
+    // 启动server
     const httpProxyServer = await container.getServiceInstance<HttpProxyServer>(HttpProxyServer);
     const httpsProxyServer = await container.getServiceInstance<HttpsProxyServer>(HttpsProxyServer);
     const uiServer = await container.getServiceInstance<UiServer>(UiServer);
@@ -117,6 +123,6 @@ export async function startProxy(options: IStartOptions) {
     await httpsProxyServer.start();
     await uiServer.start();
 
-    appInfo.printRuntimeInfo();
+    appInfoService.printRuntimeInfo();
 }
 
