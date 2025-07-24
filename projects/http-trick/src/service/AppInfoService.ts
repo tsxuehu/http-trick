@@ -21,8 +21,8 @@ export default class AppInfoService extends EventEmitter {
         socks5ProxyPort: 0,
         dnsPort: 0,
         webUiPort: 0,
-        startHttpProxy: true,
-        startSocks5: true,
+        startHttpProxy: false,
+        startSocks5: false,
         startDns: false,
         pcIp: "",
     }

@@ -79,7 +79,7 @@ export default class ProfileService extends EventEmitter {
         if (startSocks5) {
             proxy = `SOCKS5 ${proxyIp || pcIp}:${socks5ProxyPort}`
         } else if (startHttpProxy) {
-            proxy = `HTTP ${proxyIp || pcIp}:${httpProxyPort}`
+            proxy = `PROXY ${proxyIp || pcIp}:${httpProxyPort}`
         }
         let pac = this.pacTemplate({
             all,

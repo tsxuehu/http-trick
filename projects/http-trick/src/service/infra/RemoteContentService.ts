@@ -8,6 +8,7 @@ import Future from "../../lib/concurrent/Future";
 import StreamMonitor from "../../utils/stream-monitor";
 import stream from 'stream'
 import zlib from 'zlib'
+import {filterEmptyValues} from "../../utils/obj";
 
 export interface IPipeParam {
     req: IncomingMessage
@@ -103,7 +104,7 @@ export default class RemoteContentService {
             port: actualRequestData.port,
             path: actualRequestData.path,
             hostname: actualRequestData.hostname,
-            headers: actualRequestData.headers,
+            headers: filterEmptyValues(actualRequestData.headers),
             timeout: actualRequestData.timeout,
             rejectUnauthorized: false,
             setHost: false,

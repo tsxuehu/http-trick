@@ -2,7 +2,7 @@ import {IncomingMessage, ServerResponse} from "http";
 import url from 'url'
 import util from 'util'
 import {IAction, IRule} from "service/manage/rule";
-import cookie from "cookie";
+import * as cookie from "cookie";
 import {cookiesToStr} from "../../utils/cookie-2-str";
 
 /**

@@ -85,7 +85,7 @@ export default class HostDataService extends EventEmitter {
             }
 
             hosts = {
-                name: fileContent.name,
+                name: fileContent?.name || '默认HOST',
                 hostMap, globHostMap
             };
             this._userHostsCache[userId][id] = hosts;

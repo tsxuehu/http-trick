@@ -107,14 +107,14 @@ export default class ProfileController {
         };
     }
 
-    @Path(':userId/proxy.pac', HttpMethod.GET)
+    @Path('proxy.pac', HttpMethod.GET)
     async proxyPac(ctx: Context, next: Next) {
-        let {userId} = ctx.params;
         ctx.set('Content-Type', 'application/x-ns-proxy-autoconfig');
         ctx.set('Cache-Control', 'no-cache');
         ctx.set('Server', this.appInfoService.getAppName());
         ctx.set('Connection', 'Close');
         let proxyIp = ctx.query['proxy-ip'] as string;
+        let userId = ctx.query['user-id'] as string || 'root';
         ctx.body = this.profileService.generateProxyPacFile(userId, proxyIp);
     }
 

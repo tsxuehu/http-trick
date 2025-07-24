@@ -23,6 +23,7 @@ import HttpProxyServer from "./access/http-proxy/HttpProxyServer";
 import UiServer from "./access/ui-server/UiServer";
 import getPort from "get-port";
 import isObject from "lodash/isObject";
+import ActionService from "service/intercept/ActionService";
 
 export interface IStartOptions {
     httpProxyPort: number
@@ -105,16 +106,18 @@ export async function startProxy(options: IStartOptions) {
         dnsPort,
         httpsProxyPort,
         webUiPort,
+        startHttpProxy: true
     })
 
     // =======================================================================================
     // 初始化server处理器
     const wsProcessService = await container.getServiceInstance<WsProcessService>(WsProcessService);
     const httpTrafficService = await container.getServiceInstance<HttpTrafficService>(HttpTrafficService);
+    const actionService = await container.getServiceInstance<ActionService>(ActionService);
 
     await wsProcessService.start();
     await httpTrafficService.start();
-
+    await actionService.start();
     // 启动server
     const httpProxyServer = await container.getServiceInstance<HttpProxyServer>(HttpProxyServer);
     const httpsProxyServer = await container.getServiceInstance<HttpsProxyServer>(HttpsProxyServer);
