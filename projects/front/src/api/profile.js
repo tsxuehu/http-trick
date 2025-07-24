@@ -14,6 +14,12 @@ export default {
     enableRule() {
         return axios.post(`/profile/setRuleState?rulestate=1`);
     },
+    disableResolveHost() {
+        return axios.post(`/profile/setResolveHost`);
+    },
+    enableResolveHost() {
+        return axios.post(`/profile/setResolveHost?resolve=1`);
+    },
     disableHost() {
         return axios.post(`/profile/setHostState`);
     },

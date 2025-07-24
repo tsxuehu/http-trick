@@ -8,6 +8,9 @@ import Future from "../../lib/concurrent/Future";
 import StreamMonitor from "../../utils/stream-monitor";
 import stream from 'stream'
 import zlib from 'zlib'
+import {SocksProxyAgent} from 'socks-proxy-agent'
+import {HttpProxyAgent} from 'http-proxy-agent'
+import {HttpsProxyAgent} from 'https-proxy-agent'
 import {filterEmptyValues} from "../../utils/obj";
 
 export interface IPipeParam {
@@ -98,7 +101,22 @@ export default class RemoteContentService {
 
 
         const requestFuture = new Future<IncomingMessage>();
-        const client = actualRequestData.protocol === 'https:' ? https : http;
+        const isHttps = actualRequestData.protocol === 'https:'
+        const client = isHttps ? https : http;
+        let agent: http.Agent
+        if (proxyInfo.hasExternalProxy) {
+            if (proxyInfo.proxyType === 'socks5') {
+                const proxyUrl = `socks://${proxyInfo.proxyIp}:${proxyInfo.proxyPort}`
+                agent = new SocksProxyAgent(proxyUrl) as http.Agent
+            } else if (proxyInfo.proxyType === 'http') {
+                const proxyUrl = `http://${proxyInfo.proxyIp}:${proxyInfo.proxyPort}`
+                if (isHttps) {
+                    agent =  new HttpsProxyAgent(proxyUrl) as http.Agent
+                } else {
+                    agent =  new HttpProxyAgent(proxyUrl) as http.Agent
+                }
+            }
+        }
         const remoteReq = client.request({
             method: actualRequestData.method,
             port: actualRequestData.port,
@@ -108,7 +126,7 @@ export default class RemoteContentService {
             timeout: actualRequestData.timeout,
             rejectUnauthorized: false,
             setHost: false,
-            agent: undefined
+            agent
         }, res => {
             requestFuture.resolve(res)
         });

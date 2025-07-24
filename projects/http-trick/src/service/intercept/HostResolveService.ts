@@ -57,13 +57,20 @@ export default class HostResolveService {
 
     async resolveHostAndSetInfoToContext(hostname: string, context: IProcessContext) {
         const {userId, deviceId, actualRequestData, toClientResponse} = context;
-        toClientResponse.dnsResolveBeginTime = Date.now();
-        const resolved = await this.resolveHostWithWay(userId, deviceId, hostname);
-        actualRequestData.originHostname = hostname
-        actualRequestData.hostname = resolved.ip
-        toClientResponse.headers['proxy-remote-ip'] = resolved.ip;
-        toClientResponse.headers['proxy-resolve-way'] = resolved.way;
-        toClientResponse.remoteIp = resolved.ip;
+        const profile = this.profileService.getProfile(userId)
+        if (profile.resolveHost) {
+            toClientResponse.dnsResolveBeginTime = Date.now();
+            const resolved = await this.resolveHostWithWay(userId, deviceId, hostname);
+            actualRequestData.originHostname = hostname
+            actualRequestData.hostname = resolved.ip
+            toClientResponse.headers['proxy-remote-ip'] = resolved.ip;
+            toClientResponse.headers['proxy-resolve-way'] = resolved.way;
+            toClientResponse.remoteIp = resolved.ip;
+        } else {
+            actualRequestData.originHostname = hostname
+            actualRequestData.hostname = hostname
+            toClientResponse.remoteIp = 'no resolve';
+        }
     }
 
     async resolveHostWithWay(userId: string, deviceId: string, hostname: string) {

@@ -35,6 +35,14 @@ export default class ProfileController {
             code: 0
         };
     }
+    @Path('setResolveHost', HttpMethod.POST)
+    async setResolveHost(ctx: Context, next: Next) {
+        let userId = ctx.userId;
+        await this.profileService.setResolveHost(userId, !!ctx.query.resolve);
+        ctx.body = {
+            code: 0
+        };
+    }
 
     @Path('setFilterState', HttpMethod.POST)
     async setFilterState(ctx: Context, next: Next) {

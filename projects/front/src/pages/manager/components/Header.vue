@@ -1,5 +1,15 @@
 <template>
     <div class="head-nav">
+        <!-- 过滤器 -->
+        <div class="menu-slot">
+          host解析
+          <el-switch
+              :value="resolveHost"
+              @input="switchFilter"
+              active-text=""
+              inactive-text="">
+          </el-switch>
+        </div>
         <!-- host -->
         <div class="menu-slot">
             <el-dropdown :hide-on-click="false" placement="bottom-start" @command="selectHostFile">
@@ -99,11 +109,12 @@
         'appInfo', 'userId'
       ]),
       ...mapGetters([
-        'enableRule', 'enableHost', 'enableFilter'
+        'resolveHost','enableRule', 'enableHost', 'enableFilter'
       ])
     },
     methods: {
       ...mapActions([
+        'switchResolveHost',
         'selectHostFile',
         'switchHost',
         'switchRule',

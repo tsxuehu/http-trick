@@ -176,6 +176,12 @@ export default class ProfileService extends EventEmitter {
         await this.setProfile(userId, conf);
     }
 
+    async setResolveHost(userId: string, enable: boolean): Promise<void> {
+        let conf = this.getProfile(userId);
+        conf.resolveHost = enable;
+        await this.setProfile(userId, conf);
+    }
+
     async setEnableFilter(userId: string, enable: boolean): Promise<void> {
         let conf = this.getProfile(userId);
         conf.enableFilter = enable;

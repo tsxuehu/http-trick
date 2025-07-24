@@ -32,7 +32,7 @@ module.exports = {
   context: path.resolve(__dirname, '../'),
   entry,
   output: {
-    path: path.resolve(__dirname, '../../site'),
+    path: path.resolve(__dirname, '../../http-trick/site'),
     filename: '[name].js',
     publicPath: '/'
   },

@@ -57,7 +57,13 @@ export async function selectHostFile({commit, dispatch}, id) {
     throw new Error(serverData.msg);
   }
 }
-
+export async function switchResolveHost({state}) {
+  if (state.profile.resolveHost) {
+    await profileApi.disableResolveHost();
+  } else {
+    await profileApi.enableResolveHost();
+  }
+}
 export async function switchHost({state}) {
   if (state.profile.enableHost) {
     await profileApi.disableHost();
