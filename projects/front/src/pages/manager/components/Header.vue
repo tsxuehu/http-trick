@@ -5,7 +5,7 @@
           host解析
           <el-switch
               :value="resolveHost"
-              @input="switchFilter"
+              @input="switchResolveHost"
               active-text=""
               inactive-text="">
           </el-switch>

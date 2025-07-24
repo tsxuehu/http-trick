@@ -25,7 +25,7 @@
     "shell-escape": "^0.2.0",
     "url-search-params": "^0.6.1",
     "uuid": "^3.0.1",
-    "vue": "2.6.10",
+    "vue": "2.7.16",
     "vue-clipboard2": "^0.2.1",
     "vue-data-center": "^1.0.6",
     "vue-json-tree": "^0.3.3",

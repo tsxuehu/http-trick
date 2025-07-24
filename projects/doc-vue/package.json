@@ -1,0 +1,14 @@
+{
+  "name": "admin",
+  "version": "1.0.0",
+  "description": "zan proxy doc",
+  "author": "daoqi <daoqi@qq.com>",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.3"
+  }
+}

@@ -18,3 +18,4 @@ projects/http-trick/dist
 projects/http-trick/logs
 .idea
 npm-debug.log
+projects/doc-vue/.vitepress/cache

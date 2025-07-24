@@ -8,7 +8,7 @@ const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 function resolve(dir) {
   return path.join(__dirname, '..', dir);
 }
-
+const targetDir = path.resolve(__dirname, '../../http-trick/site/manager')
 let entry = {
   manager: './src/pages/manager/index.js',
   monitor: './src/pages/monitor/index.js',
@@ -20,7 +20,7 @@ let htmlPlugins = Object.keys(entry).map(pageName => {
     htmlName = 'index';
   }
   return new HtmlWebpackPlugin({
-    filename: path.resolve(__dirname, '../../site', `${htmlName}.html`),
+    filename: path.resolve(targetDir, `${htmlName}.html`),
     template: 'index.html',
     title: pageName,
     inject: true,
@@ -32,9 +32,10 @@ module.exports = {
   context: path.resolve(__dirname, '../'),
   entry,
   output: {
-    path: path.resolve(__dirname, '../../http-trick/site'),
+    path: targetDir,
     filename: '[name].js',
-    publicPath: '/'
+    publicPath: '/manager',
+    clean: true,
   },
   resolve: {
     extensions: ['.js', '.vue', '.json'],
@@ -74,7 +75,7 @@ module.exports = {
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         loader: 'url-loader',
-        query: {
+        options: {
           limit: 10000,
           name: "fonts/[name].[ext]"
         }
