@@ -2,7 +2,7 @@
 
 export default {
   // 运行用户
-  userId: 'guest',
+  userId: 'root',
   // 运行时信息
   appInfo: {
     appName: '',
@@ -37,6 +37,7 @@ export default {
     enableRule: true,// 是否启用转发规则
     enableHost: true,// 是否启用host解析
     enableFilter: true,// 是否启用filter
+    resolveHost: false, // 是否解析host
     goThroughProxyConfig: '',// 需要经过代理的域名
     externalProxy: false,// 是否使用外部http代理
     externalHttpProxy: false,

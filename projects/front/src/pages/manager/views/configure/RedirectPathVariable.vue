@@ -105,6 +105,7 @@
       },
 
       addParam() {
+        debugger
         this.redirectPathVariableArray.push({
           key: '',
           value: ''

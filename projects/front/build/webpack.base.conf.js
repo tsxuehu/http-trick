@@ -34,7 +34,7 @@ module.exports = {
   output: {
     path: targetDir,
     filename: '[name].js',
-    publicPath: '/manager',
+    publicPath: '/manager/',
     clean: true,
   },
   resolve: {
