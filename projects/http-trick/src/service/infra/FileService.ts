@@ -1,4 +1,4 @@
-import {Service} from "di/annotation";
+import {Service} from "@spring4js/container-node";
 import path from "path";
 import fs from "fs/promises";
 

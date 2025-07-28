@@ -1,4 +1,4 @@
-import {Resource, Service} from "di/annotation";
+import {Resource, Service} from "@spring4js/container-node";
 import {ActionRunExtraInfo, generateHeadersInActualRequestData, IProcessContext} from "service/intercept/http";
 import ProfileService from "service/manage/ProfileService";
 import HostResolveService from "service/intercept/HostResolveService";

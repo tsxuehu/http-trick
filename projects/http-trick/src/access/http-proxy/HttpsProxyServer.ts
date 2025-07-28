@@ -1,4 +1,4 @@
-import {Resource, Service} from "di/annotation";
+import {Resource, Service} from "@spring4js/container-node";
 import AppInfoService from "service/AppInfoService";
 import ConnectProcessService from "service/intercept/handler/ConnectProcessService";
 import HttpProcessService from "service/intercept/handler/HttpProcessService";

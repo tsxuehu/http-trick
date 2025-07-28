@@ -1,5 +1,5 @@
-import {Controller, Path, Resource} from "di/annotation";
-import {HttpMethod} from "di/meta-utils";
+import {Controller, Path, Resource} from "@spring4js/container-node";
+import {HttpMethod} from "@spring4js/container-node";
 import AppInfoService from "service/AppInfoService";
 import {Context, Next} from "koa";
 

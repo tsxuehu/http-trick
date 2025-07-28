@@ -1,4 +1,4 @@
-import {Container} from "di/container";
+import {Container} from "@spring4js/container-node";
 
 let _container: Container
 

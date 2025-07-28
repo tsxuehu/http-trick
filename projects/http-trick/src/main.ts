@@ -4,7 +4,7 @@ import {configureLogger} from "config/log4js";
 import {initAsyncContext} from "utils/trace";
 import {registerGlobalExceptionHandler} from "./global-exception";
 import path from "path";
-import {Container} from "di/container";
+import {Container} from "@spring4js/container-node";
 import {setContainer} from "utils/global-var";
 import glob from 'fast-glob';
 import AppInfoService from "service/AppInfoService";

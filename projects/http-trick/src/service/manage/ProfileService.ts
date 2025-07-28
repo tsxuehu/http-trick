@@ -1,4 +1,4 @@
-import {Resource, Service} from "di/annotation";
+import {Resource, Service} from "@spring4js/container-node";
 import {defaultProfile, IDeviceInfo, IUserProfile, IProxyConfig} from "./profile";
 import FileService from "service/infra/FileService";
 import path from "path";

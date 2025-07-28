@@ -1,4 +1,4 @@
-import {Resource, Service} from "di/annotation";
+import {Resource, Service} from "@spring4js/container-node";
 import FileService from "service/infra/FileService";
 import AppInfoService from "service/AppInfoService";
 import ProfileService from "service/manage/ProfileService";

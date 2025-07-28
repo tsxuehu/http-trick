@@ -1,5 +1,5 @@
 import dns from 'dns'
-import {Service} from "di/annotation";
+import {Service} from "@spring4js/container-node";
 import {ICacheItem} from "service/infra/dns";
 import Future from "../../lib/concurrent/Future";
 import log4js from "log4js";

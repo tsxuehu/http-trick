@@ -1,5 +1,5 @@
-import {Controller, Path, Resource} from "di/annotation";
-import {HttpMethod} from "di/meta-utils";
+import {Controller, Path, Resource} from "@spring4js/container-node";
+import {HttpMethod} from "@spring4js/container-node";
 import {Context, Next} from "koa";
 import ProfileService from "service/manage/ProfileService";
 import RuleDataService from "service/manage/RuleDataService";

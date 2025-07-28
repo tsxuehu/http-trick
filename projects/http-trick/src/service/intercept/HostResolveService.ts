@@ -1,4 +1,4 @@
-import {Resource, Service} from "di/annotation";
+import {Resource, Service} from "@spring4js/container-node";
 import ProfileService from "service/manage/ProfileService";
 import HostDataService from "service/manage/HostDataService";
 import find from "lodash/find";

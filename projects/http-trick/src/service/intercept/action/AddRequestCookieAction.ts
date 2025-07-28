@@ -1,5 +1,5 @@
 import {BaseAction} from "service/action";
-import {Service} from "di/annotation";
+import {Service} from "@spring4js/container-node";
 import {ActionRunExtraInfo, IProcessContext} from "service/intercept/http";
 
 

@@ -1,4 +1,4 @@
-import {Service} from "di/annotation";
+import {Service} from "@spring4js/container-node";
 import forEach from "lodash/forEach";
 import Future from "../../lib/concurrent/Future";
 import {IncomingMessage, ServerResponse} from "http";

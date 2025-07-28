@@ -1,4 +1,4 @@
-import {Resource, Service} from "di/annotation";
+import {Resource, Service} from "@spring4js/container-node";
 import mime from "mime";
 import fs from "fs";
 import {IToClientResponse, setError} from "service/intercept/http";

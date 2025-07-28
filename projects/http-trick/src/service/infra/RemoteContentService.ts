@@ -1,4 +1,4 @@
-import {Service} from "di/annotation";
+import {Service} from "@spring4js/container-node";
 import {IActualRequestData, IToClientResponse} from "service/intercept/http";
 import {IProxyConfig} from "service/manage/profile";
 import {IncomingMessage, ServerResponse} from "http";

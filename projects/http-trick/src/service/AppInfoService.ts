@@ -1,4 +1,4 @@
-import {Resource, Service} from "di/annotation";
+import {Resource, Service} from "@spring4js/container-node";
 import {IAppInfo} from "./app-info";
 import path from "path";
 import assign from "lodash/assign";

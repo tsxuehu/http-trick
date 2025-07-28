@@ -1,4 +1,4 @@
-import {Resource, Service} from "di/annotation";
+import {Resource, Service} from "@spring4js/container-node";
 import {ActionRunExtraInfo, IProcessContext} from "service/intercept/http";
 import MockDataService from "service/manage/MockDataService";
 import {BaseAction} from "service/action";

@@ -1,4 +1,4 @@
-import {Resource, Service} from "di/annotation";
+import {Resource, Service} from "@spring4js/container-node";
 import forEach from "lodash/forEach";
 import filter from "lodash/filter";
 import assign from "lodash/assign";

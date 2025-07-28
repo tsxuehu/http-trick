@@ -4,7 +4,7 @@ import http, {Server} from "http";
 import Koa, {Context, Next} from 'koa'
 import SocketIO from 'socket.io'
 import koa from "koa";
-import {Resource, Service} from "di/annotation";
+import {Resource, Service} from "@spring4js/container-node";
 import AppInfoService from "service/AppInfoService";
 import {getRemoteIp} from "../../utils/socket-ip";
 import koaQs from "koa-qs"
