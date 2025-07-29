@@ -124,6 +124,6 @@ export default class AppInfoService extends EventEmitter {
         startSocks5 && console.log(`Socks5 Proxy Port: ${socks5ProxyPort}`);
         startDns && console.log(`DNS Port: ${dnsPort}`);
         console.log(`IP: ${pcIp}`);
-        console.log(`Manager: http://${pcIp}:${webUiPort}/manager/index.html`);
+        console.log(`Manager: http://${pcIp}:${webUiPort}/index.html`);
     }
 }
