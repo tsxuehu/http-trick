@@ -1,0 +1,59 @@
+.install-body {
+  margin: -50px;
+  padding: 50px;
+  font-size: 14px;
+  line-height: 1.8;
+  background-color: #fff;
+}
+.install-body __qrcode {
+  display: block;
+  margin-left: -15px;
+}
+.install-body h1,
+.install-body h2,
+.install-body h3,
+.install-body h4,
+.install-body h5 {
+  font-weight: 400;
+  margin: 20px 0 10px;
+  color: rgba(51, 51, 51, 0.9);
+}
+.install-body h1 {
+  margin: 0;
+  font-size: 32px;
+  font-family: Dosis, Source Sans Pro, Helvetica Neue, Arial, sans-serif;
+}
+.install-body h2 {
+  color: #333;
+  font-size: 24px;
+  margin-top: 30px;
+}
+.install-body h2 :first-of-type {
+  margin-top: 10px;
+}
+.install-body h4 {
+  font-size: 18px;
+}
+.install-body code {
+  margin: 2px;
+  color: #455a64;
+  padding: 2px 7px;
+  font-size: 13px;
+  overflow-x: auto;
+  font-weight: 400;
+  line-height: 22px;
+  border-radius: 3px;
+  margin-bottom: 25px;
+  position: relative;
+  word-break: break-all;
+  white-space: pre-wrap;
+  background-color: #f5f7fa;
+  font-family: Source Code Pro, Monaco, Inconsolata, monospace;
+}
+.install-body ol {
+  padding-left: 20px;
+}
+.install-body a {
+  color: #3498db;
+  text-decoration: none;
+}

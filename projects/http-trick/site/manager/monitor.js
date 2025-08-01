@@ -1,4 +1,4 @@
-import { L as Layout, r as reactExports, t as theme, j as jsxRuntimeExports, M as Menu, B as Breadcrumb, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as clientExports } from "./vendor.js";
+import { i as Layout, r as reactExports, t as theme, j as jsxRuntimeExports, M as Menu, B as Breadcrumb, n as RefIcon, o as RefIcon$1, a as RefIcon$2, p as RefIcon$3, v as RefIcon$4, g as getServiceSync, S as ServiceRegistry, s as setServiceRegistry, m as clientExports } from "./vendor.js";
 const { Header, Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
   return {
@@ -54,6 +54,26 @@ const App = () => {
     ] })
   ] });
 };
-clientExports.createRoot(document.getElementById("root")).render(
-  /* @__PURE__ */ jsxRuntimeExports.jsx(reactExports.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) })
-);
+var EService = /* @__PURE__ */ ((EService2) => {
+  EService2["IWorkbenchService"] = "WorkbenchService";
+  return EService2;
+})(EService || {});
+class WorkbenchService {
+  async start(query) {
+  }
+}
+const services = {
+  [EService.IWorkbenchService]: new WorkbenchService()
+};
+const workbenchService = getServiceSync(EService.IWorkbenchService);
+async function init() {
+  const registry = new ServiceRegistry();
+  registry.registerServiceBatch(services);
+  setServiceRegistry(registry);
+  clientExports.createRoot(document.getElementById("root")).render(
+    /* @__PURE__ */ jsxRuntimeExports.jsx(reactExports.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) })
+  );
+  await workbenchService.start({});
+}
+init();
+//# sourceMappingURL=monitor.js.map

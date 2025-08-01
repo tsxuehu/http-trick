@@ -16,6 +16,7 @@ export default defineConfig((env: ConfigEnv) => {
   const isDev = env.mode !== 'production'
 
   return {
+    base: '/manager/',
     plugins: [
       react(),
      ].filter(Boolean), // 过滤可能的 undefined 值
@@ -26,7 +27,7 @@ export default defineConfig((env: ConfigEnv) => {
     },
     build: {
       emptyOutDir: true,
-      minify: false,
+      minify: !isDev,
       sourcemap: isDev,
       outDir: outputDir,
       rollupOptions: {
