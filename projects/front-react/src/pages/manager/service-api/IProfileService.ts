@@ -1,7 +1,7 @@
 import IStateBase from "../../../common/IStateBase.ts";
 
 export interface IUserProfile {
-  redirectPathVariables?: any; // 转发路劲变量
+  redirectPathVariables: Record<string, string>; // 转发路劲变量
   enableRule: boolean; // 是否启用转发规则
   enableHost: boolean; // 是否启用host解析
   enableFilter: boolean; // 是否启用filter
@@ -18,4 +18,5 @@ export interface IUserProfile {
 }
 
 export default interface IProfileService extends IStateBase<IUserProfile> {
+   saveRedirectPathVariables(variables: Record<string, string>): Promise<void>
 }

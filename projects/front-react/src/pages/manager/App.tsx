@@ -3,6 +3,8 @@ import { Breadcrumb, Layout, Menu, theme } from "antd";
 import { HashRouter as Router, } from "react-router";
 import { HttpTrickMenu } from "./config/menu.tsx";
 import { ViewRouter } from "./config/router.tsx";
+// @ts-ignore
+import './app.less'
 
 const { Header, Content, Footer, Sider } = Layout;
 

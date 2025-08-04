@@ -56,4 +56,10 @@ export default class ProfileService extends StateBase<IUserProfile> implements I
       profileApi.enableRule();
     }
   }
+  async saveRedirectPathVariables(variables: Record<string, string>) {
+    const data = this.getState()
+    let copyProfile = JSON.parse(JSON.stringify(data));
+    copyProfile.redirectPathVariables = variables;
+    await profileApi.saveFile(copyProfile);
+  }
 }

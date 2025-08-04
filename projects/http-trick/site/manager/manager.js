@@ -1,4 +1,4 @@
-import { u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, g as getServiceSync, e as React, q as qrcode, f as Routes, h as Route, N as Navigate, i as Layout, r as reactExports, t as theme, H as HashRouter, k as axios, l as createStore, S as ServiceRegistry, s as setServiceRegistry, m as clientExports } from "./vendor.js";
+import { u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, g as getServiceSync, e as React, q as qrcode, s as staticMethods, I as Input, P as Popconfirm, B as Button, F as ForwardTable, f as Routes, h as Route, N as Navigate, i as Layout, r as reactExports, t as theme, H as HashRouter, k as axios, l as createStore, S as ServiceRegistry, m as setServiceRegistry, n as clientExports } from "./vendor.js";
 const items = [
   {
     key: "/helpinstall",
@@ -144,14 +144,129 @@ class Help extends React.PureComponent {
     ] });
   }
 }
+getServiceSync(EService.IProfileService);
 class ProxyConfigure extends React.PureComponent {
+  state = {};
   render() {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "ProxyConfigure" });
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", {});
   }
 }
+const profileService$1 = getServiceSync(EService.IProfileService);
 class RedirectPathVariable extends React.PureComponent {
+  state = {
+    redirectPathVariableArray: []
+  };
+  componentDidMount() {
+    profileService$1.subscribe((userProfile) => {
+      const pairs = [];
+      for (const [key, value] of Object.entries(userProfile.redirectPathVariables)) {
+        pairs.push({
+          key,
+          value
+        });
+      }
+      this.setState({ redirectPathVariableArray: pairs });
+    });
+  }
+  addParam() {
+    const origin = this.state.redirectPathVariableArray;
+    this.setState({
+      redirectPathVariableArray: [...origin, {
+        key: "",
+        value: ""
+      }]
+    });
+  }
+  deleteParam(index) {
+    const origin = this.state.redirectPathVariableArray;
+    origin.splice(index, 1);
+    this.setState({ redirectPathVariableArray: [...origin] });
+  }
+  async saveFile() {
+    let redirectPathVariableMap = {};
+    const origin = this.state.redirectPathVariableArray;
+    for (const { key, value } of origin) {
+      redirectPathVariableMap[key] = value;
+    }
+    try {
+      await profileService$1.saveRedirectPathVariables(redirectPathVariableMap);
+      staticMethods.success("保存成功!");
+    } catch (err) {
+      staticMethods.error(`出错了，${err.message}`);
+    }
+  }
+  setKey(index, key) {
+    const origin = this.state.redirectPathVariableArray;
+    origin[index].key = key;
+    this.setState({ redirectPathVariableArray: [...origin] });
+  }
+  setValue(index, value) {
+    const origin = this.state.redirectPathVariableArray;
+    origin[index].value = value;
+    this.setState({ redirectPathVariableArray: [...origin] });
+  }
+  getColumns() {
+    return [
+      {
+        title: "变量名",
+        dataIndex: "key",
+        key: "key",
+        render: (value, record, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { value, onChange: (e) => this.setKey(index, e.target.value), placeholder: "工程名" })
+      },
+      {
+        title: "变量值",
+        dataIndex: "value",
+        key: "value",
+        render: (value, record, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            value,
+            onChange: (e) => this.setValue(index, e.target.value),
+            placeholder: "工程在本地的绝对路径"
+          }
+        )
+      },
+      {
+        title: "操作",
+        key: "action",
+        render: (_, record, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Popconfirm,
+          {
+            title: "确认",
+            description: "确认删除?",
+            onConfirm: () => this.deleteParam(index),
+            okText: "确认",
+            cancelText: "取消",
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "link", children: "删除" })
+          }
+        )
+      }
+    ];
+  }
   render() {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "RedirectPathVariable" });
+    const { redirectPathVariableArray } = this.state;
+    const columns = this.getColumns();
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "project-wraper", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "main-content__title", children: "转发路径变量管理" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          className: "project-path-info",
+          children: [
+            "配置http转发规则时，转发路径可以引用这里的变量。例如：将http请求转发到",
+            "${helloworld}",
+            "/dist/hello.js，",
+            "${helloworld}",
+            "会被替换为变量helloworld对应的值。"
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardTable, { rowKey: "key", dataSource: redirectPathVariableArray, columns }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { marginTop: "50px", textAlign: "right" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: () => this.addParam(), children: "增加工程路径设置" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", onClick: () => this.saveFile(), children: "保存" })
+      ] })
+    ] });
   }
 }
 class HostList extends React.PureComponent {
@@ -238,6 +353,13 @@ const App = () => {
     ] })
   ] }) });
 };
+async function saveFile(content) {
+  const response = await axios.post("/profile/savefile", content);
+  const serverData = response.data;
+  if (serverData.code !== 0) {
+    throw new Error(serverData.msg);
+  }
+}
 function disableRule() {
   return axios.post(`/profile/setRuleState`);
 }
@@ -443,6 +565,12 @@ class ProfileService extends StateBase {
     } else {
       enableRule();
     }
+  }
+  async saveRedirectPathVariables(variables) {
+    const data = this.getState();
+    let copyProfile = JSON.parse(JSON.stringify(data));
+    copyProfile.redirectPathVariables = variables;
+    await saveFile(copyProfile);
   }
 }
 async function setFileCheckStatus(id, checked) {

@@ -4,8 +4,12 @@
 
 import axios from "axios";
 
-export function saveFile(content: any) {
-  return axios.post("/profile/savefile", content);
+export async function saveFile(content: any) {
+  const response = await axios.post("/profile/savefile", content);
+  const serverData = response.data;
+  if (serverData.code !== 0) {
+    throw new Error(serverData.msg);
+  }
 }
 
 export function disableRule() {
