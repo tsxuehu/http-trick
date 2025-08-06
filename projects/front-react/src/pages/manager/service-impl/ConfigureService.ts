@@ -18,8 +18,8 @@ export default class ConfigureService extends StateBase<IConfigure> implements I
     });
   }
 
-  async save(newConfig: Partial<IConfigure>): Promise<void> {
+  async save(part: Partial<IConfigure>): Promise<void> {
     const oldConfig = this.getState();
-    await configApi.saveFile(Object.assign({}, oldConfig, newConfig))
+    await configApi.saveFile(Object.assign({}, oldConfig, part))
   }
 }

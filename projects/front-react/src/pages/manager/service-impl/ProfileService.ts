@@ -1,6 +1,7 @@
 import IProfileService, { IUserProfile } from "../service-api/IProfileService";
 import StateBase from "../../../common/StateBase";
 import * as profileApi from "../../../api/profile";
+import * as configApi from "../../../api/conf.ts";
 
 export default class ProfileService extends StateBase<IUserProfile> implements IProfileService {
   constructor() {
@@ -61,5 +62,11 @@ export default class ProfileService extends StateBase<IUserProfile> implements I
     let copyProfile = JSON.parse(JSON.stringify(data));
     copyProfile.redirectPathVariables = variables;
     await profileApi.saveFile(copyProfile);
+  }
+
+  async saveProfile(part: Partial<IUserProfile>): Promise<void> {
+    const oldConfig = this.getState();
+    const newProfile = Object.assign({}, oldConfig, part)
+    await profileApi.saveFile(newProfile);
   }
 }

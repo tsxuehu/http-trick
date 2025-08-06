@@ -344,6 +344,10 @@ class ProxyConfigure extends React.PureComponent {
   }
 }
 const profileService$2 = getServiceSync(EService.IProfileService);
+const PlaceHolder = `#示例
+all               # 有all 配置项，所有域名君走http解析代理
+*.domain.com      # 所有domain域名都会走Http解析代理
+www.domain.com    # www.domain.com走Http解析代理`;
 const onFinishFailed = (errorInfo) => {
   console.log("Failed:", errorInfo);
 };
@@ -354,7 +358,8 @@ function getFormDataFromProfile(profile) {
     httpProxyIp: profile.httpProxyIp,
     httpProxyPort: profile.httpProxyPort,
     socks5ProxyIp: profile.socks5ProxyIp,
-    socks5ProxyPort: profile.socks5ProxyPort
+    socks5ProxyPort: profile.socks5ProxyPort,
+    goThroughProxyConfig: profile.goThroughProxyConfig
   };
 }
 class InterceptionConfig extends React.PureComponent {
@@ -371,7 +376,21 @@ class InterceptionConfig extends React.PureComponent {
     this.unProfile?.();
   }
   onSave = async (values) => {
-    console.log(values);
+    try {
+      await profileService$2.saveProfile({
+        externalProxy: values.externalProxy,
+        externalHttpProxy: !values.isSocks5Proxy,
+        externalSocks5Proxy: values.isSocks5Proxy,
+        httpProxyIp: values.httpProxyIp,
+        httpProxyPort: values.httpProxyPort,
+        socks5ProxyIp: values.socks5ProxyIp,
+        socks5ProxyPort: values.socks5ProxyPort,
+        goThroughProxyConfig: values.goThroughProxyConfig
+      });
+      staticMethods.success("保存成功!");
+    } catch (err) {
+      staticMethods.error(`出错了，${err.message}`);
+    }
   };
   render() {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -399,25 +418,129 @@ class InterceptionConfig extends React.PureComponent {
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Form.Item,
             {
-              label: "外部代理类型",
-              name: "isSocks5Proxy",
-              shouldUpdate: () => true,
-              children: ({ getFieldValue }) => {
-                debugger;
-                this.formRef.current?.getFieldValue("externalProxy");
+              noStyle: true,
+              shouldUpdate: (prevValues, currentValues) => prevValues.externalProxy !== currentValues.externalProxy,
+              children: (form) => {
+                let externalProxy = form.getFieldValue("externalProxy");
+                if (!externalProxy) {
+                  return null;
+                }
                 return /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Radio.Group,
+                  Form.Item,
                   {
-                    name: "radiogroup",
-                    options: [
-                      { value: true, label: "Socks5代理" },
-                      { value: false, label: "Http代理" }
-                    ]
+                    label: "外部代理类型",
+                    name: "isSocks5Proxy",
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Radio.Group,
+                      {
+                        options: [
+                          { value: true, label: "Socks5代理" },
+                          { value: false, label: "Http代理" }
+                        ]
+                      }
+                    )
                   }
                 );
               }
             }
-          )
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              noStyle: true,
+              shouldUpdate: (prevValues, currentValues) => prevValues.externalProxy !== currentValues.externalProxy || prevValues.isSocks5Proxy !== currentValues.isSocks5Proxy,
+              children: (form) => {
+                let externalProxy = form.getFieldValue("externalProxy");
+                let isSocks5Proxy = form.getFieldValue("isSocks5Proxy");
+                if (!externalProxy || isSocks5Proxy) {
+                  return null;
+                }
+                return /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Form.Item,
+                  {
+                    label: "Http代理 IP",
+                    name: "httpProxyIp",
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Http代理 IP" })
+                  }
+                );
+              }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              noStyle: true,
+              shouldUpdate: (prevValues, currentValues) => prevValues.externalProxy !== currentValues.externalProxy || prevValues.isSocks5Proxy !== currentValues.isSocks5Proxy,
+              children: (form) => {
+                let externalProxy = form.getFieldValue("externalProxy");
+                let isSocks5Proxy = form.getFieldValue("isSocks5Proxy");
+                if (!externalProxy || isSocks5Proxy) {
+                  return null;
+                }
+                return /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Form.Item,
+                  {
+                    label: "Http代理 Port",
+                    name: "httpProxyPort",
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Http代理 Port" })
+                  }
+                );
+              }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              noStyle: true,
+              shouldUpdate: (prevValues, currentValues) => prevValues.externalProxy !== currentValues.externalProxy || prevValues.isSocks5Proxy !== currentValues.isSocks5Proxy,
+              children: (form) => {
+                let externalProxy = form.getFieldValue("externalProxy");
+                let isSocks5Proxy = form.getFieldValue("isSocks5Proxy");
+                if (!externalProxy || !isSocks5Proxy) {
+                  return null;
+                }
+                return /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Form.Item,
+                  {
+                    label: "Socks代理 IP",
+                    name: "socks5ProxyIp",
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Socks代理 IP" })
+                  }
+                );
+              }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              noStyle: true,
+              shouldUpdate: (prevValues, currentValues) => prevValues.externalProxy !== currentValues.externalProxy || prevValues.isSocks5Proxy !== currentValues.isSocks5Proxy,
+              children: (form) => {
+                let externalProxy = form.getFieldValue("externalProxy");
+                let isSocks5Proxy = form.getFieldValue("isSocks5Proxy");
+                if (!externalProxy || !isSocks5Proxy) {
+                  return null;
+                }
+                return /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Form.Item,
+                  {
+                    label: "Socks代理 Port",
+                    name: "socks5ProxyPort",
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Socks代理 Port" })
+                  }
+                );
+              }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "需要Http解析代理的域名",
+              name: "goThroughProxyConfig",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input.TextArea, { autoSize: { minRows: 10, maxRows: 10 }, placeholder: PlaceHolder })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: null, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", htmlType: "submit", children: "保存" }) })
         ]
       }
     );
@@ -764,9 +887,9 @@ class ConfigureService extends StateBase {
       remoteDnsServer: "223.5.5.5"
     });
   }
-  async save(newConfig) {
+  async save(part) {
     const oldConfig = this.getState();
-    await saveFile(Object.assign({}, oldConfig, newConfig));
+    await saveFile(Object.assign({}, oldConfig, part));
   }
 }
 class MockDataService extends StateBase {
@@ -851,6 +974,11 @@ class ProfileService extends StateBase {
     let copyProfile = JSON.parse(JSON.stringify(data));
     copyProfile.redirectPathVariables = variables;
     await saveFile$1(copyProfile);
+  }
+  async saveProfile(part) {
+    const oldConfig = this.getState();
+    const newProfile = Object.assign({}, oldConfig, part);
+    await saveFile$1(newProfile);
   }
 }
 async function setFileCheckStatus(id, checked) {
