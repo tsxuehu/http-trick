@@ -93,10 +93,10 @@ export async function startProxy(options: IStartOptions) {
 
   // =======================================================================================
   // 初始化代理服务器信息
-  const httpProxyPort = options.httpProxyPort || configureService.getConfigure().httpProxyPort;
-  const socks5ProxyPort = options.socks5ProxyPort || configureService.getConfigure().socks5ProxyPort;
-  const webUiPort = options.webUiPort || configureService.getConfigure().webUiPort;
-  const dnsPort = options.dnsPort || configureService.getConfigure().dnsPort;
+  const httpProxyPort = +(options.httpProxyPort || configureService.getConfigure().httpProxyPort);
+  const socks5ProxyPort = +(options.socks5ProxyPort || configureService.getConfigure().socks5ProxyPort);
+  const webUiPort = +(options.webUiPort || configureService.getConfigure().webUiPort);
+  const dnsPort = +(options.dnsPort || configureService.getConfigure().dnsPort);
   const httpsProxyPort = await getPort({ port: 40005 });
   appInfoService.setAppInfo({
     single: options.userMode != 'multi',

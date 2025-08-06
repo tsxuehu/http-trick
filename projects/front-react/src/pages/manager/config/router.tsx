@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from "react";
 import { Navigate, Routes, Route } from "react-router";
 import Help from '../views/help/Help'
 import ProxyConfigure from '../views/configure/ProxyConfigure'
+import InterceptionConfig from "../views/configure/InterceptionConfig.tsx";
 import RedirectPathVariable from '../views/configure/RedirectPathVariable'
 import HostList from '../views/host/HostList'
 import EditHost from '../views/host/EditHost'
@@ -39,7 +40,8 @@ export function ViewRouter() {
         <Route path="/" element={<Navigate to="/helpinstall" />} />
         <Route path="/helpinstall" element={<Help />} />
 
-        <Route path="/proxy-configure" element={<ProxyConfigure />} />
+        <Route path="/proxy-app-configure" element={<ProxyConfigure />} />
+        <Route path="/interception-config" element={<InterceptionConfig />} />
         <Route path="/redirect-path-variable" element={<RedirectPathVariable />} />
 
         <Route path="/hostfilelist" element={<HostList />} />

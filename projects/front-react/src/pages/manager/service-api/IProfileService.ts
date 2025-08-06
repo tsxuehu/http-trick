@@ -11,9 +11,9 @@ export interface IUserProfile {
   externalProxy: boolean; // 是否使用外部http代理
   externalHttpProxy: boolean;
   externalSocks5Proxy: boolean;
-  httpProxyIp?: any;
+  httpProxyIp: string;
   httpProxyPort: number;
-  socks5ProxyIp?: any;
+  socks5ProxyIp: string;
   socks5ProxyPort: number;
 }
 

@@ -6,4 +6,5 @@ export interface IUserInfo {
 }
 
 export default interface IUserService extends IStateBase<IUserInfo> {
+  isRoot(): boolean
 }

@@ -1,50 +1,4 @@
-import { u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, g as getServiceSync, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, P as Popconfirm, f as ForwardTable, h as Routes, i as Route, N as Navigate, k as Layout, r as reactExports, t as theme, H as HashRouter, l as axios, m as createStore, S as ServiceRegistry, n as setServiceRegistry, o as clientExports } from "./vendor.js";
-const items = [
-  {
-    key: "/helpinstall",
-    icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon, {}),
-    label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/helpinstall", children: "使用说明" })
-  },
-  {
-    key: "/proxy-configure",
-    icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$1, {}),
-    label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/proxy-configure", children: "代理配置" })
-  },
-  {
-    key: "/redirect-path-variable",
-    icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$2, {}),
-    label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/redirect-path-variable", children: "转发路径变量" })
-  },
-  {
-    key: "/hostfilelist",
-    icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
-    label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/hostfilelist", children: "Host 管理" })
-  },
-  {
-    key: "/filter",
-    icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$4, {}),
-    label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/filter", children: "Http 过滤器" })
-  },
-  {
-    key: "/rulefilelist",
-    icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$4, {}),
-    label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/rulefilelist", children: "Http 转发" })
-  },
-  {
-    key: "/datalist",
-    icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$4, {}),
-    label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/datalist", children: "自定义 mock 数据" })
-  },
-  {
-    key: "/device",
-    icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$4, {}),
-    label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/device", children: "设备管理" })
-  }
-];
-function HttpTrickMenu() {
-  const location = useLocation();
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Menu, { theme: "dark", selectedKeys: [location.pathname], mode: "inline", items });
-}
+import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as Routes, k as Route, N as Navigate, l as Layout, t as theme, H as HashRouter, m as axios, n as createStore, S as ServiceRegistry, o as setServiceRegistry, p as clientExports } from "./vendor.js";
 var EService = /* @__PURE__ */ ((EService2) => {
   EService2["IWorkbenchService"] = "WorkbenchService";
   EService2["IUserService"] = "UserService";
@@ -58,6 +12,102 @@ var EService = /* @__PURE__ */ ((EService2) => {
   EService2["IRuleService"] = "RuleService";
   return EService2;
 })(EService || {});
+const configureService$2 = getServiceSync(EService.IConfigureService);
+const userService$2 = getServiceSync(EService.IUserService);
+function getMenuItems() {
+  const professionalVersion = configureService$2.getState().professionalVersion;
+  const items = [
+    {
+      key: "/helpinstall",
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$4, {}),
+      label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/helpinstall", children: "使用说明" })
+    }
+  ];
+  if (userService$2.isRoot()) {
+    items.push({
+      key: "/proxy-configure",
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon, {}),
+      label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/proxy-app-configure", children: "代理程序设置" })
+    });
+  }
+  if (professionalVersion) {
+    items.push(...[
+      {
+        key: "/interception-config",
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$1, {}),
+        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/interception-config", children: "请求拦截设置" })
+      },
+      {
+        key: "/redirect-path-variable",
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$1, {}),
+        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/redirect-path-variable", children: "转发路径变量" })
+      },
+      {
+        key: "/hostfilelist",
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$2, {}),
+        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/hostfilelist", children: "Host 管理" })
+      },
+      {
+        key: "/filter",
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
+        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/filter", children: "Http 过滤器" })
+      },
+      {
+        key: "/rulefilelist",
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
+        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/rulefilelist", children: "Http 转发" })
+      },
+      {
+        key: "/datalist",
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
+        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/datalist", children: "自定义 mock 数据" })
+      },
+      {
+        key: "/device",
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
+        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/device", children: "设备管理" })
+      }
+    ]);
+  } else {
+    items.push(...[
+      {
+        key: "/interception-config",
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$1, {}),
+        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/interception-config", children: "请求拦截设置" })
+      },
+      {
+        key: "/rulefilelist",
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
+        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/rulefilelist", children: "Http 转发" })
+      },
+      {
+        key: "/datalist",
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
+        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/datalist", children: "自定义 mock 数据" })
+      }
+    ]);
+  }
+  return items;
+}
+function HttpTrickMenu() {
+  const [items, setItems] = reactExports.useState([]);
+  reactExports.useEffect(() => {
+    const unConfig = configureService$2.subscribe((config) => {
+      const items2 = getMenuItems();
+      setItems(items2);
+    });
+    const unUser = userService$2.subscribe((user) => {
+      const items2 = getMenuItems();
+      setItems(items2);
+    });
+    return () => {
+      unConfig();
+      unUser();
+    };
+  }, []);
+  const location = useLocation();
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Menu, { theme: "dark", selectedKeys: [location.pathname], mode: "inline", items });
+}
 const appInfoService$1 = getServiceSync(EService.IAppInfoService);
 const userService$1 = getServiceSync(EService.IUserService);
 class Help extends React.PureComponent {
@@ -145,10 +195,10 @@ class Help extends React.PureComponent {
   }
 }
 const configureService$1 = getServiceSync(EService.IConfigureService);
-const onFinishFailed = (errorInfo) => {
+const onFinishFailed$1 = (errorInfo) => {
   console.log("Failed:", errorInfo);
 };
-function getFormDataFromProfile(config) {
+function getFormDataFromProfile$1(config) {
   return {
     startHttpProxy: config.startHttpProxy,
     startSocks5: config.startSocks5,
@@ -163,18 +213,16 @@ function getFormDataFromProfile(config) {
 }
 class ProxyConfigure extends React.PureComponent {
   formRef = React.createRef();
-  state;
-  constructor(props) {
-    super(props);
-    this.state = {
-      configureFormData: getFormDataFromProfile(configureService$1.getState())
-    };
-  }
+  formInitialValue = getFormDataFromProfile$1(configureService$1.getState());
+  unConfig;
   componentDidMount() {
-    configureService$1.subscribe(() => {
-      const newFormValue = getFormDataFromProfile(configureService$1.getState());
+    this.unConfig = configureService$1.subscribe(() => {
+      const newFormValue = getFormDataFromProfile$1(configureService$1.getState());
       this.formRef.current?.setFieldsValue(newFormValue);
     });
+  }
+  componentWillUnmount() {
+    this.unConfig?.();
   }
   onSave = async (values) => {
     try {
@@ -203,9 +251,9 @@ class ProxyConfigure extends React.PureComponent {
         labelCol: { span: 8 },
         wrapperCol: { span: 16 },
         style: { maxWidth: 600 },
-        initialValues: { remember: true },
+        initialValues: this.formInitialValue,
         onFinish: this.onSave,
-        onFinishFailed,
+        onFinishFailed: onFinishFailed$1,
         autoComplete: "off",
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -290,6 +338,86 @@ class ProxyConfigure extends React.PureComponent {
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: null, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", htmlType: "submit", children: "保存" }) })
+        ]
+      }
+    );
+  }
+}
+const profileService$2 = getServiceSync(EService.IProfileService);
+const onFinishFailed = (errorInfo) => {
+  console.log("Failed:", errorInfo);
+};
+function getFormDataFromProfile(profile) {
+  return {
+    externalProxy: profile.externalProxy,
+    isSocks5Proxy: profile.externalSocks5Proxy,
+    httpProxyIp: profile.httpProxyIp,
+    httpProxyPort: profile.httpProxyPort,
+    socks5ProxyIp: profile.socks5ProxyIp,
+    socks5ProxyPort: profile.socks5ProxyPort
+  };
+}
+class InterceptionConfig extends React.PureComponent {
+  formRef = React.createRef();
+  formInitialValue = getFormDataFromProfile(profileService$2.getState());
+  unProfile;
+  componentDidMount() {
+    this.unProfile = profileService$2.subscribe(() => {
+      const newFormValue = getFormDataFromProfile(profileService$2.getState());
+      this.formRef.current?.setFieldsValue(newFormValue);
+    });
+  }
+  componentWillUnmount() {
+    this.unProfile?.();
+  }
+  onSave = async (values) => {
+    console.log(values);
+  };
+  render() {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      Form,
+      {
+        name: "configure",
+        ref: this.formRef,
+        labelCol: { span: 8 },
+        wrapperCol: { span: 16 },
+        style: { maxWidth: 600 },
+        initialValues: this.formInitialValue,
+        onFinish: this.onSave,
+        onFinishFailed,
+        autoComplete: "off",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "使用外部代理",
+              name: "externalProxy",
+              valuePropName: "checked",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { children: "使用" })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "外部代理类型",
+              name: "isSocks5Proxy",
+              shouldUpdate: () => true,
+              children: ({ getFieldValue }) => {
+                debugger;
+                this.formRef.current?.getFieldValue("externalProxy");
+                return /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Radio.Group,
+                  {
+                    name: "radiogroup",
+                    options: [
+                      { value: true, label: "Socks5代理" },
+                      { value: false, label: "Http代理" }
+                    ]
+                  }
+                );
+              }
+            }
+          )
         ]
       }
     );
@@ -464,7 +592,8 @@ function ViewRouter() {
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Routes, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/", element: /* @__PURE__ */ jsxRuntimeExports.jsx(Navigate, { to: "/helpinstall" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/helpinstall", element: /* @__PURE__ */ jsxRuntimeExports.jsx(Help, {}) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/proxy-configure", element: /* @__PURE__ */ jsxRuntimeExports.jsx(ProxyConfigure, {}) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/proxy-app-configure", element: /* @__PURE__ */ jsxRuntimeExports.jsx(ProxyConfigure, {}) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/interception-config", element: /* @__PURE__ */ jsxRuntimeExports.jsx(InterceptionConfig, {}) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/redirect-path-variable", element: /* @__PURE__ */ jsxRuntimeExports.jsx(RedirectPathVariable, {}) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/hostfilelist", element: /* @__PURE__ */ jsxRuntimeExports.jsx(HostList, {}) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/edithost", element: /* @__PURE__ */ jsxRuntimeExports.jsx(EditHost, {}) }),
@@ -741,6 +870,10 @@ class UserService extends StateBase {
     super({
       userId: "root"
     });
+  }
+  isRoot() {
+    const userId = this.getState().userId;
+    return userId === "root";
   }
 }
 const services = {

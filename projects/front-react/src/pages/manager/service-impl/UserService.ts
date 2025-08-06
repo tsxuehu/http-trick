@@ -7,4 +7,9 @@ export default class UserService extends StateBase<IUserInfo> implements IUserSe
             userId: 'root'
         });
     }
+
+    isRoot(): boolean {
+      const userId = this.getState().userId
+      return userId === 'root'
+    }
 }
