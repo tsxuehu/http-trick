@@ -16,4 +16,5 @@ export interface IConfigure {
 
 
 export default interface IConfigureService extends IStateBase<IConfigure> {
+  save(newConfig: Partial<IConfigure>): Promise<void>
 }

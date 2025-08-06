@@ -3,6 +3,7 @@
  */
 
 import axios from 'axios';
+import { assertAxiosRes } from "./utils.ts";
 
 /**
  * 创建规则文件
@@ -27,10 +28,7 @@ export function deleteFile(id:string) {
 
 export async function useFile(id:string) {
   const response = await axios.get(`/host/usefile?id=${id}`);
-  let serverData = response.data;
-  if (serverData.code != 0) {
-    throw new Error(serverData.msg);
-  }
+  assertAxiosRes(response)
 }
 
 export function getFileContent(id:string) {

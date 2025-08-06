@@ -3,13 +3,11 @@
  */
 
 import axios from "axios";
+import { assertAxiosRes } from "./utils.ts";
 
 export async function saveFile(content: any) {
   const response = await axios.post("/profile/savefile", content);
-  const serverData = response.data;
-  if (serverData.code !== 0) {
-    throw new Error(serverData.msg);
-  }
+  assertAxiosRes(response)
 }
 
 export function disableRule() {

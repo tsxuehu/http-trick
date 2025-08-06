@@ -1,4 +1,4 @@
-import { u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, g as getServiceSync, e as React, q as qrcode, s as staticMethods, I as Input, P as Popconfirm, B as Button, F as ForwardTable, f as Routes, h as Route, N as Navigate, i as Layout, r as reactExports, t as theme, H as HashRouter, k as axios, l as createStore, S as ServiceRegistry, m as setServiceRegistry, n as clientExports } from "./vendor.js";
+import { u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, g as getServiceSync, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, P as Popconfirm, f as ForwardTable, h as Routes, i as Route, N as Navigate, k as Layout, r as reactExports, t as theme, H as HashRouter, l as axios, m as createStore, S as ServiceRegistry, n as setServiceRegistry, o as clientExports } from "./vendor.js";
 const items = [
   {
     key: "/helpinstall",
@@ -144,11 +144,155 @@ class Help extends React.PureComponent {
     ] });
   }
 }
-getServiceSync(EService.IProfileService);
+const configureService$1 = getServiceSync(EService.IConfigureService);
+const onFinishFailed = (errorInfo) => {
+  console.log("Failed:", errorInfo);
+};
+function getFormDataFromProfile(config) {
+  return {
+    startHttpProxy: config.startHttpProxy,
+    startSocks5: config.startSocks5,
+    startDns: config.startDns,
+    professionalVersion: config.professionalVersion,
+    httpProxyPort: config.httpProxyPort,
+    socks5ProxyPort: config.socks5ProxyPort,
+    webUiPort: config.webUiPort,
+    dnsPort: config.dnsPort,
+    requestTimeoutTime: config.requestTimeoutTime
+  };
+}
 class ProxyConfigure extends React.PureComponent {
-  state = {};
+  formRef = React.createRef();
+  state;
+  constructor(props) {
+    super(props);
+    this.state = {
+      configureFormData: getFormDataFromProfile(configureService$1.getState())
+    };
+  }
+  componentDidMount() {
+    configureService$1.subscribe(() => {
+      const newFormValue = getFormDataFromProfile(configureService$1.getState());
+      this.formRef.current?.setFieldsValue(newFormValue);
+    });
+  }
+  onSave = async (values) => {
+    try {
+      await configureService$1.save({
+        startHttpProxy: values.startHttpProxy,
+        startSocks5: values.startSocks5,
+        startDns: values.startDns,
+        professionalVersion: values.professionalVersion,
+        httpProxyPort: +values.httpProxyPort,
+        socks5ProxyPort: +values.socks5ProxyPort,
+        webUiPort: +values.webUiPort,
+        dnsPort: +values.dnsPort,
+        requestTimeoutTime: +values.requestTimeoutTime
+      });
+      staticMethods.success("保存成功!");
+    } catch (err) {
+      staticMethods.error(`出错了，${err.message}`);
+    }
+  };
   render() {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", {});
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      Form,
+      {
+        name: "configure",
+        ref: this.formRef,
+        labelCol: { span: 8 },
+        wrapperCol: { span: 16 },
+        style: { maxWidth: 600 },
+        initialValues: { remember: true },
+        onFinish: this.onSave,
+        onFinishFailed,
+        autoComplete: "off",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "是否开启Http代理",
+              name: "startHttpProxy",
+              valuePropName: "checked",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, {})
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "是否开启Socks5代理",
+              name: "startSocks5",
+              valuePropName: "checked",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, {})
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "是否开启DNS服务",
+              name: "startDns",
+              valuePropName: "checked",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, {})
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "是否开启专业版",
+              name: "professionalVersion",
+              valuePropName: "checked",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, {})
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "Http代理端口",
+              name: "httpProxyPort",
+              rules: [{ required: true, message: "填写http代理端口号" }],
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "http代理端口" })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "Socks5端口",
+              name: "socks5ProxyPort",
+              rules: [{ required: true, message: "填写socks5代理端口" }],
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "socks5代理端口" })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "WebUi端口",
+              name: "webUiPort",
+              rules: [{ required: true, message: "填写WebUi端口" }],
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "WebUi端口" })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "DNS端口",
+              name: "dnsPort",
+              rules: [{ required: true, message: "填写DNS端口" }],
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "DNS端口" })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "超时时间",
+              name: "requestTimeoutTime",
+              rules: [{ required: true, message: "填写超时时间" }],
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "超时时间" })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: null, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", htmlType: "submit", children: "保存" }) })
+        ]
+      }
+    );
   }
 }
 const profileService$1 = getServiceSync(EService.IProfileService);
@@ -353,12 +497,15 @@ const App = () => {
     ] })
   ] }) });
 };
-async function saveFile(content) {
-  const response = await axios.post("/profile/savefile", content);
+function assertAxiosRes(response) {
   const serverData = response.data;
   if (serverData.code !== 0) {
     throw new Error(serverData.msg);
   }
+}
+async function saveFile$1(content) {
+  const response = await axios.post("/profile/savefile", content);
+  assertAxiosRes(response);
 }
 function disableRule() {
   return axios.post(`/profile/setRuleState`);
@@ -469,6 +616,9 @@ class AppInfoService extends StateBase {
     });
   }
 }
+function saveFile(content) {
+  return axios.post("/configure/savefile", content);
+}
 class ConfigureService extends StateBase {
   constructor() {
     super({
@@ -484,6 +634,10 @@ class ConfigureService extends StateBase {
       useCustomRootCA: false,
       remoteDnsServer: "223.5.5.5"
     });
+  }
+  async save(newConfig) {
+    const oldConfig = this.getState();
+    await saveFile(Object.assign({}, oldConfig, newConfig));
   }
 }
 class MockDataService extends StateBase {
@@ -503,10 +657,7 @@ class FilterService extends StateBase {
 }
 async function useFile(id) {
   const response = await axios.get(`/host/usefile?id=${id}`);
-  let serverData = response.data;
-  if (serverData.code != 0) {
-    throw new Error(serverData.msg);
-  }
+  assertAxiosRes(response);
 }
 class HostService extends StateBase {
   constructor() {
@@ -570,15 +721,12 @@ class ProfileService extends StateBase {
     const data = this.getState();
     let copyProfile = JSON.parse(JSON.stringify(data));
     copyProfile.redirectPathVariables = variables;
-    await saveFile(copyProfile);
+    await saveFile$1(copyProfile);
   }
 }
 async function setFileCheckStatus(id, checked) {
   const response = await axios.get(`/rule/setfilecheckstatus?id=${id}&checked=${checked ? 1 : 0}`);
-  let serverData = response.data;
-  if (serverData.code != 0) {
-    throw new Error(serverData.msg);
-  }
+  assertAxiosRes(response);
 }
 class RuleService extends StateBase {
   constructor() {

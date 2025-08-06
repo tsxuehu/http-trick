@@ -5,6 +5,7 @@
 import axios from "axios";
 import trim from "lodash/trim";
 import keys from "lodash/keys";
+import { assertAxiosRes } from "./utils.ts";
 
 /**
  * 创建规则文件
@@ -29,10 +30,7 @@ export function deleteFile(id: string) {
 
 export async function setFileCheckStatus(id: string, checked: boolean) {
   const response = await axios.get(`/rule/setfilecheckstatus?id=${id}&checked=${checked ? 1 : 0}`);
-  let serverData = response.data;
-  if (serverData.code != 0) {
-    throw new Error(serverData.msg);
-  }
+  assertAxiosRes(response)
 }
 
 export function getFileContent(id: string) {

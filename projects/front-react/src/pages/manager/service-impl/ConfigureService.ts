@@ -1,6 +1,6 @@
 import IConfigureService, { IConfigure } from "../service-api/IConfigureService.ts";
 import StateBase from "../../../common/StateBase.ts";
-
+import * as configApi from '../../../api/conf.ts'
 export default class ConfigureService extends StateBase<IConfigure> implements IConfigureService {
   constructor() {
     super({
@@ -16,5 +16,10 @@ export default class ConfigureService extends StateBase<IConfigure> implements I
       useCustomRootCA: false,
       remoteDnsServer: '223.5.5.5',
     });
+  }
+
+  async save(newConfig: Partial<IConfigure>): Promise<void> {
+    const oldConfig = this.getState();
+    await configApi.saveFile(Object.assign({}, oldConfig, newConfig))
   }
 }
