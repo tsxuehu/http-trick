@@ -2,25 +2,29 @@
  * Created by tsxuehu on 17/1/9.
  */
 
-import axios from "axios";
+import axios from 'axios'
+import { assertAxiosRes } from './utils.ts'
 
-export function setRuleCheckedState(ruleId: string, checked: boolean) {
-  return axios.get('/filter/setRuleCheckedState', {
+export async function setFilterCheckedState(ruleId: string, checked: boolean) {
+  const response = await axios.get('/filter/setRuleCheckedState', {
     params: {
       ruleId,
-      checked: checked ? 1 : 0
-    }
-  });
+      checked: checked ? 1 : 0,
+    },
+  })
+  assertAxiosRes(response)
 }
 
-export function saveRule(filter: any) {
-  return axios.post('/filter/saveRule', filter);
+export async function saveFilter(filter: any) {
+  const response = await axios.post('/filter/saveRule', filter)
+  assertAxiosRes(response)
 }
 
-export function removeRule(ruleId: string) {
-  return axios.get('/filter/removeRule', {
+export async function removeFilter(ruleId: string) {
+  const response = await axios.get('/filter/removeRule', {
     params: {
-      ruleId
-    }
-  });
+      ruleId,
+    },
+  })
+  assertAxiosRes(response)
 }

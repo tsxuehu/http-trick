@@ -12,6 +12,7 @@ import EService from '../../config/EService.ts'
 import IUserService from '../../service-api/IUserService.ts'
 import ActionValue from '../../components/action-value/ActionValue.tsx'
 import { ColumnsType } from 'antd/es/table'
+import { getDefaultAction } from '../../service-api/utils/rule.ts'
 
 export interface IProps extends IBaseProps {
   isEditRule: boolean
@@ -93,25 +94,9 @@ export default class RuleEditForm extends React.PureComponent<IProps, IState> {
 
   addAction() {
     const { isFilterRule } = this.props
-    const initialAction = {
-      type: isFilterRule ? 'addRequestHeader' : 'redirect', // 转发redirect, // 转发redirect  接口转发api 使用数据文件替换data
-      data: {
-        target: '', // 转发目标路径
-        dataId: '', //返回数据文件的id
-        modifyResponseType: '', // 修改响应内容类型
-        callbackName: '', // jsonp请求参数名
-        cookieKey: '', // 设置到请求里的cookie key
-        cookieValue: '', // 设置到请求里的cookie value
-        reqHeaderKey: '', // 请求header
-        reqHeaderValue: '',
-        resHeaderKey: '', // 响应header
-        resHeaderValue: '',
-        queryKey: '', // 请求query
-        queryValue: '',
-        modifyRequestScript: '', // 脚本修改请求
-        modifyResponseScript: '', // 脚本修改响应
-      },
-    }
+    const initialAction = getDefaultAction()
+    initialAction.type = isFilterRule ? 'addRequestHeader' : 'redirect'
+
     const nextRule = produce(this.state.rule, (draftRule) => {
       draftRule.actionList.push(initialAction)
     })

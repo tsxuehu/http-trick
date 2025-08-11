@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Input, Popconfirm, Table, Row, Col, Checkbox, CheckboxProps } from 'antd'
+import { Button, Input, Popconfirm, Table, Row, Col, Checkbox, CheckboxProps, message } from 'antd'
 import { getServiceSync } from '@spring4js/container-browser/lib/esm/global-fn'
 import EService from '../../config/EService.ts'
 import IFilterService from '../../service-api/IFilterService.ts'
@@ -9,6 +9,7 @@ import IMockFileService, { IMockFile } from '../../service-api/IMockFileService.
 import ActionView from '../../components/action-view/ActionView.tsx'
 import { openDialog } from '../../forms/utils.ts'
 import RuleEditForm, { IProps as IRuleEditFormProps } from '../../forms/rule-edit-form/RuleEditForm.tsx'
+import { getDefaultAction, getDefaultRule } from '../../service-api/utils/rule.ts'
 
 interface IProps {}
 
@@ -51,17 +52,70 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
     this.unMockData?.()
   }
 
-  toggleRuleCheckState(rule: IRule) {}
-
-  deleteRule(rule: IRule, index: number) {}
-
-  duplicateRule(rule: IRule, index: number) {}
-
-  async editRule(rule: IRule, index: number) {
-    const newRule = await openDialog<IRuleEditFormProps, IRule>(RuleEditForm, {
+  async addFilter() {
+    const rule = getDefaultRule()
+    const action = getDefaultAction()
+    action.type = 'addRequestHeader'
+    rule.actionList.push(action)
+    const nextFilter = await openDialog<IRuleEditFormProps, IRule>(RuleEditForm, {
       isEditRule: false,
+      isFilterRule: true,
       rule,
     })
+    try {
+      await filterService.saveFilter(nextFilter)
+      message.success('保存成功!')
+    } catch (err: any) {
+      message.error(`出错了，${err.message}`)
+    }
+  }
+
+  async duplicateRule(rule: IRule, index: number) {
+    const newRule = JSON.parse(JSON.stringify(rule))
+    newRule.id = ''
+    const nextFilter = await openDialog<IRuleEditFormProps, IRule>(RuleEditForm, {
+      isEditRule: false,
+      isFilterRule: true,
+      rule,
+    })
+    try {
+      await filterService.saveFilter(nextFilter)
+      message.success('保存成功!')
+    } catch (err: any) {
+      message.error(`出错了，${err.message}`)
+    }
+  }
+
+  async editRule(rule: IRule, index: number) {
+    const nextFilter = await openDialog<IRuleEditFormProps, IRule>(RuleEditForm, {
+      isEditRule: true,
+      isFilterRule: true,
+      rule,
+    })
+    try {
+      await filterService.saveFilter(nextFilter)
+      message.success('保存成功!')
+    } catch (err: any) {
+      message.error(`出错了，${err.message}`)
+    }
+  }
+
+  async toggleRuleCheckState(rule: IRule) {
+    try {
+      await filterService.setFilterCheckedState(rule.id, !rule.checked)
+      message.success('保存成功!')
+    } catch (err: any) {
+      message.error(`出错了，${err.message}`)
+    }
+  }
+
+  async deleteRule(rule: IRule, index: number) {
+    try {
+      await filterService.removeFilter(rule.id)
+      message.success('保存成功!')
+    } catch (err: any) {
+      message.error(`出错了，${err.message}`)
+    }
   }
 
   getColumns() {
@@ -147,7 +201,9 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
         </div>
         <Row>
           <Col span={6} offset={16}>
-            <Button type="primary">新增过滤器</Button>
+            <Button type="primary" onClick={() => this.addFilter()}>
+              新增过滤器
+            </Button>
           </Col>
         </Row>
         <Table rowKey="id" dataSource={filters} columns={columns} />

@@ -1062,6 +1062,49 @@ class ActionValue extends React.PureComponent {
     ] });
   }
 }
+function getDefaultRule() {
+  return {
+    name: "",
+    id: "",
+    method: "",
+    match: "",
+    checked: true,
+    actionList: []
+  };
+}
+function getDefaultAction() {
+  return {
+    type: "redirect",
+    // 转发redirect  接口转发api 使用数据文件替换data
+    data: {
+      target: "",
+      // 转发目标路径
+      dataId: "",
+      //返回数据文件的id
+      modifyResponseType: "",
+      // 修改响应内容类型
+      callbackName: "",
+      // jsonp请求参数名
+      cookieKey: "",
+      // 设置到请求里的cookie key
+      cookieValue: "",
+      // 设置到请求里的cookie value
+      reqHeaderKey: "",
+      // 请求header
+      reqHeaderValue: "",
+      resHeaderKey: "",
+      // 响应header
+      resHeaderValue: "",
+      queryKey: "",
+      // 请求query
+      queryValue: "",
+      modifyRequestScript: "",
+      // 脚本修改请求
+      modifyResponseScript: ""
+      // 脚本修改响应
+    }
+  };
+}
 const MethodList = [
   { value: "", label: "所有" },
   { value: "get", label: "GET" },
@@ -1123,37 +1166,8 @@ class RuleEditForm extends React.PureComponent {
   }
   addAction() {
     const { isFilterRule } = this.props;
-    const initialAction = {
-      type: isFilterRule ? "addRequestHeader" : "redirect",
-      // 转发redirect, // 转发redirect  接口转发api 使用数据文件替换data
-      data: {
-        target: "",
-        // 转发目标路径
-        dataId: "",
-        //返回数据文件的id
-        modifyResponseType: "",
-        // 修改响应内容类型
-        callbackName: "",
-        // jsonp请求参数名
-        cookieKey: "",
-        // 设置到请求里的cookie key
-        cookieValue: "",
-        // 设置到请求里的cookie value
-        reqHeaderKey: "",
-        // 请求header
-        reqHeaderValue: "",
-        resHeaderKey: "",
-        // 响应header
-        resHeaderValue: "",
-        queryKey: "",
-        // 请求query
-        queryValue: "",
-        modifyRequestScript: "",
-        // 脚本修改请求
-        modifyResponseScript: ""
-        // 脚本修改响应
-      }
-    };
+    const initialAction = getDefaultAction();
+    initialAction.type = isFilterRule ? "addRequestHeader" : "redirect";
     const nextRule = produce(this.state.rule, (draftRule) => {
       draftRule.actionList.push(initialAction);
     });
@@ -1305,17 +1319,66 @@ class FilterList extends React.PureComponent {
     this.unProfile?.();
     this.unMockData?.();
   }
-  toggleRuleCheckState(rule) {
-  }
-  deleteRule(rule, index) {
-  }
-  duplicateRule(rule, index) {
-  }
-  async editRule(rule, index) {
-    await openDialog(RuleEditForm, {
+  async addFilter() {
+    const rule = getDefaultRule();
+    const action = getDefaultAction();
+    action.type = "addRequestHeader";
+    rule.actionList.push(action);
+    const nextFilter = await openDialog(RuleEditForm, {
       isEditRule: false,
+      isFilterRule: true,
       rule
     });
+    try {
+      await filterService$1.saveFilter(nextFilter);
+      staticMethods.success("保存成功!");
+    } catch (err) {
+      staticMethods.error(`出错了，${err.message}`);
+    }
+  }
+  async duplicateRule(rule, index) {
+    const newRule = JSON.parse(JSON.stringify(rule));
+    newRule.id = "";
+    const nextFilter = await openDialog(RuleEditForm, {
+      isEditRule: false,
+      isFilterRule: true,
+      rule
+    });
+    try {
+      await filterService$1.saveFilter(nextFilter);
+      staticMethods.success("保存成功!");
+    } catch (err) {
+      staticMethods.error(`出错了，${err.message}`);
+    }
+  }
+  async editRule(rule, index) {
+    const nextFilter = await openDialog(RuleEditForm, {
+      isEditRule: true,
+      isFilterRule: true,
+      rule
+    });
+    try {
+      await filterService$1.saveFilter(nextFilter);
+      staticMethods.success("保存成功!");
+    } catch (err) {
+      staticMethods.error(`出错了，${err.message}`);
+    }
+  }
+  async toggleRuleCheckState(rule) {
+    try {
+      await filterService$1.setFilterCheckedState(rule.id, !rule.checked);
+      staticMethods.success("保存成功!");
+    } catch (err) {
+      staticMethods.error(`出错了，${err.message}`);
+    }
+  }
+  async deleteRule(rule, index) {
+    try {
+      await filterService$1.removeFilter(rule.id);
+      staticMethods.success("保存成功!");
+    } catch (err) {
+      staticMethods.error(`出错了，${err.message}`);
+    }
   }
   getColumns() {
     const { mockDataList, enableFilter: enableFilter2 } = this.state;
@@ -1382,7 +1445,7 @@ class FilterList extends React.PureComponent {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "main-content__title", children: "过滤器" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "project-path-info", children: "一个http请求会可以执行多个匹配的过滤器；过滤器可以用于向http请求里植入登录态。可以控制单个过滤器是否启用" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Row, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, offset: 16, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", children: "新增过滤器" }) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Row, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, offset: 16, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", onClick: () => this.addFilter(), children: "新增过滤器" }) }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardTable, { rowKey: "id", dataSource: filters, columns })
     ] });
   }
@@ -1513,7 +1576,7 @@ class WorkbenchService {
       hostService.setState(data);
     });
     socket.on("rulefilelist", (data) => {
-      ruleService.setState(data);
+      ruleService.setRuleFileList(data);
     });
     socket.on("filters", (data) => {
       filterService.setFilters(data);
@@ -1596,6 +1659,27 @@ class DeviceService extends StateBase {
     super([]);
   }
 }
+async function setFilterCheckedState(ruleId, checked) {
+  const response = await axios.get("/filter/setRuleCheckedState", {
+    params: {
+      ruleId,
+      checked: checked ? 1 : 0
+    }
+  });
+  assertAxiosRes(response);
+}
+async function saveFilter(filter) {
+  const response = await axios.post("/filter/saveRule", filter);
+  assertAxiosRes(response);
+}
+async function removeFilter(ruleId) {
+  const response = await axios.get("/filter/removeRule", {
+    params: {
+      ruleId
+    }
+  });
+  assertAxiosRes(response);
+}
 class FilterService extends StateBase {
   constructor() {
     super({ filters: [] });
@@ -1605,6 +1689,15 @@ class FilterService extends StateBase {
   }
   getFilters() {
     return this.getState().filters;
+  }
+  async removeFilter(id) {
+    await removeFilter(id);
+  }
+  async saveFilter(filter) {
+    await saveFilter(filter);
+  }
+  async setFilterCheckedState(ruleId, checked) {
+    await setFilterCheckedState(ruleId, checked);
   }
 }
 async function useFile(id) {
@@ -1687,7 +1780,13 @@ async function setFileCheckStatus(id, checked) {
 }
 class RuleService extends StateBase {
   constructor() {
-    super([]);
+    super({ ruleFileList: [] });
+  }
+  getRuleFileList() {
+    return this.getState().ruleFileList;
+  }
+  setRuleFileList(ruleFileList) {
+    this.setState({ ruleFileList });
   }
   async setFileCheckStatus(ruleFileId, check) {
     await setFileCheckStatus(ruleFileId, check);

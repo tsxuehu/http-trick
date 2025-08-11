@@ -58,7 +58,7 @@ export default class WorkbenchService implements IWorkbenchService {
     })
 
     socket.on('rulefilelist', (data: IRuleFileSimple[]) => {
-      ruleService.setState(data)
+      ruleService.setRuleFileList(data)
     })
 
     socket.on('filters', (data: IRule[]) => {
