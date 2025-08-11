@@ -76,6 +76,32 @@
   bottom: 22px;
   right: 0;
 }
+.rule-list-op {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+.rule-list-op .op {
+  position: relative;
+  margin-left: 10px;
+}
+.rule-list-op .op .importfile {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.rule-list-op .op .importfile::-webkit-file-upload-button {
+  cursor: pointer;
+}
+.rule-file-op-container {
+  display: flex;
+  justify-content: space-around;
+}
+.addrule-btn-wrap {
+  text-align: right;
+}
 .rule-edit-form .config-row {
   margin-bottom: 10px;
   display: flex;

@@ -193,7 +193,6 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
 
   render() {
     const { filters } = this.state
-    console.log(this.state)
     const columns = this.getColumns()
     return (
       <div>

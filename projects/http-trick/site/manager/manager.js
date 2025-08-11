@@ -295,7 +295,7 @@ class ProxyConfigure extends React.PureComponent {
     );
   }
 }
-const profileService$3 = getServiceSync(EService.IProfileService);
+const profileService$4 = getServiceSync(EService.IProfileService);
 const PlaceHolder = `#示例
 all               # 有all 配置项，所有域名君走http解析代理
 *.domain.com      # 所有domain域名都会走Http解析代理
@@ -316,11 +316,11 @@ function getFormDataFromProfile(profile) {
 }
 class InterceptionConfig extends React.PureComponent {
   formRef = React.createRef();
-  formInitialValue = getFormDataFromProfile(profileService$3.getProfile());
+  formInitialValue = getFormDataFromProfile(profileService$4.getProfile());
   unProfile;
   componentDidMount() {
-    this.unProfile = profileService$3.subscribe(() => {
-      const newFormValue = getFormDataFromProfile(profileService$3.getProfile());
+    this.unProfile = profileService$4.subscribe(() => {
+      const newFormValue = getFormDataFromProfile(profileService$4.getProfile());
       this.formRef.current?.setFieldsValue(newFormValue);
     });
   }
@@ -329,7 +329,7 @@ class InterceptionConfig extends React.PureComponent {
   }
   onSave = async (values) => {
     try {
-      await profileService$3.saveProfile({
+      await profileService$4.saveProfile({
         externalProxy: values.externalProxy,
         externalHttpProxy: !values.isSocks5Proxy,
         externalSocks5Proxy: values.isSocks5Proxy,
@@ -448,13 +448,13 @@ class InterceptionConfig extends React.PureComponent {
     );
   }
 }
-const profileService$2 = getServiceSync(EService.IProfileService);
+const profileService$3 = getServiceSync(EService.IProfileService);
 class RedirectPathVariable extends React.PureComponent {
   state = {
     redirectPathVariableArray: []
   };
   componentDidMount() {
-    profileService$2.subscribe((userProfile) => {
+    profileService$3.subscribe((userProfile) => {
       const pairs = [];
       for (const [key, value] of Object.entries(userProfile.redirectPathVariables)) {
         pairs.push({
@@ -486,7 +486,7 @@ class RedirectPathVariable extends React.PureComponent {
       redirectPathVariableMap[key] = value;
     }
     try {
-      await profileService$2.saveRedirectPathVariables(redirectPathVariableMap);
+      await profileService$3.saveRedirectPathVariables(redirectPathVariableMap);
       staticMethods.success("保存成功!");
     } catch (err) {
       staticMethods.error(`出错了，${err.message}`);
@@ -581,9 +581,84 @@ class CreateHost extends React.PureComponent {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "CreateHost" });
   }
 }
+const ruleService$2 = getServiceSync(EService.IRuleService);
+getServiceSync(EService.IAppInfoService);
+const profileService$2 = getServiceSync(EService.IProfileService);
 class RuleList extends React.PureComponent {
+  state = {
+    ruleFileList: [],
+    enableRule: true
+  };
+  unRule;
+  unProfile;
+  componentDidMount() {
+    this.unRule = ruleService$2.subscribe((data) => {
+      this.setState({ ruleFileList: data.ruleFileList });
+    });
+    this.unProfile = profileService$2.subscribe(() => {
+      this.setState({ enableRule: profileService$2.getProfile().enableRule });
+    });
+  }
+  componentWillUnmount() {
+    this.unRule?.();
+    this.unProfile?.();
+  }
+  importRemoteRule() {
+  }
+  addRuleCollection() {
+  }
+  onDeleteFile(file, index) {
+  }
+  onDownloadFile(file, index) {
+  }
+  onShareFile(file, index) {
+  }
+  onSelectionChange(file, index) {
+  }
+  getColumns() {
+    const { enableRule: enableRule2 } = this.state;
+    return [
+      {
+        title: "操作",
+        key: "action",
+        render: (_, ruleFile, index) => {
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Popconfirm,
+              {
+                title: "确认",
+                description: "确认删除?",
+                onConfirm: () => this.onDeleteFile(ruleFile, index),
+                okText: "确认",
+                cancelText: "取消",
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", danger: true, children: "删除" })
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", onClick: () => this.onDownloadFile(ruleFile, index), children: "下载" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", onClick: () => this.onShareFile(ruleFile, index), children: "分享" })
+          ] });
+        }
+      },
+      {
+        title: "启用",
+        dataIndex: "checked",
+        key: "checked",
+        render: (value, ruleFile, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { value, disabled: !enableRule2, onChange: (e) => this.onSelectionChange(ruleFile, index), children: "Checkbox" })
+      }
+    ];
+  }
   render() {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "RuleList" });
+    const { ruleFileList, appInfo } = this.state;
+    const columns = this.getColumns();
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "main-content__title", children: "规则集列表" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "project-path-info", children: "http转发规则以规则集的方式组织，可以控制单个规则集是否启用。" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rule-list-op", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "op", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { size: "small", onClick: () => this.importRemoteRule(), children: "导入远程规则" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "op", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { size: "small", onClick: () => this.addRuleCollection(), children: "新增规则集" }) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardTable, { rowKey: "id", dataSource: ruleFileList, columns })
+    ] });
   }
 }
 class EditRule extends React.PureComponent {
@@ -1478,7 +1553,6 @@ class FilterList extends React.PureComponent {
   }
   render() {
     const { filters } = this.state;
-    console.log(this.state);
     const columns = this.getColumns();
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "main-content__title", children: "过滤器" }),
