@@ -53,6 +53,15 @@ export interface IActionData {
   modifyRequestScript?: string
   modifyResponseScript?: string
 }
+export interface IHttpApiInfo {
+  method: string
+  url: string
+}
+export interface IMatchResult {
+  matchResult: string // 匹配结果
+  redirectResult: string // 转发结果
+  message: string
+}
 
 export default interface IRuleService extends IStateBase<{ ruleFileList: IRuleFileSimple[] }> {
   getRuleFileList(): IRuleFileSimple[]
@@ -60,4 +69,5 @@ export default interface IRuleService extends IStateBase<{ ruleFileList: IRuleFi
   setRuleFileList(ruleFileList: IRuleFileSimple[]): void
 
   setFileCheckStatus(ruleFileId: string, check: boolean): Promise<void>
+  testRule(match: IHttpApiInfo, target: string, request: IHttpApiInfo): Promise<IMatchResult>
 }

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, Checkbox, Input, Modal, Select, Table } from 'antd'
-import { IBaseProps } from '../utils.ts'
+import { IBaseProps, openDialog } from '../utils.ts'
 import { IAction, IRule } from '../../service-api/IRuleService.ts'
 import set from 'lodash/set'
 // @ts-ignore
@@ -13,6 +13,7 @@ import IUserService from '../../service-api/IUserService.ts'
 import ActionValue from '../../components/action-value/ActionValue.tsx'
 import { ColumnsType } from 'antd/es/table'
 import { getDefaultAction } from '../../service-api/utils/rule.ts'
+import RuleTestForm, { IProps as IRuleTestFormProps } from '../rule-test-form/RuleTestForm.tsx'
 
 export interface IProps extends IBaseProps {
   isEditRule: boolean
@@ -110,8 +111,13 @@ export default class RuleEditForm extends React.PureComponent<IProps, IState> {
     this.setState({ rule: nextRule })
   }
 
-  doTestRule(index: number) {
-    // TODO 测试
+  testTarget(target: string) {
+    const { rule } = this.state
+    openDialog<IRuleTestFormProps, undefined>(RuleTestForm, {
+      matchMethod: rule.method,
+      matchUrl: rule.match,
+      target: target,
+    })
   }
 
   getColumns(): ColumnsType<IAction> {
@@ -143,6 +149,7 @@ export default class RuleEditForm extends React.PureComponent<IProps, IState> {
               allowRedirectToLocal={isRoot}
               mockDataList={mockDataList}
               onChange={(path, value) => this.setValue(`actionList[${index}].data.${path}`, value)}
+              onTestTarget={(target) => this.testTarget(target)}
             />
           )
         },
@@ -171,7 +178,7 @@ export default class RuleEditForm extends React.PureComponent<IProps, IState> {
         open={true}
         okText={isEditRule ? '保存规则' : '创建规则'}
         onOk={() => this.handleOk()}
-        onCancel={onCancel}
+        onCancel={() => onCancel(undefined)}
         footer={(_, { OkBtn, CancelBtn }) => (
           <>
             <CancelBtn />
@@ -213,7 +220,7 @@ export default class RuleEditForm extends React.PureComponent<IProps, IState> {
                   onChange={(e) => this.setValue('match', e.target.value)}
                   placeholder="填写要拦截的url中部分连续的字符串，或者匹配要拦截url的正则表达式"
                 />
-                <Button type="link" size="small" onClick={() => this.doTestRule(-1)}>
+                <Button type="link" size="small" onClick={() => this.testTarget('')}>
                   测试
                 </Button>
               </div>

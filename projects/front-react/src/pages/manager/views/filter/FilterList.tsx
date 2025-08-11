@@ -39,7 +39,7 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
       this.setState({ filters: filterService.getFilters() })
     })
     this.unProfile = profileService.subscribe(() => {
-      this.setState({ enableFilter: profileService.getState().enableFilter })
+      this.setState({ enableFilter: profileService.getProfile().enableFilter })
     })
     this.unMockData = mockDataService.subscribe(() => {
       this.setState({ mockDataList: mockDataService.getMockFileList() })
@@ -62,6 +62,9 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
       isFilterRule: true,
       rule,
     })
+    if (!nextFilter) {
+      return
+    }
     try {
       await filterService.saveFilter(nextFilter)
       message.success('保存成功!')
@@ -73,13 +76,9 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
   async duplicateRule(rule: IRule, index: number) {
     const newRule = JSON.parse(JSON.stringify(rule))
     newRule.id = ''
-    const nextFilter = await openDialog<IRuleEditFormProps, IRule>(RuleEditForm, {
-      isEditRule: false,
-      isFilterRule: true,
-      rule,
-    })
+
     try {
-      await filterService.saveFilter(nextFilter)
+      await filterService.saveFilter(newRule)
       message.success('保存成功!')
     } catch (err: any) {
       message.error(`出错了，${err.message}`)
@@ -92,6 +91,9 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
       isFilterRule: true,
       rule,
     })
+    if (!nextFilter) {
+      return
+    }
     try {
       await filterService.saveFilter(nextFilter)
       message.success('保存成功!')

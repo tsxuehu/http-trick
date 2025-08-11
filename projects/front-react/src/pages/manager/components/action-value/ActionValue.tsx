@@ -12,6 +12,7 @@ interface IProps {
   allowRedirectToLocal: boolean
   mockDataList: IMockFile[]
   onChange: (path: string, value: string) => void
+  onTestTarget: (target: string) => void
 }
 
 interface IState {}
@@ -24,10 +25,6 @@ const ModifyResponseTypeOptions = [
 ]
 
 export default class ActionValue extends React.PureComponent<IProps, IState> {
-  doTestRule(index: number) {
-    // TODO
-  }
-
   createNewDataFile() {
     // TODO
   }
@@ -37,7 +34,7 @@ export default class ActionValue extends React.PureComponent<IProps, IState> {
   }
 
   render() {
-    const { action, mockDataList, onChange, allowRedirectToLocal } = this.props
+    const { action, mockDataList, onChange, allowRedirectToLocal, onTestTarget } = this.props
     const mockDataOptions = mockDataList.map<{ value: string; label: string }>((item) => {
       return { value: item.id, label: item.name }
     })
@@ -66,7 +63,7 @@ export default class ActionValue extends React.PureComponent<IProps, IState> {
                     : '填写转发路径(必须以http/https开头)'
                 }
               />
-              <Button type="link" size="small" onClick={() => this.doTestRule(-1)}>
+              <Button type="link" size="small" onClick={() => onTestTarget(action.data.target!)}>
                 测试
               </Button>
             </div>
