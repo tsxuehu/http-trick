@@ -14,6 +14,7 @@ async function init() {
 
   const registry = new ServiceRegistry();
   registry.registerServiceBatch(services);
+  window.__registry = registry
   setServiceRegistry(registry);
 
   createRoot(document.getElementById("root")!).render(

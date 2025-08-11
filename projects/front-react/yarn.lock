@@ -704,6 +704,11 @@
   resolved "https://registry.npmmirror.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.46.1.tgz#932d8696dfef673bee1a1e291a5531d25a6903be"
   integrity sha512-7GVB4luhFmGUNXXJhH2jJwZCFB3pIOixv2E3s17GQHBFUOQaISlt7aGcQgqvCaDSxTZJUzlK/QJ1FN8S94MrzQ==
 
+"@spring4js/concurrent@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.npmmirror.com/@spring4js/concurrent/-/concurrent-1.0.2.tgz#cbff34b7728439813614607b3ab7891b04781d1b"
+  integrity sha512-N+Ja0urzaKV7ZBH+S9ctK5SKt0mMmOWucYF5QW4jnJyruJdXxy/4qMk4CEKUJIzrW8FhjCU323QWsOI/G4MT9A==
+
 "@spring4js/container-browser@^1.0.1":
   version "1.0.1"
   resolved "https://registry.npmmirror.com/@spring4js/container-browser/-/container-browser-1.0.1.tgz#58ca5a1542d5875610eab2807f7b1401f1ac611f"
@@ -1439,6 +1444,11 @@ image-size@~0.5.0:
   version "0.5.5"
   resolved "https://registry.npmmirror.com/image-size/-/image-size-0.5.5.tgz#09dfd4ab9d20e29eb1c3e80b8990378df9e3cb9c"
   integrity sha512-6TDAlDPZxUFCv+fuOkIoXT/V/f3Qbq8e37p+YOiYrUv3v9cc3/6x78VdfPgFVaB9dZYeLUfKgHRebpkm/oP2VQ==
+
+immer@^10.1.1:
+  version "10.1.1"
+  resolved "https://registry.npmmirror.com/immer/-/immer-10.1.1.tgz#206f344ea372d8ea176891545ee53ccc062db7bc"
+  integrity sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==
 
 import-fresh@^3.2.1:
   version "3.3.1"
