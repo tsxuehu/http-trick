@@ -1,4 +1,4 @@
-import IStateBase from "../../../common/IStateBase.ts";
+import IStateBase from '../../../common/IStateBase.ts'
 
 export interface IAppInfo {
   appName: string
@@ -15,4 +15,6 @@ export interface IAppInfo {
 }
 
 export default interface IAppInfoService extends IStateBase<IAppInfo> {
+  setAppInfo(appInfo: IAppInfo): void
+  getAppInfo(): IAppInfo
 }

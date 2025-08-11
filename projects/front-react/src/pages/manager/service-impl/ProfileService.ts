@@ -1,7 +1,7 @@
-import IProfileService, { IUserProfile } from "../service-api/IProfileService";
-import StateBase from "../../../common/StateBase";
-import * as profileApi from "../../../api/profile";
-import * as configApi from "../../../api/conf.ts";
+import IProfileService, { IUserProfile } from '../service-api/IProfileService'
+import StateBase from '../../../common/StateBase'
+import * as profileApi from '../../../api/profile'
+import * as configApi from '../../../api/conf.ts'
 
 export default class ProfileService extends StateBase<IUserProfile> implements IProfileService {
   constructor() {
@@ -10,63 +10,70 @@ export default class ProfileService extends StateBase<IUserProfile> implements I
       enableRule: true,
       enableHost: true,
       enableFilter: true,
-      goThroughProxyConfig: "",
+      goThroughProxyConfig: '',
       resolveHost: false,
       externalProxy: false,
       externalHttpProxy: false,
       externalSocks5Proxy: true,
-      httpProxyIp: "",
+      httpProxyIp: '',
       httpProxyPort: 8888,
-      socks5ProxyIp: "",
-      socks5ProxyPort: 8889
-    });
+      socks5ProxyIp: '',
+      socks5ProxyPort: 8889,
+    })
+  }
+
+  setProfile(profile: IUserProfile): void {
+    this.setState(profile)
+  }
+  getProfile(): IUserProfile {
+    return this.getState()
   }
 
   async switchResolveHost() {
-    const profile = this.getState();
+    const profile = this.getState()
     if (profile.resolveHost) {
-      await profileApi.disableResolveHost();
+      await profileApi.disableResolveHost()
     } else {
-      await profileApi.enableResolveHost();
+      await profileApi.enableResolveHost()
     }
   }
 
   async switchHost() {
-    const profile = this.getState();
+    const profile = this.getState()
     if (profile.enableHost) {
-      await profileApi.disableHost();
+      await profileApi.disableHost()
     } else {
-      await profileApi.enableHost();
+      await profileApi.enableHost()
     }
   }
 
   async switchFilter() {
-    const profile = this.getState();
+    const profile = this.getState()
     if (profile.enableFilter) {
-      profileApi.disableFilter();
+      profileApi.disableFilter()
     } else {
-      profileApi.enableFilter();
+      profileApi.enableFilter()
     }
   }
 
   async switchRule() {
-    const profile = this.getState();
+    const profile = this.getState()
     if (profile.enableRule) {
-      profileApi.disableRule();
+      profileApi.disableRule()
     } else {
-      profileApi.enableRule();
+      profileApi.enableRule()
     }
   }
   async saveRedirectPathVariables(variables: Record<string, string>) {
     const data = this.getState()
-    let copyProfile = JSON.parse(JSON.stringify(data));
-    copyProfile.redirectPathVariables = variables;
-    await profileApi.saveFile(copyProfile);
+    let copyProfile = JSON.parse(JSON.stringify(data))
+    copyProfile.redirectPathVariables = variables
+    await profileApi.saveFile(copyProfile)
   }
 
   async saveProfile(part: Partial<IUserProfile>): Promise<void> {
-    const oldConfig = this.getState();
+    const oldConfig = this.getState()
     const newProfile = Object.assign({}, oldConfig, part)
-    await profileApi.saveFile(newProfile);
+    await profileApi.saveFile(newProfile)
   }
 }

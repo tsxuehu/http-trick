@@ -1,5 +1,5 @@
-import IAppInfoService, { IAppInfo } from "../service-api/IAppInfoService.ts";
-import StateBase from "../../../common/StateBase.ts";
+import IAppInfoService, { IAppInfo } from '../service-api/IAppInfoService.ts'
+import StateBase from '../../../common/StateBase.ts'
 
 export default class AppInfoService extends StateBase<IAppInfo> implements IAppInfoService {
   constructor() {
@@ -14,7 +14,14 @@ export default class AppInfoService extends StateBase<IAppInfo> implements IAppI
       startHttpProxy: false,
       startSocks5: false,
       startDns: false,
-      pcIp: "",
-    });
+      pcIp: '',
+    })
+  }
+
+  setAppInfo(appInfo: IAppInfo): void {
+    this.setState(appInfo)
+  }
+  getAppInfo(): IAppInfo {
+    return this.getState()
   }
 }

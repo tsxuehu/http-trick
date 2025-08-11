@@ -26,7 +26,7 @@ export default class WorkbenchService implements IWorkbenchService {
   async start(query: Record<string, string>): Promise<void> {
     this.initSocketIO()
     const userId = await profileApi.getUserId()
-    userService.setState({ userId })
+    userService.setUserId(userId)
   }
 
   initSocketIO() {
@@ -38,23 +38,23 @@ export default class WorkbenchService implements IWorkbenchService {
     let socket = io('/manager')
 
     socket.on('appinfo', (data: IAppInfo) => {
-      appInfoService.setState(data)
+      appInfoService.setAppInfo(data)
     })
 
     socket.on('configure', (data: IConfigure) => {
-      configureService.setState(data)
+      configureService.setConfig(data)
     })
 
     socket.on('profile', (data: IUserProfile) => {
-      profileService.setState(data)
+      profileService.setProfile(data)
     })
 
     socket.on('bindedDeviceList', (data: IDeviceInfo[]) => {
-      deviceService.setState(data)
+      deviceService.setDeviceList(data)
     })
 
     socket.on('hostfilelist', (data: IHostFileListItem[]) => {
-      hostService.setState(data)
+      hostService.setHostFileList(data)
     })
 
     socket.on('rulefilelist', (data: IRuleFileSimple[]) => {

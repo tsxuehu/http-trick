@@ -1,10 +1,10 @@
-import IStateBase from "../../../common/IStateBase.ts";
+import IStateBase from '../../../common/IStateBase.ts'
 
 export interface IUserInfo {
-    userId: string
-
+  userId: string
 }
 
 export default interface IUserService extends IStateBase<IUserInfo> {
   isRoot(): boolean
+  setUserId(userId: string): void
 }

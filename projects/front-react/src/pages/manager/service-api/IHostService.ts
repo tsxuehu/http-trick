@@ -1,18 +1,18 @@
-import IStateBase from "../../../common/IStateBase.ts";
+import IStateBase from '../../../common/IStateBase.ts'
 
 export interface IHostFile {
-  meta: Meta;
-  id: string;
-  userId: string;
-  readonly: boolean;
-  default: boolean;
-  checked: boolean;
-  name: string;
-  description: string;
-  content: string;
+  meta: Meta
+  id: string
+  userId: string
+  readonly: boolean
+  default: boolean
+  checked: boolean
+  name: string
+  description: string
+  content: string
 }
 export interface Meta {
-  local: boolean;
+  local: boolean
 }
 export interface IHostFileListItem {
   id: string
@@ -22,5 +22,7 @@ export interface IHostFileListItem {
   meta: Meta
 }
 
-export default interface IHostService extends IStateBase<IHostFileListItem[]> {
+export default interface IHostService extends IStateBase<{ hostFileList: IHostFileListItem[] }> {
+  setHostFileList(hostFileList: IHostFileListItem[]): void
+  getHostFileList(): IHostFileListItem[]
 }
