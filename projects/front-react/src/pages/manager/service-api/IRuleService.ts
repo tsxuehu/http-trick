@@ -31,9 +31,20 @@ export interface IRule {
   checked: boolean;
   actionList: IAction[];
 }
-
+export enum EAction {
+  addQuery = 'addQuery',
+  addRequestCookie = 'addRequestCookie',
+  addRequestHeader = 'addRequestHeader',
+  addResponseHeader = 'addResponseHeader',
+  bypass = 'bypass',
+  mockData = 'mockData',
+  modifyResponse = 'modifyResponse',
+  redirect = 'redirect',
+  scriptModifyRequest = 'scriptModifyRequest',
+  scriptModifyResponse = 'scriptModifyResponse',
+}
 export interface IAction {
-  type: string;
+  type: EAction;
   data: IActionData;
 }
 
@@ -65,13 +76,18 @@ export interface IMatchResult {
 
 export default interface IRuleService extends IStateBase<{ ruleFileList: IRuleFileSimple[] }> {
   getRuleFileList(): IRuleFileSimple[];
-
   setRuleFileList(ruleFileList: IRuleFileSimple[]): void;
 
-  setFileCheckStatus(ruleFileId: string, check: boolean): Promise<void>;
   testRule(match: IHttpApiInfo, target: string, request: IHttpApiInfo): Promise<IMatchResult>;
-  deleteRuleFile(id: string): Promise<void>;
   getReferenceVar(content: string): string[];
-  saveRuleFile(id: string, content: any): Promise<void>;
+
   createFile(name: string, description: string): Promise<string>;
+  getFileContent(id: string): Promise<IRuleFile>;
+  setFileCheckStatus(ruleFileId: string, check: boolean): Promise<void>;
+  saveRuleFile(id: string, content: any): Promise<void>;
+  deleteRuleFile(id: string): Promise<void>;
+
+  setRuleCheckedState(ruleFileId: string, ruleId: string, checked: boolean): Promise<void>;
+  saveRule(ruleFileId: string, rule: IRule): Promise<void>;
+  removeRule(ruleFileId: string, ruleId: string): Promise<void>;
 }

@@ -1,88 +1,81 @@
-import React from 'react'
-import { Button, Input, Popconfirm, Table, Row, Col, Checkbox, CheckboxProps, message } from 'antd'
-import { getServiceSync } from '@spring4js/container-browser/lib/esm/global-fn'
-import EService from '../../config/EService.ts'
-import IFilterService from '../../service-api/IFilterService.ts'
-import { IAction, IRule } from '../../service-api/IRuleService.ts'
-import IProfileService from '../../service-api/IProfileService.ts'
-import IMockFileService, { IMockFile } from '../../service-api/IMockFileService.ts'
-import ActionView from '../../components/action-view/ActionView.tsx'
-import { openDialog } from '../../forms/utils.ts'
-import RuleEditForm, { IProps as IRuleEditFormProps } from '../../forms/rule-edit-form/RuleEditForm.tsx'
-import { getDefaultAction, getDefaultRule } from '../../service-api/utils/rule.ts'
+import React from 'react';
+import { Button, Input, Popconfirm, Table, Row, Col, Checkbox, CheckboxProps, message } from 'antd';
+import { getServiceSync } from '@spring4js/container-browser/lib/esm/global-fn';
+import EService from '../../config/EService.ts';
+import IFilterService from '../../service-api/IFilterService.ts';
+import { EAction, IAction, IRule } from '../../service-api/IRuleService.ts';
+import IProfileService from '../../service-api/IProfileService.ts';
+import IMockFileService, { IMockFile } from '../../service-api/IMockFileService.ts';
+import ActionView from '../../components/action-view/ActionView.tsx';
+import { openDialog } from '../../forms/utils.ts';
+import RuleEditForm, { IProps as IRuleEditFormProps } from '../../forms/rule-edit-form/RuleEditForm.tsx';
+import { getDefaultAction, getDefaultRule } from '../../service-api/utils/rule.ts';
+import { ColumnsType } from 'antd/es/table';
 
 interface IProps {}
 
 interface IState {
-  filters: IRule[]
-  enableFilter: boolean
-  mockDataList: IMockFile[]
+  filters: IRule[];
+  enableFilter: boolean;
+  mockDataList: IMockFile[];
 }
 
-const filterService = getServiceSync<IFilterService>(EService.IFilterService)
-const profileService = getServiceSync<IProfileService>(EService.IProfileService)
-const mockDataService = getServiceSync<IMockFileService>(EService.IMockDataService)
+const filterService = getServiceSync<IFilterService>(EService.IFilterService);
+const profileService = getServiceSync<IProfileService>(EService.IProfileService);
+const mockDataService = getServiceSync<IMockFileService>(EService.IMockDataService);
 
 export default class FilterList extends React.PureComponent<IProps, IState> {
   state: IState = {
     filters: [],
     enableFilter: true,
     mockDataList: [],
-  }
+  };
 
-  unFilter?: () => void
-  unProfile?: () => void
-  unMockData?: () => void
+  unFilter?: () => void;
+  unProfile?: () => void;
+  unMockData?: () => void;
 
   componentDidMount() {
     this.unFilter = filterService.subscribe(() => {
-      this.setState({ filters: filterService.getFilters() })
-    })
+      this.setState({ filters: filterService.getFilters() });
+    });
     this.unProfile = profileService.subscribe(() => {
-      this.setState({ enableFilter: profileService.getProfile().enableFilter })
-    })
+      this.setState({ enableFilter: profileService.getProfile().enableFilter });
+    });
     this.unMockData = mockDataService.subscribe(() => {
-      this.setState({ mockDataList: mockDataService.getMockFileList() })
-    })
+      this.setState({ mockDataList: mockDataService.getMockFileList() });
+    });
   }
 
   componentWillUnmount() {
-    this.unFilter?.()
-    this.unProfile?.()
-    this.unMockData?.()
+    this.unFilter?.();
+    this.unProfile?.();
+    this.unMockData?.();
   }
 
   async addFilter() {
-    const rule = getDefaultRule()
-    const action = getDefaultAction()
-    action.type = 'addRequestHeader'
-    rule.actionList.push(action)
+    const rule = getDefaultRule();
+    const action = getDefaultAction();
+    action.type = EAction.addRequestHeader;
+    rule.actionList.push(action);
     const nextFilter = await openDialog<IRuleEditFormProps, IRule>(RuleEditForm, {
       isEditRule: false,
       isFilterRule: true,
       rule,
-    })
+    });
     if (!nextFilter) {
-      return
+      return;
     }
-    try {
-      await filterService.saveFilter(nextFilter)
-      message.success('保存成功!')
-    } catch (err: any) {
-      message.error(`出错了，${err.message}`)
-    }
+    await filterService.saveFilter(nextFilter);
+    message.success('保存成功!');
   }
 
   async duplicateRule(rule: IRule, index: number) {
-    const newRule = JSON.parse(JSON.stringify(rule))
-    newRule.id = ''
+    const newRule = JSON.parse(JSON.stringify(rule));
+    newRule.id = '';
 
-    try {
-      await filterService.saveFilter(newRule)
-      message.success('保存成功!')
-    } catch (err: any) {
-      message.error(`出错了，${err.message}`)
-    }
+    await filterService.saveFilter(newRule);
+    message.success('复制成功!');
   }
 
   async editRule(rule: IRule, index: number) {
@@ -90,47 +83,37 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
       isEditRule: true,
       isFilterRule: true,
       rule,
-    })
+    });
     if (!nextFilter) {
-      return
+      return;
     }
-    try {
-      await filterService.saveFilter(nextFilter)
-      message.success('保存成功!')
-    } catch (err: any) {
-      message.error(`出错了，${err.message}`)
-    }
+    await filterService.saveFilter(nextFilter);
+    message.success('保存成功!');
   }
 
-  async toggleRuleCheckState(rule: IRule) {
-    try {
-      await filterService.setFilterCheckedState(rule.id, !rule.checked)
-      message.success('设置成功!')
-    } catch (err: any) {
-      message.error(`出错了，${err.message}`)
-    }
+  async setFilterCheckedState(rule: IRule) {
+    await filterService.setFilterCheckedState(rule.id, !rule.checked);
+    message.success('设置成功!');
   }
 
   async deleteRule(rule: IRule, index: number) {
-    try {
-      await filterService.removeFilter(rule.id)
-      message.success('删除成功!')
-    } catch (err: any) {
-      message.error(`出错了，${err.message}`)
-    }
+    await filterService.removeFilter(rule.id);
+    message.success('删除成功!');
   }
 
-  getColumns() {
-    const { mockDataList, enableFilter } = this.state
+  getColumns(): ColumnsType<IRule> {
+    const { mockDataList, enableFilter } = this.state;
     return [
       {
         title: '启用',
         dataIndex: 'checked',
         key: 'checked',
         render: (value: boolean, rule: IRule, index: number) => (
-          <Checkbox value={value} disabled={!enableFilter} onChange={(e) => this.toggleRuleCheckState(rule)}>
-            Checkbox
-          </Checkbox>
+          <Checkbox
+            checked={value}
+            disabled={!enableFilter}
+            onChange={(e) => this.setFilterCheckedState(rule)}
+          ></Checkbox>
         ),
       },
       {
@@ -158,7 +141,7 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
         render: (actionList: IAction[], rule: IRule, index: number) => {
           return actionList.map((action: IAction, index: number) => (
             <ActionView key={index} action={action} mockDataList={mockDataList}></ActionView>
-          ))
+          ));
         },
       },
       {
@@ -185,15 +168,15 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
                 编辑
               </Button>
             </>
-          )
+          );
         },
       },
-    ]
+    ];
   }
 
   render() {
-    const { filters } = this.state
-    const columns = this.getColumns()
+    const { filters } = this.state;
+    const columns = this.getColumns();
     return (
       <div>
         <div className="main-content__title">过滤器</div>
@@ -209,6 +192,6 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
         </Row>
         <Table rowKey="id" dataSource={filters} columns={columns} />
       </div>
-    )
+    );
   }
 }

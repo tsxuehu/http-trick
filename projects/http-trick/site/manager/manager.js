@@ -1,4 +1,4 @@
-import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as Future, k as clientExports, l as Modal, m as axios, n as copyToClipboard, N as NavLink, o as useNavigate, p as find, S as Select, t as produce, v as set, w as Row, x as Col, y as Routes, z as Route, A as Navigate, D as Layout, E as theme, H as HashRouter, G as createStore, J as trim, K as keys, O as ServiceRegistry, Q as setServiceRegistry } from "./vendor.js";
+import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as Future, k as clientExports, l as Modal, m as axios, n as copyToClipboard, N as NavLink, o as find, S as Select, p as produce, t as set, v as Row, w as Col, x as useNavigate, y as Routes, z as Route, A as Navigate, D as Layout, E as theme, H as HashRouter, G as createStore, J as trim, K as keys, O as ServiceRegistry, Q as setServiceRegistry } from "./vendor.js";
 var EService = /* @__PURE__ */ ((EService2) => {
   EService2["IWorkbenchService"] = "WorkbenchService";
   EService2["IUserService"] = "UserService";
@@ -666,7 +666,7 @@ function assertAxiosRes(response) {
     throw new Error(serverData.msg);
   }
 }
-const ruleService$3 = getServiceSync(EService.IRuleService);
+const ruleService$4 = getServiceSync(EService.IRuleService);
 const appInfoService$1 = getServiceSync(EService.IAppInfoService);
 const profileService$2 = getServiceSync(EService.IProfileService);
 class RuleList extends React.PureComponent {
@@ -677,7 +677,7 @@ class RuleList extends React.PureComponent {
   unRule;
   unProfile;
   componentDidMount() {
-    this.unRule = ruleService$3.subscribe((data) => {
+    this.unRule = ruleService$4.subscribe((data) => {
       this.setState({ ruleFileList: data.ruleFileList });
     });
     this.unProfile = profileService$2.subscribe(() => {
@@ -707,7 +707,7 @@ class RuleList extends React.PureComponent {
     content.id = "";
     content.name = values.name;
     content.checked = false;
-    const varNameList = ruleService$3.getReferenceVar(content);
+    const varNameList = ruleService$4.getReferenceVar(content);
     let infoStr;
     if (varNameList.length > 0) {
       infoStr = `导入规则文件名为${content.name},引用变量【${varNameList.join(
@@ -721,7 +721,7 @@ class RuleList extends React.PureComponent {
       content: infoStr,
       onOk: async () => {
         try {
-          await ruleService$3.saveRuleFile(content.id, content);
+          await ruleService$4.saveRuleFile(content.id, content);
           staticMethods.success("创建成功!");
         } catch (err) {
           staticMethods.error(`出错了，${err.message}`);
@@ -731,7 +731,7 @@ class RuleList extends React.PureComponent {
   }
   async onDeleteFile(file, index) {
     try {
-      await ruleService$3.deleteRuleFile(file.id);
+      await ruleService$4.deleteRuleFile(file.id);
       staticMethods.success("删除成功!");
     } catch (err) {
       staticMethods.error(`出错了，${err.message}`);
@@ -752,7 +752,7 @@ class RuleList extends React.PureComponent {
   }
   async toggleFileCheckStatus(file, index) {
     try {
-      await ruleService$3.setFileCheckStatus(file.id, !file.checked);
+      await ruleService$4.setFileCheckStatus(file.id, !file.checked);
     } catch (err) {
       staticMethods.error(`出错了，${err.message}`);
     }
@@ -823,143 +823,61 @@ class RuleList extends React.PureComponent {
     ] });
   }
 }
-class EditRule extends React.PureComponent {
-  render() {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "EditHost" });
-  }
+var EAction = /* @__PURE__ */ ((EAction2) => {
+  EAction2["addQuery"] = "addQuery";
+  EAction2["addRequestCookie"] = "addRequestCookie";
+  EAction2["addRequestHeader"] = "addRequestHeader";
+  EAction2["addResponseHeader"] = "addResponseHeader";
+  EAction2["bypass"] = "bypass";
+  EAction2["mockData"] = "mockData";
+  EAction2["modifyResponse"] = "modifyResponse";
+  EAction2["redirect"] = "redirect";
+  EAction2["scriptModifyRequest"] = "scriptModifyRequest";
+  EAction2["scriptModifyResponse"] = "scriptModifyResponse";
+  return EAction2;
+})(EAction || {});
+function getDefaultRule() {
+  return {
+    name: "",
+    id: "",
+    method: "",
+    match: "",
+    checked: true,
+    actionList: []
+  };
 }
-const ruleService$2 = getServiceSync(EService.IRuleService);
-const CreateRule = () => {
-  const navigate = useNavigate();
-  const onSave = async (values) => {
-    try {
-      const id = await ruleService$2.createFile(values.name, values.description);
-      navigate(`/editrule?id=${id}`);
-      staticMethods.success("创建成功!");
-    } catch (err) {
-      staticMethods.error(`出错了，${err.message}`);
+function getDefaultAction() {
+  return {
+    type: EAction.redirect,
+    // 转发redirect  接口转发api 使用数据文件替换data
+    data: {
+      target: "",
+      // 转发目标路径
+      dataId: "",
+      //返回数据文件的id
+      modifyResponseType: "",
+      // 修改响应内容类型
+      callbackName: "",
+      // jsonp请求参数名
+      cookieKey: "",
+      // 设置到请求里的cookie key
+      cookieValue: "",
+      // 设置到请求里的cookie value
+      reqHeaderKey: "",
+      // 请求header
+      reqHeaderValue: "",
+      resHeaderKey: "",
+      // 响应header
+      resHeaderValue: "",
+      queryKey: "",
+      // 请求query
+      queryValue: "",
+      modifyRequestScript: "",
+      // 脚本修改请求
+      modifyResponseScript: ""
+      // 脚本修改响应
     }
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "main-content__title", children: "创建规则集" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(
-      Form,
-      {
-        name: "创建规则集",
-        labelCol: { span: 8 },
-        wrapperCol: { span: 16 },
-        style: { maxWidth: 600 },
-        onFinish: onSave,
-        autoComplete: "off",
-        children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Form.Item,
-            {
-              label: "规则集名字",
-              name: "name",
-              rules: [
-                { type: "string", required: true, message: "请输入文件名称名称" },
-                { type: "string", min: 2, max: 20, message: "长度在 2 到 20 个字符" }
-              ],
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "规则集名字" })
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Form.Item,
-            {
-              label: "规则集描述",
-              name: "description",
-              rules: [{ required: true, message: "请输入文件描述" }],
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input.TextArea, { autoSize: { minRows: 10, maxRows: 10 }, placeholder: "规则集描述" })
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(Form.Item, { label: null, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { size: "small", onClick: () => navigate(-1), children: "返回" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", htmlType: "submit", children: "创建" })
-          ] })
-        ]
-      }
-    )
-  ] });
-};
-const modifyResponseType = [
-  { value: "addTimestampToJsCss", label: "将html中的js、css请求加上时间戳" },
-  { value: "returnDataInJsonpStyle", label: "以JSONP的方式返回数据" },
-  { value: "allowCros", label: "增加跨域头部" },
-  { value: "return404", label: "返回404" }
-];
-class ActionView extends React.PureComponent {
-  modifyResponseDescription() {
-    const { action } = this.props;
-    if (action.type == "modifyResponse") {
-      const finded = find(modifyResponseType, (entry) => {
-        return entry.value == action.data.modifyResponseType;
-      });
-      if (!finded) return "未知类型";
-      if (finded.value != "returnDataInJsonpStyle") {
-        return finded.label;
-      }
-      return finded.label + "( callback参数名: " + action.data.callbackName + " )";
-    }
-    return "";
-  }
-  render() {
-    const { action, mockDataList } = this.props;
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "action-value-container", children: [
-      action.type == "redirect" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-redirect row", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "转发" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "value", children: action.data.target })
-      ] }),
-      action.type == "mockData" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-mock-data row", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "返回mock数据" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "value", children: mockDataList.find((item) => item.id == action.data.dataId)?.name })
-      ] }),
-      action.type == "addRequestCookie" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-key-value row", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "设置请求Cookie" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "value", children: [
-          action.data.cookieKey,
-          ":",
-          action.data.cookieValue
-        ] })
-      ] }),
-      action.type == "addRequestHeader" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-key-value row", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "设置请求头" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "value", children: [
-          action.data.reqHeaderKey,
-          ":",
-          action.data.reqHeaderValue
-        ] })
-      ] }),
-      action.type == "addQuery" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-key-value row", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "增加请求Query" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "value", children: [
-          action.data.queryKey,
-          ":",
-          action.data.queryValue
-        ] })
-      ] }),
-      action.type == "addResponseHeader" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-key-value row", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "设置响应头" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "value", children: [
-          action.data.resHeaderKey,
-          ":",
-          action.data.resHeaderValue
-        ] })
-      ] }),
-      action.type == "modifyResponse" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-modify-response row", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "修改响应Body" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "value", children: this.modifyResponseDescription() })
-      ] }),
-      action.type == "scriptModifyRequest" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-script row", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "Js修改请求内容" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "value", children: action.data.modifyRequestScript })
-      ] }),
-      action.type == "scriptModifyResponse" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-script row", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "Js修改响应内容" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "value", children: action.data.modifyResponseScript })
-      ] })
-    ] });
-  }
 }
 const If = (props) => {
   const { condition, renderer } = props;
@@ -1216,49 +1134,6 @@ class ActionValue extends React.PureComponent {
     ] });
   }
 }
-function getDefaultRule() {
-  return {
-    name: "",
-    id: "",
-    method: "",
-    match: "",
-    checked: true,
-    actionList: []
-  };
-}
-function getDefaultAction() {
-  return {
-    type: "redirect",
-    // 转发redirect  接口转发api 使用数据文件替换data
-    data: {
-      target: "",
-      // 转发目标路径
-      dataId: "",
-      //返回数据文件的id
-      modifyResponseType: "",
-      // 修改响应内容类型
-      callbackName: "",
-      // jsonp请求参数名
-      cookieKey: "",
-      // 设置到请求里的cookie key
-      cookieValue: "",
-      // 设置到请求里的cookie value
-      reqHeaderKey: "",
-      // 请求header
-      reqHeaderValue: "",
-      resHeaderKey: "",
-      // 响应header
-      resHeaderValue: "",
-      queryKey: "",
-      // 请求query
-      queryValue: "",
-      modifyRequestScript: "",
-      // 脚本修改请求
-      modifyResponseScript: ""
-      // 脚本修改响应
-    }
-  };
-}
 const HttpInput = (props) => {
   const { id, value = {}, onChange, options } = props;
   const [method, setMethod] = reactExports.useState("");
@@ -1292,7 +1167,7 @@ const HttpInput = (props) => {
     /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { type: "text", value: value?.url || url, onChange: onUrlChange, style: { width: 100 } })
   ] });
 };
-const ruleService$1 = getServiceSync(EService.IRuleService);
+const ruleService$3 = getServiceSync(EService.IRuleService);
 class RuleTestForm extends React.PureComponent {
   formRef = React.createRef();
   initialValue;
@@ -1319,7 +1194,7 @@ class RuleTestForm extends React.PureComponent {
   async testMatchRule() {
     const values = this.formRef.current?.getFieldsValue();
     try {
-      const result = await ruleService$1.testRule(values.match, values.target, values.request);
+      const result = await ruleService$3.testRule(values.match, values.target, values.request);
       this.formRef.current?.setFieldsValue({
         matchResult: result.matchResult,
         redirectResult: result.redirectResult,
@@ -1420,7 +1295,7 @@ const ActionTypeList_Rule = [
   { value: "scriptModifyRequest", label: "js修改请求内容" },
   { value: "scriptModifyResponse", label: "js修改响应内容" }
 ];
-const mockDataService$2 = getServiceSync(EService.IMockDataService);
+const mockDataService$3 = getServiceSync(EService.IMockDataService);
 const userService$1 = getServiceSync(EService.IUserService);
 class RuleEditForm extends React.PureComponent {
   unMockData;
@@ -1432,8 +1307,8 @@ class RuleEditForm extends React.PureComponent {
     };
   }
   componentDidMount() {
-    this.unMockData = mockDataService$2.subscribe(() => {
-      this.setState({ mockDataList: mockDataService$2.getMockFileList() });
+    this.unMockData = mockDataService$3.subscribe(() => {
+      this.setState({ mockDataList: mockDataService$3.getMockFileList() });
     });
   }
   componentWillUnmount() {
@@ -1582,6 +1457,307 @@ class RuleEditForm extends React.PureComponent {
     );
   }
 }
+const modifyResponseType = [
+  { value: "addTimestampToJsCss", label: "将html中的js、css请求加上时间戳" },
+  { value: "returnDataInJsonpStyle", label: "以JSONP的方式返回数据" },
+  { value: "allowCros", label: "增加跨域头部" },
+  { value: "return404", label: "返回404" }
+];
+class ActionView extends React.PureComponent {
+  modifyResponseDescription() {
+    const { action } = this.props;
+    if (action.type == "modifyResponse") {
+      const finded = find(modifyResponseType, (entry) => {
+        return entry.value == action.data.modifyResponseType;
+      });
+      if (!finded) return "未知类型";
+      if (finded.value != "returnDataInJsonpStyle") {
+        return finded.label;
+      }
+      return finded.label + "( callback参数名: " + action.data.callbackName + " )";
+    }
+    return "";
+  }
+  render() {
+    const { action, mockDataList } = this.props;
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "action-value-container", children: [
+      action.type == "redirect" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-redirect row", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "转发" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "value", children: action.data.target })
+      ] }),
+      action.type == "mockData" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-mock-data row", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "返回mock数据" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "value", children: mockDataList.find((item) => item.id == action.data.dataId)?.name })
+      ] }),
+      action.type == "addRequestCookie" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-key-value row", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "设置请求Cookie" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "value", children: [
+          action.data.cookieKey,
+          ":",
+          action.data.cookieValue
+        ] })
+      ] }),
+      action.type == "addRequestHeader" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-key-value row", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "设置请求头" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "value", children: [
+          action.data.reqHeaderKey,
+          ":",
+          action.data.reqHeaderValue
+        ] })
+      ] }),
+      action.type == "addQuery" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-key-value row", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "增加请求Query" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "value", children: [
+          action.data.queryKey,
+          ":",
+          action.data.queryValue
+        ] })
+      ] }),
+      action.type == "addResponseHeader" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-key-value row", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "设置响应头" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "value", children: [
+          action.data.resHeaderKey,
+          ":",
+          action.data.resHeaderValue
+        ] })
+      ] }),
+      action.type == "modifyResponse" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-modify-response row", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "修改响应Body" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "value", children: this.modifyResponseDescription() })
+      ] }),
+      action.type == "scriptModifyRequest" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-script row", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "Js修改请求内容" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "value", children: action.data.modifyRequestScript })
+      ] }),
+      action.type == "scriptModifyResponse" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "value-script row", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "name", children: "Js修改响应内容" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "value", children: action.data.modifyResponseScript })
+      ] })
+    ] });
+  }
+}
+function getQueryParams() {
+  let searchString;
+  if (window.location.hash) {
+    const hash = window.location.hash.slice(1);
+    searchString = hash.split("?")[1] || "";
+  } else {
+    searchString = window.location.search.slice(1);
+  }
+  return Object.fromEntries(new URLSearchParams(searchString));
+}
+const ruleService$2 = getServiceSync(EService.IRuleService);
+const mockDataService$2 = getServiceSync(EService.IMockDataService);
+class EditRule extends React.PureComponent {
+  state = {
+    ruleFileId: "",
+    loaded: false,
+    mockDataList: []
+  };
+  unRule;
+  unMockData;
+  componentDidMount() {
+    this.loadRuleFile();
+    this.unMockData = mockDataService$2.subscribe(() => {
+      this.setState({ mockDataList: mockDataService$2.getMockFileList() });
+    });
+  }
+  async loadRuleFile() {
+    const query = getQueryParams();
+    const id = query.id;
+    const content = await ruleService$2.getFileContent(id);
+    if (!content) {
+      return;
+    }
+    this.setState({
+      ruleFileId: id,
+      loaded: true,
+      ruleFile: content
+    });
+  }
+  componentWillUnmount() {
+    this.unRule?.();
+    this.unMockData?.();
+  }
+  async addRule() {
+    const rule = getDefaultRule();
+    const action = getDefaultAction();
+    action.type = EAction.redirect;
+    rule.actionList.push(action);
+    const nextFilter = await openDialog(RuleEditForm, {
+      isEditRule: false,
+      isFilterRule: true,
+      rule
+    });
+    if (!nextFilter) {
+      return;
+    }
+    const { ruleFileId } = this.state;
+    await ruleService$2.saveRule(ruleFileId, nextFilter);
+    staticMethods.success("保存成功!");
+    this.loadRuleFile();
+  }
+  async toggleRuleCheckState(rule) {
+    const { ruleFileId } = this.state;
+    await ruleService$2.setRuleCheckedState(ruleFileId, rule.id, !rule.checked);
+    staticMethods.success("设置成功!");
+    this.loadRuleFile();
+  }
+  async deleteRule(rule, index) {
+    const { ruleFileId } = this.state;
+    await ruleService$2.removeRule(ruleFileId, rule.id);
+    staticMethods.success("删除成功!");
+    this.loadRuleFile();
+  }
+  async editRule(rule, index) {
+    const nextFilter = await openDialog(RuleEditForm, {
+      isEditRule: true,
+      isFilterRule: true,
+      rule
+    });
+    if (!nextFilter) {
+      return;
+    }
+    const { ruleFileId } = this.state;
+    await ruleService$2.saveRule(ruleFileId, nextFilter);
+    staticMethods.success("保存成功!");
+    this.loadRuleFile();
+  }
+  async duplicateRule(rule, index) {
+    const newRule = JSON.parse(JSON.stringify(rule));
+    newRule.id = "";
+    const { ruleFileId } = this.state;
+    await ruleService$2.saveRuleFile(ruleFileId, newRule);
+    staticMethods.success("复制成功!");
+    this.loadRuleFile();
+  }
+  getColumns() {
+    const { mockDataList } = this.state;
+    return [
+      {
+        title: "启用",
+        dataIndex: "checked",
+        key: "checked",
+        render: (value, rule, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { checked: value, onChange: (e) => this.toggleRuleCheckState(rule) })
+      },
+      {
+        title: "规则名",
+        dataIndex: "name",
+        key: "name",
+        render: (value, rule, index) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: value })
+      },
+      {
+        title: "匹配方法",
+        dataIndex: "method",
+        key: "method",
+        render: (value, rule, index) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: value ? value : "全部" })
+      },
+      {
+        title: "匹配路径",
+        dataIndex: "match",
+        key: "match",
+        render: (value, rule, index) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: value })
+      },
+      {
+        title: "执行动作",
+        dataIndex: "actionList",
+        key: "actionList",
+        render: (actionList, rule, index) => {
+          return actionList.map((action, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(ActionView, { action, mockDataList }, index2));
+        }
+      },
+      {
+        title: "操作",
+        key: "action",
+        render: (_, rule, index) => {
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Popconfirm,
+              {
+                title: "确认",
+                description: "确认删除?",
+                onConfirm: () => this.deleteRule(rule, index),
+                okText: "确认",
+                cancelText: "取消",
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", danger: true, children: "删除" })
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", onClick: () => this.duplicateRule(rule, index), children: "复制" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", onClick: () => this.editRule(rule, index), children: "编辑" })
+          ] });
+        }
+      }
+    ];
+  }
+  render() {
+    const { ruleFile, loaded } = this.state;
+    const ruleList = ruleFile?.ruleList || [];
+    const columns = this.getColumns();
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "main-content__title", children: [
+        "编辑规则集",
+        loaded ? ": " + ruleFile.name : ""
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "project-path-info", children: "可以控制单个规则是否启用，当规则所在规则集没有启用时，规则不管是否启用，都不会生效。" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Row, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, offset: 16, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", onClick: () => this.addRule(), children: "新增过滤器" }) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardTable, { rowKey: "id", dataSource: ruleList, columns })
+    ] });
+  }
+}
+const ruleService$1 = getServiceSync(EService.IRuleService);
+const CreateRule = () => {
+  const navigate = useNavigate();
+  const onSave = async (values) => {
+    try {
+      const id = await ruleService$1.createFile(values.name, values.description);
+      navigate(`/editrule?id=${id}`);
+      staticMethods.success("创建成功!");
+    } catch (err) {
+      staticMethods.error(`出错了，${err.message}`);
+    }
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "main-content__title", children: "创建规则集" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      Form,
+      {
+        name: "创建规则集",
+        labelCol: { span: 8 },
+        wrapperCol: { span: 16 },
+        style: { maxWidth: 600 },
+        onFinish: onSave,
+        autoComplete: "off",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "规则集名字",
+              name: "name",
+              rules: [
+                { type: "string", required: true, message: "请输入文件名称名称" },
+                { type: "string", min: 2, max: 20, message: "长度在 2 到 20 个字符" }
+              ],
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "规则集名字" })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "规则集描述",
+              name: "description",
+              rules: [{ required: true, message: "请输入文件描述" }],
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input.TextArea, { autoSize: { minRows: 10, maxRows: 10 }, placeholder: "规则集描述" })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Form.Item, { label: null, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { size: "small", onClick: () => navigate(-1), children: "返回" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", htmlType: "submit", children: "创建" })
+          ] })
+        ]
+      }
+    )
+  ] });
+};
 const filterService$1 = getServiceSync(EService.IFilterService);
 const profileService$1 = getServiceSync(EService.IProfileService);
 const mockDataService$1 = getServiceSync(EService.IMockDataService);
@@ -1613,7 +1789,7 @@ class FilterList extends React.PureComponent {
   async addFilter() {
     const rule = getDefaultRule();
     const action = getDefaultAction();
-    action.type = "addRequestHeader";
+    action.type = EAction.addRequestHeader;
     rule.actionList.push(action);
     const nextFilter = await openDialog(RuleEditForm, {
       isEditRule: false,
@@ -1623,22 +1799,14 @@ class FilterList extends React.PureComponent {
     if (!nextFilter) {
       return;
     }
-    try {
-      await filterService$1.saveFilter(nextFilter);
-      staticMethods.success("保存成功!");
-    } catch (err) {
-      staticMethods.error(`出错了，${err.message}`);
-    }
+    await filterService$1.saveFilter(nextFilter);
+    staticMethods.success("保存成功!");
   }
   async duplicateRule(rule, index) {
     const newRule = JSON.parse(JSON.stringify(rule));
     newRule.id = "";
-    try {
-      await filterService$1.saveFilter(newRule);
-      staticMethods.success("保存成功!");
-    } catch (err) {
-      staticMethods.error(`出错了，${err.message}`);
-    }
+    await filterService$1.saveFilter(newRule);
+    staticMethods.success("复制成功!");
   }
   async editRule(rule, index) {
     const nextFilter = await openDialog(RuleEditForm, {
@@ -1649,28 +1817,16 @@ class FilterList extends React.PureComponent {
     if (!nextFilter) {
       return;
     }
-    try {
-      await filterService$1.saveFilter(nextFilter);
-      staticMethods.success("保存成功!");
-    } catch (err) {
-      staticMethods.error(`出错了，${err.message}`);
-    }
+    await filterService$1.saveFilter(nextFilter);
+    staticMethods.success("保存成功!");
   }
-  async toggleRuleCheckState(rule) {
-    try {
-      await filterService$1.setFilterCheckedState(rule.id, !rule.checked);
-      staticMethods.success("设置成功!");
-    } catch (err) {
-      staticMethods.error(`出错了，${err.message}`);
-    }
+  async setFilterCheckedState(rule) {
+    await filterService$1.setFilterCheckedState(rule.id, !rule.checked);
+    staticMethods.success("设置成功!");
   }
   async deleteRule(rule, index) {
-    try {
-      await filterService$1.removeFilter(rule.id);
-      staticMethods.success("删除成功!");
-    } catch (err) {
-      staticMethods.error(`出错了，${err.message}`);
-    }
+    await filterService$1.removeFilter(rule.id);
+    staticMethods.success("删除成功!");
   }
   getColumns() {
     const { mockDataList, enableFilter: enableFilter2 } = this.state;
@@ -1679,7 +1835,14 @@ class FilterList extends React.PureComponent {
         title: "启用",
         dataIndex: "checked",
         key: "checked",
-        render: (value, rule, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { value, disabled: !enableFilter2, onChange: (e) => this.toggleRuleCheckState(rule), children: "Checkbox" })
+        render: (value, rule, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Checkbox,
+          {
+            checked: value,
+            disabled: !enableFilter2,
+            onChange: (e) => this.setFilterCheckedState(rule)
+          }
+        )
       },
       {
         title: "规则名",
@@ -2114,9 +2277,47 @@ async function testRule(content) {
   assertAxiosRes(response);
   return response.data.data;
 }
+async function getFileContent(id) {
+  const response = await axios.get(`/rule/getfile?id=${id}`);
+  assertAxiosRes(response);
+  return response.data.data;
+}
+async function setRuleCheckedState(ruleFileId, ruleId, checked) {
+  const response = await axios.get(`/rule/setRuleCheckedState`, {
+    params: {
+      ruleFileId,
+      ruleId,
+      checked: checked ? 1 : 0
+    }
+  });
+  assertAxiosRes(response);
+}
+async function saveRule(ruleFileId, rule) {
+  const response = await axios.post(`/rule/saveRule`, rule, {
+    params: {
+      ruleFileId
+    }
+  });
+  assertAxiosRes(response);
+}
+async function removeRule(ruleFileId, ruleId) {
+  const response = await axios.get(`/rule/removeRule`, {
+    params: {
+      ruleFileId,
+      ruleId
+    }
+  });
+  assertAxiosRes(response);
+}
 class RuleService extends StateBase {
   constructor() {
     super({ ruleFileList: [] });
+  }
+  getRuleFileList() {
+    return this.getState().ruleFileList;
+  }
+  setRuleFileList(ruleFileList) {
+    this.setState({ ruleFileList });
   }
   async testRule(match, target, request) {
     return await testRule({
@@ -2132,18 +2333,6 @@ class RuleService extends StateBase {
       // 转发末班
     });
   }
-  getRuleFileList() {
-    return this.getState().ruleFileList;
-  }
-  setRuleFileList(ruleFileList) {
-    this.setState({ ruleFileList });
-  }
-  async setFileCheckStatus(ruleFileId, check) {
-    await setFileCheckStatus(ruleFileId, check);
-  }
-  async deleteRuleFile(id) {
-    await deleteFile(id);
-  }
   getReferenceVar(content) {
     const contentStr = JSON.stringify(content);
     const reg1 = RegExp("<%=(.+?)%>", "g");
@@ -2158,12 +2347,30 @@ class RuleService extends StateBase {
     }
     return keys(varObj);
   }
-  async saveRuleFile(id, content) {
-    await saveRuleFile(id, content);
-  }
   async createFile(name, description) {
     const res = await createFile(name, description);
     return res.id;
+  }
+  async getFileContent(id) {
+    return await getFileContent(id);
+  }
+  async setFileCheckStatus(ruleFileId, check) {
+    await setFileCheckStatus(ruleFileId, check);
+  }
+  async saveRuleFile(id, content) {
+    await saveRuleFile(id, content);
+  }
+  async deleteRuleFile(id) {
+    await deleteFile(id);
+  }
+  async setRuleCheckedState(ruleFileId, ruleId, checked) {
+    await setRuleCheckedState(ruleFileId, ruleId, checked);
+  }
+  async saveRule(ruleFileId, rule) {
+    await saveRule(ruleFileId, rule);
+  }
+  async removeRule(ruleFileId, ruleId) {
+    await removeRule(ruleFileId, ruleId);
   }
 }
 class UserService extends StateBase {

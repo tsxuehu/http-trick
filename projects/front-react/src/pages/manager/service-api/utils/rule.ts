@@ -1,4 +1,4 @@
-import { IAction, IRule } from '../IRuleService.ts'
+import { EAction, IAction, IRule } from '../IRuleService.ts';
 
 export function getDefaultRule(): IRule {
   return {
@@ -8,11 +8,11 @@ export function getDefaultRule(): IRule {
     match: '',
     checked: true,
     actionList: [],
-  }
+  };
 }
 export function getDefaultAction(): IAction {
   return {
-    type: 'redirect', // 转发redirect  接口转发api 使用数据文件替换data
+    type: EAction.redirect, // 转发redirect  接口转发api 使用数据文件替换data
     data: {
       target: '', // 转发目标路径
       dataId: '', //返回数据文件的id
@@ -29,5 +29,5 @@ export function getDefaultAction(): IAction {
       modifyRequestScript: '', // 脚本修改请求
       modifyResponseScript: '', // 脚本修改响应
     },
-  }
+  };
 }
