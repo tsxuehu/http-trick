@@ -70,4 +70,7 @@ export default interface IRuleService extends IStateBase<{ ruleFileList: IRuleFi
 
   setFileCheckStatus(ruleFileId: string, check: boolean): Promise<void>
   testRule(match: IHttpApiInfo, target: string, request: IHttpApiInfo): Promise<IMatchResult>
+  deleteRuleFile(id: string): Promise<void>
+  getReferenceVar(content: string): string[]
+  saveRuleFile(id: string, content: any): Promise<void>
 }

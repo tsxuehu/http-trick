@@ -24,8 +24,9 @@ export function getFileList() {
   return axios.get('/rule/filelist')
 }
 
-export function deleteFile(id: string) {
-  return axios.get(`/rule/deletefile?id=${id}`)
+export async function deleteFile(id: string) {
+  const response = await axios.get(`/rule/deletefile?id=${id}`)
+  assertAxiosRes(response)
 }
 
 export async function setFileCheckStatus(id: string, checked: boolean) {
@@ -64,29 +65,13 @@ export function saveRule(ruleFileId: string, rule: any) {
   })
 }
 
-export function saveRuleFile(id: string, content: any) {
-  return axios.post(`/rule/saveRuleFile?id=${id}`, content)
+export async function saveRuleFile(id: string, content: any) {
+  const response = await axios.post(`/rule/saveRuleFile?id=${id}`, content)
+  assertAxiosRes(response)
 }
 
 export async function testRule(content: any) {
   const response = await axios.post('/rule/test', content)
   assertAxiosRes(response)
   return response.data.data
-}
-
-export function getReferenceVar(content: any) {
-  var contentStr = JSON.stringify(content)
-  var reg1 = RegExp('<%=(.+?)%>', 'g')
-  var reg2 = RegExp('\\$\\{(.+?)\\}', 'g')
-  var result
-  var varObj = {}
-  while ((result = reg1.exec(contentStr)) != null) {
-    // @ts-ignore
-    varObj[trim(result[1])] = 1
-  }
-  while ((result = reg2.exec(contentStr)) != null) {
-    // @ts-ignore
-    varObj[trim(result[1])] = 1
-  }
-  return keys(varObj)
 }

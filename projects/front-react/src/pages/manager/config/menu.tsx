@@ -1,111 +1,115 @@
-import { Menu, MenuProps } from "antd";
-import React, { useEffect, useState } from "react";
+import { Menu, MenuProps } from 'antd'
+import React, { useEffect, useState } from 'react'
 import {
   HomeOutlined,
   UserOutlined,
   SettingOutlined,
   FileTextOutlined,
   PieChartOutlined,
-  ShoppingCartOutlined
-} from "@ant-design/icons";
-import { HashRouter as Router, Routes, Route, Link, useLocation } from "react-router";
-import { getServiceSync } from "@spring4js/container-browser/lib/esm/global-fn";
-import IConfigureService from "../service-api/IConfigureService.ts";
-import EService from "./EService.ts";
-import IUserService from "../service-api/IUserService.ts";
+  ShoppingCartOutlined,
+} from '@ant-design/icons'
+import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router'
+import { getServiceSync } from '@spring4js/container-browser/lib/esm/global-fn'
+import IConfigureService from '../service-api/IConfigureService.ts'
+import EService from './EService.ts'
+import IUserService from '../service-api/IUserService.ts'
 
-const configureService = getServiceSync<IConfigureService>(EService.IConfigureService);
-const userService = getServiceSync<IUserService>(EService.IUserService);
+const configureService = getServiceSync<IConfigureService>(EService.IConfigureService)
+const userService = getServiceSync<IUserService>(EService.IUserService)
 
-
-type MenuItem = Required<MenuProps>["items"][number];
+type MenuItem = Required<MenuProps>['items'][number]
 
 function getMenuItems(): MenuItem[] {
-  const professionalVersion = configureService.getState().professionalVersion
+  const professionalVersion = configureService.getConfig().professionalVersion
   const items: MenuItem[] = [
     {
-      key: "/helpinstall",
+      key: '/helpinstall',
       icon: <HomeOutlined />,
-      label: <Link to="/helpinstall">使用说明</Link>
-    }]
-    if (userService.isRoot()) {
-      items.push({
-        key: "/proxy-configure",
-        icon: <UserOutlined />,
-        label: <Link to="/proxy-app-configure">代理程序设置</Link>
-      })
-    }
+      label: <Link to="/helpinstall">使用说明</Link>,
+    },
+  ]
+  if (userService.isRoot()) {
+    items.push({
+      key: '/proxy-configure',
+      icon: <UserOutlined />,
+      label: <Link to="/proxy-app-configure">代理程序设置</Link>,
+    })
+  }
 
-    if (professionalVersion) {
-      items.push(...[
+  if (professionalVersion) {
+    items.push(
+      ...[
         {
-          key: "/interception-config",
+          key: '/interception-config',
           icon: <ShoppingCartOutlined />,
-          label: <Link to="/interception-config">请求拦截设置</Link>
+          label: <Link to="/interception-config">请求拦截设置</Link>,
         },
         {
-          key: "/redirect-path-variable",
+          key: '/redirect-path-variable',
           icon: <ShoppingCartOutlined />,
-          label: <Link to="/redirect-path-variable">转发路径变量</Link>
+          label: <Link to="/redirect-path-variable">转发路径变量</Link>,
         },
         {
-          key: "/hostfilelist",
+          key: '/hostfilelist',
           icon: <FileTextOutlined />,
-          label: <Link to="/hostfilelist">Host 管理</Link>
+          label: <Link to="/hostfilelist">Host 管理</Link>,
         },
         {
-          key: "/filter",
+          key: '/filter',
           icon: <SettingOutlined />,
-          label: <Link to="/filter">Http 过滤器</Link>
+          label: <Link to="/filter">Http 过滤器</Link>,
         },
         {
-          key: "/rulefilelist",
+          key: '/rulefilelist',
           icon: <SettingOutlined />,
-          label: <Link to="/rulefilelist">Http 转发</Link>
+          label: <Link to="/rulefilelist">Http 转发</Link>,
         },
         {
-          key: "/datalist",
+          key: '/datalist',
           icon: <SettingOutlined />,
-          label: <Link to="/datalist">自定义 mock 数据</Link>
+          label: <Link to="/datalist">自定义 mock 数据</Link>,
         },
         {
-          key: "/device",
+          key: '/device',
           icon: <SettingOutlined />,
-          label: <Link to="/device">设备管理</Link>
-        }
-      ])
-    } else {
-      items.push(...[
+          label: <Link to="/device">设备管理</Link>,
+        },
+      ],
+    )
+  } else {
+    items.push(
+      ...[
         {
-          key: "/interception-config",
+          key: '/interception-config',
           icon: <ShoppingCartOutlined />,
-          label: <Link to="/interception-config">请求拦截设置</Link>
+          label: <Link to="/interception-config">请求拦截设置</Link>,
         },
         {
-          key: "/rulefilelist",
+          key: '/rulefilelist',
           icon: <SettingOutlined />,
-          label: <Link to="/rulefilelist">Http 转发</Link>
+          label: <Link to="/rulefilelist">Http 转发</Link>,
         },
         {
-          key: "/datalist",
+          key: '/datalist',
           icon: <SettingOutlined />,
-          label: <Link to="/datalist">自定义 mock 数据</Link>
-        }
-      ])
-    }
+          label: <Link to="/datalist">自定义 mock 数据</Link>,
+        },
+      ],
+    )
+  }
 
-  return items;
- }
+  return items
+}
 
 export function HttpTrickMenu() {
   const [items, setItems] = useState<MenuItem[]>([])
 
-  useEffect(()=>{
-    const unConfig = configureService.subscribe((config)=>{
+  useEffect(() => {
+    const unConfig = configureService.subscribe((config) => {
       const items = getMenuItems()
       setItems(items)
     })
-    const unUser = userService.subscribe((user)=>{
+    const unUser = userService.subscribe((user) => {
       const items = getMenuItems()
       setItems(items)
     })
@@ -117,5 +121,5 @@ export function HttpTrickMenu() {
 
   const location = useLocation()
 
-  return <Menu theme="dark" selectedKeys={[location.pathname]} mode="inline" items={items} />;
+  return <Menu theme="dark" selectedKeys={[location.pathname]} mode="inline" items={items} />
 }

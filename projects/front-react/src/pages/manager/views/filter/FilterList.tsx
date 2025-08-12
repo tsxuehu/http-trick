@@ -105,7 +105,7 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
   async toggleRuleCheckState(rule: IRule) {
     try {
       await filterService.setFilterCheckedState(rule.id, !rule.checked)
-      message.success('保存成功!')
+      message.success('设置成功!')
     } catch (err: any) {
       message.error(`出错了，${err.message}`)
     }
@@ -114,7 +114,7 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
   async deleteRule(rule: IRule, index: number) {
     try {
       await filterService.removeFilter(rule.id)
-      message.success('保存成功!')
+      message.success('删除成功!')
     } catch (err: any) {
       message.error(`出错了，${err.message}`)
     }

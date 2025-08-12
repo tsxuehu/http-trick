@@ -1,14 +1,19 @@
 import React from 'react'
-import { Button, Checkbox, Popconfirm, Table } from 'antd'
+import { Button, Checkbox, message, Modal, Popconfirm, Table } from 'antd'
 import { getServiceSync } from '@spring4js/container-browser/lib/esm/global-fn'
 import IRuleService, { IAction, IRule, IRuleFileSimple } from '../../service-api/IRuleService.ts'
 import EService from '../../config/EService.ts'
 import IAppInfoService, { IAppInfo } from '../../service-api/IAppInfoService.ts'
-
+import copyToClipboard from 'copy-to-clipboard'
 // @ts-ignore
 import './rule-list.less'
 import { ColumnsType } from 'antd/es/table'
 import IProfileService from '../../service-api/IProfileService.ts'
+import { NavLink } from 'react-router'
+import { openDialog } from '../../forms/utils.ts'
+import RuleEditForm, { IProps as IRuleEditFormProps } from '../../forms/rule-edit-form/RuleEditForm.tsx'
+import PromptForm, { IPromptFormProps } from '../../forms/prompt/PromptForm.tsx'
+import { getRemoteFile } from '../../../../api/utils.ts'
 
 interface IProps {}
 
@@ -45,26 +50,97 @@ export default class RuleList extends React.PureComponent<IProps, IState> {
     this.unProfile?.()
   }
 
-  importRemoteRule() {}
+  async importRemoteRule() {
+    const values = await openDialog<IPromptFormProps, any>(PromptForm, {
+      title: '导入远程规则',
+      fields: [
+        { label: '请输入远程规则文件的url', key: 'url', value: '', placeholder: '' },
+        { label: '请输入导入规则的文件名', key: 'name', value: '', placeholder: '' },
+      ],
+    })
+    if (!values) {
+      return
+    }
+    const content = await getRemoteFile(values.url)
+    content.meta = {
+      remote: true,
+      url: values.url,
+    }
+    content.id = ''
 
-  addRuleCollection() {}
+    content.name = values.name
+    content.checked = false
 
-  onDeleteFile(file: IRuleFileSimple, index: number) {}
+    const varNameList = ruleService.getReferenceVar(content)
+    let infoStr
+    if (varNameList.length > 0) {
+      infoStr = `导入规则文件名为${content.name},引用变量【${varNameList.join(
+        '; ',
+      )}】请确保变量已经在转发路径变量中设置过`
+    } else {
+      infoStr = `导入规则文件名为${content.name}`
+    }
+    Modal.confirm({
+      title: '导入远程规则',
+      content: infoStr,
+      onOk: async () => {
+        try {
+          await ruleService.saveRuleFile(content.id, content)
+          message.success('创建成功!')
+        } catch (err: any) {
+          message.error(`出错了，${err.message}`)
+        }
+      },
+    })
+  }
 
-  onDownloadFile(file: IRuleFileSimple, index: number) {}
+  async onDeleteFile(file: IRuleFileSimple, index: number) {
+    try {
+      await ruleService.deleteRuleFile(file.id)
+      message.success('删除成功!')
+    } catch (err: any) {
+      message.error(`出错了，${err.message}`)
+    }
+  }
 
-  onShareFile(file: IRuleFileSimple, index: number) {}
+  onDownloadFile(file: IRuleFileSimple, index: number) {
+    if (!file.meta.remote) {
+      window.open('/rule/download?id=' + file.id, '_blank')
+    } else {
+      window.open(file.meta.url, '_blank')
+    }
+  }
 
-  onSelectionChange(file: IRuleFileSimple, index: number) {
-    // this.setFileCheckStatus({
-    //   ruleFileId: ruleFile.id,
-    //   check: !ruleFile.checked
-    // })
+  onShareFile(file: IRuleFileSimple, index: number) {
+    const appInfo = appInfoService.getAppInfo()
+    let url = `http://${appInfo.pcIp}:${appInfo.webUiPort}/rule/file/raw?id=${encodeURIComponent(file.id)}`
+    copyToClipboard(url)
+    message.success(`已复制规则${file.name}链接`)
+  }
+
+  async toggleFileCheckStatus(file: IRuleFileSimple, index: number) {
+    try {
+      await ruleService.setFileCheckStatus(file.id, !file.checked)
+    } catch (err: any) {
+      message.error(`出错了，${err.message}`)
+    }
   }
 
   getColumns(): ColumnsType<IRuleFileSimple> {
     const { enableRule } = this.state
     return [
+      {
+        title: '名字',
+        dataIndex: 'name',
+        key: 'name',
+        render: (value: boolean, ruleFile: IRuleFileSimple, index: number) => <>{value}</>,
+      },
+      {
+        title: '描述',
+        dataIndex: 'description',
+        key: 'description',
+        render: (value: boolean, ruleFile: IRuleFileSimple, index: number) => <>{value}</>,
+      },
       {
         title: '操作',
         key: 'action',
@@ -97,7 +173,7 @@ export default class RuleList extends React.PureComponent<IProps, IState> {
         dataIndex: 'checked',
         key: 'checked',
         render: (value: boolean, ruleFile: IRuleFileSimple, index: number) => (
-          <Checkbox value={value} disabled={!enableRule} onChange={(e) => this.onSelectionChange(ruleFile, index)}>
+          <Checkbox value={value} disabled={!enableRule} onChange={(e) => this.toggleFileCheckStatus(ruleFile, index)}>
             Checkbox
           </Checkbox>
         ),
@@ -106,7 +182,7 @@ export default class RuleList extends React.PureComponent<IProps, IState> {
   }
 
   render() {
-    const { ruleFileList, appInfo } = this.state
+    const { ruleFileList } = this.state
     const columns = this.getColumns()
     return (
       <div>
@@ -119,9 +195,9 @@ export default class RuleList extends React.PureComponent<IProps, IState> {
             </Button>
           </div>
           <div className="op">
-            <Button size="small" onClick={() => this.addRuleCollection()}>
-              新增规则集
-            </Button>
+            <NavLink to="/createrulefile">
+              <Button size="small">新增规则集</Button>
+            </NavLink>
           </div>
         </div>
         <Table rowKey="id" dataSource={ruleFileList} columns={columns} />

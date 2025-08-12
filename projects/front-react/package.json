@@ -14,6 +14,7 @@
     "@spring4js/log": "^1.0.1",
     "@types/lodash": "^4.17.20",
     "antd": "^5.26.6",
+    "copy-to-clipboard": "^3.3.3",
     "immer": "^10.1.1",
     "lodash": "^4.17.21",
     "qrcode-js": "^0.0.2",

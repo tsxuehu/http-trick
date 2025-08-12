@@ -1,4 +1,4 @@
-import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as find, k as Future, l as clientExports, S as Select, m as Modal, p as produce, n as set, o as Row, t as Col, v as Routes, w as Route, N as Navigate, x as Layout, y as theme, H as HashRouter, z as axios, A as createStore, D as ServiceRegistry, E as setServiceRegistry } from "./vendor.js";
+import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as Future, k as clientExports, l as Modal, m as axios, n as copyToClipboard, N as NavLink, o as find, S as Select, p as produce, t as set, v as Row, w as Col, x as Routes, y as Route, z as Navigate, A as Layout, D as theme, H as HashRouter, E as createStore, G as trim, J as keys, K as ServiceRegistry, O as setServiceRegistry } from "./vendor.js";
 var EService = /* @__PURE__ */ ((EService2) => {
   EService2["IWorkbenchService"] = "WorkbenchService";
   EService2["IUserService"] = "UserService";
@@ -15,7 +15,7 @@ var EService = /* @__PURE__ */ ((EService2) => {
 const configureService$2 = getServiceSync(EService.IConfigureService);
 const userService$3 = getServiceSync(EService.IUserService);
 function getMenuItems() {
-  const professionalVersion = configureService$2.getState().professionalVersion;
+  const professionalVersion = configureService$2.getConfig().professionalVersion;
   const items = [
     {
       key: "/helpinstall",
@@ -31,61 +31,65 @@ function getMenuItems() {
     });
   }
   if (professionalVersion) {
-    items.push(...[
-      {
-        key: "/interception-config",
-        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$1, {}),
-        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/interception-config", children: "请求拦截设置" })
-      },
-      {
-        key: "/redirect-path-variable",
-        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$1, {}),
-        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/redirect-path-variable", children: "转发路径变量" })
-      },
-      {
-        key: "/hostfilelist",
-        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$2, {}),
-        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/hostfilelist", children: "Host 管理" })
-      },
-      {
-        key: "/filter",
-        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
-        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/filter", children: "Http 过滤器" })
-      },
-      {
-        key: "/rulefilelist",
-        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
-        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/rulefilelist", children: "Http 转发" })
-      },
-      {
-        key: "/datalist",
-        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
-        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/datalist", children: "自定义 mock 数据" })
-      },
-      {
-        key: "/device",
-        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
-        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/device", children: "设备管理" })
-      }
-    ]);
+    items.push(
+      ...[
+        {
+          key: "/interception-config",
+          icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$1, {}),
+          label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/interception-config", children: "请求拦截设置" })
+        },
+        {
+          key: "/redirect-path-variable",
+          icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$1, {}),
+          label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/redirect-path-variable", children: "转发路径变量" })
+        },
+        {
+          key: "/hostfilelist",
+          icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$2, {}),
+          label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/hostfilelist", children: "Host 管理" })
+        },
+        {
+          key: "/filter",
+          icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
+          label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/filter", children: "Http 过滤器" })
+        },
+        {
+          key: "/rulefilelist",
+          icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
+          label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/rulefilelist", children: "Http 转发" })
+        },
+        {
+          key: "/datalist",
+          icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
+          label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/datalist", children: "自定义 mock 数据" })
+        },
+        {
+          key: "/device",
+          icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
+          label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/device", children: "设备管理" })
+        }
+      ]
+    );
   } else {
-    items.push(...[
-      {
-        key: "/interception-config",
-        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$1, {}),
-        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/interception-config", children: "请求拦截设置" })
-      },
-      {
-        key: "/rulefilelist",
-        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
-        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/rulefilelist", children: "Http 转发" })
-      },
-      {
-        key: "/datalist",
-        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
-        label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/datalist", children: "自定义 mock 数据" })
-      }
-    ]);
+    items.push(
+      ...[
+        {
+          key: "/interception-config",
+          icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$1, {}),
+          label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/interception-config", children: "请求拦截设置" })
+        },
+        {
+          key: "/rulefilelist",
+          icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
+          label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/rulefilelist", children: "Http 转发" })
+        },
+        {
+          key: "/datalist",
+          icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}),
+          label: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/datalist", children: "自定义 mock 数据" })
+        }
+      ]
+    );
   }
   return items;
 }
@@ -108,18 +112,18 @@ function HttpTrickMenu() {
   const location = useLocation();
   return /* @__PURE__ */ jsxRuntimeExports.jsx(Menu, { theme: "dark", selectedKeys: [location.pathname], mode: "inline", items });
 }
-const appInfoService$1 = getServiceSync(EService.IAppInfoService);
+const appInfoService$2 = getServiceSync(EService.IAppInfoService);
 const userService$2 = getServiceSync(EService.IUserService);
 class Help extends React.PureComponent {
   state = {
-    appInfo: appInfoService$1.getState(),
+    appInfo: appInfoService$2.getState(),
     userInfo: userService$2.getState()
   };
   componentDidMount() {
     userService$2.subscribe((userInfo) => {
       this.setState({ userInfo });
     });
-    appInfoService$1.subscribe((appInfo) => {
+    appInfoService$2.subscribe((appInfo) => {
       this.setState({ appInfo });
     });
   }
@@ -581,8 +585,89 @@ class CreateHost extends React.PureComponent {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "CreateHost" });
   }
 }
+function openDialog(dialog, props) {
+  const future = new Future();
+  const dialogContainerDiv = document.createElement("div");
+  document.body.appendChild(dialogContainerDiv);
+  const root = clientExports.createRoot(dialogContainerDiv);
+  const destroy = () => {
+    try {
+      root.unmount();
+      document.body.removeChild(dialogContainerDiv);
+    } catch (error) {
+    }
+  };
+  const dialogProps = {
+    ...props,
+    onOk: (data) => {
+      destroy();
+      future.resolve(data);
+    },
+    onCancel: (data) => {
+      destroy();
+      future.resolve(data);
+    },
+    onError: (error) => {
+      destroy();
+      future.reject(error);
+    }
+  };
+  root.render(
+    React.createElement(dialog, dialogProps)
+  );
+  return future.get();
+}
+const PromptForm = (props) => {
+  const { title = "编辑信息", okText = "确认", cancelText = "取消", fields, onOk, onCancel } = props;
+  const [form] = Form.useForm();
+  reactExports.useEffect(() => {
+    if (fields.length > 0) {
+      const initialValues = {};
+      fields.forEach((field) => {
+        initialValues[field.key] = field.value;
+      });
+      form.setFieldsValue(initialValues);
+    }
+  }, []);
+  const handleOk = async () => {
+    const values = await form.validateFields();
+    onOk(values);
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Modal,
+    {
+      title,
+      okText,
+      cancelText,
+      open: true,
+      onOk: () => handleOk(),
+      onCancel: () => onCancel(void 0),
+      children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form, { form, layout: "vertical", name: "custom_prompt_form", children: fields.map((field) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Form.Item,
+        {
+          name: field.key,
+          label: field.label || field.key,
+          rules: [{ required: true, message: `请输入${field.label || field.key}` }],
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: field.placeholder || `请输入${field.label || field.key}` })
+        },
+        field.key
+      )) })
+    }
+  );
+};
+async function getRemoteFile(url) {
+  const response = await axios.get(`/utils/getRemoteFile?url=${encodeURIComponent(url)}`);
+  assertAxiosRes(response);
+  return response.data.data;
+}
+function assertAxiosRes(response) {
+  const serverData = response.data;
+  if (serverData.code !== 0) {
+    throw new Error(serverData.msg);
+  }
+}
 const ruleService$2 = getServiceSync(EService.IRuleService);
-getServiceSync(EService.IAppInfoService);
+const appInfoService$1 = getServiceSync(EService.IAppInfoService);
 const profileService$2 = getServiceSync(EService.IProfileService);
 class RuleList extends React.PureComponent {
   state = {
@@ -603,21 +688,90 @@ class RuleList extends React.PureComponent {
     this.unRule?.();
     this.unProfile?.();
   }
-  importRemoteRule() {
+  async importRemoteRule() {
+    const values = await openDialog(PromptForm, {
+      title: "导入远程规则",
+      fields: [
+        { label: "请输入远程规则文件的url", key: "url", value: "", placeholder: "" },
+        { label: "请输入导入规则的文件名", key: "name", value: "", placeholder: "" }
+      ]
+    });
+    if (!values) {
+      return;
+    }
+    const content = await getRemoteFile(values.url);
+    content.meta = {
+      remote: true,
+      url: values.url
+    };
+    content.id = "";
+    content.name = values.name;
+    content.checked = false;
+    const varNameList = ruleService$2.getReferenceVar(content);
+    let infoStr;
+    if (varNameList.length > 0) {
+      infoStr = `导入规则文件名为${content.name},引用变量【${varNameList.join(
+        "; "
+      )}】请确保变量已经在转发路径变量中设置过`;
+    } else {
+      infoStr = `导入规则文件名为${content.name}`;
+    }
+    Modal.confirm({
+      title: "导入远程规则",
+      content: infoStr,
+      onOk: async () => {
+        try {
+          await ruleService$2.saveRuleFile(content.id, content);
+          staticMethods.success("创建成功!");
+        } catch (err) {
+          staticMethods.error(`出错了，${err.message}`);
+        }
+      }
+    });
   }
-  addRuleCollection() {
-  }
-  onDeleteFile(file, index) {
+  async onDeleteFile(file, index) {
+    try {
+      await ruleService$2.deleteRuleFile(file.id);
+      staticMethods.success("删除成功!");
+    } catch (err) {
+      staticMethods.error(`出错了，${err.message}`);
+    }
   }
   onDownloadFile(file, index) {
+    if (!file.meta.remote) {
+      window.open("/rule/download?id=" + file.id, "_blank");
+    } else {
+      window.open(file.meta.url, "_blank");
+    }
   }
   onShareFile(file, index) {
+    const appInfo = appInfoService$1.getAppInfo();
+    let url = `http://${appInfo.pcIp}:${appInfo.webUiPort}/rule/file/raw?id=${encodeURIComponent(file.id)}`;
+    copyToClipboard(url);
+    staticMethods.success(`已复制规则${file.name}链接`);
   }
-  onSelectionChange(file, index) {
+  async toggleFileCheckStatus(file, index) {
+    try {
+      await ruleService$2.setFileCheckStatus(file.id, !file.checked);
+    } catch (err) {
+      staticMethods.error(`出错了，${err.message}`);
+    }
   }
   getColumns() {
     const { enableRule: enableRule2 } = this.state;
     return [
+      {
+        title: "名字",
+        dataIndex: "name",
+        key: "name",
+        render: (value, ruleFile, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: value })
+      },
+      {
+        title: "描述",
+        dataIndex: "description",
+        key: "description",
+        render: (value, ruleFile, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: value })
+      },
       {
         title: "操作",
         key: "action",
@@ -643,19 +797,19 @@ class RuleList extends React.PureComponent {
         title: "启用",
         dataIndex: "checked",
         key: "checked",
-        render: (value, ruleFile, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { value, disabled: !enableRule2, onChange: (e) => this.onSelectionChange(ruleFile, index), children: "Checkbox" })
+        render: (value, ruleFile, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { value, disabled: !enableRule2, onChange: (e) => this.toggleFileCheckStatus(ruleFile, index), children: "Checkbox" })
       }
     ];
   }
   render() {
-    const { ruleFileList, appInfo } = this.state;
+    const { ruleFileList } = this.state;
     const columns = this.getColumns();
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "main-content__title", children: "规则集列表" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "project-path-info", children: "http转发规则以规则集的方式组织，可以控制单个规则集是否启用。" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rule-list-op", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "op", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { size: "small", onClick: () => this.importRemoteRule(), children: "导入远程规则" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "op", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { size: "small", onClick: () => this.addRuleCollection(), children: "新增规则集" }) })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "op", children: /* @__PURE__ */ jsxRuntimeExports.jsx(NavLink, { to: "/createrulefile", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { size: "small", children: "新增规则集" }) }) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardTable, { rowKey: "id", dataSource: ruleFileList, columns })
     ] });
@@ -749,38 +903,6 @@ class ActionView extends React.PureComponent {
       ] })
     ] });
   }
-}
-function openDialog(dialog, props) {
-  const future = new Future();
-  const dialogContainerDiv = document.createElement("div");
-  document.body.appendChild(dialogContainerDiv);
-  const root = clientExports.createRoot(dialogContainerDiv);
-  const destroy = () => {
-    try {
-      root.unmount();
-      document.body.removeChild(dialogContainerDiv);
-    } catch (error) {
-    }
-  };
-  const dialogProps = {
-    ...props,
-    onOk: (data) => {
-      destroy();
-      future.resolve(data);
-    },
-    onCancel: (data) => {
-      destroy();
-      future.resolve(data);
-    },
-    onError: (error) => {
-      destroy();
-      future.reject(error);
-    }
-  };
-  root.render(
-    React.createElement(dialog, dialogProps)
-  );
-  return future.get();
 }
 const If = (props) => {
   const { condition, renderer } = props;
@@ -1480,7 +1602,7 @@ class FilterList extends React.PureComponent {
   async toggleRuleCheckState(rule) {
     try {
       await filterService$1.setFilterCheckedState(rule.id, !rule.checked);
-      staticMethods.success("保存成功!");
+      staticMethods.success("设置成功!");
     } catch (err) {
       staticMethods.error(`出错了，${err.message}`);
     }
@@ -1488,7 +1610,7 @@ class FilterList extends React.PureComponent {
   async deleteRule(rule, index) {
     try {
       await filterService$1.removeFilter(rule.id);
-      staticMethods.success("保存成功!");
+      staticMethods.success("删除成功!");
     } catch (err) {
       staticMethods.error(`出错了，${err.message}`);
     }
@@ -1612,12 +1734,6 @@ const App = () => {
     ] })
   ] }) });
 };
-function assertAxiosRes(response) {
-  const serverData = response.data;
-  if (serverData.code !== 0) {
-    throw new Error(serverData.msg);
-  }
-}
 async function saveFile$1(content) {
   const response = await axios.post("/profile/savefile", content);
   assertAxiosRes(response);
@@ -1916,8 +2032,16 @@ class ProfileService extends StateBase {
     await saveFile$1(newProfile);
   }
 }
+async function deleteFile(id) {
+  const response = await axios.get(`/rule/deletefile?id=${id}`);
+  assertAxiosRes(response);
+}
 async function setFileCheckStatus(id, checked) {
   const response = await axios.get(`/rule/setfilecheckstatus?id=${id}&checked=${checked ? 1 : 0}`);
+  assertAxiosRes(response);
+}
+async function saveRuleFile(id, content) {
+  const response = await axios.post(`/rule/saveRuleFile?id=${id}`, content);
   assertAxiosRes(response);
 }
 async function testRule(content) {
@@ -1951,6 +2075,26 @@ class RuleService extends StateBase {
   }
   async setFileCheckStatus(ruleFileId, check) {
     await setFileCheckStatus(ruleFileId, check);
+  }
+  async deleteRuleFile(id) {
+    await deleteFile(id);
+  }
+  getReferenceVar(content) {
+    const contentStr = JSON.stringify(content);
+    const reg1 = RegExp("<%=(.+?)%>", "g");
+    const reg2 = RegExp("\\$\\{(.+?)\\}", "g");
+    let result;
+    const varObj = {};
+    while ((result = reg1.exec(contentStr)) != null) {
+      varObj[trim(result[1])] = 1;
+    }
+    while ((result = reg2.exec(contentStr)) != null) {
+      varObj[trim(result[1])] = 1;
+    }
+    return keys(varObj);
+  }
+  async saveRuleFile(id, content) {
+    await saveRuleFile(id, content);
   }
 }
 class UserService extends StateBase {
