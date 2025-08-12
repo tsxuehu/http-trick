@@ -1,4 +1,4 @@
-import { A as Layout, r as reactExports, D as theme, j as jsxRuntimeExports, M as Menu, Q as Breadcrumb, T as RefIcon, U as RefIcon$1, R as RefIcon$2, V as RefIcon$3, W as RefIcon$4, g as getServiceSync, K as ServiceRegistry, O as setServiceRegistry, k as clientExports } from "./vendor.js";
+import { D as Layout, r as reactExports, E as theme, j as jsxRuntimeExports, M as Menu, T as Breadcrumb, U as RefIcon, V as RefIcon$1, R as RefIcon$2, W as RefIcon$3, X as RefIcon$4, g as getServiceSync, O as ServiceRegistry, Q as setServiceRegistry, k as clientExports } from "./vendor.js";
 const { Header, Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
   return {

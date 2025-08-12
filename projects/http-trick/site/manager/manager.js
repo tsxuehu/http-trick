@@ -1,4 +1,4 @@
-import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as Future, k as clientExports, l as Modal, m as axios, n as copyToClipboard, N as NavLink, o as find, S as Select, p as produce, t as set, v as Row, w as Col, x as Routes, y as Route, z as Navigate, A as Layout, D as theme, H as HashRouter, E as createStore, G as trim, J as keys, K as ServiceRegistry, O as setServiceRegistry } from "./vendor.js";
+import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as Future, k as clientExports, l as Modal, m as axios, n as copyToClipboard, N as NavLink, o as useNavigate, p as find, S as Select, t as produce, v as set, w as Row, x as Col, y as Routes, z as Route, A as Navigate, D as Layout, E as theme, H as HashRouter, G as createStore, J as trim, K as keys, O as ServiceRegistry, Q as setServiceRegistry } from "./vendor.js";
 var EService = /* @__PURE__ */ ((EService2) => {
   EService2["IWorkbenchService"] = "WorkbenchService";
   EService2["IUserService"] = "UserService";
@@ -666,7 +666,7 @@ function assertAxiosRes(response) {
     throw new Error(serverData.msg);
   }
 }
-const ruleService$2 = getServiceSync(EService.IRuleService);
+const ruleService$3 = getServiceSync(EService.IRuleService);
 const appInfoService$1 = getServiceSync(EService.IAppInfoService);
 const profileService$2 = getServiceSync(EService.IProfileService);
 class RuleList extends React.PureComponent {
@@ -677,7 +677,7 @@ class RuleList extends React.PureComponent {
   unRule;
   unProfile;
   componentDidMount() {
-    this.unRule = ruleService$2.subscribe((data) => {
+    this.unRule = ruleService$3.subscribe((data) => {
       this.setState({ ruleFileList: data.ruleFileList });
     });
     this.unProfile = profileService$2.subscribe(() => {
@@ -707,7 +707,7 @@ class RuleList extends React.PureComponent {
     content.id = "";
     content.name = values.name;
     content.checked = false;
-    const varNameList = ruleService$2.getReferenceVar(content);
+    const varNameList = ruleService$3.getReferenceVar(content);
     let infoStr;
     if (varNameList.length > 0) {
       infoStr = `导入规则文件名为${content.name},引用变量【${varNameList.join(
@@ -721,7 +721,7 @@ class RuleList extends React.PureComponent {
       content: infoStr,
       onOk: async () => {
         try {
-          await ruleService$2.saveRuleFile(content.id, content);
+          await ruleService$3.saveRuleFile(content.id, content);
           staticMethods.success("创建成功!");
         } catch (err) {
           staticMethods.error(`出错了，${err.message}`);
@@ -731,7 +731,7 @@ class RuleList extends React.PureComponent {
   }
   async onDeleteFile(file, index) {
     try {
-      await ruleService$2.deleteRuleFile(file.id);
+      await ruleService$3.deleteRuleFile(file.id);
       staticMethods.success("删除成功!");
     } catch (err) {
       staticMethods.error(`出错了，${err.message}`);
@@ -752,7 +752,7 @@ class RuleList extends React.PureComponent {
   }
   async toggleFileCheckStatus(file, index) {
     try {
-      await ruleService$2.setFileCheckStatus(file.id, !file.checked);
+      await ruleService$3.setFileCheckStatus(file.id, !file.checked);
     } catch (err) {
       staticMethods.error(`出错了，${err.message}`);
     }
@@ -789,7 +789,8 @@ class RuleList extends React.PureComponent {
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", onClick: () => this.onDownloadFile(ruleFile, index), children: "下载" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", onClick: () => this.onShareFile(ruleFile, index), children: "分享" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", onClick: () => this.onShareFile(ruleFile, index), children: "分享" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(NavLink, { to: `/editrule?id=${ruleFile.id}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { size: "small", children: "编辑" }) })
           ] });
         }
       },
@@ -797,7 +798,14 @@ class RuleList extends React.PureComponent {
         title: "启用",
         dataIndex: "checked",
         key: "checked",
-        render: (value, ruleFile, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(Checkbox, { value, disabled: !enableRule2, onChange: (e) => this.toggleFileCheckStatus(ruleFile, index), children: "Checkbox" })
+        render: (value, ruleFile, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Checkbox,
+          {
+            checked: value,
+            disabled: !enableRule2,
+            onChange: (e) => this.toggleFileCheckStatus(ruleFile, index)
+          }
+        )
       }
     ];
   }
@@ -820,11 +828,60 @@ class EditRule extends React.PureComponent {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "EditHost" });
   }
 }
-class CreateRule extends React.PureComponent {
-  render() {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "CreateHost" });
-  }
-}
+const ruleService$2 = getServiceSync(EService.IRuleService);
+const CreateRule = () => {
+  const navigate = useNavigate();
+  const onSave = async (values) => {
+    try {
+      const id = await ruleService$2.createFile(values.name, values.description);
+      navigate(`/editrule?id=${id}`);
+      staticMethods.success("创建成功!");
+    } catch (err) {
+      staticMethods.error(`出错了，${err.message}`);
+    }
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "main-content__title", children: "创建规则集" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      Form,
+      {
+        name: "创建规则集",
+        labelCol: { span: 8 },
+        wrapperCol: { span: 16 },
+        style: { maxWidth: 600 },
+        onFinish: onSave,
+        autoComplete: "off",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "规则集名字",
+              name: "name",
+              rules: [
+                { type: "string", required: true, message: "请输入文件名称名称" },
+                { type: "string", min: 2, max: 20, message: "长度在 2 到 20 个字符" }
+              ],
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "规则集名字" })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Form.Item,
+            {
+              label: "规则集描述",
+              name: "description",
+              rules: [{ required: true, message: "请输入文件描述" }],
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input.TextArea, { autoSize: { minRows: 10, maxRows: 10 }, placeholder: "规则集描述" })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Form.Item, { label: null, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { size: "small", onClick: () => navigate(-1), children: "返回" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", htmlType: "submit", children: "创建" })
+          ] })
+        ]
+      }
+    )
+  ] });
+};
 const modifyResponseType = [
   { value: "addTimestampToJsCss", label: "将html中的js、css请求加上时间戳" },
   { value: "returnDataInJsonpStyle", label: "以JSONP的方式返回数据" },
@@ -2032,6 +2089,14 @@ class ProfileService extends StateBase {
     await saveFile$1(newProfile);
   }
 }
+async function createFile(name, description) {
+  const response = await axios.post("/rule/create", {
+    name,
+    description
+  });
+  assertAxiosRes(response);
+  return response.data.data;
+}
 async function deleteFile(id) {
   const response = await axios.get(`/rule/deletefile?id=${id}`);
   assertAxiosRes(response);
@@ -2095,6 +2160,10 @@ class RuleService extends StateBase {
   }
   async saveRuleFile(id, content) {
     await saveRuleFile(id, content);
+  }
+  async createFile(name, description) {
+    const res = await createFile(name, description);
+    return res.id;
   }
 }
 class UserService extends StateBase {

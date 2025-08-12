@@ -1,53 +1,52 @@
-import React from 'react'
-import { Button, Checkbox, message, Modal, Popconfirm, Table } from 'antd'
-import { getServiceSync } from '@spring4js/container-browser/lib/esm/global-fn'
-import IRuleService, { IAction, IRule, IRuleFileSimple } from '../../service-api/IRuleService.ts'
-import EService from '../../config/EService.ts'
-import IAppInfoService, { IAppInfo } from '../../service-api/IAppInfoService.ts'
-import copyToClipboard from 'copy-to-clipboard'
+import React from 'react';
+import { Button, Checkbox, message, Modal, Popconfirm, Table } from 'antd';
+import { getServiceSync } from '@spring4js/container-browser/lib/esm/global-fn';
+import IRuleService, { IAction, IRule, IRuleFileSimple } from '../../service-api/IRuleService.ts';
+import EService from '../../config/EService.ts';
+import IAppInfoService, { IAppInfo } from '../../service-api/IAppInfoService.ts';
+import copyToClipboard from 'copy-to-clipboard';
 // @ts-ignore
-import './rule-list.less'
-import { ColumnsType } from 'antd/es/table'
-import IProfileService from '../../service-api/IProfileService.ts'
-import { NavLink } from 'react-router'
-import { openDialog } from '../../forms/utils.ts'
-import RuleEditForm, { IProps as IRuleEditFormProps } from '../../forms/rule-edit-form/RuleEditForm.tsx'
-import PromptForm, { IPromptFormProps } from '../../forms/prompt/PromptForm.tsx'
-import { getRemoteFile } from '../../../../api/utils.ts'
+import './rule-list.less';
+import { ColumnsType } from 'antd/es/table';
+import IProfileService from '../../service-api/IProfileService.ts';
+import { NavLink } from 'react-router';
+import { openDialog } from '../../forms/utils.ts';
+import PromptForm, { IPromptFormProps } from '../../forms/prompt/PromptForm.tsx';
+import { getRemoteFile } from '../../../../api/utils.ts';
 
 interface IProps {}
 
 interface IState {
-  ruleFileList: IRuleFileSimple[]
-  enableRule: boolean
+  ruleFileList: IRuleFileSimple[];
+  enableRule: boolean;
 }
 
-const ruleService = getServiceSync<IRuleService>(EService.IRuleService)
-const appInfoService = getServiceSync<IAppInfoService>(EService.IAppInfoService)
-const profileService = getServiceSync<IProfileService>(EService.IProfileService)
+const ruleService = getServiceSync<IRuleService>(EService.IRuleService);
+const appInfoService = getServiceSync<IAppInfoService>(EService.IAppInfoService);
+const profileService = getServiceSync<IProfileService>(EService.IProfileService);
 
 export default class RuleList extends React.PureComponent<IProps, IState> {
   state: IState = {
     ruleFileList: [],
     enableRule: true,
-  }
+  };
 
-  unRule?: () => void
-  unProfile?: () => void
+  unRule?: () => void;
+  unProfile?: () => void;
 
   componentDidMount() {
     this.unRule = ruleService.subscribe((data) => {
-      this.setState({ ruleFileList: data.ruleFileList })
-    })
+      this.setState({ ruleFileList: data.ruleFileList });
+    });
 
     this.unProfile = profileService.subscribe(() => {
-      this.setState({ enableRule: profileService.getProfile().enableRule })
-    })
+      this.setState({ enableRule: profileService.getProfile().enableRule });
+    });
   }
 
   componentWillUnmount() {
-    this.unRule?.()
-    this.unProfile?.()
+    this.unRule?.();
+    this.unProfile?.();
   }
 
   async importRemoteRule() {
@@ -57,77 +56,77 @@ export default class RuleList extends React.PureComponent<IProps, IState> {
         { label: '请输入远程规则文件的url', key: 'url', value: '', placeholder: '' },
         { label: '请输入导入规则的文件名', key: 'name', value: '', placeholder: '' },
       ],
-    })
+    });
     if (!values) {
-      return
+      return;
     }
-    const content = await getRemoteFile(values.url)
+    const content = await getRemoteFile(values.url);
     content.meta = {
       remote: true,
       url: values.url,
-    }
-    content.id = ''
+    };
+    content.id = '';
 
-    content.name = values.name
-    content.checked = false
+    content.name = values.name;
+    content.checked = false;
 
-    const varNameList = ruleService.getReferenceVar(content)
-    let infoStr
+    const varNameList = ruleService.getReferenceVar(content);
+    let infoStr;
     if (varNameList.length > 0) {
       infoStr = `导入规则文件名为${content.name},引用变量【${varNameList.join(
         '; ',
-      )}】请确保变量已经在转发路径变量中设置过`
+      )}】请确保变量已经在转发路径变量中设置过`;
     } else {
-      infoStr = `导入规则文件名为${content.name}`
+      infoStr = `导入规则文件名为${content.name}`;
     }
     Modal.confirm({
       title: '导入远程规则',
       content: infoStr,
       onOk: async () => {
         try {
-          await ruleService.saveRuleFile(content.id, content)
-          message.success('创建成功!')
+          await ruleService.saveRuleFile(content.id, content);
+          message.success('创建成功!');
         } catch (err: any) {
-          message.error(`出错了，${err.message}`)
+          message.error(`出错了，${err.message}`);
         }
       },
-    })
+    });
   }
 
   async onDeleteFile(file: IRuleFileSimple, index: number) {
     try {
-      await ruleService.deleteRuleFile(file.id)
-      message.success('删除成功!')
+      await ruleService.deleteRuleFile(file.id);
+      message.success('删除成功!');
     } catch (err: any) {
-      message.error(`出错了，${err.message}`)
+      message.error(`出错了，${err.message}`);
     }
   }
 
   onDownloadFile(file: IRuleFileSimple, index: number) {
     if (!file.meta.remote) {
-      window.open('/rule/download?id=' + file.id, '_blank')
+      window.open('/rule/download?id=' + file.id, '_blank');
     } else {
-      window.open(file.meta.url, '_blank')
+      window.open(file.meta.url, '_blank');
     }
   }
 
   onShareFile(file: IRuleFileSimple, index: number) {
-    const appInfo = appInfoService.getAppInfo()
-    let url = `http://${appInfo.pcIp}:${appInfo.webUiPort}/rule/file/raw?id=${encodeURIComponent(file.id)}`
-    copyToClipboard(url)
-    message.success(`已复制规则${file.name}链接`)
+    const appInfo = appInfoService.getAppInfo();
+    let url = `http://${appInfo.pcIp}:${appInfo.webUiPort}/rule/file/raw?id=${encodeURIComponent(file.id)}`;
+    copyToClipboard(url);
+    message.success(`已复制规则${file.name}链接`);
   }
 
   async toggleFileCheckStatus(file: IRuleFileSimple, index: number) {
     try {
-      await ruleService.setFileCheckStatus(file.id, !file.checked)
+      await ruleService.setFileCheckStatus(file.id, !file.checked);
     } catch (err: any) {
-      message.error(`出错了，${err.message}`)
+      message.error(`出错了，${err.message}`);
     }
   }
 
   getColumns(): ColumnsType<IRuleFileSimple> {
-    const { enableRule } = this.state
+    const { enableRule } = this.state;
     return [
       {
         title: '名字',
@@ -164,8 +163,11 @@ export default class RuleList extends React.PureComponent<IProps, IState> {
               <Button type="primary" onClick={() => this.onShareFile(ruleFile, index)}>
                 分享
               </Button>
+              <NavLink to={`/editrule?id=${ruleFile.id}`}>
+                <Button size="small">编辑</Button>
+              </NavLink>
             </>
-          )
+          );
         },
       },
       {
@@ -173,17 +175,19 @@ export default class RuleList extends React.PureComponent<IProps, IState> {
         dataIndex: 'checked',
         key: 'checked',
         render: (value: boolean, ruleFile: IRuleFileSimple, index: number) => (
-          <Checkbox value={value} disabled={!enableRule} onChange={(e) => this.toggleFileCheckStatus(ruleFile, index)}>
-            Checkbox
-          </Checkbox>
+          <Checkbox
+            checked={value}
+            disabled={!enableRule}
+            onChange={(e) => this.toggleFileCheckStatus(ruleFile, index)}
+          ></Checkbox>
         ),
       },
-    ]
+    ];
   }
 
   render() {
-    const { ruleFileList } = this.state
-    const columns = this.getColumns()
+    const { ruleFileList } = this.state;
+    const columns = this.getColumns();
     return (
       <div>
         <div className="main-content__title">规则集列表</div>
@@ -202,6 +206,6 @@ export default class RuleList extends React.PureComponent<IProps, IState> {
         </div>
         <Table rowKey="id" dataSource={ruleFileList} columns={columns} />
       </div>
-    )
+    );
   }
 }

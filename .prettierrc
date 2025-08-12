@@ -1,5 +1,5 @@
 {
-  "semi": false,
+  "semi": true,
   "editor.tabSize": 2,
   "printWidth": 120,
   "singleQuote": true
