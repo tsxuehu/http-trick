@@ -1,28 +1,35 @@
-import IStateBase from '../../../common/IStateBase.ts'
+import IStateBase from '../../../common/IStateBase.ts';
 
 export interface IHostFile {
-  meta: Meta
-  id: string
-  userId: string
-  readonly: boolean
-  default: boolean
-  checked: boolean
-  name: string
-  description: string
-  content: string
+  meta: Meta;
+  id: string;
+  userId: string;
+  readonly: boolean;
+  default: boolean;
+  checked: boolean;
+  name: string;
+  description: string;
+  content: string;
 }
 export interface Meta {
-  local: boolean
+  local: boolean;
 }
 export interface IHostFileListItem {
-  id: string
-  name: string
-  checked: boolean
-  description: string
-  meta: Meta
+  id: string;
+  name: string;
+  checked: boolean;
+  description: string;
+  meta: Meta;
 }
 
 export default interface IHostService extends IStateBase<{ hostFileList: IHostFileListItem[] }> {
-  setHostFileList(hostFileList: IHostFileListItem[]): void
-  getHostFileList(): IHostFileListItem[]
+  setHostFileList(hostFileList: IHostFileListItem[]): void;
+  getHostFileList(): IHostFileListItem[];
+
+  createFile(name: string, description: string): Promise<void>;
+  useFile(id: string): Promise<void>;
+  deleteFile(id: string): Promise<void>;
+
+  getFileContent(id: string): Promise<IHostFile>;
+  saveFile(id: string, content: IHostFile): Promise<void>;
 }

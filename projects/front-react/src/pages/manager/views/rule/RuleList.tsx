@@ -84,8 +84,8 @@ export default class RuleList extends React.PureComponent<IProps, IState> {
       content: infoStr,
       onOk: async () => {
         try {
-          await ruleService.saveRuleFile(content.id, content);
-          message.success('创建成功!');
+          await ruleService.saveRuleFile('', content);
+          message.success('导入成功!');
         } catch (err: any) {
           message.error(`出错了，${err.message}`);
         }
@@ -94,12 +94,8 @@ export default class RuleList extends React.PureComponent<IProps, IState> {
   }
 
   async onDeleteFile(file: IRuleFileSimple, index: number) {
-    try {
-      await ruleService.deleteRuleFile(file.id);
-      message.success('删除成功!');
-    } catch (err: any) {
-      message.error(`出错了，${err.message}`);
-    }
+    await ruleService.deleteRuleFile(file.id);
+    message.success('删除成功!');
   }
 
   onDownloadFile(file: IRuleFileSimple, index: number) {
@@ -118,11 +114,7 @@ export default class RuleList extends React.PureComponent<IProps, IState> {
   }
 
   async toggleFileCheckStatus(file: IRuleFileSimple, index: number) {
-    try {
-      await ruleService.setFileCheckStatus(file.id, !file.checked);
-    } catch (err: any) {
-      message.error(`出错了，${err.message}`);
-    }
+    await ruleService.setFileCheckStatus(file.id, !file.checked);
   }
 
   getColumns(): ColumnsType<IRuleFileSimple> {
@@ -197,8 +189,6 @@ export default class RuleList extends React.PureComponent<IProps, IState> {
             <Button size="small" onClick={() => this.importRemoteRule()}>
               导入远程规则
             </Button>
-          </div>
-          <div className="op">
             <NavLink to="/createrulefile">
               <Button size="small">新增规则集</Button>
             </NavLink>

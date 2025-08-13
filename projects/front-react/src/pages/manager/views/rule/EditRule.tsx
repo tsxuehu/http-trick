@@ -41,6 +41,10 @@ export default class EditRule extends React.PureComponent<IProps, IState> {
       this.setState({ mockDataList: mockDataService.getDataFileEntryList() });
     });
   }
+  componentWillUnmount() {
+    this.unRule?.();
+    this.unMockData?.();
+  }
   async loadRuleFile() {
     const query = getQueryParams();
     const id = query.id;
@@ -53,10 +57,6 @@ export default class EditRule extends React.PureComponent<IProps, IState> {
       loaded: true,
       ruleFile: content,
     });
-  }
-  componentWillUnmount() {
-    this.unRule?.();
-    this.unMockData?.();
   }
   async addRule() {
     const rule = getDefaultRule();

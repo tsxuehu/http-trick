@@ -3,38 +3,44 @@
  */
 
 import axios from 'axios';
-import { assertAxiosRes } from "./utils.ts";
+import { assertAxiosRes } from './utils.ts';
 
 /**
  * 创建规则文件
  */
-export function createFile(name:string, description:string) {
-  return axios.post('/host/create', {
+export async function createFile(name: string, description: string) {
+  const response = await axios.post('/host/create', {
     name: name,
-    description: description
+    description: description,
   });
+  assertAxiosRes(response);
 }
 
 /**
  * 获取规则文件列表
  */
-export function getFileList() {
-  return axios.get('/host/filelist');
+export async function getFileList() {
+  const response = await axios.get('/host/filelist');
+  assertAxiosRes(response);
+  return response.data.data;
 }
 
-export function deleteFile(id:string) {
-  return axios.get(`/host/deletefile?id=${id}`);
+export async function deleteFile(id: string) {
+  const response = await axios.get(`/host/deletefile?id=${id}`);
+  assertAxiosRes(response);
 }
 
-export async function useFile(id:string) {
+export async function useFile(id: string) {
   const response = await axios.get(`/host/usefile?id=${id}`);
-  assertAxiosRes(response)
+  assertAxiosRes(response);
 }
 
-export function getFileContent(id:string) {
-  return axios.get(`/host/getfile?id=${id}`);
+export async function getFileContent(id: string) {
+  const response = await axios.get(`/host/getfile?id=${id}`);
+  return response.data.data;
 }
 
-export function saveFile(id:string, content: any) {
-  return axios.post(`/host/savefile?id=${id}`, content);
+export async function saveFile(id: string, content: any) {
+  const response = await axios.post(`/host/savefile?id=${id}`, content);
+  assertAxiosRes(response);
 }

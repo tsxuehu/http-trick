@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button, Checkbox, Form, Input, message } from 'antd';
-import { NavLink } from 'react-router';
 import { useNavigate } from 'react-router';
 import { getServiceSync } from '@spring4js/container-browser/lib/esm/global-fn';
 import IRuleService from '../../service-api/IRuleService.ts';
