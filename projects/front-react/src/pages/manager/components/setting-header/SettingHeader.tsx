@@ -10,7 +10,7 @@ interface IProps {}
 interface IState {
   enableFilter: boolean;
   enableHost: boolean;
-  resolveHost: boolean;
+  resolveIp: boolean;
   enableRule: boolean;
   ruleFileList: IRuleFileSimple[];
   hostFileList: IHostFileListItem[];
@@ -24,7 +24,7 @@ export default class SettingHeader extends React.PureComponent<IProps, IState> {
   state: IState = {
     enableFilter: false,
     enableHost: false,
-    resolveHost: false,
+    resolveIp: false,
     enableRule: false,
     ruleFileList: [],
     hostFileList: [],
@@ -37,7 +37,7 @@ export default class SettingHeader extends React.PureComponent<IProps, IState> {
       this.setState({
         enableFilter: data.enableFilter,
         enableHost: data.enableHost,
-        resolveHost: data.resolveHost,
+        resolveIp: data.resolveIp,
         enableRule: data.enableRule,
       });
     });
@@ -54,8 +54,8 @@ export default class SettingHeader extends React.PureComponent<IProps, IState> {
     this.unRule?.();
     this.unHost?.();
   }
-  async setResolveHost(value: boolean) {
-    await profileService.setResolveHost(value);
+  async setResolveIp(value: boolean) {
+    await profileService.setResolveIp(value);
   }
   async setEnableFilter(value: boolean) {
     await profileService.setEnableFilter(value);
@@ -87,7 +87,7 @@ export default class SettingHeader extends React.PureComponent<IProps, IState> {
     }
   }
   render() {
-    const { enableFilter, enableHost, resolveHost, enableRule, ruleFileList, hostFileList } = this.state;
+    const { enableFilter, enableHost, resolveIp, enableRule, ruleFileList, hostFileList } = this.state;
     const hostOptions = [];
     let selectedHostId = '';
     for (const hostFile of hostFileList) {
@@ -109,10 +109,10 @@ export default class SettingHeader extends React.PureComponent<IProps, IState> {
     return (
       <div className="setting-header">
         <span>
-          host解析为IP <Switch checked={resolveHost} onChange={(value, e) => this.setResolveHost(value)} />
+          解析IP <Switch checked={resolveIp} onChange={(value, e) => this.setResolveIp(value)} />
         </span>
         <span>
-          Host解析文件
+          Host设置
           <Select
             value={selectedHostId}
             style={{ width: 120 }}

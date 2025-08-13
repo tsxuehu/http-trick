@@ -6,7 +6,7 @@ export interface IUserProfile {
   enableHost: boolean; // 是否启用host解析
   enableFilter: boolean; // 是否启用filter
   goThroughProxyConfig: string; // 需要经过代理的域名
-  resolveHost: boolean; // 解析域名
+  resolveIp: boolean; // 解析域名
   // 下游代理配置
   externalProxy: boolean; // 是否使用外部http代理
   externalHttpProxy: boolean;
@@ -21,7 +21,7 @@ export default interface IProfileService extends IStateBase<IUserProfile> {
   setProfile(profile: IUserProfile): void;
   getProfile(): IUserProfile;
 
-  setResolveHost(value: boolean): Promise<void>;
+  setResolveIp(value: boolean): Promise<void>;
   setEnableFilter(value: boolean): Promise<void>;
   setEnableHost(value: boolean): Promise<void>;
   setEnableRule(value: boolean): Promise<void>;

@@ -2315,7 +2315,7 @@ class SettingHeader extends React.PureComponent {
   state = {
     enableFilter: false,
     enableHost: false,
-    resolveHost: false,
+    resolveIp: false,
     enableRule: false,
     ruleFileList: [],
     hostFileList: []
@@ -2328,7 +2328,7 @@ class SettingHeader extends React.PureComponent {
       this.setState({
         enableFilter: data.enableFilter,
         enableHost: data.enableHost,
-        resolveHost: data.resolveHost,
+        resolveIp: data.resolveIp,
         enableRule: data.enableRule
       });
     });
@@ -2344,8 +2344,8 @@ class SettingHeader extends React.PureComponent {
     this.unRule?.();
     this.unHost?.();
   }
-  async setResolveHost(value) {
-    await profileService$1.setResolveHost(value);
+  async setResolveIp(value) {
+    await profileService$1.setResolveIp(value);
   }
   async setEnableFilter(value) {
     await profileService$1.setEnableFilter(value);
@@ -2376,7 +2376,7 @@ class SettingHeader extends React.PureComponent {
     }
   }
   render() {
-    const { enableFilter: enableFilter2, enableHost: enableHost2, resolveHost, enableRule: enableRule2, ruleFileList, hostFileList } = this.state;
+    const { enableFilter: enableFilter2, enableHost: enableHost2, resolveIp, enableRule: enableRule2, ruleFileList, hostFileList } = this.state;
     const hostOptions = [];
     let selectedHostId = "";
     for (const hostFile of hostFileList) {
@@ -2395,11 +2395,11 @@ class SettingHeader extends React.PureComponent {
     }
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "setting-header", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-        "host解析为IP ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Switch, { checked: resolveHost, onChange: (value, e) => this.setResolveHost(value) })
+        "解析IP ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Switch, { checked: resolveIp, onChange: (value, e) => this.setResolveIp(value) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-        "Host解析文件",
+        "Host设置",
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Select,
           {
@@ -2467,12 +2467,12 @@ async function enableRule() {
   const response = await axios.post(`/profile/setRuleState?rulestate=1`);
   assertAxiosRes(response);
 }
-async function disableResolveHost() {
-  const response = await axios.post(`/profile/setResolveHost`);
+async function disableResolveIp() {
+  const response = await axios.post(`/profile/setResolveIp`);
   assertAxiosRes(response);
 }
-async function enableResolveHost() {
-  const response = await axios.post(`/profile/setResolveHost?resolve=1`);
+async function enableResolveIp() {
+  const response = await axios.post(`/profile/setResolveIp?resolve=1`);
   assertAxiosRes(response);
 }
 async function disableHost() {
@@ -2764,7 +2764,7 @@ class ProfileService extends StateBase {
       enableHost: true,
       enableFilter: true,
       goThroughProxyConfig: "",
-      resolveHost: false,
+      resolveIp: false,
       externalProxy: false,
       externalHttpProxy: false,
       externalSocks5Proxy: true,
@@ -2780,11 +2780,11 @@ class ProfileService extends StateBase {
   getProfile() {
     return this.getState();
   }
-  async setResolveHost(value) {
+  async setResolveIp(value) {
     if (value) {
-      await enableResolveHost();
+      await enableResolveIp();
     } else {
-      await disableResolveHost();
+      await disableResolveIp();
     }
   }
   async setEnableFilter(value) {

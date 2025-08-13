@@ -20,13 +20,13 @@ export async function enableRule() {
   assertAxiosRes(response);
 }
 
-export async function disableResolveHost() {
-  const response = await axios.post(`/profile/setResolveHost`);
+export async function disableResolveIp() {
+  const response = await axios.post(`/profile/setResolveIp`);
   assertAxiosRes(response);
 }
 
-export async function enableResolveHost() {
-  const response = await axios.post(`/profile/setResolveHost?resolve=1`);
+export async function enableResolveIp() {
+  const response = await axios.post(`/profile/setResolveIp?resolve=1`);
   assertAxiosRes(response);
 }
 

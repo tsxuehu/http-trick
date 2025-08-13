@@ -11,7 +11,7 @@ export default class ProfileService extends StateBase<IUserProfile> implements I
       enableHost: true,
       enableFilter: true,
       goThroughProxyConfig: '',
-      resolveHost: false,
+      resolveIp: false,
       externalProxy: false,
       externalHttpProxy: false,
       externalSocks5Proxy: true,
@@ -29,11 +29,11 @@ export default class ProfileService extends StateBase<IUserProfile> implements I
     return this.getState();
   }
 
-  async setResolveHost(value: boolean): Promise<void> {
+  async setResolveIp(value: boolean): Promise<void> {
     if (value) {
-      await profileApi.enableResolveHost();
+      await profileApi.enableResolveIp();
     } else {
-      await profileApi.disableResolveHost();
+      await profileApi.disableResolveIp();
     }
   }
   async setEnableFilter(value: boolean): Promise<void> {
