@@ -1,29 +1,29 @@
-import React from 'react'
-import { Button, Checkbox, Input, Modal, Select, Table } from 'antd'
-import { IBaseProps, openDialog } from '../utils.ts'
-import { IAction, IRule } from '../../service-api/IRuleService.ts'
-import set from 'lodash/set'
+import React from 'react';
+import { Button, Checkbox, Input, Modal, Select, Table } from 'antd';
+import { IBaseProps, openDialog } from '../utils.ts';
+import { EAction, IAction, IRule } from '../../service-api/IRuleService.ts';
+import set from 'lodash/set';
 // @ts-ignore
-import './index.less'
-import { produce } from 'immer'
-import { getServiceSync } from '@spring4js/container-browser/lib/esm/global-fn'
-import IMockFileService, { IMockFile } from '../../service-api/IMockFileService.ts'
-import EService from '../../config/EService.ts'
-import IUserService from '../../service-api/IUserService.ts'
-import ActionValue from '../../components/action-value/ActionValue.tsx'
-import { ColumnsType } from 'antd/es/table'
-import { getDefaultAction } from '../../service-api/utils/rule.ts'
-import RuleTestForm, { IProps as IRuleTestFormProps } from '../rule-test-form/RuleTestForm.tsx'
+import './index.less';
+import { produce } from 'immer';
+import { getServiceSync } from '@spring4js/container-browser/lib/esm/global-fn';
+import IDataFileService, { IDataFileEntry } from '../../service-api/IDataFileService.ts';
+import EService from '../../config/EService.ts';
+import IUserService from '../../service-api/IUserService.ts';
+import ActionValue from '../../components/action-value/ActionValue.tsx';
+import { ColumnsType } from 'antd/es/table';
+import { getDefaultAction } from '../../service-api/utils/rule.ts';
+import RuleTestForm, { IProps as IRuleTestFormProps } from '../rule-test-form/RuleTestForm.tsx';
 
 export interface IProps extends IBaseProps {
-  isEditRule: boolean
-  isFilterRule: boolean
-  rule: IRule
+  isEditRule: boolean;
+  isFilterRule: boolean;
+  rule: IRule;
 }
 
 interface IState {
-  rule: IRule
-  mockDataList: IMockFile[]
+  rule: IRule;
+  mockDataList: IDataFileEntry[];
 }
 
 const MethodList = [
@@ -34,7 +34,7 @@ const MethodList = [
   { value: 'patch', label: 'PATCH' },
   { value: 'delete', label: 'DELETE' },
   { value: 'options', label: 'OPTIONS' },
-]
+];
 const ActionTypeList_Filter = [
   //  {value: 'redirect', label: '转发请求'},
   //  {value: 'mockData', label: '返回自定义数据'},
@@ -45,7 +45,7 @@ const ActionTypeList_Filter = [
   //  {value: 'modifyResponse', label: '修改响应内容'},
   { value: 'scriptModifyRequest', label: 'js修改请求内容' },
   { value: 'scriptModifyResponse', label: 'js修改响应内容' },
-]
+];
 const ActionTypeList_Rule = [
   { value: 'redirect', label: '转发请求' },
   { value: 'mockData', label: '返回自定义数据' },
@@ -56,74 +56,74 @@ const ActionTypeList_Rule = [
   { value: 'modifyResponse', label: '修改响应内容' },
   { value: 'scriptModifyRequest', label: 'js修改请求内容' },
   { value: 'scriptModifyResponse', label: 'js修改响应内容' },
-]
+];
 
-const mockDataService = getServiceSync<IMockFileService>(EService.IMockDataService)
-const userService = getServiceSync<IUserService>(EService.IUserService)
+const mockDataService = getServiceSync<IDataFileService>(EService.IDataFileService);
+const userService = getServiceSync<IUserService>(EService.IUserService);
 
 export default class RuleEditForm extends React.PureComponent<IProps, IState> {
-  unMockData?: () => void
+  unMockData?: () => void;
 
   constructor(props: IProps) {
-    super(props)
+    super(props);
     this.state = {
       rule: JSON.parse(JSON.stringify(props.rule)),
       mockDataList: [],
-    }
+    };
   }
 
   componentDidMount() {
     this.unMockData = mockDataService.subscribe(() => {
-      this.setState({ mockDataList: mockDataService.getMockFileList() })
-    })
+      this.setState({ mockDataList: mockDataService.getDataFileEntryList() });
+    });
   }
 
   componentWillUnmount() {
-    this.unMockData?.()
+    this.unMockData?.();
   }
 
   setValue(path: string, value: any) {
     const nextRule = produce(this.state.rule, (draftRule) => {
-      set(draftRule, path, value)
-    })
-    this.setState({ rule: nextRule })
+      set(draftRule, path, value);
+    });
+    this.setState({ rule: nextRule });
   }
 
   handleOk() {
-    this.props.onOk(this.state.rule)
+    this.props.onOk(this.state.rule);
   }
 
   addAction() {
-    const { isFilterRule } = this.props
-    const initialAction = getDefaultAction()
-    initialAction.type = isFilterRule ? 'addRequestHeader' : 'redirect'
+    const { isFilterRule } = this.props;
+    const initialAction = getDefaultAction();
+    initialAction.type = isFilterRule ? EAction.addRequestHeader : EAction.redirect;
 
     const nextRule = produce(this.state.rule, (draftRule) => {
-      draftRule.actionList.push(initialAction)
-    })
-    this.setState({ rule: nextRule })
+      draftRule.actionList.push(initialAction);
+    });
+    this.setState({ rule: nextRule });
   }
 
   deleteAction(action: IAction, index: number) {
     const nextRule = produce(this.state.rule, (draftRule) => {
-      draftRule.actionList.splice(index, 1)
-    })
-    this.setState({ rule: nextRule })
+      draftRule.actionList.splice(index, 1);
+    });
+    this.setState({ rule: nextRule });
   }
 
   testTarget(target: string) {
-    const { rule } = this.state
+    const { rule } = this.state;
     openDialog<IRuleTestFormProps, undefined>(RuleTestForm, {
       matchMethod: rule.method,
       matchUrl: rule.match,
       target: target,
-    })
+    });
   }
 
   getColumns(): ColumnsType<IAction> {
-    const isRoot = userService.isRoot()
-    const { isFilterRule } = this.props
-    const { mockDataList } = this.state
+    const isRoot = userService.isRoot();
+    const { isFilterRule } = this.props;
+    const { mockDataList } = this.state;
     return [
       {
         title: '动作',
@@ -151,7 +151,7 @@ export default class RuleEditForm extends React.PureComponent<IProps, IState> {
               onChange={(path, value) => this.setValue(`actionList[${index}].data.${path}`, value)}
               onTestTarget={(target) => this.testTarget(target)}
             />
-          )
+          );
         },
       },
       {
@@ -162,16 +162,16 @@ export default class RuleEditForm extends React.PureComponent<IProps, IState> {
             <Button type="primary" danger onClick={() => this.deleteAction(action, index)}>
               删除
             </Button>
-          )
+          );
         },
       },
-    ]
+    ];
   }
 
   render() {
-    const { onCancel, isEditRule } = this.props
-    const { rule } = this.state
-    const columns = this.getColumns()
+    const { onCancel, isEditRule } = this.props;
+    const { rule } = this.state;
+    const columns = this.getColumns();
     return (
       <Modal
         title={isEditRule ? '编辑规则' : '新建规则'}
@@ -232,6 +232,6 @@ export default class RuleEditForm extends React.PureComponent<IProps, IState> {
           </div>
         </div>
       </Modal>
-    )
+    );
   }
 }

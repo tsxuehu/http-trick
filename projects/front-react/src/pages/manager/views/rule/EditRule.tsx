@@ -9,21 +9,21 @@ import EService from '../../config/EService.ts';
 import { openDialog } from '../../forms/utils.ts';
 import RuleEditForm, { IProps as IRuleEditFormProps } from '../../forms/rule-edit-form/RuleEditForm.tsx';
 import { ColumnsType } from 'antd/es/table';
-import IMockFileService, { IMockFile } from '../../service-api/IMockFileService.ts';
+import IDataFileService, { IDataFileEntry } from '../../service-api/IDataFileService.ts';
 import ActionView from '../../components/action-view/ActionView.tsx';
 import { getQueryParams } from '../../../../common/query-string.ts';
 
 interface IProps {}
 
 interface IState {
-  mockDataList: IMockFile[];
+  mockDataList: IDataFileEntry[];
   ruleFileId: string;
   loaded: boolean;
   ruleFile?: IRuleFile;
 }
 
 const ruleService = getServiceSync<IRuleService>(EService.IRuleService);
-const mockDataService = getServiceSync<IMockFileService>(EService.IMockDataService);
+const mockDataService = getServiceSync<IDataFileService>(EService.IDataFileService);
 
 export default class EditRule extends React.PureComponent<IProps, IState> {
   state: IState = {
@@ -38,7 +38,7 @@ export default class EditRule extends React.PureComponent<IProps, IState> {
   componentDidMount() {
     this.loadRuleFile();
     this.unMockData = mockDataService.subscribe(() => {
-      this.setState({ mockDataList: mockDataService.getMockFileList() });
+      this.setState({ mockDataList: mockDataService.getDataFileEntryList() });
     });
   }
   async loadRuleFile() {
@@ -184,7 +184,7 @@ export default class EditRule extends React.PureComponent<IProps, IState> {
     const columns = this.getColumns();
     return (
       <div>
-        <div className="main-content__title">编辑规则集{loaded ? ': ' + ruleFile.name : ''}</div>
+        <div className="main-content__title">编辑规则集{loaded ? ': ' + ruleFile?.name : ''}</div>
         <div className="project-path-info">
           可以控制单个规则是否启用，当规则所在规则集没有启用时，规则不管是否启用，都不会生效。
         </div>

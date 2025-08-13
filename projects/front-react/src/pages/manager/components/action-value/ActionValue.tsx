@@ -1,18 +1,18 @@
-import React from 'react'
-import { IAction } from '../../service-api/IRuleService.ts'
-import { IMockFile } from '../../service-api/IMockFileService.ts'
-import find from 'lodash/find'
+import React from 'react';
+import { IAction } from '../../service-api/IRuleService.ts';
+import { IDataFileEntry } from '../../service-api/IDataFileService.ts';
+import find from 'lodash/find';
 // @ts-ignore
-import './index.less'
-import If from '../logic/If.tsx'
-import { Button, Input, Select } from 'antd'
+import './index.less';
+import If from '../logic/If.tsx';
+import { Button, Input, Select } from 'antd';
 
 interface IProps {
-  action: IAction
-  allowRedirectToLocal: boolean
-  mockDataList: IMockFile[]
-  onChange: (path: string, value: string) => void
-  onTestTarget: (target: string) => void
+  action: IAction;
+  allowRedirectToLocal: boolean;
+  mockDataList: IDataFileEntry[];
+  onChange: (path: string, value: string) => void;
+  onTestTarget: (target: string) => void;
 }
 
 interface IState {}
@@ -22,29 +22,29 @@ const ModifyResponseTypeOptions = [
   { value: 'returnDataInJsonpStyle', label: '以JSONP的方式返回数据' },
   { value: 'allowCros', label: '增加跨域头部' },
   { value: 'return404', label: '返回404' },
-]
+];
 
 export default class ActionValue extends React.PureComponent<IProps, IState> {
   createNewDataFile() {
     // TODO
   }
 
-  editDataFile(datafile: IMockFile) {
+  editDataFile(datafile: IDataFileEntry) {
     // TODO
   }
 
   render() {
-    const { action, mockDataList, onChange, allowRedirectToLocal, onTestTarget } = this.props
+    const { action, mockDataList, onChange, allowRedirectToLocal, onTestTarget } = this.props;
     const mockDataOptions = mockDataList.map<{ value: string; label: string }>((item) => {
-      return { value: item.id, label: item.name }
-    })
-    let datafileEntry: IMockFile | undefined = undefined
+      return { value: item.id, label: item.name };
+    });
+    let datafileEntry: IDataFileEntry | undefined = undefined;
     if (action.type == 'mockData') {
       const finded = find(mockDataList, (entry) => {
-        return entry.id == action.data.dataId
-      })
+        return entry.id == action.data.dataId;
+      });
       if (finded) {
-        datafileEntry = finded
+        datafileEntry = finded;
       }
     }
     return (
@@ -244,6 +244,6 @@ export default class ActionValue extends React.PureComponent<IProps, IState> {
           }
         />
       </div>
-    )
+    );
   }
 }

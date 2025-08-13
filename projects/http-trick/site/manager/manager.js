@@ -1,10 +1,10 @@
-import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as Future, k as clientExports, l as Modal, m as axios, n as copyToClipboard, N as NavLink, o as find, S as Select, p as produce, t as set, v as Row, w as Col, x as useNavigate, y as Routes, z as Route, A as Navigate, D as Layout, E as theme, H as HashRouter, G as createStore, J as trim, K as keys, O as ServiceRegistry, Q as setServiceRegistry } from "./vendor.js";
+import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as Future, k as clientExports, l as Modal, m as axios, n as copyToClipboard, N as NavLink, o as find, S as Select, p as produce, t as set, v as Row, w as Col, x as useNavigate, y as editor, z as Routes, A as Route, D as Navigate, E as Layout, G as theme, H as HashRouter, J as createStore, K as trim, O as keys, Q as ServiceRegistry, T as setServiceRegistry } from "./vendor.js";
 var EService = /* @__PURE__ */ ((EService2) => {
   EService2["IWorkbenchService"] = "WorkbenchService";
   EService2["IUserService"] = "UserService";
   EService2["IAppInfoService"] = "AppInfoService";
   EService2["IConfigureService"] = "ConfigureService";
-  EService2["IMockDataService"] = "DataService";
+  EService2["IDataFileService"] = "DataService";
   EService2["IDeviceService"] = "DeviceService";
   EService2["IFilterService"] = "FilterService";
   EService2["IHostService"] = "HostService";
@@ -1295,7 +1295,7 @@ const ActionTypeList_Rule = [
   { value: "scriptModifyRequest", label: "js修改请求内容" },
   { value: "scriptModifyResponse", label: "js修改响应内容" }
 ];
-const mockDataService$3 = getServiceSync(EService.IMockDataService);
+const mockDataService$3 = getServiceSync(EService.IDataFileService);
 const userService$1 = getServiceSync(EService.IUserService);
 class RuleEditForm extends React.PureComponent {
   unMockData;
@@ -1308,7 +1308,7 @@ class RuleEditForm extends React.PureComponent {
   }
   componentDidMount() {
     this.unMockData = mockDataService$3.subscribe(() => {
-      this.setState({ mockDataList: mockDataService$3.getMockFileList() });
+      this.setState({ mockDataList: mockDataService$3.getDataFileEntryList() });
     });
   }
   componentWillUnmount() {
@@ -1326,7 +1326,7 @@ class RuleEditForm extends React.PureComponent {
   addAction() {
     const { isFilterRule } = this.props;
     const initialAction = getDefaultAction();
-    initialAction.type = isFilterRule ? "addRequestHeader" : "redirect";
+    initialAction.type = isFilterRule ? EAction.addRequestHeader : EAction.redirect;
     const nextRule = produce(this.state.rule, (draftRule) => {
       draftRule.actionList.push(initialAction);
     });
@@ -1547,7 +1547,7 @@ function getQueryParams() {
   return Object.fromEntries(new URLSearchParams(searchString));
 }
 const ruleService$2 = getServiceSync(EService.IRuleService);
-const mockDataService$2 = getServiceSync(EService.IMockDataService);
+const mockDataService$2 = getServiceSync(EService.IDataFileService);
 class EditRule extends React.PureComponent {
   state = {
     ruleFileId: "",
@@ -1559,7 +1559,7 @@ class EditRule extends React.PureComponent {
   componentDidMount() {
     this.loadRuleFile();
     this.unMockData = mockDataService$2.subscribe(() => {
-      this.setState({ mockDataList: mockDataService$2.getMockFileList() });
+      this.setState({ mockDataList: mockDataService$2.getDataFileEntryList() });
     });
   }
   async loadRuleFile() {
@@ -1696,7 +1696,7 @@ class EditRule extends React.PureComponent {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "main-content__title", children: [
         "编辑规则集",
-        loaded ? ": " + ruleFile.name : ""
+        loaded ? ": " + ruleFile?.name : ""
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "project-path-info", children: "可以控制单个规则是否启用，当规则所在规则集没有启用时，规则不管是否启用，都不会生效。" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Row, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, offset: 16, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", onClick: () => this.addRule(), children: "新增过滤器" }) }) }),
@@ -1760,7 +1760,7 @@ const CreateRule = () => {
 };
 const filterService$1 = getServiceSync(EService.IFilterService);
 const profileService$1 = getServiceSync(EService.IProfileService);
-const mockDataService$1 = getServiceSync(EService.IMockDataService);
+const mockDataService$1 = getServiceSync(EService.IDataFileService);
 class FilterList extends React.PureComponent {
   state = {
     filters: [],
@@ -1778,7 +1778,7 @@ class FilterList extends React.PureComponent {
       this.setState({ enableFilter: profileService$1.getProfile().enableFilter });
     });
     this.unMockData = mockDataService$1.subscribe(() => {
-      this.setState({ mockDataList: mockDataService$1.getMockFileList() });
+      this.setState({ mockDataList: mockDataService$1.getDataFileEntryList() });
     });
   }
   componentWillUnmount() {
@@ -1904,9 +1904,182 @@ class FilterList extends React.PureComponent {
     ] });
   }
 }
-class DataList extends React.PureComponent {
+var EContentType = /* @__PURE__ */ ((EContentType2) => {
+  EContentType2["html"] = "text/html";
+  EContentType2["json"] = "application/json";
+  EContentType2["javascript"] = "application/javascript";
+  return EContentType2;
+})(EContentType || {});
+const DataCreateForm = (props) => {
+  const { onOk, onCancel } = props;
+  const [form] = Form.useForm();
+  const handleOk = async () => {
+    const values = await form.validateFields();
+    onOk(values);
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Modal, { title: "新建Mock数据文件", open: true, onOk: () => handleOk(), onCancel: () => onCancel(void 0), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Form, { form, layout: "vertical", name: "custom_prompt_form", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "名称", name: "name", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "名称", name: "contenttype", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Select,
+      {
+        style: { width: 80, margin: "0 8px" },
+        options: [
+          { value: EContentType.html, label: "html" },
+          { value: EContentType.json, label: "json" },
+          { value: EContentType.javascript, label: "javascript" }
+        ]
+      }
+    ) })
+  ] }) });
+};
+const ContentTypeLangMap = {
+  [EContentType.html]: "html",
+  [EContentType.json]: "json",
+  [EContentType.javascript]: "javascript"
+};
+class DataEditForm extends React.PureComponent {
+  editor;
+  async handleOk() {
+    const { onOk, onCancel, dataFileEntry } = this.props;
+    const content = this.editor?.getValue();
+    onOk(content);
+  }
+  componentDidMount() {
+    const { dataFileEntry, content } = this.props;
+    this.editor = editor.create(document.getElementById("content-editor-container"), {
+      value: content,
+      language: ContentTypeLangMap[dataFileEntry.contenttype] || "javascript",
+      theme: "vs-dark",
+      automaticLayout: true
+    });
+    setTimeout(() => {
+      this.editor?.updateOptions({
+        lineNumbers: "on"
+      });
+    }, 2e3);
+  }
+  componentWillUnmount() {
+    this.editor?.dispose();
+    this.editor = void 0;
+  }
   render() {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "DataList" });
+    const { onCancel, dataFileEntry } = this.props;
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      Modal,
+      {
+        title: "编辑Mock数据文件",
+        open: true,
+        onOk: () => this.handleOk(),
+        onCancel: () => onCancel(void 0),
+        footer: (_, { OkBtn, CancelBtn }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CancelBtn, {}),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", onClick: () => {
+          }, children: "全屏" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", onClick: () => {
+          }, children: "格式化" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(OkBtn, {})
+        ] }),
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            "编辑数据文件 ",
+            dataFileEntry.name,
+            " [Content-Type: ",
+            dataFileEntry.contenttype,
+            "]"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "content-editor-container", style: { height: "305px" } }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            "Press ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "F11" }),
+            " when cursor is in the editor to toggle full screen editing. ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Esc" }),
+            " ",
+            "can also be used to ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx("i", { children: "exit" }),
+            " full screen editing."
+          ] })
+        ]
+      }
+    );
+  }
+}
+const dataFileService = getServiceSync(EService.IDataFileService);
+class DataList extends React.PureComponent {
+  state = {
+    dataFileList: []
+  };
+  unMockData;
+  componentDidMount() {
+    this.unMockData = dataFileService.subscribe((data) => {
+      this.setState({ dataFileList: data.dataFileList });
+    });
+  }
+  componentWillUnmount() {
+    this.unMockData?.();
+  }
+  async requestAddDataFile() {
+    const entry = await openDialog(DataCreateForm, {});
+    await dataFileService.createDataFileEntry(entry);
+    staticMethods.success("创建成功!");
+  }
+  async requestEditDataFile(dataEntry, index) {
+    const content = await dataFileService.getDataFile(dataEntry.id);
+    const newContent = await openDialog(DataEditForm, {
+      dataFileEntry: dataEntry,
+      content
+    });
+    await dataFileService.saveDataFile(dataEntry.id, newContent);
+    staticMethods.success("创建成功!");
+  }
+  async deleteDataFile(dataEntry, index) {
+    await dataFileService.removeDataFileEntry(dataEntry);
+    staticMethods.success("删除成功!");
+  }
+  getColumns() {
+    return [
+      {
+        title: "名字",
+        dataIndex: "name",
+        key: "name",
+        render: (value, mockFile, index) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: value })
+      },
+      {
+        title: "类型",
+        dataIndex: "contenttype",
+        key: "contenttype",
+        render: (value, mockFile, index) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: value })
+      },
+      {
+        title: "操作",
+        key: "action",
+        render: (_, mockFile, index) => {
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Popconfirm,
+              {
+                title: "确认",
+                description: "确认删除?",
+                onConfirm: () => this.deleteDataFile(mockFile, index),
+                okText: "确认",
+                cancelText: "取消",
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", danger: true, children: "删除" })
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "primary", onClick: () => this.requestEditDataFile(mockFile, index), children: "编辑" })
+          ] });
+        }
+      }
+    ];
+  }
+  render() {
+    const columns = this.getColumns();
+    const { dataFileList } = this.state;
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "main-content__title", children: "自定义数据文件列表" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "project-path-info", children: "在http转发规则里面，可以配置将这里的mock数据返回给浏览器" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "top-op", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { size: "small", onClick: () => this.requestAddDataFile(), children: "新增数据文件" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardTable, { rowKey: "id", dataSource: dataFileList, columns })
+    ] });
   }
 }
 class DeviceList extends React.PureComponent {
@@ -1988,7 +2161,7 @@ async function getUserId() {
 }
 const appInfoService = getServiceSync(EService.IAppInfoService);
 const configureService = getServiceSync(EService.IConfigureService);
-const mockDataService = getServiceSync(EService.IMockDataService);
+const mockDataService = getServiceSync(EService.IDataFileService);
 const deviceService = getServiceSync(EService.IDeviceService);
 const filterService = getServiceSync(EService.IFilterService);
 const hostService = getServiceSync(EService.IHostService);
@@ -2030,7 +2203,7 @@ class WorkbenchService {
       filterService.setFilters(data);
     });
     socket.on("datalist", (data) => {
-      mockDataService.setMockFileList(data);
+      mockDataService.setDataFileEntryList(data);
     });
   }
 }
@@ -2103,15 +2276,46 @@ class ConfigureService extends StateBase {
     return this.getState();
   }
 }
-class MockFileService extends StateBase {
+async function removeDataFile(content) {
+  const response = await axios.post("/data/removedatafile", content);
+  assertAxiosRes(response);
+}
+async function createDataFile(content) {
+  const response = await axios.post("/data/createdatafile", content);
+  assertAxiosRes(response);
+}
+async function getDataFile(id) {
+  const response = await axios.get(`/data/getdatafile?id=${id}`);
+  assertAxiosRes(response);
+  return response.data.data;
+}
+async function saveDataFile(id, content) {
+  var data = new FormData();
+  data.append("content", content);
+  const response = await axios.post(`/data/savedatafile?id=${id}`, data);
+  assertAxiosRes(response);
+}
+class DataFileService extends StateBase {
   constructor() {
-    super({ mockFileList: [] });
+    super({ dataFileList: [] });
   }
-  setMockFileList(mockFileList) {
-    this.setState({ mockFileList });
+  setDataFileEntryList(dataFileList) {
+    this.setState({ dataFileList });
   }
-  getMockFileList() {
-    return this.getState().mockFileList;
+  getDataFileEntryList() {
+    return this.getState().dataFileList;
+  }
+  async createDataFileEntry(dataFileEntry) {
+    await createDataFile(dataFileEntry);
+  }
+  async removeDataFileEntry(mockFile) {
+    await removeDataFile(mockFile);
+  }
+  async getDataFile(id) {
+    return await getDataFile(id);
+  }
+  async saveDataFile(id, content) {
+    await saveDataFile(id, content);
   }
 }
 class DeviceService extends StateBase {
@@ -2392,7 +2596,7 @@ const services = {
   [EService.IUserService]: new UserService(),
   [EService.IAppInfoService]: new AppInfoService(),
   [EService.IConfigureService]: new ConfigureService(),
-  [EService.IMockDataService]: new MockFileService(),
+  [EService.IDataFileService]: new DataFileService(),
   [EService.IDeviceService]: new DeviceService(),
   [EService.IFilterService]: new FilterService(),
   [EService.IHostService]: new HostService(),

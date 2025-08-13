@@ -102,6 +102,11 @@
 .addrule-btn-wrap {
   text-align: right;
 }
+.action-panel .btn-panel {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+}
 .rule-edit-form .config-row {
   margin-bottom: 10px;
   display: flex;
@@ -149,6 +154,13 @@
 }
 .action-value-container .value-key-value .row-last {
   margin-bottom: 0;
+}
+.top-op {
+  text-align: right;
+  margin-bottom: 10px;
+}
+.addhost-btn-wrap {
+  text-align: right;
 }
 html,
 body {

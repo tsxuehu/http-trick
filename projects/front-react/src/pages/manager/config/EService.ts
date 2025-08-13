@@ -1,15 +1,15 @@
-import IUserService from "../service-api/IUserService.ts";
+import IUserService from '../service-api/IUserService.ts';
 
 enum EService {
-    IWorkbenchService = 'WorkbenchService',
-    IUserService = 'UserService',
-    IAppInfoService = 'AppInfoService',
-    IConfigureService = 'ConfigureService',
-    IMockDataService = 'DataService',
-    IDeviceService = 'DeviceService',
-    IFilterService = 'FilterService',
-    IHostService = 'HostService',
-    IProfileService = 'ProfileService',
-    IRuleService = 'RuleService',
+  IWorkbenchService = 'WorkbenchService',
+  IUserService = 'UserService',
+  IAppInfoService = 'AppInfoService',
+  IConfigureService = 'ConfigureService',
+  IDataFileService = 'DataService',
+  IDeviceService = 'DeviceService',
+  IFilterService = 'FilterService',
+  IHostService = 'HostService',
+  IProfileService = 'ProfileService',
+  IRuleService = 'RuleService',
 }
-export default EService
+export default EService;

@@ -1,11 +1,11 @@
-import React from 'react'
-import { IAction } from '../../service-api/IRuleService.ts'
-import { IMockFile } from '../../service-api/IMockFileService.ts'
-import find from 'lodash/find'
+import React from 'react';
+import { IAction } from '../../service-api/IRuleService.ts';
+import { IDataFileEntry } from '../../service-api/IDataFileService.ts';
+import find from 'lodash/find';
 
 interface IProps {
-  action: IAction
-  mockDataList: IMockFile[]
+  action: IAction;
+  mockDataList: IDataFileEntry[];
 }
 
 interface IState {}
@@ -15,26 +15,26 @@ const modifyResponseType = [
   { value: 'returnDataInJsonpStyle', label: '以JSONP的方式返回数据' },
   { value: 'allowCros', label: '增加跨域头部' },
   { value: 'return404', label: '返回404' },
-]
+];
 
 export default class ActionView extends React.PureComponent<IProps, IState> {
   modifyResponseDescription() {
-    const { action } = this.props
+    const { action } = this.props;
     if (action.type == 'modifyResponse') {
       const finded = find(modifyResponseType, (entry) => {
-        return entry.value == action.data.modifyResponseType
-      })
-      if (!finded) return '未知类型'
+        return entry.value == action.data.modifyResponseType;
+      });
+      if (!finded) return '未知类型';
       if (finded.value != 'returnDataInJsonpStyle') {
-        return finded.label
+        return finded.label;
       }
-      return finded.label + '( callback参数名: ' + action.data.callbackName + ' )'
+      return finded.label + '( callback参数名: ' + action.data.callbackName + ' )';
     }
-    return ''
+    return '';
   }
 
   render() {
-    const { action, mockDataList } = this.props
+    const { action, mockDataList } = this.props;
     return (
       <div className="action-value-container">
         {action.type == 'redirect' && (
@@ -100,6 +100,6 @@ export default class ActionView extends React.PureComponent<IProps, IState> {
           </div>
         )}
       </div>
-    )
+    );
   }
 }

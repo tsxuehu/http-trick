@@ -2,36 +2,45 @@
  * Created by tsxuehu on 17/1/9.
  */
 import axios from 'axios';
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
+import { assertAxiosRes } from './utils.ts';
 
-export function getDataList() {
-    return axios.get('/data/getdatalist');
+export async function getDataList() {
+  const response = await axios.get('/data/getdatalist');
+  assertAxiosRes(response);
+  return response.data.data;
 }
 
-export function removeDataFile(content: any) {
-    return axios.post('/data/removedatafile', content);
+export async function removeDataFile(content: any) {
+  const response = await axios.post('/data/removedatafile', content);
+  assertAxiosRes(response);
 }
 
-export function createDataFile(content: any) {
-    return axios.post('/data/createdatafile', content);
+export async function createDataFile(content: any) {
+  const response = await axios.post('/data/createdatafile', content);
+  assertAxiosRes(response);
 }
 
-export function getDataFile(id: string) {
-    return axios.get(`/data/getdatafile?id=${id}`);
+export async function getDataFile(id: string) {
+  const response = await axios.get(`/data/getdatafile?id=${id}`);
+  assertAxiosRes(response);
+  return response.data.data;
 }
 
 // 保存版本数据
-export function saveDataFile(id: string, content: any) {
-    var data = new FormData();
-    data.append('content', content);
-    return axios.post(`/data/savedatafile?id=${id}`, data);
+export async function saveDataFile(id: string, content: any) {
+  var data = new FormData();
+  data.append('content', content);
+  const response = await axios.post(`/data/savedatafile?id=${id}`, data);
+  assertAxiosRes(response);
 }
 
-export function saveDataEntryFromTraffic(reqId: string, name: string, contenttype: string) {
-    return axios.post('/data/savedatafromtraffic', {
-        id: uuidv4(),
-        name: name,
-        contenttype: contenttype,
-        reqid: reqId
-    });
+export async function saveDataEntryFromTraffic(reqId: string, name: string, contenttype: string) {
+  const response = await axios.post('/data/savedatafromtraffic', {
+    id: uuidv4(),
+    name: name,
+    contenttype: contenttype,
+    reqid: reqId,
+  });
+  assertAxiosRes(response);
 }

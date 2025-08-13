@@ -5,7 +5,7 @@ import EService from '../../config/EService.ts';
 import IFilterService from '../../service-api/IFilterService.ts';
 import { EAction, IAction, IRule } from '../../service-api/IRuleService.ts';
 import IProfileService from '../../service-api/IProfileService.ts';
-import IMockFileService, { IMockFile } from '../../service-api/IMockFileService.ts';
+import IDataFileService, { IDataFileEntry } from '../../service-api/IDataFileService.ts';
 import ActionView from '../../components/action-view/ActionView.tsx';
 import { openDialog } from '../../forms/utils.ts';
 import RuleEditForm, { IProps as IRuleEditFormProps } from '../../forms/rule-edit-form/RuleEditForm.tsx';
@@ -17,12 +17,12 @@ interface IProps {}
 interface IState {
   filters: IRule[];
   enableFilter: boolean;
-  mockDataList: IMockFile[];
+  mockDataList: IDataFileEntry[];
 }
 
 const filterService = getServiceSync<IFilterService>(EService.IFilterService);
 const profileService = getServiceSync<IProfileService>(EService.IProfileService);
-const mockDataService = getServiceSync<IMockFileService>(EService.IMockDataService);
+const mockDataService = getServiceSync<IDataFileService>(EService.IDataFileService);
 
 export default class FilterList extends React.PureComponent<IProps, IState> {
   state: IState = {
@@ -43,7 +43,7 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
       this.setState({ enableFilter: profileService.getProfile().enableFilter });
     });
     this.unMockData = mockDataService.subscribe(() => {
-      this.setState({ mockDataList: mockDataService.getMockFileList() });
+      this.setState({ mockDataList: mockDataService.getDataFileEntryList() });
     });
   }
 
