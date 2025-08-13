@@ -1,4 +1,4 @@
-import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as Future, k as clientExports, l as Modal, m as axios, n as copyToClipboard, N as NavLink, p as produce, o as Row, t as Col, v as useNavigate, w as find, S as Select, x as set, y as editor, z as v4, A as Routes, D as Route, E as Navigate, G as Layout, H as theme, J as HashRouter, K as createStore, O as trim, Q as keys, T as ServiceRegistry, U as setServiceRegistry } from "./vendor.js";
+import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as Future, k as clientExports, l as Modal, m as axios, n as copyToClipboard, N as NavLink, p as produce, o as Row, t as Col, v as useNavigate, w as find, S as Select, x as set, y as editor, z as v4, A as Routes, D as Route, E as Navigate, G as Switch, H as Layout, J as theme, K as HashRouter, O as createStore, Q as trim, T as keys, U as ServiceRegistry, V as setServiceRegistry } from "./vendor.js";
 var EService = /* @__PURE__ */ ((EService2) => {
   EService2["IWorkbenchService"] = "WorkbenchService";
   EService2["IUserService"] = "UserService";
@@ -299,7 +299,7 @@ class ProxyConfigure extends React.PureComponent {
     );
   }
 }
-const profileService$5 = getServiceSync(EService.IProfileService);
+const profileService$6 = getServiceSync(EService.IProfileService);
 const PlaceHolder$1 = `#示例
 all               # 有all 配置项，所有域名君走http解析代理
 *.domain.com      # 所有domain域名都会走Http解析代理
@@ -320,11 +320,11 @@ function getFormDataFromProfile(profile) {
 }
 class InterceptionConfig extends React.PureComponent {
   formRef = React.createRef();
-  formInitialValue = getFormDataFromProfile(profileService$5.getProfile());
+  formInitialValue = getFormDataFromProfile(profileService$6.getProfile());
   unProfile;
   componentDidMount() {
-    this.unProfile = profileService$5.subscribe(() => {
-      const newFormValue = getFormDataFromProfile(profileService$5.getProfile());
+    this.unProfile = profileService$6.subscribe(() => {
+      const newFormValue = getFormDataFromProfile(profileService$6.getProfile());
       this.formRef.current?.setFieldsValue(newFormValue);
     });
   }
@@ -333,7 +333,7 @@ class InterceptionConfig extends React.PureComponent {
   }
   onSave = async (values) => {
     try {
-      await profileService$5.saveProfile({
+      await profileService$6.saveProfile({
         externalProxy: values.externalProxy,
         externalHttpProxy: !values.isSocks5Proxy,
         externalSocks5Proxy: values.isSocks5Proxy,
@@ -452,13 +452,13 @@ class InterceptionConfig extends React.PureComponent {
     );
   }
 }
-const profileService$4 = getServiceSync(EService.IProfileService);
+const profileService$5 = getServiceSync(EService.IProfileService);
 class RedirectPathVariable extends React.PureComponent {
   state = {
     redirectPathVariableArray: []
   };
   componentDidMount() {
-    profileService$4.subscribe((userProfile) => {
+    profileService$5.subscribe((userProfile) => {
       const pairs = [];
       for (const [key, value] of Object.entries(userProfile.redirectPathVariables)) {
         pairs.push({
@@ -490,7 +490,7 @@ class RedirectPathVariable extends React.PureComponent {
       redirectPathVariableMap[key] = value;
     }
     try {
-      await profileService$4.saveRedirectPathVariables(redirectPathVariableMap);
+      await profileService$5.saveRedirectPathVariables(redirectPathVariableMap);
       staticMethods.success("保存成功!");
     } catch (err) {
       staticMethods.error(`出错了，${err.message}`);
@@ -651,8 +651,8 @@ function assertAxiosRes(response) {
     throw new Error(serverData.msg);
   }
 }
-const hostService$3 = getServiceSync(EService.IHostService);
-const profileService$3 = getServiceSync(EService.IProfileService);
+const hostService$4 = getServiceSync(EService.IHostService);
+const profileService$4 = getServiceSync(EService.IProfileService);
 const appInfoService$2 = getServiceSync(EService.IAppInfoService);
 class HostList extends React.PureComponent {
   state = {
@@ -662,11 +662,11 @@ class HostList extends React.PureComponent {
   unHost;
   unProfile;
   componentDidMount() {
-    this.unHost = hostService$3.subscribe((data) => {
+    this.unHost = hostService$4.subscribe((data) => {
       this.setState({ hostFileList: data.hostFileList });
     });
-    this.unProfile = profileService$3.subscribe(() => {
-      this.setState({ enableHost: profileService$3.getProfile().enableHost });
+    this.unProfile = profileService$4.subscribe(() => {
+      this.setState({ enableHost: profileService$4.getProfile().enableHost });
     });
   }
   componentWillUnmount() {
@@ -692,11 +692,11 @@ class HostList extends React.PureComponent {
     content.id = "";
     content.name = values.name;
     content.checked = false;
-    await hostService$3.saveFile("", content);
+    await hostService$4.saveFile("", content);
     staticMethods.success("导入成功!");
   }
   async onDeleteFile(file, index) {
-    await hostService$3.deleteFile(file.id);
+    await hostService$4.deleteFile(file.id);
     staticMethods.success("删除成功!");
   }
   onShareFile(file, index) {
@@ -706,7 +706,7 @@ class HostList extends React.PureComponent {
     staticMethods.success(`已复制Host${file.name}链接`);
   }
   async useFile(file, index) {
-    await hostService$3.useFile(file.id);
+    await hostService$4.useFile(file.id);
   }
   getColumns() {
     const { enableHost: enableHost2 } = this.state;
@@ -780,7 +780,7 @@ const PlaceHolder = `#示例
 8.8.8.8    www.google.com
 4.4.4.4    *.taobao.com #所有后缀为.taobao.com的域名都被解析为4.4.4.4
 6.6.6.6    www.youzan.com h5.youzan.com`;
-const hostService$2 = getServiceSync(EService.IHostService);
+const hostService$3 = getServiceSync(EService.IHostService);
 class EditHost extends React.PureComponent {
   state = {
     hostFileId: "",
@@ -794,7 +794,7 @@ class EditHost extends React.PureComponent {
   async loadHostFile() {
     const query = getQueryParams();
     const id = query.id;
-    const content = await hostService$2.getFileContent(id);
+    const content = await hostService$3.getFileContent(id);
     if (!content) {
       return;
     }
@@ -806,7 +806,7 @@ class EditHost extends React.PureComponent {
   }
   async saveFile() {
     const { hostFile, hostFileId } = this.state;
-    await hostService$2.saveFile(hostFileId, hostFile);
+    await hostService$3.saveFile(hostFileId, hostFile);
   }
   onContentChange(content) {
     const { hostFile } = this.state;
@@ -837,12 +837,12 @@ class EditHost extends React.PureComponent {
     ] });
   }
 }
-const hostService$1 = getServiceSync(EService.IHostService);
+const hostService$2 = getServiceSync(EService.IHostService);
 const CreateHost = () => {
   const navigate = useNavigate();
   const onSave = async (values) => {
     try {
-      const id = await hostService$1.createFile(values.name, values.description);
+      const id = await hostService$2.createFile(values.name, values.description);
       navigate(`/edithost?id=${id}`);
       staticMethods.success("创建成功!");
     } catch (err) {
@@ -883,9 +883,9 @@ const CreateHost = () => {
     )
   ] });
 };
-const ruleService$4 = getServiceSync(EService.IRuleService);
+const ruleService$5 = getServiceSync(EService.IRuleService);
 const appInfoService$1 = getServiceSync(EService.IAppInfoService);
-const profileService$2 = getServiceSync(EService.IProfileService);
+const profileService$3 = getServiceSync(EService.IProfileService);
 class RuleList extends React.PureComponent {
   state = {
     ruleFileList: [],
@@ -894,11 +894,11 @@ class RuleList extends React.PureComponent {
   unRule;
   unProfile;
   componentDidMount() {
-    this.unRule = ruleService$4.subscribe((data) => {
+    this.unRule = ruleService$5.subscribe((data) => {
       this.setState({ ruleFileList: data.ruleFileList });
     });
-    this.unProfile = profileService$2.subscribe(() => {
-      this.setState({ enableRule: profileService$2.getProfile().enableRule });
+    this.unProfile = profileService$3.subscribe(() => {
+      this.setState({ enableRule: profileService$3.getProfile().enableRule });
     });
   }
   componentWillUnmount() {
@@ -924,7 +924,7 @@ class RuleList extends React.PureComponent {
     content.id = "";
     content.name = values.name;
     content.checked = false;
-    const varNameList = ruleService$4.getReferenceVar(content);
+    const varNameList = ruleService$5.getReferenceVar(content);
     let infoStr;
     if (varNameList.length > 0) {
       infoStr = `导入规则文件名为${content.name},引用变量【${varNameList.join(
@@ -938,7 +938,7 @@ class RuleList extends React.PureComponent {
       content: infoStr,
       onOk: async () => {
         try {
-          await ruleService$4.saveRuleFile("", content);
+          await ruleService$5.saveRuleFile("", content);
           staticMethods.success("导入成功!");
         } catch (err) {
           staticMethods.error(`出错了，${err.message}`);
@@ -947,7 +947,7 @@ class RuleList extends React.PureComponent {
     });
   }
   async onDeleteFile(file, index) {
-    await ruleService$4.deleteRuleFile(file.id);
+    await ruleService$5.deleteRuleFile(file.id);
     staticMethods.success("删除成功!");
   }
   onDownloadFile(file, index) {
@@ -964,7 +964,7 @@ class RuleList extends React.PureComponent {
     staticMethods.success(`已复制规则${file.name}链接`);
   }
   async toggleFileCheckStatus(file, index) {
-    await ruleService$4.setFileCheckStatus(file.id, !file.checked);
+    await ruleService$5.setFileCheckStatus(file.id, !file.checked);
   }
   getColumns() {
     const { enableRule: enableRule2 } = this.state;
@@ -1376,7 +1376,7 @@ const HttpInput = (props) => {
     /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { type: "text", value: value?.url || url, onChange: onUrlChange, style: { width: 100 } })
   ] });
 };
-const ruleService$3 = getServiceSync(EService.IRuleService);
+const ruleService$4 = getServiceSync(EService.IRuleService);
 class RuleTestForm extends React.PureComponent {
   formRef = React.createRef();
   initialValue;
@@ -1403,7 +1403,7 @@ class RuleTestForm extends React.PureComponent {
   async testMatchRule() {
     const values = this.formRef.current?.getFieldsValue();
     try {
-      const result = await ruleService$3.testRule(values.match, values.target, values.request);
+      const result = await ruleService$4.testRule(values.match, values.target, values.request);
       this.formRef.current?.setFieldsValue({
         matchResult: result.matchResult,
         redirectResult: result.redirectResult,
@@ -1745,7 +1745,7 @@ class ActionView extends React.PureComponent {
     ] });
   }
 }
-const ruleService$2 = getServiceSync(EService.IRuleService);
+const ruleService$3 = getServiceSync(EService.IRuleService);
 const mockDataService$2 = getServiceSync(EService.IDataFileService);
 class EditRule extends React.PureComponent {
   state = {
@@ -1768,7 +1768,7 @@ class EditRule extends React.PureComponent {
   async loadRuleFile() {
     const query = getQueryParams();
     const id = query.id;
-    const content = await ruleService$2.getFileContent(id);
+    const content = await ruleService$3.getFileContent(id);
     if (!content) {
       return;
     }
@@ -1792,19 +1792,19 @@ class EditRule extends React.PureComponent {
       return;
     }
     const { ruleFileId } = this.state;
-    await ruleService$2.saveRule(ruleFileId, nextFilter);
+    await ruleService$3.saveRule(ruleFileId, nextFilter);
     staticMethods.success("保存成功!");
     this.loadRuleFile();
   }
   async toggleRuleCheckState(rule) {
     const { ruleFileId } = this.state;
-    await ruleService$2.setRuleCheckedState(ruleFileId, rule.id, !rule.checked);
+    await ruleService$3.setRuleCheckedState(ruleFileId, rule.id, !rule.checked);
     staticMethods.success("设置成功!");
     this.loadRuleFile();
   }
   async deleteRule(rule, index) {
     const { ruleFileId } = this.state;
-    await ruleService$2.removeRule(ruleFileId, rule.id);
+    await ruleService$3.removeRule(ruleFileId, rule.id);
     staticMethods.success("删除成功!");
     this.loadRuleFile();
   }
@@ -1818,7 +1818,7 @@ class EditRule extends React.PureComponent {
       return;
     }
     const { ruleFileId } = this.state;
-    await ruleService$2.saveRule(ruleFileId, nextFilter);
+    await ruleService$3.saveRule(ruleFileId, nextFilter);
     staticMethods.success("保存成功!");
     this.loadRuleFile();
   }
@@ -1826,7 +1826,7 @@ class EditRule extends React.PureComponent {
     const newRule = JSON.parse(JSON.stringify(rule));
     newRule.id = "";
     const { ruleFileId } = this.state;
-    await ruleService$2.saveRuleFile(ruleFileId, newRule);
+    await ruleService$3.saveRuleFile(ruleFileId, newRule);
     staticMethods.success("复制成功!");
     this.loadRuleFile();
   }
@@ -1903,12 +1903,12 @@ class EditRule extends React.PureComponent {
     ] });
   }
 }
-const ruleService$1 = getServiceSync(EService.IRuleService);
+const ruleService$2 = getServiceSync(EService.IRuleService);
 const CreateRule = () => {
   const navigate = useNavigate();
   const onSave = async (values) => {
     try {
-      const id = await ruleService$1.createFile(values.name, values.description);
+      const id = await ruleService$2.createFile(values.name, values.description);
       navigate(`/editrule?id=${id}`);
       staticMethods.success("创建成功!");
     } catch (err) {
@@ -1958,7 +1958,7 @@ const CreateRule = () => {
   ] });
 };
 const filterService$1 = getServiceSync(EService.IFilterService);
-const profileService$1 = getServiceSync(EService.IProfileService);
+const profileService$2 = getServiceSync(EService.IProfileService);
 const mockDataService$1 = getServiceSync(EService.IDataFileService);
 class FilterList extends React.PureComponent {
   state = {
@@ -1973,8 +1973,8 @@ class FilterList extends React.PureComponent {
     this.unFilter = filterService$1.subscribe(() => {
       this.setState({ filters: filterService$1.getFilters() });
     });
-    this.unProfile = profileService$1.subscribe(() => {
-      this.setState({ enableFilter: profileService$1.getProfile().enableFilter });
+    this.unProfile = profileService$2.subscribe(() => {
+      this.setState({ enableFilter: profileService$2.getProfile().enableFilter });
     });
     this.unMockData = mockDataService$1.subscribe(() => {
       this.setState({ mockDataList: mockDataService$1.getDataFileEntryList() });
@@ -2308,6 +2308,134 @@ function ViewRouter() {
     ] })
   );
 }
+const profileService$1 = getServiceSync(EService.IProfileService);
+const ruleService$1 = getServiceSync(EService.IRuleService);
+const hostService$1 = getServiceSync(EService.IHostService);
+class SettingHeader extends React.PureComponent {
+  state = {
+    enableFilter: false,
+    enableHost: false,
+    resolveHost: false,
+    enableRule: false,
+    ruleFileList: [],
+    hostFileList: []
+  };
+  unProfile;
+  unRule;
+  unHost;
+  componentDidMount() {
+    this.unProfile = profileService$1.subscribe((data) => {
+      this.setState({
+        enableFilter: data.enableFilter,
+        enableHost: data.enableHost,
+        resolveHost: data.resolveHost,
+        enableRule: data.enableRule
+      });
+    });
+    this.unRule = ruleService$1.subscribe((data) => {
+      this.setState({ ruleFileList: data.ruleFileList });
+    });
+    this.unHost = hostService$1.subscribe((data) => {
+      this.setState({ hostFileList: data.hostFileList });
+    });
+  }
+  componentWillUnmount() {
+    this.unProfile?.();
+    this.unRule?.();
+    this.unHost?.();
+  }
+  async setResolveHost(value) {
+    await profileService$1.setResolveHost(value);
+  }
+  async setEnableFilter(value) {
+    await profileService$1.setEnableFilter(value);
+  }
+  async setEnableHost(value) {
+    await profileService$1.setEnableHost(value);
+  }
+  async setEnableRule(value) {
+    await profileService$1.setEnableRule(value);
+  }
+  async selectHostFile(id) {
+    await hostService$1.useFile(id);
+  }
+  async selectRuleFile(ids) {
+    const { ruleFileList } = this.state;
+    const oldCheckedIds = ruleFileList.filter((item) => item.checked).map((item) => item.id);
+    const oldIdSet = new Set(oldCheckedIds);
+    const newIdSet = new Set(ids);
+    for (let id of oldCheckedIds) {
+      if (!newIdSet.has(id)) {
+        await ruleService$1.setFileCheckStatus(id, false);
+      }
+    }
+    for (let id of ids) {
+      if (!oldIdSet.has(id)) {
+        await ruleService$1.setFileCheckStatus(id, true);
+      }
+    }
+  }
+  render() {
+    const { enableFilter: enableFilter2, enableHost: enableHost2, resolveHost, enableRule: enableRule2, ruleFileList, hostFileList } = this.state;
+    const hostOptions = [];
+    let selectedHostId = "";
+    for (const hostFile of hostFileList) {
+      if (hostFile.checked) {
+        selectedHostId = hostFile.id;
+      }
+      hostOptions.push({ value: hostFile.id, label: hostFile.name });
+    }
+    const ruleOptions = [];
+    let selectedRuleIds = [];
+    for (const ruleFile of ruleFileList) {
+      if (ruleFile.checked) {
+        selectedRuleIds.push(ruleFile.id);
+      }
+      ruleOptions.push({ value: ruleFile.id, label: ruleFile.name });
+    }
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "setting-header", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+        "host解析为IP ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Switch, { checked: resolveHost, onChange: (value, e) => this.setResolveHost(value) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+        "Host解析文件",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Select,
+          {
+            value: selectedHostId,
+            style: { width: 120 },
+            size: "small",
+            placeholder: "请选择修改返回body操作",
+            onChange: (value) => this.selectHostFile(value),
+            options: hostOptions
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Switch, { checked: enableHost2, onChange: (value, e) => this.setEnableHost(value) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+        "Rule设置",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Select,
+          {
+            mode: "multiple",
+            value: selectedRuleIds,
+            style: { width: 120 },
+            size: "small",
+            placeholder: "请选择修改返回body操作",
+            onChange: (value) => this.selectRuleFile(value),
+            options: ruleOptions
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Switch, { checked: enableRule2, onChange: (value, e) => this.setEnableRule(value) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+        "过滤器开关 ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Switch, { checked: enableFilter2, onChange: (value, e) => this.setEnableFilter(value) })
+      ] })
+    ] });
+  }
+}
 const { Header, Content, Footer, Sider } = Layout;
 const App = () => {
   const [collapsed, setCollapsed] = reactExports.useState(false);
@@ -2317,7 +2445,7 @@ const App = () => {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(HashRouter, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Layout, { style: { minHeight: "100vh" }, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Sider, { collapsible: true, collapsed, onCollapse: (value) => setCollapsed(value), children: /* @__PURE__ */ jsxRuntimeExports.jsx(HttpTrickMenu, {}) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Layout, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Header, { style: { padding: 0, background: colorBgContainer } }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Header, { style: { padding: 0, background: colorBgContainer }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(SettingHeader, {}) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Content, { style: { margin: "0 16px" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(ViewRouter, {}) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Footer, { style: { textAlign: "center" }, children: [
         "Http Trick ©",
@@ -2331,33 +2459,42 @@ async function saveFile$2(content) {
   const response = await axios.post("/profile/savefile", content);
   assertAxiosRes(response);
 }
-function disableRule() {
-  return axios.post(`/profile/setRuleState`);
+async function disableRule() {
+  const response = await axios.post(`/profile/setRuleState`);
+  assertAxiosRes(response);
 }
-function enableRule() {
-  return axios.post(`/profile/setRuleState?rulestate=1`);
+async function enableRule() {
+  const response = await axios.post(`/profile/setRuleState?rulestate=1`);
+  assertAxiosRes(response);
 }
-function disableResolveHost() {
-  return axios.post(`/profile/setResolveHost`);
+async function disableResolveHost() {
+  const response = await axios.post(`/profile/setResolveHost`);
+  assertAxiosRes(response);
 }
-function enableResolveHost() {
-  return axios.post(`/profile/setResolveHost?resolve=1`);
+async function enableResolveHost() {
+  const response = await axios.post(`/profile/setResolveHost?resolve=1`);
+  assertAxiosRes(response);
 }
-function disableHost() {
-  return axios.post(`/profile/setHostState`);
+async function disableHost() {
+  const response = await axios.post(`/profile/setHostState`);
+  assertAxiosRes(response);
 }
-function enableHost() {
-  return axios.post(`/profile/setHostState?hoststate=1`);
+async function enableHost() {
+  const response = await axios.post(`/profile/setHostState?hoststate=1`);
+  assertAxiosRes(response);
 }
-function disableFilter() {
-  return axios.post(`/profile/setFilterState`);
+async function disableFilter() {
+  const response = await axios.post(`/profile/setFilterState`);
+  assertAxiosRes(response);
 }
-function enableFilter() {
-  return axios.post(`/profile/setFilterState?filterstate=1`);
+async function enableFilter() {
+  const response = await axios.post(`/profile/setFilterState?filterstate=1`);
+  assertAxiosRes(response);
 }
 async function getUserId() {
-  const result = await axios.get(`/profile/getUserId`);
-  return result.data.data.userId;
+  const response = await axios.get(`/profile/getUserId`);
+  assertAxiosRes(response);
+  return response.data.data.userId;
 }
 const appInfoService = getServiceSync(EService.IAppInfoService);
 const configureService = getServiceSync(EService.IConfigureService);
@@ -2643,36 +2780,32 @@ class ProfileService extends StateBase {
   getProfile() {
     return this.getState();
   }
-  async switchResolveHost() {
-    const profile = this.getState();
-    if (profile.resolveHost) {
-      await disableResolveHost();
-    } else {
+  async setResolveHost(value) {
+    if (value) {
       await enableResolveHost();
+    } else {
+      await disableResolveHost();
     }
   }
-  async switchHost() {
-    const profile = this.getState();
-    if (profile.enableHost) {
-      await disableHost();
+  async setEnableFilter(value) {
+    if (value) {
+      await enableFilter();
     } else {
+      await disableFilter();
+    }
+  }
+  async setEnableHost(value) {
+    if (value) {
       await enableHost();
+    } else {
+      await disableHost();
     }
   }
-  async switchFilter() {
-    const profile = this.getState();
-    if (profile.enableFilter) {
-      disableFilter();
+  async setEnableRule(value) {
+    if (value) {
+      await enableRule();
     } else {
-      enableFilter();
-    }
-  }
-  async switchRule() {
-    const profile = this.getState();
-    if (profile.enableRule) {
-      disableRule();
-    } else {
-      enableRule();
+      await disableRule();
     }
   }
   async saveRedirectPathVariables(variables) {

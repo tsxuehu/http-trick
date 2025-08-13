@@ -11971,7 +11971,7 @@ function getAlphaColor$1(frontColor, backgroundColor) {
     a: 1
   }).toRgbString();
 }
-var __rest$P = function(s, e2) {
+var __rest$Q = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -11982,7 +11982,7 @@ var __rest$P = function(s, e2) {
 function formatToken(derivativeToken) {
   const {
     override
-  } = derivativeToken, restToken = __rest$P(derivativeToken, ["override"]);
+  } = derivativeToken, restToken = __rest$Q(derivativeToken, ["override"]);
   const overrideTokens = Object.assign({}, override);
   Object.keys(seedToken).forEach((token2) => {
     delete overrideTokens[token2];
@@ -12136,7 +12136,7 @@ function formatToken(derivativeToken) {
   }), overrideTokens);
   return aliasToken;
 }
-var __rest$O = function(s, e2) {
+var __rest$P = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -12197,7 +12197,7 @@ const getComputedToken = (originToken, overrideToken, theme2) => {
   const derivativeToken = theme2.getDerivativeToken(originToken);
   const {
     override
-  } = overrideToken, components = __rest$O(overrideToken, ["override"]);
+  } = overrideToken, components = __rest$P(overrideToken, ["override"]);
   let mergedDerivativeToken = Object.assign(Object.assign({}, derivativeToken), {
     override
   });
@@ -12206,7 +12206,7 @@ const getComputedToken = (originToken, overrideToken, theme2) => {
     Object.entries(components).forEach(([key, value]) => {
       const {
         theme: componentTheme
-      } = value, componentTokens = __rest$O(value, ["theme"]);
+      } = value, componentTokens = __rest$P(value, ["theme"]);
       let mergedComponentToken = componentTokens;
       if (componentTheme) {
         mergedComponentToken = getComputedToken(Object.assign(Object.assign({}, mergedDerivativeToken), componentTokens), {
@@ -12492,10 +12492,10 @@ function useTheme(theme2, parentTheme, config) {
     return !isEqual$1(prevTheme, nextTheme, true);
   }));
 }
-var _excluded$J = ["children"];
+var _excluded$K = ["children"];
 var Context$2 = /* @__PURE__ */ reactExports.createContext({});
 function MotionProvider(_ref) {
-  var children = _ref.children, props = _objectWithoutProperties(_ref, _excluded$J);
+  var children = _ref.children, props = _objectWithoutProperties(_ref, _excluded$K);
   return /* @__PURE__ */ reactExports.createElement(Context$2.Provider, {
     value: props
   }, children);
@@ -13014,7 +13014,7 @@ function diffKeys() {
   });
   return list;
 }
-var _excluded$I = ["component", "children", "onVisibleChanged", "onAllRemoved"], _excluded2$6 = ["status"];
+var _excluded$J = ["component", "children", "onVisibleChanged", "onAllRemoved"], _excluded2$6 = ["status"];
 var MOTION_PROP_NAMES = ["eventProps", "visible", "children", "motionName", "motionAppear", "motionEnter", "motionLeave", "motionLeaveImmediately", "motionDeadline", "removeOnLeave", "leavedClassName", "onAppearPrepare", "onAppearStart", "onAppearActive", "onAppearEnd", "onEnterStart", "onEnterActive", "onEnterEnd", "onLeaveStart", "onLeaveActive", "onLeaveEnd"];
 function genCSSMotionList(transitionSupport) {
   var CSSMotion$1 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : CSSMotion;
@@ -13062,7 +13062,7 @@ function genCSSMotionList(transitionSupport) {
         var keyEntities = this.state.keyEntities;
         var _this$props = this.props, component = _this$props.component, children = _this$props.children, _onVisibleChanged = _this$props.onVisibleChanged;
         _this$props.onAllRemoved;
-        var restProps = _objectWithoutProperties(_this$props, _excluded$I);
+        var restProps = _objectWithoutProperties(_this$props, _excluded$J);
         var Component = component || reactExports.Fragment;
         var motionProps = {};
         MOTION_PROP_NAMES.forEach(function(prop) {
@@ -13143,7 +13143,7 @@ function MotionWrapper(props) {
   return children;
 }
 const PropWarning = () => null;
-var __rest$N = function(s, e2) {
+var __rest$O = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -13444,7 +13444,7 @@ const ProviderChildren = (props) => {
       token: token2,
       components,
       cssVar
-    } = _a3, rest = __rest$N(_a3, ["algorithm", "token", "components", "cssVar"]);
+    } = _a3, rest = __rest$O(_a3, ["algorithm", "token", "components", "cssVar"]);
     const themeObj = algorithm && (!Array.isArray(algorithm) || algorithm.length > 0) ? createTheme(algorithm) : defaultTheme;
     const parsedComponents = {};
     Object.entries(components || {}).forEach(([componentName, componentToken]) => {
@@ -13587,7 +13587,7 @@ var useInsertStyles = function useInsertStyles2(eleRef) {
     });
   }, []);
 };
-var _excluded$H = ["icon", "className", "onClick", "style", "primaryColor", "secondaryColor"];
+var _excluded$I = ["icon", "className", "onClick", "style", "primaryColor", "secondaryColor"];
 var twoToneColorPalette = {
   primaryColor: "#333",
   secondaryColor: "#E6E6E6",
@@ -13603,7 +13603,7 @@ function getTwoToneColors() {
   return _objectSpread2({}, twoToneColorPalette);
 }
 var IconBase = function IconBase2(props) {
-  var icon = props.icon, className = props.className, onClick = props.onClick, style2 = props.style, primaryColor = props.primaryColor, secondaryColor = props.secondaryColor, restProps = _objectWithoutProperties(props, _excluded$H);
+  var icon = props.icon, className = props.className, onClick = props.onClick, style2 = props.style, primaryColor = props.primaryColor, secondaryColor = props.secondaryColor, restProps = _objectWithoutProperties(props, _excluded$I);
   var svgRef = reactExports.useRef();
   var colors = twoToneColorPalette;
   if (primaryColor) {
@@ -13653,10 +13653,10 @@ function getTwoToneColor() {
   }
   return [colors.primaryColor, colors.secondaryColor];
 }
-var _excluded$G = ["className", "icon", "spin", "rotate", "tabIndex", "onClick", "twoToneColor"];
+var _excluded$H = ["className", "icon", "spin", "rotate", "tabIndex", "onClick", "twoToneColor"];
 setTwoToneColor(blue.primary);
 var Icon$1 = /* @__PURE__ */ reactExports.forwardRef(function(props, ref) {
-  var className = props.className, icon = props.icon, spin = props.spin, rotate = props.rotate, tabIndex = props.tabIndex, onClick = props.onClick, twoToneColor = props.twoToneColor, restProps = _objectWithoutProperties(props, _excluded$G);
+  var className = props.className, icon = props.icon, spin = props.spin, rotate = props.rotate, tabIndex = props.tabIndex, onClick = props.onClick, twoToneColor = props.twoToneColor, restProps = _objectWithoutProperties(props, _excluded$H);
   var _React$useContext = reactExports.useContext(IconContext), _React$useContext$pre = _React$useContext.prefixCls, prefixCls = _React$useContext$pre === void 0 ? "anticon" : _React$useContext$pre, rootClassName = _React$useContext.rootClassName;
   var classString = classNames(rootClassName, prefixCls, _defineProperty$1(_defineProperty$1({}, "".concat(prefixCls, "-").concat(icon.name), !!icon.name), "".concat(prefixCls, "-spin"), !!spin || icon.name === "loading"), className);
   var iconTabIndex = tabIndex;
@@ -14191,7 +14191,7 @@ var useStack = function useStack2(config) {
   }
   return [!!config, result];
 };
-var _excluded$F = ["className", "style", "classNames", "styles"];
+var _excluded$G = ["className", "style", "classNames", "styles"];
 var NoticeList = function NoticeList2(props) {
   var configList = props.configList, placement = props.placement, prefixCls = props.prefixCls, className = props.className, style2 = props.style, motion = props.motion, onAllNoticeRemoved = props.onAllNoticeRemoved, onNoticeClose = props.onNoticeClose, stackConfig = props.stack;
   var _useContext = reactExports.useContext(NotificationContext), ctxCls = _useContext.classNames;
@@ -14240,7 +14240,7 @@ var NoticeList = function NoticeList2(props) {
     var config = _ref2.config, motionClassName = _ref2.className, motionStyle = _ref2.style, motionIndex = _ref2.index;
     var _ref3 = config, key = _ref3.key, times = _ref3.times;
     var strKey = String(key);
-    var _ref4 = config, configClassName = _ref4.className, configStyle = _ref4.style, configClassNames = _ref4.classNames, configStyles = _ref4.styles, restConfig = _objectWithoutProperties(_ref4, _excluded$F);
+    var _ref4 = config, configClassName = _ref4.className, configStyle = _ref4.style, configClassNames = _ref4.classNames, configStyles = _ref4.styles, restConfig = _objectWithoutProperties(_ref4, _excluded$G);
     var dataIndex = keys2.findIndex(function(item) {
       return item.key === strKey;
     });
@@ -14404,7 +14404,7 @@ var Notifications = /* @__PURE__ */ reactExports.forwardRef(function(props, ref)
     }) : list;
   })), container);
 });
-var _excluded$E = ["getContainer", "motion", "prefixCls", "maxCount", "className", "style", "onAllRemoved", "stack", "renderNotifications"];
+var _excluded$F = ["getContainer", "motion", "prefixCls", "maxCount", "className", "style", "onAllRemoved", "stack", "renderNotifications"];
 var defaultGetContainer = function defaultGetContainer2() {
   return document.body;
 };
@@ -14428,7 +14428,7 @@ function mergeConfig() {
 }
 function useNotification() {
   var rootConfig = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {};
-  var _rootConfig$getContai = rootConfig.getContainer, getContainer2 = _rootConfig$getContai === void 0 ? defaultGetContainer : _rootConfig$getContai, motion = rootConfig.motion, prefixCls = rootConfig.prefixCls, maxCount = rootConfig.maxCount, className = rootConfig.className, style2 = rootConfig.style, onAllRemoved = rootConfig.onAllRemoved, stack = rootConfig.stack, renderNotifications2 = rootConfig.renderNotifications, shareConfig = _objectWithoutProperties(rootConfig, _excluded$E);
+  var _rootConfig$getContai = rootConfig.getContainer, getContainer2 = _rootConfig$getContai === void 0 ? defaultGetContainer : _rootConfig$getContai, motion = rootConfig.motion, prefixCls = rootConfig.prefixCls, maxCount = rootConfig.maxCount, className = rootConfig.className, style2 = rootConfig.style, onAllRemoved = rootConfig.onAllRemoved, stack = rootConfig.stack, renderNotifications2 = rootConfig.renderNotifications, shareConfig = _objectWithoutProperties(rootConfig, _excluded$F);
   var _React$useState = reactExports.useState(), _React$useState2 = _slicedToArray(_React$useState, 2), container = _React$useState2[0], setContainer = _React$useState2[1];
   var notificationsRef = reactExports.useRef();
   var contextHolder = /* @__PURE__ */ reactExports.createElement(Notifications, {
@@ -14701,18 +14701,18 @@ const genMessageStyle = (token2) => {
     }
   ];
 };
-const prepareComponentToken$h = (token2) => ({
+const prepareComponentToken$i = (token2) => ({
   zIndexPopup: token2.zIndexPopupBase + CONTAINER_MAX_OFFSET + 10,
   contentBg: token2.colorBgElevated,
   contentPadding: `${(token2.controlHeightLG - token2.fontSize * token2.lineHeight) / 2}px ${token2.paddingSM}px`
 });
-const useStyle$o = genStyleHooks("Message", (token2) => {
+const useStyle$p = genStyleHooks("Message", (token2) => {
   const combinedToken = merge(token2, {
     height: 150
   });
   return [genMessageStyle(combinedToken)];
-}, prepareComponentToken$h);
-var __rest$M = function(s, e2) {
+}, prepareComponentToken$i);
+var __rest$N = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -14742,13 +14742,13 @@ const PurePanel$7 = (props) => {
     type: type4,
     icon,
     content
-  } = props, restProps = __rest$M(props, ["prefixCls", "className", "type", "icon", "content"]);
+  } = props, restProps = __rest$N(props, ["prefixCls", "className", "type", "icon", "content"]);
   const {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
   const prefixCls = staticPrefixCls || getPrefixCls("message");
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$o(prefixCls, rootCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$p(prefixCls, rootCls);
   return wrapCSSVar(/* @__PURE__ */ reactExports.createElement(Notify, Object.assign({}, restProps, {
     prefixCls,
     className: classNames(className, hashId, `${prefixCls}-notice-pure-panel`, cssVarCls, rootCls),
@@ -14780,7 +14780,7 @@ function wrapPromiseFn(openFn) {
   result.promise = closePromise;
   return result;
 }
-var __rest$L = function(s, e2) {
+var __rest$M = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -14795,7 +14795,7 @@ const Wrapper = ({
   prefixCls
 }) => {
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$o(prefixCls, rootCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$p(prefixCls, rootCls);
   return wrapCSSVar(/* @__PURE__ */ reactExports.createElement(NotificationProvider, {
     classNames: {
       list: classNames(hashId, cssVarCls, rootCls)
@@ -14891,7 +14891,7 @@ function useInternalMessage(messageConfig) {
         className,
         style: style2,
         onClose
-      } = config, restConfig = __rest$L(config, ["content", "icon", "type", "key", "className", "style", "onClose"]);
+      } = config, restConfig = __rest$M(config, ["content", "icon", "type", "key", "className", "style", "onClose"]);
       let mergedKey = key;
       if (mergedKey === void 0 || mergedKey === null) {
         keyIndex += 1;
@@ -15416,7 +15416,7 @@ const genWaveStyle = (token2) => {
     }
   };
 };
-const useStyle$n = genComponentStyleHook("Wave", (token2) => [genWaveStyle(token2)]);
+const useStyle$o = genComponentStyleHook("Wave", (token2) => [genWaveStyle(token2)]);
 const TARGET_CLS = `${defaultPrefixCls}-wave-target`;
 function isValidWaveColor(color) {
   return color && color !== "#fff" && color !== "#ffffff" && color !== "rgb(255, 255, 255)" && color !== "rgba(255, 255, 255, 1)" && !/rgba\((?:\d*, ){3}0\)/.test(color) && // any transparent rgba color
@@ -15602,7 +15602,7 @@ const Wave = (props) => {
   } = reactExports.useContext(ConfigContext);
   const containerRef = reactExports.useRef(null);
   const prefixCls = getPrefixCls("wave");
-  const [, hashId] = useStyle$n(prefixCls);
+  const [, hashId] = useStyle$o(prefixCls);
   const showWave = useWave(containerRef, classNames(prefixCls, hashId), component);
   React.useEffect(() => {
     const node2 = containerRef.current;
@@ -15727,7 +15727,7 @@ const genSpaceGapStyle = (token2) => {
     }
   };
 };
-const useStyle$m = genStyleHooks("Space", (token2) => {
+const useStyle$n = genStyleHooks("Space", (token2) => {
   const spaceToken = merge(token2, {
     spaceGapSmallSize: token2.paddingXS,
     spaceGapMiddleSize: token2.padding,
@@ -15739,7 +15739,7 @@ const useStyle$m = genStyleHooks("Space", (token2) => {
   // https://github.com/ant-design/ant-design/issues/40315
   resetStyle: false
 });
-var __rest$K = function(s, e2) {
+var __rest$L = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -15783,7 +15783,7 @@ const NoCompactStyle = (props) => {
 const CompactItem = (props) => {
   const {
     children
-  } = props, others = __rest$K(props, ["children"]);
+  } = props, others = __rest$L(props, ["children"]);
   return /* @__PURE__ */ reactExports.createElement(SpaceCompactItemContext.Provider, {
     value: reactExports.useMemo(() => others, [others])
   }, children);
@@ -15801,10 +15801,10 @@ const Compact$1 = (props) => {
     className,
     rootClassName,
     children
-  } = props, restProps = __rest$K(props, ["size", "direction", "block", "prefixCls", "className", "rootClassName", "children"]);
+  } = props, restProps = __rest$L(props, ["size", "direction", "block", "prefixCls", "className", "rootClassName", "children"]);
   const mergedSize = useSize((ctx) => size !== null && size !== void 0 ? size : ctx);
   const prefixCls = getPrefixCls("space-compact", customizePrefixCls);
-  const [wrapCSSVar, hashId] = useStyle$m(prefixCls);
+  const [wrapCSSVar, hashId] = useStyle$n(prefixCls);
   const clx = classNames(prefixCls, hashId, {
     [`${prefixCls}-rtl`]: directionConfig === "rtl",
     [`${prefixCls}-block`]: block,
@@ -15829,7 +15829,7 @@ const Compact$1 = (props) => {
     className: clx
   }, restProps), nodes));
 };
-var __rest$J = function(s, e2) {
+var __rest$K = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -15847,7 +15847,7 @@ const ButtonGroup = (props) => {
     prefixCls: customizePrefixCls,
     size,
     className
-  } = props, others = __rest$J(props, ["prefixCls", "size", "className"]);
+  } = props, others = __rest$K(props, ["prefixCls", "size", "className"]);
   const prefixCls = getPrefixCls("btn-group", customizePrefixCls);
   const [, , hashId] = useToken$1();
   const sizeCls = reactExports.useMemo(() => {
@@ -16077,7 +16077,7 @@ const genGroupStyle$1 = (token2) => {
     ]
   };
 };
-var _excluded$D = ["b"], _excluded2$5 = ["v"];
+var _excluded$E = ["b"], _excluded2$5 = ["v"];
 var getRoundNumber = function getRoundNumber2(value) {
   return Math.round(Number(value || 0));
 };
@@ -16086,7 +16086,7 @@ var convertHsb2Hsv = function convertHsb2Hsv2(color) {
     return color;
   }
   if (color && _typeof(color) === "object" && "h" in color && "b" in color) {
-    var _ref = color, b = _ref.b, resets = _objectWithoutProperties(_ref, _excluded$D);
+    var _ref = color, b = _ref.b, resets = _objectWithoutProperties(_ref, _excluded$E);
     return _objectSpread2(_objectSpread2({}, resets), {}, {
       v: b
     });
@@ -16817,7 +16817,7 @@ const prepareToken$3 = (token2) => {
   });
   return buttonToken;
 };
-const prepareComponentToken$g = (token2) => {
+const prepareComponentToken$h = (token2) => {
   var _a3, _b3, _c2, _d2, _e2, _f2;
   const contentFontSize = (_a3 = token2.contentFontSize) !== null && _a3 !== void 0 ? _a3 : token2.fontSize;
   const contentFontSizeSM = (_b3 = token2.contentFontSizeSM) !== null && _b3 !== void 0 ? _b3 : token2.fontSize;
@@ -17315,7 +17315,7 @@ const genBlockButtonStyle = (token2) => {
     }
   };
 };
-const useStyle$l = genStyleHooks("Button", (token2) => {
+const useStyle$m = genStyleHooks("Button", (token2) => {
   const buttonToken = prepareToken$3(token2);
   return [
     // Shared
@@ -17333,7 +17333,7 @@ const useStyle$l = genStyleHooks("Button", (token2) => {
     // Button Group
     genGroupStyle$1(buttonToken)
   ];
-}, prepareComponentToken$g, {
+}, prepareComponentToken$h, {
   unitless: {
     fontWeight: true,
     contentLineHeight: true,
@@ -17475,8 +17475,8 @@ const Compact = genSubStyleComponent(["Button", "compact"], (token2) => {
     genCompactItemVerticalStyle(buttonToken),
     genButtonCompactStyle(buttonToken)
   ];
-}, prepareComponentToken$g);
-var __rest$I = function(s, e2) {
+}, prepareComponentToken$h);
+var __rest$J = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -17532,7 +17532,7 @@ const InternalCompoundedButton = /* @__PURE__ */ React.forwardRef((props, ref) =
     style: customStyle = {},
     autoInsertSpace,
     autoFocus
-  } = props, rest = __rest$I(props, ["loading", "prefixCls", "color", "variant", "type", "danger", "shape", "size", "styles", "disabled", "className", "rootClassName", "children", "icon", "iconPosition", "ghost", "block", "htmlType", "classNames", "style", "autoInsertSpace", "autoFocus"]);
+  } = props, rest = __rest$J(props, ["loading", "prefixCls", "color", "variant", "type", "danger", "shape", "size", "styles", "disabled", "className", "rootClassName", "children", "icon", "iconPosition", "ghost", "block", "htmlType", "classNames", "style", "autoInsertSpace", "autoFocus"]);
   const mergedType = type4 || "default";
   const {
     button
@@ -17566,7 +17566,7 @@ const InternalCompoundedButton = /* @__PURE__ */ React.forwardRef((props, ref) =
   } = useComponentConfig("button");
   const mergedInsertSpace = (_a3 = autoInsertSpace !== null && autoInsertSpace !== void 0 ? autoInsertSpace : contextAutoInsertSpace) !== null && _a3 !== void 0 ? _a3 : true;
   const prefixCls = getPrefixCls("btn", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$l(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$m(prefixCls);
   const disabled = reactExports.useContext(DisabledContext);
   const mergedDisabled = customDisabled !== null && customDisabled !== void 0 ? customDisabled : disabled;
   const groupSize = reactExports.useContext(GroupSizeContext);
@@ -19874,7 +19874,7 @@ function move(array4, moveIndex, toIndex) {
   }
   return array4;
 }
-var _excluded$C = ["name"];
+var _excluded$D = ["name"];
 var EMPTY_ERRORS = [];
 function requireUpdate(shouldUpdate, prev2, next2, prevValue, nextValue, info) {
   if (typeof shouldUpdate === "function") {
@@ -20316,7 +20316,7 @@ _defineProperty$1(Field, "defaultProps", {
 });
 function WrapperField(_ref6) {
   var _restProps$isListFiel;
-  var name = _ref6.name, restProps = _objectWithoutProperties(_ref6, _excluded$C);
+  var name = _ref6.name, restProps = _objectWithoutProperties(_ref6, _excluded$D);
   var fieldContext = reactExports.useContext(Context$1);
   var listContext = reactExports.useContext(ListContext);
   var namePath = name !== void 0 ? getNamePath(name) : void 0;
@@ -20539,7 +20539,7 @@ var NameMap = /* @__PURE__ */ function() {
   }]);
   return NameMap2;
 }();
-var _excluded$B = ["name"];
+var _excluded$C = ["name"];
 var FormStore = /* @__PURE__ */ _createClass(function FormStore2(forceRootUpdate) {
   var _this = this;
   _classCallCheck(this, FormStore2);
@@ -20933,7 +20933,7 @@ var FormStore = /* @__PURE__ */ _createClass(function FormStore2(forceRootUpdate
     var prevStore = _this.store;
     var namePathList = [];
     fields.forEach(function(fieldData) {
-      var name = fieldData.name, data = _objectWithoutProperties(fieldData, _excluded$B);
+      var name = fieldData.name, data = _objectWithoutProperties(fieldData, _excluded$C);
       var namePath = getNamePath(name);
       namePathList.push(namePath);
       if ("value" in data) {
@@ -21339,9 +21339,9 @@ var FormProvider$1 = function FormProvider(_ref) {
     })
   }, children);
 };
-var _excluded$A = ["name", "initialValues", "fields", "form", "preserve", "children", "component", "validateMessages", "validateTrigger", "onValuesChange", "onFieldsChange", "onFinish", "onFinishFailed", "clearOnDestroy"];
+var _excluded$B = ["name", "initialValues", "fields", "form", "preserve", "children", "component", "validateMessages", "validateTrigger", "onValuesChange", "onFieldsChange", "onFinish", "onFinishFailed", "clearOnDestroy"];
 var Form$3 = function Form(_ref, ref) {
-  var name = _ref.name, initialValues = _ref.initialValues, fields = _ref.fields, form = _ref.form, preserve2 = _ref.preserve, children = _ref.children, _ref$component = _ref.component, Component = _ref$component === void 0 ? "form" : _ref$component, validateMessages = _ref.validateMessages, _ref$validateTrigger = _ref.validateTrigger, validateTrigger = _ref$validateTrigger === void 0 ? "onChange" : _ref$validateTrigger, onValuesChange = _ref.onValuesChange, _onFieldsChange = _ref.onFieldsChange, _onFinish = _ref.onFinish, onFinishFailed = _ref.onFinishFailed, clearOnDestroy = _ref.clearOnDestroy, restProps = _objectWithoutProperties(_ref, _excluded$A);
+  var name = _ref.name, initialValues = _ref.initialValues, fields = _ref.fields, form = _ref.form, preserve2 = _ref.preserve, children = _ref.children, _ref$component = _ref.component, Component = _ref$component === void 0 ? "form" : _ref$component, validateMessages = _ref.validateMessages, _ref$validateTrigger = _ref.validateTrigger, validateTrigger = _ref$validateTrigger === void 0 ? "onChange" : _ref$validateTrigger, onValuesChange = _ref.onValuesChange, _onFieldsChange = _ref.onFieldsChange, _onFinish = _ref.onFinish, onFinishFailed = _ref.onFinishFailed, clearOnDestroy = _ref.clearOnDestroy, restProps = _objectWithoutProperties(_ref, _excluded$B);
   var nativeElementRef = reactExports.useRef(null);
   var formContext = reactExports.useContext(FormContext$1);
   var _useForm = useForm$1(form), _useForm2 = _slicedToArray(_useForm, 1), formInstance = _useForm2[0];
@@ -21976,7 +21976,7 @@ const genBaseStyle$5 = (token2) => {
     }
   };
 };
-const prepareComponentToken$f = (token2) => {
+const prepareComponentToken$g = (token2) => {
   const {
     colorFillContent,
     colorFill
@@ -21994,7 +21994,7 @@ const prepareComponentToken$f = (token2) => {
     paragraphLiHeight: token2.controlHeight / 2
   };
 };
-const useStyle$k = genStyleHooks("Skeleton", (token2) => {
+const useStyle$l = genStyleHooks("Skeleton", (token2) => {
   const {
     componentCls,
     calc
@@ -22013,7 +22013,7 @@ const useStyle$k = genStyleHooks("Skeleton", (token2) => {
     skeletonLoadingMotionDuration: "1.4s"
   });
   return [genBaseStyle$5(skeletonToken)];
-}, prepareComponentToken$f, {
+}, prepareComponentToken$g, {
   deprecatedTokens: [["color", "gradientFromColor"], ["colorGradientEnd", "gradientToColor"]]
 });
 const SkeletonAvatar = (props) => {
@@ -22029,7 +22029,7 @@ const SkeletonAvatar = (props) => {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
   const prefixCls = getPrefixCls("skeleton", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$k(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$l(prefixCls);
   const otherProps = omit(props, ["prefixCls", "className"]);
   const cls = classNames(prefixCls, `${prefixCls}-element`, {
     [`${prefixCls}-active`]: active
@@ -22055,7 +22055,7 @@ const SkeletonButton = (props) => {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
   const prefixCls = getPrefixCls("skeleton", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$k(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$l(prefixCls);
   const otherProps = omit(props, ["prefixCls"]);
   const cls = classNames(prefixCls, `${prefixCls}-element`, {
     [`${prefixCls}-active`]: active,
@@ -22081,7 +22081,7 @@ const SkeletonImage = (props) => {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
   const prefixCls = getPrefixCls("skeleton", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$k(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$l(prefixCls);
   const cls = classNames(prefixCls, `${prefixCls}-element`, {
     [`${prefixCls}-active`]: active
   }, className, rootClassName, hashId, cssVarCls);
@@ -22112,7 +22112,7 @@ const SkeletonInput = (props) => {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
   const prefixCls = getPrefixCls("skeleton", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$k(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$l(prefixCls);
   const otherProps = omit(props, ["prefixCls"]);
   const cls = classNames(prefixCls, `${prefixCls}-element`, {
     [`${prefixCls}-active`]: active,
@@ -22138,7 +22138,7 @@ const SkeletonNode = (props) => {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
   const prefixCls = getPrefixCls("skeleton", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$k(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$l(prefixCls);
   const cls = classNames(prefixCls, `${prefixCls}-element`, {
     [`${prefixCls}-active`]: active
   }, hashId, className, rootClassName, cssVarCls);
@@ -22263,7 +22263,7 @@ const Skeleton = (props) => {
     style: contextStyle
   } = useComponentConfig("skeleton");
   const prefixCls = getPrefixCls("skeleton", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$k(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$l(prefixCls);
   if (loading || !("loading" in props)) {
     const hasAvatar = !!avatar;
     const hasTitle = !!title;
@@ -22838,7 +22838,7 @@ const prepareToken$2 = (token2) => {
   });
   return modalToken;
 };
-const prepareComponentToken$e = (token2) => ({
+const prepareComponentToken$f = (token2) => ({
   footerBg: "transparent",
   headerBg: token2.colorBgElevated,
   titleLineHeight: token2.lineHeightHeading5,
@@ -22859,15 +22859,15 @@ const prepareComponentToken$e = (token2) => ({
   confirmIconMarginInlineEnd: token2.wireframe ? token2.margin : token2.marginSM,
   confirmBtnsMarginTop: token2.wireframe ? token2.marginLG : token2.marginSM
 });
-const useStyle$j = genStyleHooks("Modal", (token2) => {
+const useStyle$k = genStyleHooks("Modal", (token2) => {
   const modalToken = prepareToken$2(token2);
   return [genModalStyle(modalToken), genRTLStyle(modalToken), genModalMaskStyle(modalToken), initZoomMotion(modalToken, "zoom"), genResponsiveWidthStyle(modalToken)];
-}, prepareComponentToken$e, {
+}, prepareComponentToken$f, {
   unitless: {
     titleLineHeight: true
   }
 });
-var __rest$H = function(s, e2) {
+var __rest$I = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -22914,7 +22914,7 @@ const Modal$1 = (props) => {
     onCancel,
     destroyOnHidden,
     destroyOnClose
-  } = props, restProps = __rest$H(props, ["prefixCls", "className", "rootClassName", "open", "wrapClassName", "centered", "getContainer", "focusTriggerAfterClose", "style", "visible", "width", "footer", "classNames", "styles", "children", "loading", "confirmLoading", "zIndex", "mousePosition", "onOk", "onCancel", "destroyOnHidden", "destroyOnClose"]);
+  } = props, restProps = __rest$I(props, ["prefixCls", "className", "rootClassName", "open", "wrapClassName", "centered", "getContainer", "focusTriggerAfterClose", "style", "visible", "width", "footer", "classNames", "styles", "children", "loading", "confirmLoading", "zIndex", "mousePosition", "onOk", "onCancel", "destroyOnHidden", "destroyOnClose"]);
   const {
     getPopupContainer: getContextPopupContainer,
     getPrefixCls,
@@ -22933,7 +22933,7 @@ const Modal$1 = (props) => {
   const prefixCls = getPrefixCls("modal", customizePrefixCls);
   const rootPrefixCls = getPrefixCls();
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$j(prefixCls, rootCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$k(prefixCls, rootCls);
   const wrapClassNameExtended = classNames(wrapClassName, {
     [`${prefixCls}-centered`]: centered !== null && centered !== void 0 ? centered : modalContext === null || modalContext === void 0 ? void 0 : modalContext.centered,
     [`${prefixCls}-wrap-rtl`]: direction === "rtl"
@@ -23102,11 +23102,11 @@ const genModalConfirmStyle = (token2) => {
 const Confirm = genSubStyleComponent(["Modal", "confirm"], (token2) => {
   const modalToken = prepareToken$2(token2);
   return [genModalConfirmStyle(modalToken)];
-}, prepareComponentToken$e, {
+}, prepareComponentToken$f, {
   // confirm is weak than modal since no conflict here
   order: -1e3
 });
-var __rest$G = function(s, e2) {
+var __rest$H = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -23126,7 +23126,7 @@ function ConfirmContent(props) {
     footer,
     // Legacy for static function usage
     locale: staticLocale
-  } = props, resetProps = __rest$G(props, ["prefixCls", "icon", "okText", "cancelText", "confirmPrefixCls", "type", "okCancel", "footer", "locale"]);
+  } = props, resetProps = __rest$H(props, ["prefixCls", "icon", "okText", "cancelText", "confirmPrefixCls", "type", "okCancel", "footer", "locale"]);
   let mergedIcon = icon;
   if (!icon && icon !== null) {
     switch (type4) {
@@ -23385,7 +23385,7 @@ function modalGlobalConfig({
 }) {
   defaultRootPrefixCls = rootPrefixCls;
 }
-var __rest$F = function(s, e2) {
+var __rest$G = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -23398,7 +23398,7 @@ const HookModal = (_a3, ref) => {
   var {
     afterClose: hookAfterClose,
     config
-  } = _a3, restProps = __rest$F(_a3, ["afterClose", "config"]);
+  } = _a3, restProps = __rest$G(_a3, ["afterClose", "config"]);
   const [open2, setOpen] = reactExports.useState(true);
   const [innerConfig, setInnerConfig] = reactExports.useState(config);
   const {
@@ -23784,10 +23784,10 @@ function isValidateOpenKey(currentKeyCode) {
     ].includes(currentKeyCode)
   );
 }
-var _excluded$z = ["prefixCls", "invalidate", "item", "renderItem", "responsive", "responsiveDisabled", "registerSize", "itemKey", "className", "style", "children", "display", "order", "component"];
+var _excluded$A = ["prefixCls", "invalidate", "item", "renderItem", "responsive", "responsiveDisabled", "registerSize", "itemKey", "className", "style", "children", "display", "order", "component"];
 var UNDEFINED = void 0;
 function InternalItem(props, ref) {
-  var prefixCls = props.prefixCls, invalidate = props.invalidate, item = props.item, renderItem2 = props.renderItem, responsive = props.responsive, responsiveDisabled = props.responsiveDisabled, registerSize = props.registerSize, itemKey2 = props.itemKey, className = props.className, style2 = props.style, children = props.children, display = props.display, order = props.order, _props$component = props.component, Component = _props$component === void 0 ? "div" : _props$component, restProps = _objectWithoutProperties(props, _excluded$z);
+  var prefixCls = props.prefixCls, invalidate = props.invalidate, item = props.item, renderItem2 = props.renderItem, responsive = props.responsive, responsiveDisabled = props.responsiveDisabled, registerSize = props.registerSize, itemKey2 = props.itemKey, className = props.className, style2 = props.style, children = props.children, display = props.display, order = props.order, _props$component = props.component, Component = _props$component === void 0 ? "div" : _props$component, restProps = _objectWithoutProperties(props, _excluded$A);
   var mergedHidden = responsive && !display;
   function internalRegisterSize(width2) {
     registerSize(itemKey2, width2);
@@ -23873,11 +23873,11 @@ function useEffectState(notifyEffectUpdate, defaultValue) {
   return [stateValue, setEffectVal];
 }
 var OverflowContext = /* @__PURE__ */ React.createContext(null);
-var _excluded$y = ["component"], _excluded2$4 = ["className"], _excluded3$1 = ["className"];
+var _excluded$z = ["component"], _excluded2$4 = ["className"], _excluded3$1 = ["className"];
 var InternalRawItem = function InternalRawItem2(props, ref) {
   var context = reactExports.useContext(OverflowContext);
   if (!context) {
-    var _props$component = props.component, Component = _props$component === void 0 ? "div" : _props$component, _restProps = _objectWithoutProperties(props, _excluded$y);
+    var _props$component = props.component, Component = _props$component === void 0 ? "div" : _props$component, _restProps = _objectWithoutProperties(props, _excluded$z);
     return /* @__PURE__ */ reactExports.createElement(Component, _extends({}, _restProps, {
       ref
     }));
@@ -23893,14 +23893,14 @@ var InternalRawItem = function InternalRawItem2(props, ref) {
 };
 var RawItem = /* @__PURE__ */ reactExports.forwardRef(InternalRawItem);
 RawItem.displayName = "RawItem";
-var _excluded$x = ["prefixCls", "data", "renderItem", "renderRawItem", "itemKey", "itemWidth", "ssr", "style", "className", "maxCount", "renderRest", "renderRawRest", "suffix", "component", "itemComponent", "onVisibleChange"];
+var _excluded$y = ["prefixCls", "data", "renderItem", "renderRawItem", "itemKey", "itemWidth", "ssr", "style", "className", "maxCount", "renderRest", "renderRawRest", "suffix", "component", "itemComponent", "onVisibleChange"];
 var RESPONSIVE = "responsive";
 var INVALIDATE = "invalidate";
 function defaultRenderRest(omittedItems) {
   return "+ ".concat(omittedItems.length, " ...");
 }
 function Overflow(props, ref) {
-  var _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-overflow" : _props$prefixCls, _props$data = props.data, data = _props$data === void 0 ? [] : _props$data, renderItem2 = props.renderItem, renderRawItem = props.renderRawItem, itemKey2 = props.itemKey, _props$itemWidth = props.itemWidth, itemWidth = _props$itemWidth === void 0 ? 10 : _props$itemWidth, ssr = props.ssr, style2 = props.style, className = props.className, maxCount = props.maxCount, renderRest = props.renderRest, renderRawRest = props.renderRawRest, suffix = props.suffix, _props$component = props.component, Component = _props$component === void 0 ? "div" : _props$component, itemComponent = props.itemComponent, onVisibleChange = props.onVisibleChange, restProps = _objectWithoutProperties(props, _excluded$x);
+  var _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-overflow" : _props$prefixCls, _props$data = props.data, data = _props$data === void 0 ? [] : _props$data, renderItem2 = props.renderItem, renderRawItem = props.renderRawItem, itemKey2 = props.itemKey, _props$itemWidth = props.itemWidth, itemWidth = _props$itemWidth === void 0 ? 10 : _props$itemWidth, ssr = props.ssr, style2 = props.style, className = props.className, maxCount = props.maxCount, renderRest = props.renderRest, renderRawRest = props.renderRawRest, suffix = props.suffix, _props$component = props.component, Component = _props$component === void 0 ? "div" : _props$component, itemComponent = props.itemComponent, onVisibleChange = props.onVisibleChange, restProps = _objectWithoutProperties(props, _excluded$y);
   var fullySSR = ssr === "full";
   var notifyEffectUpdate = useBatcher();
   var _useEffectState = useEffectState(notifyEffectUpdate, null), _useEffectState2 = _slicedToArray(_useEffectState, 2), containerWidth = _useEffectState2[0], setContainerWidth = _useEffectState2[1];
@@ -24115,9 +24115,9 @@ function composeProps(originProps, patchProps, isAll) {
   });
   return composedProps;
 }
-var _excluded$w = ["prefixCls", "id", "inputElement", "autoFocus", "autoComplete", "editable", "activeDescendantId", "value", "open", "attrs"];
+var _excluded$x = ["prefixCls", "id", "inputElement", "autoFocus", "autoComplete", "editable", "activeDescendantId", "value", "open", "attrs"];
 var Input$3 = function Input2(props, ref) {
-  var prefixCls = props.prefixCls, id = props.id, inputElement = props.inputElement, autoFocus = props.autoFocus, autoComplete = props.autoComplete, editable = props.editable, activeDescendantId = props.activeDescendantId, value = props.value, open2 = props.open, attrs = props.attrs, restProps = _objectWithoutProperties(props, _excluded$w);
+  var prefixCls = props.prefixCls, id = props.id, inputElement = props.inputElement, autoFocus = props.autoFocus, autoComplete = props.autoComplete, editable = props.editable, activeDescendantId = props.activeDescendantId, value = props.value, open2 = props.open, attrs = props.attrs, restProps = _objectWithoutProperties(props, _excluded$x);
   var inputNode = inputElement || /* @__PURE__ */ reactExports.createElement("input", null);
   var _inputNode = inputNode, originRef = _inputNode.ref, originProps = _inputNode.props;
   warning$3(!("maxLength" in inputNode.props));
@@ -25293,11 +25293,11 @@ function useWinClick(open2, clickToHide, targetEle, popupEle, mask, maskClosable
   }
   return onPopupPointerDown;
 }
-var _excluded$v = ["prefixCls", "children", "action", "showAction", "hideAction", "popupVisible", "defaultPopupVisible", "onPopupVisibleChange", "afterPopupVisibleChange", "mouseEnterDelay", "mouseLeaveDelay", "focusDelay", "blurDelay", "mask", "maskClosable", "getPopupContainer", "forceRender", "autoDestroy", "destroyPopupOnHide", "popup", "popupClassName", "popupStyle", "popupPlacement", "builtinPlacements", "popupAlign", "zIndex", "stretch", "getPopupClassNameFromAlign", "fresh", "alignPoint", "onPopupClick", "onPopupAlign", "arrow", "popupMotion", "maskMotion", "popupTransitionName", "popupAnimation", "maskTransitionName", "maskAnimation", "className", "getTriggerDOMNode"];
+var _excluded$w = ["prefixCls", "children", "action", "showAction", "hideAction", "popupVisible", "defaultPopupVisible", "onPopupVisibleChange", "afterPopupVisibleChange", "mouseEnterDelay", "mouseLeaveDelay", "focusDelay", "blurDelay", "mask", "maskClosable", "getPopupContainer", "forceRender", "autoDestroy", "destroyPopupOnHide", "popup", "popupClassName", "popupStyle", "popupPlacement", "builtinPlacements", "popupAlign", "zIndex", "stretch", "getPopupClassNameFromAlign", "fresh", "alignPoint", "onPopupClick", "onPopupAlign", "arrow", "popupMotion", "maskMotion", "popupTransitionName", "popupAnimation", "maskTransitionName", "maskAnimation", "className", "getTriggerDOMNode"];
 function generateTrigger() {
   var PortalComponent = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : Portal;
   var Trigger2 = /* @__PURE__ */ reactExports.forwardRef(function(props, ref) {
-    var _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-trigger-popup" : _props$prefixCls, children = props.children, _props$action = props.action, action = _props$action === void 0 ? "hover" : _props$action, showAction = props.showAction, hideAction = props.hideAction, popupVisible = props.popupVisible, defaultPopupVisible = props.defaultPopupVisible, onPopupVisibleChange = props.onPopupVisibleChange, afterPopupVisibleChange = props.afterPopupVisibleChange, mouseEnterDelay = props.mouseEnterDelay, _props$mouseLeaveDela = props.mouseLeaveDelay, mouseLeaveDelay = _props$mouseLeaveDela === void 0 ? 0.1 : _props$mouseLeaveDela, focusDelay = props.focusDelay, blurDelay = props.blurDelay, mask = props.mask, _props$maskClosable = props.maskClosable, maskClosable = _props$maskClosable === void 0 ? true : _props$maskClosable, getPopupContainer = props.getPopupContainer, forceRender = props.forceRender, autoDestroy = props.autoDestroy, destroyPopupOnHide = props.destroyPopupOnHide, popup = props.popup, popupClassName = props.popupClassName, popupStyle = props.popupStyle, popupPlacement = props.popupPlacement, _props$builtinPlaceme = props.builtinPlacements, builtinPlacements = _props$builtinPlaceme === void 0 ? {} : _props$builtinPlaceme, popupAlign = props.popupAlign, zIndex = props.zIndex, stretch = props.stretch, getPopupClassNameFromAlign = props.getPopupClassNameFromAlign, fresh = props.fresh, alignPoint = props.alignPoint, onPopupClick = props.onPopupClick, onPopupAlign = props.onPopupAlign, arrow = props.arrow, popupMotion = props.popupMotion, maskMotion = props.maskMotion, popupTransitionName = props.popupTransitionName, popupAnimation = props.popupAnimation, maskTransitionName = props.maskTransitionName, maskAnimation = props.maskAnimation, className = props.className, getTriggerDOMNode = props.getTriggerDOMNode, restProps = _objectWithoutProperties(props, _excluded$v);
+    var _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-trigger-popup" : _props$prefixCls, children = props.children, _props$action = props.action, action = _props$action === void 0 ? "hover" : _props$action, showAction = props.showAction, hideAction = props.hideAction, popupVisible = props.popupVisible, defaultPopupVisible = props.defaultPopupVisible, onPopupVisibleChange = props.onPopupVisibleChange, afterPopupVisibleChange = props.afterPopupVisibleChange, mouseEnterDelay = props.mouseEnterDelay, _props$mouseLeaveDela = props.mouseLeaveDelay, mouseLeaveDelay = _props$mouseLeaveDela === void 0 ? 0.1 : _props$mouseLeaveDela, focusDelay = props.focusDelay, blurDelay = props.blurDelay, mask = props.mask, _props$maskClosable = props.maskClosable, maskClosable = _props$maskClosable === void 0 ? true : _props$maskClosable, getPopupContainer = props.getPopupContainer, forceRender = props.forceRender, autoDestroy = props.autoDestroy, destroyPopupOnHide = props.destroyPopupOnHide, popup = props.popup, popupClassName = props.popupClassName, popupStyle = props.popupStyle, popupPlacement = props.popupPlacement, _props$builtinPlaceme = props.builtinPlacements, builtinPlacements = _props$builtinPlaceme === void 0 ? {} : _props$builtinPlaceme, popupAlign = props.popupAlign, zIndex = props.zIndex, stretch = props.stretch, getPopupClassNameFromAlign = props.getPopupClassNameFromAlign, fresh = props.fresh, alignPoint = props.alignPoint, onPopupClick = props.onPopupClick, onPopupAlign = props.onPopupAlign, arrow = props.arrow, popupMotion = props.popupMotion, maskMotion = props.maskMotion, popupTransitionName = props.popupTransitionName, popupAnimation = props.popupAnimation, maskTransitionName = props.maskTransitionName, maskAnimation = props.maskAnimation, className = props.className, getTriggerDOMNode = props.getTriggerDOMNode, restProps = _objectWithoutProperties(props, _excluded$w);
     var mergedAutoDestroy = autoDestroy || destroyPopupOnHide || false;
     var _React$useState = reactExports.useState(false), _React$useState2 = _slicedToArray(_React$useState, 2), mobile = _React$useState2[0], setMobile = _React$useState2[1];
     useLayoutEffect$1(function() {
@@ -25616,7 +25616,7 @@ function generateTrigger() {
   return Trigger2;
 }
 const Trigger = generateTrigger(Portal);
-var _excluded$u = ["prefixCls", "disabled", "visible", "children", "popupElement", "animation", "transitionName", "dropdownStyle", "dropdownClassName", "direction", "placement", "builtinPlacements", "dropdownMatchSelectWidth", "dropdownRender", "dropdownAlign", "getPopupContainer", "empty", "getTriggerDOMNode", "onPopupVisibleChange", "onPopupMouseEnter"];
+var _excluded$v = ["prefixCls", "disabled", "visible", "children", "popupElement", "animation", "transitionName", "dropdownStyle", "dropdownClassName", "direction", "placement", "builtinPlacements", "dropdownMatchSelectWidth", "dropdownRender", "dropdownAlign", "getPopupContainer", "empty", "getTriggerDOMNode", "onPopupVisibleChange", "onPopupMouseEnter"];
 var getBuiltInPlacements$1 = function getBuiltInPlacements2(dropdownMatchSelectWidth) {
   var adjustX = dropdownMatchSelectWidth === true ? 0 : 1;
   return {
@@ -25661,7 +25661,7 @@ var getBuiltInPlacements$1 = function getBuiltInPlacements2(dropdownMatchSelectW
 var SelectTrigger = function SelectTrigger2(props, ref) {
   var prefixCls = props.prefixCls;
   props.disabled;
-  var visible = props.visible, children = props.children, popupElement = props.popupElement, animation = props.animation, transitionName = props.transitionName, dropdownStyle = props.dropdownStyle, dropdownClassName = props.dropdownClassName, _props$direction = props.direction, direction = _props$direction === void 0 ? "ltr" : _props$direction, placement = props.placement, builtinPlacements = props.builtinPlacements, dropdownMatchSelectWidth = props.dropdownMatchSelectWidth, dropdownRender = props.dropdownRender, dropdownAlign = props.dropdownAlign, getPopupContainer = props.getPopupContainer, empty2 = props.empty, getTriggerDOMNode = props.getTriggerDOMNode, onPopupVisibleChange = props.onPopupVisibleChange, onPopupMouseEnter = props.onPopupMouseEnter, restProps = _objectWithoutProperties(props, _excluded$u);
+  var visible = props.visible, children = props.children, popupElement = props.popupElement, animation = props.animation, transitionName = props.transitionName, dropdownStyle = props.dropdownStyle, dropdownClassName = props.dropdownClassName, _props$direction = props.direction, direction = _props$direction === void 0 ? "ltr" : _props$direction, placement = props.placement, builtinPlacements = props.builtinPlacements, dropdownMatchSelectWidth = props.dropdownMatchSelectWidth, dropdownRender = props.dropdownRender, dropdownAlign = props.dropdownAlign, getPopupContainer = props.getPopupContainer, empty2 = props.empty, getTriggerDOMNode = props.getTriggerDOMNode, onPopupVisibleChange = props.onPopupVisibleChange, onPopupMouseEnter = props.onPopupMouseEnter, restProps = _objectWithoutProperties(props, _excluded$v);
   var dropdownPrefixCls = "".concat(prefixCls, "-dropdown");
   var popupNode = popupElement;
   if (dropdownRender) {
@@ -25834,14 +25834,14 @@ function Polite(props) {
     return ["number", "string"].includes(_typeof(label)) ? label : value;
   }).join(", ")), values.length > MAX_COUNT ? ", ..." : null);
 }
-var _excluded$t = ["id", "prefixCls", "className", "showSearch", "tagRender", "direction", "omitDomProps", "displayValues", "onDisplayValuesChange", "emptyOptions", "notFoundContent", "onClear", "mode", "disabled", "loading", "getInputElement", "getRawInputElement", "open", "defaultOpen", "onDropdownVisibleChange", "activeValue", "onActiveValueChange", "activeDescendantId", "searchValue", "autoClearSearchValue", "onSearch", "onSearchSplit", "tokenSeparators", "allowClear", "prefix", "suffixIcon", "clearIcon", "OptionList", "animation", "transitionName", "dropdownStyle", "dropdownClassName", "dropdownMatchSelectWidth", "dropdownRender", "dropdownAlign", "placement", "builtinPlacements", "getPopupContainer", "showAction", "onFocus", "onBlur", "onKeyUp", "onKeyDown", "onMouseDown"];
+var _excluded$u = ["id", "prefixCls", "className", "showSearch", "tagRender", "direction", "omitDomProps", "displayValues", "onDisplayValuesChange", "emptyOptions", "notFoundContent", "onClear", "mode", "disabled", "loading", "getInputElement", "getRawInputElement", "open", "defaultOpen", "onDropdownVisibleChange", "activeValue", "onActiveValueChange", "activeDescendantId", "searchValue", "autoClearSearchValue", "onSearch", "onSearchSplit", "tokenSeparators", "allowClear", "prefix", "suffixIcon", "clearIcon", "OptionList", "animation", "transitionName", "dropdownStyle", "dropdownClassName", "dropdownMatchSelectWidth", "dropdownRender", "dropdownAlign", "placement", "builtinPlacements", "getPopupContainer", "showAction", "onFocus", "onBlur", "onKeyUp", "onKeyDown", "onMouseDown"];
 var DEFAULT_OMIT_PROPS = ["value", "onChange", "removeIcon", "placeholder", "autoFocus", "maxTagCount", "maxTagTextLength", "maxTagPlaceholder", "choiceTransitionName", "onInputKeyDown", "onPopupScroll", "tabIndex"];
 var isMultiple = function isMultiple2(mode) {
   return mode === "tags" || mode === "multiple";
 };
 var BaseSelect = /* @__PURE__ */ reactExports.forwardRef(function(props, ref) {
   var _customizeRawInputEle;
-  var id = props.id, prefixCls = props.prefixCls, className = props.className, showSearch = props.showSearch, tagRender = props.tagRender, direction = props.direction, omitDomProps = props.omitDomProps, displayValues = props.displayValues, onDisplayValuesChange = props.onDisplayValuesChange, emptyOptions = props.emptyOptions, _props$notFoundConten = props.notFoundContent, notFoundContent = _props$notFoundConten === void 0 ? "Not Found" : _props$notFoundConten, onClear = props.onClear, mode = props.mode, disabled = props.disabled, loading = props.loading, getInputElement = props.getInputElement, getRawInputElement = props.getRawInputElement, open2 = props.open, defaultOpen = props.defaultOpen, onDropdownVisibleChange = props.onDropdownVisibleChange, activeValue = props.activeValue, onActiveValueChange = props.onActiveValueChange, activeDescendantId = props.activeDescendantId, searchValue = props.searchValue, autoClearSearchValue = props.autoClearSearchValue, onSearch = props.onSearch, onSearchSplit = props.onSearchSplit, tokenSeparators = props.tokenSeparators, allowClear = props.allowClear, prefix = props.prefix, suffixIcon = props.suffixIcon, clearIcon = props.clearIcon, OptionList3 = props.OptionList, animation = props.animation, transitionName = props.transitionName, dropdownStyle = props.dropdownStyle, dropdownClassName = props.dropdownClassName, dropdownMatchSelectWidth = props.dropdownMatchSelectWidth, dropdownRender = props.dropdownRender, dropdownAlign = props.dropdownAlign, placement = props.placement, builtinPlacements = props.builtinPlacements, getPopupContainer = props.getPopupContainer, _props$showAction = props.showAction, showAction = _props$showAction === void 0 ? [] : _props$showAction, onFocus = props.onFocus, onBlur = props.onBlur, onKeyUp = props.onKeyUp, onKeyDown2 = props.onKeyDown, onMouseDown = props.onMouseDown, restProps = _objectWithoutProperties(props, _excluded$t);
+  var id = props.id, prefixCls = props.prefixCls, className = props.className, showSearch = props.showSearch, tagRender = props.tagRender, direction = props.direction, omitDomProps = props.omitDomProps, displayValues = props.displayValues, onDisplayValuesChange = props.onDisplayValuesChange, emptyOptions = props.emptyOptions, _props$notFoundConten = props.notFoundContent, notFoundContent = _props$notFoundConten === void 0 ? "Not Found" : _props$notFoundConten, onClear = props.onClear, mode = props.mode, disabled = props.disabled, loading = props.loading, getInputElement = props.getInputElement, getRawInputElement = props.getRawInputElement, open2 = props.open, defaultOpen = props.defaultOpen, onDropdownVisibleChange = props.onDropdownVisibleChange, activeValue = props.activeValue, onActiveValueChange = props.onActiveValueChange, activeDescendantId = props.activeDescendantId, searchValue = props.searchValue, autoClearSearchValue = props.autoClearSearchValue, onSearch = props.onSearch, onSearchSplit = props.onSearchSplit, tokenSeparators = props.tokenSeparators, allowClear = props.allowClear, prefix = props.prefix, suffixIcon = props.suffixIcon, clearIcon = props.clearIcon, OptionList3 = props.OptionList, animation = props.animation, transitionName = props.transitionName, dropdownStyle = props.dropdownStyle, dropdownClassName = props.dropdownClassName, dropdownMatchSelectWidth = props.dropdownMatchSelectWidth, dropdownRender = props.dropdownRender, dropdownAlign = props.dropdownAlign, placement = props.placement, builtinPlacements = props.builtinPlacements, getPopupContainer = props.getPopupContainer, _props$showAction = props.showAction, showAction = _props$showAction === void 0 ? [] : _props$showAction, onFocus = props.onFocus, onBlur = props.onBlur, onKeyUp = props.onKeyUp, onKeyDown2 = props.onKeyDown, onMouseDown = props.onMouseDown, restProps = _objectWithoutProperties(props, _excluded$u);
   var multiple = isMultiple(mode);
   var mergedShowSearch = (showSearch !== void 0 ? showSearch : multiple) || mode === "combobox";
   var domProps = _objectSpread2({}, restProps);
@@ -27031,14 +27031,14 @@ function getSpinSize() {
   baseSize = Math.max(baseSize, MIN_SIZE);
   return Math.floor(baseSize);
 }
-var _excluded$s = ["prefixCls", "className", "height", "itemHeight", "fullHeight", "style", "data", "children", "itemKey", "virtual", "direction", "scrollWidth", "component", "onScroll", "onVirtualScroll", "onVisibleChange", "innerProps", "extraRender", "styles", "showScrollBar"];
+var _excluded$t = ["prefixCls", "className", "height", "itemHeight", "fullHeight", "style", "data", "children", "itemKey", "virtual", "direction", "scrollWidth", "component", "onScroll", "onVirtualScroll", "onVisibleChange", "innerProps", "extraRender", "styles", "showScrollBar"];
 var EMPTY_DATA$1 = [];
 var ScrollStyle = {
   overflowY: "auto",
   overflowAnchor: "none"
 };
 function RawList(props, ref) {
-  var _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-virtual-list" : _props$prefixCls, className = props.className, height = props.height, itemHeight = props.itemHeight, _props$fullHeight = props.fullHeight, fullHeight = _props$fullHeight === void 0 ? true : _props$fullHeight, style2 = props.style, data = props.data, children = props.children, itemKey2 = props.itemKey, virtual = props.virtual, direction = props.direction, scrollWidth = props.scrollWidth, _props$component = props.component, Component = _props$component === void 0 ? "div" : _props$component, onScroll = props.onScroll, onVirtualScroll = props.onVirtualScroll, onVisibleChange = props.onVisibleChange, innerProps = props.innerProps, extraRender = props.extraRender, styles = props.styles, _props$showScrollBar = props.showScrollBar, showScrollBar = _props$showScrollBar === void 0 ? "optional" : _props$showScrollBar, restProps = _objectWithoutProperties(props, _excluded$s);
+  var _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-virtual-list" : _props$prefixCls, className = props.className, height = props.height, itemHeight = props.itemHeight, _props$fullHeight = props.fullHeight, fullHeight = _props$fullHeight === void 0 ? true : _props$fullHeight, style2 = props.style, data = props.data, children = props.children, itemKey2 = props.itemKey, virtual = props.virtual, direction = props.direction, scrollWidth = props.scrollWidth, _props$component = props.component, Component = _props$component === void 0 ? "div" : _props$component, onScroll = props.onScroll, onVirtualScroll = props.onVirtualScroll, onVisibleChange = props.onVisibleChange, innerProps = props.innerProps, extraRender = props.extraRender, styles = props.styles, _props$showScrollBar = props.showScrollBar, showScrollBar = _props$showScrollBar === void 0 ? "optional" : _props$showScrollBar, restProps = _objectWithoutProperties(props, _excluded$t);
   var getKey2 = reactExports.useCallback(function(item) {
     if (typeof itemKey2 === "function") {
       return itemKey2(item);
@@ -27437,7 +27437,7 @@ List$1.displayName = "List";
 function isPlatformMac() {
   return /(mac\sos|macintosh)/i.test(navigator.appVersion);
 }
-var _excluded$r = ["disabled", "title", "children", "style", "className"];
+var _excluded$s = ["disabled", "title", "children", "style", "className"];
 function isTitleType(content) {
   return typeof content === "string" || typeof content === "number";
 }
@@ -27672,7 +27672,7 @@ var OptionList = function OptionList2(_, ref) {
     }
     var disabled = data.disabled, title = data.title;
     data.children;
-    var style2 = data.style, className = data.className, otherProps = _objectWithoutProperties(data, _excluded$r);
+    var style2 = data.style, className = data.className, otherProps = _objectWithoutProperties(data, _excluded$s);
     var passedProps = omit(otherProps, omitFieldNameList);
     var selected = isSelected(value);
     var mergedDisabled = disabled || !selected && overMaxCount;
@@ -27815,9 +27815,9 @@ function useId2(id) {
   }, []);
   return id || innerId;
 }
-var _excluded$q = ["children", "value"], _excluded2$3 = ["children"];
+var _excluded$r = ["children", "value"], _excluded2$3 = ["children"];
 function convertNodeToOption(node2) {
-  var _ref = node2, key = _ref.key, _ref$props = _ref.props, children = _ref$props.children, value = _ref$props.value, restProps = _objectWithoutProperties(_ref$props, _excluded$q);
+  var _ref = node2, key = _ref.key, _ref$props = _ref.props, children = _ref$props.children, value = _ref$props.value, restProps = _objectWithoutProperties(_ref$props, _excluded$r);
   return _objectSpread2({
     key,
     value: value !== void 0 ? value : key,
@@ -27888,13 +27888,13 @@ function useRefFunc(callback) {
   }, []);
   return cacheFn;
 }
-var _excluded$p = ["id", "mode", "prefixCls", "backfill", "fieldNames", "inputValue", "searchValue", "onSearch", "autoClearSearchValue", "onSelect", "onDeselect", "dropdownMatchSelectWidth", "filterOption", "filterSort", "optionFilterProp", "optionLabelProp", "options", "optionRender", "children", "defaultActiveFirstOption", "menuItemSelectedIcon", "virtual", "direction", "listHeight", "listItemHeight", "labelRender", "value", "defaultValue", "labelInValue", "onChange", "maxCount"];
+var _excluded$q = ["id", "mode", "prefixCls", "backfill", "fieldNames", "inputValue", "searchValue", "onSearch", "autoClearSearchValue", "onSelect", "onDeselect", "dropdownMatchSelectWidth", "filterOption", "filterSort", "optionFilterProp", "optionLabelProp", "options", "optionRender", "children", "defaultActiveFirstOption", "menuItemSelectedIcon", "virtual", "direction", "listHeight", "listItemHeight", "labelRender", "value", "defaultValue", "labelInValue", "onChange", "maxCount"];
 var OMIT_DOM_PROPS = ["inputValue"];
 function isRawValue(value) {
   return !value || _typeof(value) !== "object";
 }
 var Select$1 = /* @__PURE__ */ reactExports.forwardRef(function(props, ref) {
-  var id = props.id, mode = props.mode, _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-select" : _props$prefixCls, backfill = props.backfill, fieldNames = props.fieldNames, inputValue = props.inputValue, searchValue = props.searchValue, onSearch = props.onSearch, _props$autoClearSearc = props.autoClearSearchValue, autoClearSearchValue = _props$autoClearSearc === void 0 ? true : _props$autoClearSearc, onSelect = props.onSelect, onDeselect = props.onDeselect, _props$dropdownMatchS = props.dropdownMatchSelectWidth, dropdownMatchSelectWidth = _props$dropdownMatchS === void 0 ? true : _props$dropdownMatchS, filterOption = props.filterOption, filterSort = props.filterSort, optionFilterProp = props.optionFilterProp, optionLabelProp = props.optionLabelProp, options = props.options, optionRender = props.optionRender, children = props.children, defaultActiveFirstOption = props.defaultActiveFirstOption, menuItemSelectedIcon = props.menuItemSelectedIcon, virtual = props.virtual, direction = props.direction, _props$listHeight = props.listHeight, listHeight = _props$listHeight === void 0 ? 200 : _props$listHeight, _props$listItemHeight = props.listItemHeight, listItemHeight = _props$listItemHeight === void 0 ? 20 : _props$listItemHeight, labelRender = props.labelRender, value = props.value, defaultValue = props.defaultValue, labelInValue = props.labelInValue, onChange = props.onChange, maxCount = props.maxCount, restProps = _objectWithoutProperties(props, _excluded$p);
+  var id = props.id, mode = props.mode, _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-select" : _props$prefixCls, backfill = props.backfill, fieldNames = props.fieldNames, inputValue = props.inputValue, searchValue = props.searchValue, onSearch = props.onSearch, _props$autoClearSearc = props.autoClearSearchValue, autoClearSearchValue = _props$autoClearSearc === void 0 ? true : _props$autoClearSearc, onSelect = props.onSelect, onDeselect = props.onDeselect, _props$dropdownMatchS = props.dropdownMatchSelectWidth, dropdownMatchSelectWidth = _props$dropdownMatchS === void 0 ? true : _props$dropdownMatchS, filterOption = props.filterOption, filterSort = props.filterSort, optionFilterProp = props.optionFilterProp, optionLabelProp = props.optionLabelProp, options = props.options, optionRender = props.optionRender, children = props.children, defaultActiveFirstOption = props.defaultActiveFirstOption, menuItemSelectedIcon = props.menuItemSelectedIcon, virtual = props.virtual, direction = props.direction, _props$listHeight = props.listHeight, listHeight = _props$listHeight === void 0 ? 200 : _props$listHeight, _props$listItemHeight = props.listItemHeight, listItemHeight = _props$listItemHeight === void 0 ? 20 : _props$listItemHeight, labelRender = props.labelRender, value = props.value, defaultValue = props.defaultValue, labelInValue = props.labelInValue, onChange = props.onChange, maxCount = props.maxCount, restProps = _objectWithoutProperties(props, _excluded$q);
   var mergedId = useId2(id);
   var multiple = isMultiple(mode);
   var childrenAsData = !!(!options && children);
@@ -28380,7 +28380,7 @@ const genSharedEmptyStyle = (token2) => {
     }
   };
 };
-const useStyle$i = genStyleHooks("Empty", (token2) => {
+const useStyle$j = genStyleHooks("Empty", (token2) => {
   const {
     componentCls,
     controlHeightLG,
@@ -28394,7 +28394,7 @@ const useStyle$i = genStyleHooks("Empty", (token2) => {
   });
   return [genSharedEmptyStyle(emptyToken)];
 });
-var __rest$E = function(s, e2) {
+var __rest$F = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -28416,7 +28416,7 @@ const Empty = (props) => {
     style: style2,
     classNames: emptyClassNames,
     styles
-  } = props, restProps = __rest$E(props, ["className", "rootClassName", "prefixCls", "image", "description", "children", "imageStyle", "style", "classNames", "styles"]);
+  } = props, restProps = __rest$F(props, ["className", "rootClassName", "prefixCls", "image", "description", "children", "imageStyle", "style", "classNames", "styles"]);
   const {
     getPrefixCls,
     direction,
@@ -28426,7 +28426,7 @@ const Empty = (props) => {
     styles: contextStyles
   } = useComponentConfig("empty");
   const prefixCls = getPrefixCls("empty", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$i(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$j(prefixCls);
   const [locale2] = useLocale("Empty");
   const des = typeof description !== "undefined" ? description : locale2 === null || locale2 === void 0 ? void 0 : locale2.description;
   const alt = typeof des === "string" ? des : "empty";
@@ -29115,7 +29115,7 @@ function genSingleStyle(token2) {
     }), "lg")
   ];
 }
-const prepareComponentToken$d = (token2) => {
+const prepareComponentToken$e = (token2) => {
   const {
     fontSize,
     lineHeight,
@@ -29621,7 +29621,7 @@ const useSelectStyle = genStyleHooks("Select", (token2, {
     selectHeight: token2.controlHeight
   });
   return [genSelectStyle(selectToken), genVariantsStyle(selectToken)];
-}, prepareComponentToken$d, {
+}, prepareComponentToken$e, {
   unitless: {
     optionLineHeight: true,
     optionSelectedFontWeight: true
@@ -29719,7 +29719,7 @@ function useIcons({
 function useShowArrow(suffixIcon, showArrow) {
   return showArrow !== void 0 ? showArrow : suffixIcon !== null;
 }
-var __rest$D = function(s, e2) {
+var __rest$E = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -29763,7 +29763,7 @@ const InternalSelect = (props, ref) => {
     onOpenChange,
     styles,
     classNames: classNames$1
-  } = props, rest = __rest$D(props, ["prefixCls", "bordered", "className", "rootClassName", "getPopupContainer", "popupClassName", "dropdownClassName", "listHeight", "placement", "listItemHeight", "size", "disabled", "notFoundContent", "status", "builtinPlacements", "dropdownMatchSelectWidth", "popupMatchSelectWidth", "direction", "style", "allowClear", "variant", "dropdownStyle", "transitionName", "tagRender", "maxCount", "prefix", "dropdownRender", "popupRender", "onDropdownVisibleChange", "onOpenChange", "styles", "classNames"]);
+  } = props, rest = __rest$E(props, ["prefixCls", "bordered", "className", "rootClassName", "getPopupContainer", "popupClassName", "dropdownClassName", "listHeight", "placement", "listItemHeight", "size", "disabled", "notFoundContent", "status", "builtinPlacements", "dropdownMatchSelectWidth", "popupMatchSelectWidth", "direction", "style", "allowClear", "variant", "dropdownStyle", "transitionName", "tagRender", "maxCount", "prefix", "dropdownRender", "popupRender", "onDropdownVisibleChange", "onOpenChange", "styles", "classNames"]);
   const {
     getPopupContainer: getContextPopupContainer,
     getPrefixCls,
@@ -30132,11 +30132,11 @@ var placements$2 = {
     targetOffset: targetOffset$1
   }
 };
-var _excluded$o = ["overlayClassName", "trigger", "mouseEnterDelay", "mouseLeaveDelay", "overlayStyle", "prefixCls", "children", "onVisibleChange", "afterVisibleChange", "transitionName", "animation", "motion", "placement", "align", "destroyTooltipOnHide", "defaultVisible", "getTooltipContainer", "overlayInnerStyle", "arrowContent", "overlay", "id", "showArrow", "classNames", "styles"];
+var _excluded$p = ["overlayClassName", "trigger", "mouseEnterDelay", "mouseLeaveDelay", "overlayStyle", "prefixCls", "children", "onVisibleChange", "afterVisibleChange", "transitionName", "animation", "motion", "placement", "align", "destroyTooltipOnHide", "defaultVisible", "getTooltipContainer", "overlayInnerStyle", "arrowContent", "overlay", "id", "showArrow", "classNames", "styles"];
 var Tooltip$1 = function Tooltip(props, ref) {
   var overlayClassName = props.overlayClassName, _props$trigger = props.trigger, trigger = _props$trigger === void 0 ? ["hover"] : _props$trigger, _props$mouseEnterDela = props.mouseEnterDelay, mouseEnterDelay = _props$mouseEnterDela === void 0 ? 0 : _props$mouseEnterDela, _props$mouseLeaveDela = props.mouseLeaveDelay, mouseLeaveDelay = _props$mouseLeaveDela === void 0 ? 0.1 : _props$mouseLeaveDela, overlayStyle = props.overlayStyle, _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-tooltip" : _props$prefixCls, children = props.children, onVisibleChange = props.onVisibleChange, afterVisibleChange = props.afterVisibleChange, transitionName = props.transitionName, animation = props.animation, motion = props.motion, _props$placement = props.placement, placement = _props$placement === void 0 ? "right" : _props$placement, _props$align = props.align, align = _props$align === void 0 ? {} : _props$align, _props$destroyTooltip = props.destroyTooltipOnHide, destroyTooltipOnHide = _props$destroyTooltip === void 0 ? false : _props$destroyTooltip, defaultVisible = props.defaultVisible, getTooltipContainer = props.getTooltipContainer, overlayInnerStyle = props.overlayInnerStyle;
   props.arrowContent;
-  var overlay = props.overlay, id = props.id, _props$showArrow = props.showArrow, showArrow = _props$showArrow === void 0 ? true : _props$showArrow, tooltipClassNames = props.classNames, tooltipStyles = props.styles, restProps = _objectWithoutProperties(props, _excluded$o);
+  var overlay = props.overlay, id = props.id, _props$showArrow = props.showArrow, showArrow = _props$showArrow === void 0 ? true : _props$showArrow, tooltipClassNames = props.classNames, tooltipStyles = props.styles, restProps = _objectWithoutProperties(props, _excluded$p);
   var mergedId = useId$1(id);
   var triggerRef = reactExports.useRef(null);
   reactExports.useImperativeHandle(ref, function() {
@@ -30677,7 +30677,7 @@ const genTooltipStyle = (token2) => {
     }
   ];
 };
-const prepareComponentToken$c = (token2) => Object.assign(Object.assign({
+const prepareComponentToken$d = (token2) => Object.assign(Object.assign({
   zIndexPopup: token2.zIndexPopupBase + 70
 }, getArrowOffsetToken({
   contentRadius: token2.borderRadius,
@@ -30685,7 +30685,7 @@ const prepareComponentToken$c = (token2) => Object.assign(Object.assign({
 })), getArrowToken(merge(token2, {
   borderRadiusOuter: Math.min(token2.borderRadiusOuter, 4)
 })));
-const useStyle$h = (prefixCls, injectStyle = true) => {
+const useStyle$i = (prefixCls, injectStyle = true) => {
   const useStyle2 = genStyleHooks("Tooltip", (token2) => {
     const {
       borderRadius,
@@ -30700,7 +30700,7 @@ const useStyle$h = (prefixCls, injectStyle = true) => {
       tooltipBg: colorBgSpotlight
     });
     return [genTooltipStyle(TooltipToken), initZoomMotion(token2, "zoom-big-fast")];
-  }, prepareComponentToken$c, {
+  }, prepareComponentToken$d, {
     resetStyle: false,
     // Popover use Tooltip as internal component. We do not need to handle this.
     injectStyle
@@ -30744,7 +30744,7 @@ const PurePanel$5 = (props) => {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
   const prefixCls = getPrefixCls("tooltip", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$h(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$i(prefixCls);
   const colorInfo = parseColor(prefixCls, color);
   const arrowContentStyle = colorInfo.arrowStyle;
   const formattedOverlayInnerStyle = Object.assign(Object.assign({}, overlayInnerStyle), colorInfo.overlayStyle);
@@ -30760,7 +30760,7 @@ const PurePanel$5 = (props) => {
     overlayInnerStyle: formattedOverlayInnerStyle
   }), title)));
 };
-var __rest$C = function(s, e2) {
+var __rest$D = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -30797,7 +30797,7 @@ const InternalTooltip = /* @__PURE__ */ reactExports.forwardRef((props, ref) => 
     overlayClassName,
     styles,
     classNames: tooltipClassNames
-  } = props, restProps = __rest$C(props, ["prefixCls", "openClassName", "getTooltipContainer", "color", "overlayInnerStyle", "children", "afterOpenChange", "afterVisibleChange", "destroyTooltipOnHide", "destroyOnHidden", "arrow", "title", "overlay", "builtinPlacements", "arrowPointAtCenter", "autoAdjustOverflow", "motion", "getPopupContainer", "placement", "mouseEnterDelay", "mouseLeaveDelay", "overlayStyle", "rootClassName", "overlayClassName", "styles", "classNames"]);
+  } = props, restProps = __rest$D(props, ["prefixCls", "openClassName", "getTooltipContainer", "color", "overlayInnerStyle", "children", "afterOpenChange", "afterVisibleChange", "destroyTooltipOnHide", "destroyOnHidden", "arrow", "title", "overlay", "builtinPlacements", "arrowPointAtCenter", "autoAdjustOverflow", "motion", "getPopupContainer", "placement", "mouseEnterDelay", "mouseLeaveDelay", "overlayStyle", "rootClassName", "overlayClassName", "styles", "classNames"]);
   const mergedShowArrow = !!arrow;
   const [, token2] = useToken$1();
   const {
@@ -30874,7 +30874,7 @@ const InternalTooltip = /* @__PURE__ */ reactExports.forwardRef((props, ref) => 
   const child = /* @__PURE__ */ reactExports.isValidElement(children) && !isFragment(children) ? children : /* @__PURE__ */ reactExports.createElement("span", null, children);
   const childProps = child.props;
   const childCls = !childProps.className || typeof childProps.className === "string" ? classNames(childProps.className, openClassName || `${prefixCls}-open`) : childProps.className;
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$h(prefixCls, !injectFromPopover);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$i(prefixCls, !injectFromPopover);
   const colorInfo = parseColor(prefixCls, color);
   const arrowContentStyle = colorInfo.arrowStyle;
   const rootClassNames = classNames(overlayClassName, {
@@ -31029,7 +31029,7 @@ const genColorStyle = (token2) => {
     })
   };
 };
-const prepareComponentToken$b = (token2) => {
+const prepareComponentToken$c = (token2) => {
   const {
     lineWidth,
     controlHeight,
@@ -31062,7 +31062,7 @@ const prepareComponentToken$b = (token2) => {
     innerContentPadding: wireframe ? `${paddingSM}px ${popoverPaddingHorizontal}px` : 0
   });
 };
-const useStyle$g = genStyleHooks("Popover", (token2) => {
+const useStyle$h = genStyleHooks("Popover", (token2) => {
   const {
     colorBgElevated,
     colorText
@@ -31072,11 +31072,11 @@ const useStyle$g = genStyleHooks("Popover", (token2) => {
     popoverColor: colorText
   });
   return [genBaseStyle$3(popoverToken), genColorStyle(popoverToken), initZoomMotion(popoverToken, "zoom-big")];
-}, prepareComponentToken$b, {
+}, prepareComponentToken$c, {
   resetStyle: false,
   deprecatedTokens: [["width", "titleMinWidth"], ["minWidth", "titleMinWidth"]]
 });
-var __rest$B = function(s, e2) {
+var __rest$C = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -31130,19 +31130,19 @@ const PurePanel$4 = (props) => {
   const {
     prefixCls: customizePrefixCls,
     className
-  } = props, restProps = __rest$B(props, ["prefixCls", "className"]);
+  } = props, restProps = __rest$C(props, ["prefixCls", "className"]);
   const {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
   const prefixCls = getPrefixCls("popover", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$g(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$h(prefixCls);
   return wrapCSSVar(/* @__PURE__ */ reactExports.createElement(RawPurePanel, Object.assign({}, restProps, {
     prefixCls,
     hashId,
     className: classNames(className, cssVarCls)
   })));
 };
-var __rest$A = function(s, e2) {
+var __rest$B = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -31166,7 +31166,7 @@ const InternalPopover = /* @__PURE__ */ reactExports.forwardRef((props, ref) => 
     overlayStyle = {},
     styles,
     classNames: popoverClassNames
-  } = props, otherProps = __rest$A(props, ["prefixCls", "title", "content", "overlayClassName", "placement", "trigger", "children", "mouseEnterDelay", "mouseLeaveDelay", "onOpenChange", "overlayStyle", "styles", "classNames"]);
+  } = props, otherProps = __rest$B(props, ["prefixCls", "title", "content", "overlayClassName", "placement", "trigger", "children", "mouseEnterDelay", "mouseLeaveDelay", "onOpenChange", "overlayStyle", "styles", "classNames"]);
   const {
     getPrefixCls,
     className: contextClassName,
@@ -31175,7 +31175,7 @@ const InternalPopover = /* @__PURE__ */ reactExports.forwardRef((props, ref) => 
     styles: contextStyles
   } = useComponentConfig("popover");
   const prefixCls = getPrefixCls("popover", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$g(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$h(prefixCls);
   const rootPrefixCls = getPrefixCls();
   const rootClassNames = classNames(overlayClassName, hashId, cssVarCls, contextClassName, contextClassNames.root, popoverClassNames === null || popoverClassNames === void 0 ? void 0 : popoverClassNames.root);
   const bodyClassNames = classNames(contextClassNames.body, popoverClassNames === null || popoverClassNames === void 0 ? void 0 : popoverClassNames.body);
@@ -31358,10 +31358,10 @@ var placements$1 = {
     targetOffset
   }
 };
-var _excluded$n = ["arrow", "prefixCls", "transitionName", "animation", "align", "placement", "placements", "getPopupContainer", "showAction", "hideAction", "overlayClassName", "overlayStyle", "visible", "trigger", "autoFocus", "overlay", "children", "onVisibleChange"];
+var _excluded$o = ["arrow", "prefixCls", "transitionName", "animation", "align", "placement", "placements", "getPopupContainer", "showAction", "hideAction", "overlayClassName", "overlayStyle", "visible", "trigger", "autoFocus", "overlay", "children", "onVisibleChange"];
 function Dropdown$2(props, ref) {
   var _children$props;
-  var _props$arrow = props.arrow, arrow = _props$arrow === void 0 ? false : _props$arrow, _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-dropdown" : _props$prefixCls, transitionName = props.transitionName, animation = props.animation, align = props.align, _props$placement = props.placement, placement = _props$placement === void 0 ? "bottomLeft" : _props$placement, _props$placements = props.placements, placements2 = _props$placements === void 0 ? placements$1 : _props$placements, getPopupContainer = props.getPopupContainer, showAction = props.showAction, hideAction = props.hideAction, overlayClassName = props.overlayClassName, overlayStyle = props.overlayStyle, visible = props.visible, _props$trigger = props.trigger, trigger = _props$trigger === void 0 ? ["hover"] : _props$trigger, autoFocus = props.autoFocus, overlay = props.overlay, children = props.children, onVisibleChange = props.onVisibleChange, otherProps = _objectWithoutProperties(props, _excluded$n);
+  var _props$arrow = props.arrow, arrow = _props$arrow === void 0 ? false : _props$arrow, _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-dropdown" : _props$prefixCls, transitionName = props.transitionName, animation = props.animation, align = props.align, _props$placement = props.placement, placement = _props$placement === void 0 ? "bottomLeft" : _props$placement, _props$placements = props.placements, placements2 = _props$placements === void 0 ? placements$1 : _props$placements, getPopupContainer = props.getPopupContainer, showAction = props.showAction, hideAction = props.hideAction, overlayClassName = props.overlayClassName, overlayStyle = props.overlayStyle, visible = props.visible, _props$trigger = props.trigger, trigger = _props$trigger === void 0 ? ["hover"] : _props$trigger, autoFocus = props.autoFocus, overlay = props.overlay, children = props.children, onVisibleChange = props.onVisibleChange, otherProps = _objectWithoutProperties(props, _excluded$o);
   var _React$useState = React.useState(), _React$useState2 = _slicedToArray(_React$useState, 2), triggerVisible = _React$useState2[0], setTriggerVisible = _React$useState2[1];
   var mergedVisible = "visible" in props ? visible : triggerVisible;
   var triggerRef = React.useRef(null);
@@ -31459,7 +31459,7 @@ function useMenuId(eventKey) {
   var id = reactExports.useContext(IdContext);
   return getMenuId(id, eventKey);
 }
-var _excluded$m = ["children", "locked"];
+var _excluded$n = ["children", "locked"];
 var MenuContext$1 = /* @__PURE__ */ reactExports.createContext(null);
 function mergeProps(origin, target) {
   var clone2 = _objectSpread2({}, origin);
@@ -31472,7 +31472,7 @@ function mergeProps(origin, target) {
   return clone2;
 }
 function InheritableContextProvider(_ref) {
-  var children = _ref.children, locked = _ref.locked, restProps = _objectWithoutProperties(_ref, _excluded$m);
+  var children = _ref.children, locked = _ref.locked, restProps = _objectWithoutProperties(_ref, _excluded$n);
   var context = reactExports.useContext(MenuContext$1);
   var inheritableContext = useMemo(function() {
     return mergeProps(context, restProps);
@@ -31899,9 +31899,9 @@ function Icon(_ref) {
   }
   return iconNode || children || null;
 }
-var _excluded$l = ["item"];
+var _excluded$m = ["item"];
 function warnItemProp(_ref) {
-  var item = _ref.item, restInfo = _objectWithoutProperties(_ref, _excluded$l);
+  var item = _ref.item, restInfo = _objectWithoutProperties(_ref, _excluded$m);
   Object.defineProperty(restInfo, "item", {
     get: function get2() {
       warningOnce$1(false, "`info.item` is deprecated since we will move to function component that not provides React Node instance in future.");
@@ -31910,7 +31910,7 @@ function warnItemProp(_ref) {
   });
   return restInfo;
 }
-var _excluded$k = ["title", "attribute", "elementRef"], _excluded2$2 = ["style", "className", "eventKey", "warnKey", "disabled", "itemIcon", "children", "role", "onMouseEnter", "onMouseLeave", "onClick", "onKeyDown", "onFocus"], _excluded3 = ["active"];
+var _excluded$l = ["title", "attribute", "elementRef"], _excluded2$2 = ["style", "className", "eventKey", "warnKey", "disabled", "itemIcon", "children", "role", "onMouseEnter", "onMouseLeave", "onClick", "onKeyDown", "onFocus"], _excluded3 = ["active"];
 var LegacyMenuItem = /* @__PURE__ */ function(_React$Component) {
   _inherits(LegacyMenuItem2, _React$Component);
   var _super = _createSuper(LegacyMenuItem2);
@@ -31921,7 +31921,7 @@ var LegacyMenuItem = /* @__PURE__ */ function(_React$Component) {
   _createClass(LegacyMenuItem2, [{
     key: "render",
     value: function render2() {
-      var _this$props = this.props, title = _this$props.title, attribute = _this$props.attribute, elementRef = _this$props.elementRef, restProps = _objectWithoutProperties(_this$props, _excluded$k);
+      var _this$props = this.props, title = _this$props.title, attribute = _this$props.attribute, elementRef = _this$props.elementRef, restProps = _objectWithoutProperties(_this$props, _excluded$l);
       var passedProps = omit(restProps, ["eventKey", "popupClassName", "popupOffset", "onTitleClick"]);
       warningOnce$1(!attribute, "`attribute` of Menu.Item is deprecated. Please pass attribute directly.");
       return /* @__PURE__ */ reactExports.createElement(ForwardOverflow.Item, _extends({}, attribute, {
@@ -32030,9 +32030,9 @@ function MenuItem$1(props, ref) {
   }));
 }
 const MenuItem$2 = /* @__PURE__ */ reactExports.forwardRef(MenuItem$1);
-var _excluded$j = ["className", "children"];
+var _excluded$k = ["className", "children"];
 var InternalSubMenuList = function InternalSubMenuList2(_ref, ref) {
-  var className = _ref.className, children = _ref.children, restProps = _objectWithoutProperties(_ref, _excluded$j);
+  var className = _ref.className, children = _ref.children, restProps = _objectWithoutProperties(_ref, _excluded$k);
   var _React$useContext = reactExports.useContext(MenuContext$1), prefixCls = _React$useContext.prefixCls, mode = _React$useContext.mode, rtl = _React$useContext.rtl;
   return /* @__PURE__ */ reactExports.createElement("ul", _extends({
     className: classNames(prefixCls, rtl && "".concat(prefixCls, "-rtl"), "".concat(prefixCls, "-sub"), "".concat(prefixCls, "-").concat(mode === "inline" ? "inline" : "vertical"), className),
@@ -32242,11 +32242,11 @@ function InlineSubMenuList(_ref) {
     }, children);
   }));
 }
-var _excluded$i = ["style", "className", "title", "eventKey", "warnKey", "disabled", "internalPopupClose", "children", "itemIcon", "expandIcon", "popupClassName", "popupOffset", "popupStyle", "onClick", "onMouseEnter", "onMouseLeave", "onTitleClick", "onTitleMouseEnter", "onTitleMouseLeave"], _excluded2$1 = ["active"];
+var _excluded$j = ["style", "className", "title", "eventKey", "warnKey", "disabled", "internalPopupClose", "children", "itemIcon", "expandIcon", "popupClassName", "popupOffset", "popupStyle", "onClick", "onMouseEnter", "onMouseLeave", "onTitleClick", "onTitleMouseEnter", "onTitleMouseLeave"], _excluded2$1 = ["active"];
 var InternalSubMenu = /* @__PURE__ */ reactExports.forwardRef(function(props, ref) {
   var style2 = props.style, className = props.className, title = props.title, eventKey = props.eventKey;
   props.warnKey;
-  var disabled = props.disabled, internalPopupClose = props.internalPopupClose, children = props.children, itemIcon = props.itemIcon, expandIcon = props.expandIcon, popupClassName = props.popupClassName, popupOffset = props.popupOffset, popupStyle = props.popupStyle, onClick = props.onClick, onMouseEnter = props.onMouseEnter, onMouseLeave = props.onMouseLeave, onTitleClick = props.onTitleClick, onTitleMouseEnter = props.onTitleMouseEnter, onTitleMouseLeave = props.onTitleMouseLeave, restProps = _objectWithoutProperties(props, _excluded$i);
+  var disabled = props.disabled, internalPopupClose = props.internalPopupClose, children = props.children, itemIcon = props.itemIcon, expandIcon = props.expandIcon, popupClassName = props.popupClassName, popupOffset = props.popupOffset, popupStyle = props.popupStyle, onClick = props.onClick, onMouseEnter = props.onMouseEnter, onMouseLeave = props.onMouseLeave, onTitleClick = props.onTitleClick, onTitleMouseEnter = props.onTitleMouseEnter, onTitleMouseLeave = props.onTitleMouseLeave, restProps = _objectWithoutProperties(props, _excluded$j);
   var domDataId = useMenuId(eventKey);
   var _React$useContext = reactExports.useContext(MenuContext$1), prefixCls = _React$useContext.prefixCls, mode = _React$useContext.mode, openKeys = _React$useContext.openKeys, contextDisabled = _React$useContext.disabled, overflowDisabled = _React$useContext.overflowDisabled, activeKey = _React$useContext.activeKey, selectedKeys = _React$useContext.selectedKeys, contextItemIcon = _React$useContext.itemIcon, contextExpandIcon = _React$useContext.expandIcon, onItemClick = _React$useContext.onItemClick, onOpenChange = _React$useContext.onOpenChange, onActive = _React$useContext.onActive;
   var _React$useContext2 = reactExports.useContext(PrivateContext), _internalRenderSubMenuItem = _React$useContext2._internalRenderSubMenuItem;
@@ -32440,11 +32440,11 @@ function Divider(_ref) {
     style: style2
   });
 }
-var _excluded$h = ["className", "title", "eventKey", "children"];
+var _excluded$i = ["className", "title", "eventKey", "children"];
 var InternalMenuItemGroup = /* @__PURE__ */ reactExports.forwardRef(function(props, ref) {
   var className = props.className, title = props.title;
   props.eventKey;
-  var children = props.children, restProps = _objectWithoutProperties(props, _excluded$h);
+  var children = props.children, restProps = _objectWithoutProperties(props, _excluded$i);
   var _React$useContext = reactExports.useContext(MenuContext$1), prefixCls = _React$useContext.prefixCls;
   var groupPrefixCls = "".concat(prefixCls, "-item-group");
   return /* @__PURE__ */ reactExports.createElement("li", _extends({
@@ -32476,12 +32476,12 @@ var MenuItemGroup = /* @__PURE__ */ reactExports.forwardRef(function(props, ref)
     ref
   }, omit(props, ["warnKey"])), childList);
 });
-var _excluded$g = ["label", "children", "key", "type", "extra"];
+var _excluded$h = ["label", "children", "key", "type", "extra"];
 function convertItemsToNodes(list, components, prefixCls) {
   var MergedMenuItem = components.item, MergedMenuItemGroup = components.group, MergedSubMenu = components.submenu, MergedDivider = components.divider;
   return (list || []).map(function(opt, index2) {
     if (opt && _typeof(opt) === "object") {
-      var _ref = opt, label = _ref.label, children = _ref.children, key = _ref.key, type4 = _ref.type, extra = _ref.extra, restProps = _objectWithoutProperties(_ref, _excluded$g);
+      var _ref = opt, label = _ref.label, children = _ref.children, key = _ref.key, type4 = _ref.type, extra = _ref.extra, restProps = _objectWithoutProperties(_ref, _excluded$h);
       var mergedKey = key !== null && key !== void 0 ? key : "tmp-".concat(index2);
       if (children || type4 === "group") {
         if (type4 === "group") {
@@ -32528,14 +32528,14 @@ function parseItems(children, items, keyPath, components, prefixCls) {
   }
   return parseChildren(childNodes, keyPath);
 }
-var _excluded$f = ["prefixCls", "rootClassName", "style", "className", "tabIndex", "items", "children", "direction", "id", "mode", "inlineCollapsed", "disabled", "disabledOverflow", "subMenuOpenDelay", "subMenuCloseDelay", "forceSubMenuRender", "defaultOpenKeys", "openKeys", "activeKey", "defaultActiveFirst", "selectable", "multiple", "defaultSelectedKeys", "selectedKeys", "onSelect", "onDeselect", "inlineIndent", "motion", "defaultMotions", "triggerSubMenuAction", "builtinPlacements", "itemIcon", "expandIcon", "overflowedIndicator", "overflowedIndicatorPopupClassName", "getPopupContainer", "onClick", "onOpenChange", "onKeyDown", "openAnimation", "openTransitionName", "_internalRenderMenuItem", "_internalRenderSubMenuItem", "_internalComponents"];
+var _excluded$g = ["prefixCls", "rootClassName", "style", "className", "tabIndex", "items", "children", "direction", "id", "mode", "inlineCollapsed", "disabled", "disabledOverflow", "subMenuOpenDelay", "subMenuCloseDelay", "forceSubMenuRender", "defaultOpenKeys", "openKeys", "activeKey", "defaultActiveFirst", "selectable", "multiple", "defaultSelectedKeys", "selectedKeys", "onSelect", "onDeselect", "inlineIndent", "motion", "defaultMotions", "triggerSubMenuAction", "builtinPlacements", "itemIcon", "expandIcon", "overflowedIndicator", "overflowedIndicatorPopupClassName", "getPopupContainer", "onClick", "onOpenChange", "onKeyDown", "openAnimation", "openTransitionName", "_internalRenderMenuItem", "_internalRenderSubMenuItem", "_internalComponents"];
 var EMPTY_LIST$3 = [];
 var Menu$2 = /* @__PURE__ */ reactExports.forwardRef(function(props, ref) {
   var _childList$;
   var _ref = props, _ref$prefixCls = _ref.prefixCls, prefixCls = _ref$prefixCls === void 0 ? "rc-menu" : _ref$prefixCls, rootClassName = _ref.rootClassName, style2 = _ref.style, className = _ref.className, _ref$tabIndex = _ref.tabIndex, tabIndex = _ref$tabIndex === void 0 ? 0 : _ref$tabIndex, items = _ref.items, children = _ref.children, direction = _ref.direction, id = _ref.id, _ref$mode = _ref.mode, mode = _ref$mode === void 0 ? "vertical" : _ref$mode, inlineCollapsed = _ref.inlineCollapsed, disabled = _ref.disabled, disabledOverflow = _ref.disabledOverflow, _ref$subMenuOpenDelay = _ref.subMenuOpenDelay, subMenuOpenDelay = _ref$subMenuOpenDelay === void 0 ? 0.1 : _ref$subMenuOpenDelay, _ref$subMenuCloseDela = _ref.subMenuCloseDelay, subMenuCloseDelay = _ref$subMenuCloseDela === void 0 ? 0.1 : _ref$subMenuCloseDela, forceSubMenuRender = _ref.forceSubMenuRender, defaultOpenKeys = _ref.defaultOpenKeys, openKeys = _ref.openKeys, activeKey = _ref.activeKey, defaultActiveFirst = _ref.defaultActiveFirst, _ref$selectable = _ref.selectable, selectable = _ref$selectable === void 0 ? true : _ref$selectable, _ref$multiple = _ref.multiple, multiple = _ref$multiple === void 0 ? false : _ref$multiple, defaultSelectedKeys = _ref.defaultSelectedKeys, selectedKeys = _ref.selectedKeys, onSelect = _ref.onSelect, onDeselect = _ref.onDeselect, _ref$inlineIndent = _ref.inlineIndent, inlineIndent = _ref$inlineIndent === void 0 ? 24 : _ref$inlineIndent, motion = _ref.motion, defaultMotions = _ref.defaultMotions, _ref$triggerSubMenuAc = _ref.triggerSubMenuAction, triggerSubMenuAction = _ref$triggerSubMenuAc === void 0 ? "hover" : _ref$triggerSubMenuAc, builtinPlacements = _ref.builtinPlacements, itemIcon = _ref.itemIcon, expandIcon = _ref.expandIcon, _ref$overflowedIndica = _ref.overflowedIndicator, overflowedIndicator = _ref$overflowedIndica === void 0 ? "..." : _ref$overflowedIndica, overflowedIndicatorPopupClassName = _ref.overflowedIndicatorPopupClassName, getPopupContainer = _ref.getPopupContainer, onClick = _ref.onClick, onOpenChange = _ref.onOpenChange, onKeyDown2 = _ref.onKeyDown;
   _ref.openAnimation;
   _ref.openTransitionName;
-  var _internalRenderMenuItem = _ref._internalRenderMenuItem, _internalRenderSubMenuItem = _ref._internalRenderSubMenuItem, _internalComponents = _ref._internalComponents, restProps = _objectWithoutProperties(_ref, _excluded$f);
+  var _internalRenderMenuItem = _ref._internalRenderMenuItem, _internalRenderSubMenuItem = _ref._internalRenderSubMenuItem, _internalComponents = _ref._internalComponents, restProps = _objectWithoutProperties(_ref, _excluded$g);
   var _React$useMemo = reactExports.useMemo(function() {
     return [parseItems(children, items, EMPTY_LIST$3, _internalComponents, prefixCls), parseItems(children, items, EMPTY_LIST$3, {}, prefixCls)];
   }, [children, items, _internalComponents]), _React$useMemo2 = _slicedToArray(_React$useMemo, 2), childList = _React$useMemo2[0], measureChildList = _React$useMemo2[1];
@@ -32894,7 +32894,7 @@ const genLayoutStyle = (token2) => {
     }
   };
 };
-const prepareComponentToken$a = (token2) => {
+const prepareComponentToken$b = (token2) => {
   const {
     colorBgLayout,
     controlHeight,
@@ -32930,7 +32930,7 @@ const prepareComponentToken$a = (token2) => {
   };
 };
 const DEPRECATED_TOKENS = [["colorBgBody", "bodyBg"], ["colorBgHeader", "headerBg"], ["colorBgTrigger", "triggerBg"]];
-const useStyle$f = genStyleHooks("Layout", (token2) => [genLayoutStyle(token2)], prepareComponentToken$a, {
+const useStyle$g = genStyleHooks("Layout", (token2) => [genLayoutStyle(token2)], prepareComponentToken$b, {
   deprecatedTokens: DEPRECATED_TOKENS
 });
 const genSiderStyle = (token2) => {
@@ -33040,10 +33040,10 @@ const genSiderStyle = (token2) => {
     }
   };
 };
-const useStyle$e = genStyleHooks(["Layout", "Sider"], (token2) => [genSiderStyle(token2)], prepareComponentToken$a, {
+const useStyle$f = genStyleHooks(["Layout", "Sider"], (token2) => [genSiderStyle(token2)], prepareComponentToken$b, {
   deprecatedTokens: DEPRECATED_TOKENS
 });
-var __rest$z = function(s, e2) {
+var __rest$A = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -33085,7 +33085,7 @@ const Sider = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     breakpoint,
     onCollapse,
     onBreakpoint
-  } = props, otherProps = __rest$z(props, ["prefixCls", "className", "trigger", "children", "defaultCollapsed", "theme", "style", "collapsible", "reverseArrow", "width", "collapsedWidth", "zeroWidthTriggerStyle", "breakpoint", "onCollapse", "onBreakpoint"]);
+  } = props, otherProps = __rest$A(props, ["prefixCls", "className", "trigger", "children", "defaultCollapsed", "theme", "style", "collapsible", "reverseArrow", "width", "collapsedWidth", "zeroWidthTriggerStyle", "breakpoint", "onCollapse", "onBreakpoint"]);
   const {
     siderHook
   } = reactExports.useContext(LayoutContext);
@@ -33107,7 +33107,7 @@ const Sider = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     direction
   } = reactExports.useContext(ConfigContext);
   const prefixCls = getPrefixCls("layout-sider", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$e(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$f(prefixCls);
   const responsiveHandlerRef = reactExports.useRef(null);
   responsiveHandlerRef.current = (mql) => {
     setBelow(mql.matches);
@@ -33200,7 +33200,7 @@ const MenuContext = /* @__PURE__ */ reactExports.createContext({
   firstLevel: true,
   inlineCollapsed: false
 });
-var __rest$y = function(s, e2) {
+var __rest$z = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -33213,7 +33213,7 @@ const MenuDivider = (props) => {
     prefixCls: customizePrefixCls,
     className,
     dashed
-  } = props, restProps = __rest$y(props, ["prefixCls", "className", "dashed"]);
+  } = props, restProps = __rest$z(props, ["prefixCls", "className", "dashed"]);
   const {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
@@ -33294,7 +33294,7 @@ const MenuItem = (props) => {
   }
   return returnNode;
 };
-var __rest$x = function(s, e2) {
+var __rest$y = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -33306,7 +33306,7 @@ const OverrideContext = /* @__PURE__ */ reactExports.createContext(null);
 const OverrideProvider = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
   const {
     children
-  } = props, restProps = __rest$x(props, ["children"]);
+  } = props, restProps = __rest$y(props, ["children"]);
   const override = reactExports.useContext(OverrideContext);
   const context = reactExports.useMemo(() => Object.assign(Object.assign({}, override), restProps), [
     override,
@@ -34133,7 +34133,7 @@ const getBaseStyle = (token2) => {
     }
   ];
 };
-const prepareComponentToken$9 = (token2) => {
+const prepareComponentToken$a = (token2) => {
   var _a3, _b3, _c2;
   const {
     colorPrimary,
@@ -34251,7 +34251,7 @@ const prepareComponentToken$9 = (token2) => {
     itemWidth: activeBarWidth ? `calc(100% + ${activeBarBorderWidth}px)` : `calc(100% - ${itemMarginInline * 2}px)`
   };
 };
-const useStyle$d = (prefixCls, rootCls = prefixCls, injectStyle = true) => {
+const useStyle$e = (prefixCls, rootCls = prefixCls, injectStyle = true) => {
   const useStyle2 = genStyleHooks("Menu", (token2) => {
     const {
       colorBgElevated,
@@ -34330,7 +34330,7 @@ const useStyle$d = (prefixCls, rootCls = prefixCls, injectStyle = true) => {
       initSlideMotion(menuToken, "slide-down"),
       initZoomMotion(menuToken, "zoom-big")
     ];
-  }, prepareComponentToken$9, {
+  }, prepareComponentToken$a, {
     deprecatedTokens: [["colorGroupTitle", "groupTitleColor"], ["radiusItem", "itemBorderRadius"], ["radiusSubMenuItem", "subMenuItemBorderRadius"], ["colorItemText", "itemColor"], ["colorItemTextHover", "itemHoverColor"], ["colorItemTextHoverHorizontal", "horizontalItemHoverColor"], ["colorItemTextSelected", "itemSelectedColor"], ["colorItemTextSelectedHorizontal", "horizontalItemSelectedColor"], ["colorItemTextDisabled", "itemDisabledColor"], ["colorDangerItemText", "dangerItemColor"], ["colorDangerItemTextHover", "dangerItemHoverColor"], ["colorDangerItemTextSelected", "dangerItemSelectedColor"], ["colorDangerItemBgActive", "dangerItemActiveBg"], ["colorDangerItemBgSelected", "dangerItemSelectedBg"], ["colorItemBg", "itemBg"], ["colorItemBgHover", "itemHoverBg"], ["colorSubItemBg", "subMenuItemBg"], ["colorItemBgActive", "itemActiveBg"], ["colorItemBgSelectedHorizontal", "horizontalItemSelectedBg"], ["colorActiveBarWidth", "activeBarWidth"], ["colorActiveBarHeight", "activeBarHeight"], ["colorActiveBarBorderSize", "activeBarBorderWidth"], ["colorItemBgSelected", "itemSelectedBg"]],
     // Dropdown will handle menu style self. We do not need to handle this.
     injectStyle,
@@ -34384,7 +34384,7 @@ const SubMenu = (props) => {
     }, props.popupStyle)
   })));
 };
-var __rest$w = function(s, e2) {
+var __rest$x = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -34425,7 +34425,7 @@ const InternalMenu = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     selectable,
     onClick,
     overflowedIndicatorPopupClassName
-  } = props, restProps = __rest$w(props, ["prefixCls", "className", "style", "theme", "expandIcon", "_internalDisableMenuItemTitleTooltip", "inlineCollapsed", "siderCollapsed", "rootClassName", "mode", "selectable", "onClick", "overflowedIndicatorPopupClassName"]);
+  } = props, restProps = __rest$x(props, ["prefixCls", "className", "style", "theme", "expandIcon", "_internalDisableMenuItemTitleTooltip", "inlineCollapsed", "siderCollapsed", "rootClassName", "mode", "selectable", "onClick", "overflowedIndicatorPopupClassName"]);
   const passedProps = omit(restProps, ["collapsedWidth"]);
   (_a3 = overrideObj.validator) === null || _a3 === void 0 ? void 0 : _a3.call(overrideObj, {
     mode
@@ -34449,7 +34449,7 @@ const InternalMenu = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
   };
   const prefixCls = getPrefixCls("menu", customizePrefixCls || overrideObj.prefixCls);
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$d(prefixCls, rootCls, !override);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$e(prefixCls, rootCls, !override);
   const menuClassName = classNames(`${prefixCls}-${theme2}`, menu === null || menu === void 0 ? void 0 : menu.className, className);
   const mergedExpandIcon = reactExports.useMemo(() => {
     var _a22, _b3;
@@ -34809,14 +34809,14 @@ const genBaseStyle$2 = (token2) => {
     [initSlideMotion(token2, "slide-up"), initSlideMotion(token2, "slide-down"), initMoveMotion(token2, "move-up"), initMoveMotion(token2, "move-down"), initZoomMotion(token2, "zoom-big")]
   ];
 };
-const prepareComponentToken$8 = (token2) => Object.assign(Object.assign({
+const prepareComponentToken$9 = (token2) => Object.assign(Object.assign({
   zIndexPopup: token2.zIndexPopupBase + 50,
   paddingBlock: (token2.controlHeight - token2.fontSize * token2.lineHeight) / 2
 }, getArrowOffsetToken({
   contentRadius: token2.borderRadiusLG,
   limitVerticalRadius: true
 })), getArrowToken(token2));
-const useStyle$c = genStyleHooks("Dropdown", (token2) => {
+const useStyle$d = genStyleHooks("Dropdown", (token2) => {
   const {
     marginXXS,
     sizePopupArrow,
@@ -34829,7 +34829,7 @@ const useStyle$c = genStyleHooks("Dropdown", (token2) => {
     dropdownEdgeChildPadding: paddingXXS
   });
   return [genBaseStyle$2(dropdownToken), genStatusStyle(dropdownToken)];
-}, prepareComponentToken$8, {
+}, prepareComponentToken$9, {
   resetStyle: false
 });
 const Dropdown$1 = (props) => {
@@ -34890,7 +34890,7 @@ const Dropdown$1 = (props) => {
   }, [placement, direction]);
   const prefixCls = getPrefixCls("dropdown", customizePrefixCls);
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$c(prefixCls, rootCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$d(prefixCls, rootCls);
   const [, token2] = useToken$1();
   const child = reactExports.Children.only(isPrimitive(children) ? /* @__PURE__ */ reactExports.createElement("span", null, children) : children);
   const popupTrigger = cloneElement(child, {
@@ -35007,7 +35007,7 @@ const BreadcrumbSeparator = ({
   }, children === "" ? children : children || "/");
 };
 BreadcrumbSeparator.__ANT_BREADCRUMB_SEPARATOR = true;
-var __rest$v = function(s, e2) {
+var __rest$w = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -35029,7 +35029,7 @@ function renderItem(prefixCls, item, children, href) {
   const {
     className,
     onClick
-  } = item, restItem = __rest$v(item, ["className", "onClick"]);
+  } = item, restItem = __rest$w(item, ["className", "onClick"]);
   const passedProps = Object.assign(Object.assign({}, pickAttrs(restItem, {
     data: true,
     aria: true
@@ -35056,7 +35056,7 @@ function useItemRender(prefixCls, itemRender) {
   };
   return mergedItemRender;
 }
-var __rest$u = function(s, e2) {
+var __rest$v = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -35080,7 +35080,7 @@ const InternalBreadcrumbItem = (props) => {
       if (menu) {
         const _a3 = menu || {}, {
           items
-        } = _a3, menuProps = __rest$u(_a3, ["items"]);
+        } = _a3, menuProps = __rest$v(_a3, ["items"]);
         mergeDropDownProps.menu = Object.assign(Object.assign({}, menuProps), {
           items: items === null || items === void 0 ? void 0 : items.map((_a22, index2) => {
             var {
@@ -35088,7 +35088,7 @@ const InternalBreadcrumbItem = (props) => {
               title,
               label,
               path: path2
-            } = _a22, itemProps = __rest$u(_a22, ["key", "title", "label", "path"]);
+            } = _a22, itemProps = __rest$v(_a22, ["key", "title", "label", "path"]);
             let mergedLabel = label !== null && label !== void 0 ? label : title;
             if (path2) {
               mergedLabel = /* @__PURE__ */ reactExports.createElement("a", {
@@ -35123,7 +35123,7 @@ const BreadcrumbItem = (props) => {
     prefixCls: customizePrefixCls,
     children,
     href
-  } = props, restProps = __rest$u(props, ["prefixCls", "children", "href"]);
+  } = props, restProps = __rest$v(props, ["prefixCls", "children", "href"]);
   const {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
@@ -35211,7 +35211,7 @@ const genBreadcrumbStyle = (token2) => {
     })
   };
 };
-const prepareComponentToken$7 = (token2) => ({
+const prepareComponentToken$8 = (token2) => ({
   itemColor: token2.colorTextDescription,
   lastItemColor: token2.colorText,
   iconFontSize: token2.fontSize,
@@ -35220,11 +35220,11 @@ const prepareComponentToken$7 = (token2) => ({
   separatorColor: token2.colorTextDescription,
   separatorMargin: token2.marginXS
 });
-const useStyle$b = genStyleHooks("Breadcrumb", (token2) => {
+const useStyle$c = genStyleHooks("Breadcrumb", (token2) => {
   const breadcrumbToken = merge(token2, {});
   return genBreadcrumbStyle(breadcrumbToken);
-}, prepareComponentToken$7);
-var __rest$t = function(s, e2) {
+}, prepareComponentToken$8);
+var __rest$u = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -35236,7 +35236,7 @@ function route2item(route) {
   const {
     breadcrumbName,
     children
-  } = route, rest = __rest$t(route, ["breadcrumbName", "children"]);
+  } = route, rest = __rest$u(route, ["breadcrumbName", "children"]);
   const clone2 = Object.assign({
     title: breadcrumbName
   }, rest);
@@ -35245,7 +35245,7 @@ function route2item(route) {
       items: children.map((_a3) => {
         var {
           breadcrumbName: itemBreadcrumbName
-        } = _a3, itemProps = __rest$t(_a3, ["breadcrumbName"]);
+        } = _a3, itemProps = __rest$u(_a3, ["breadcrumbName"]);
         return Object.assign(Object.assign({}, itemProps), {
           title: itemBreadcrumbName
         });
@@ -35265,7 +35265,7 @@ function useItems(items, routes) {
     return null;
   }, [items, routes]);
 }
-var __rest$s = function(s, e2) {
+var __rest$t = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -35295,7 +35295,7 @@ const Breadcrumb = (props) => {
     children,
     itemRender,
     params = {}
-  } = props, restProps = __rest$s(props, ["prefixCls", "separator", "style", "className", "rootClassName", "routes", "items", "children", "itemRender", "params"]);
+  } = props, restProps = __rest$t(props, ["prefixCls", "separator", "style", "className", "rootClassName", "routes", "items", "children", "itemRender", "params"]);
   const {
     getPrefixCls,
     direction,
@@ -35303,7 +35303,7 @@ const Breadcrumb = (props) => {
   } = reactExports.useContext(ConfigContext);
   let crumbs;
   const prefixCls = getPrefixCls("breadcrumb", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$b(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$c(prefixCls);
   const mergedItems = useItems(items, legacyRoutes);
   const mergedItemRender = useItemRender(prefixCls, itemRender);
   if (mergedItems && mergedItems.length > 0) {
@@ -35387,9 +35387,9 @@ const RadioGroupContext = /* @__PURE__ */ reactExports.createContext(null);
 const RadioGroupContextProvider = RadioGroupContext.Provider;
 const RadioOptionTypeContext = /* @__PURE__ */ reactExports.createContext(null);
 const RadioOptionTypeContextProvider = RadioOptionTypeContext.Provider;
-var _excluded$e = ["prefixCls", "className", "style", "checked", "disabled", "defaultChecked", "type", "title", "onChange"];
+var _excluded$f = ["prefixCls", "className", "style", "checked", "disabled", "defaultChecked", "type", "title", "onChange"];
 var Checkbox$2 = /* @__PURE__ */ reactExports.forwardRef(function(props, ref) {
-  var _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-checkbox" : _props$prefixCls, className = props.className, style2 = props.style, checked = props.checked, disabled = props.disabled, _props$defaultChecked = props.defaultChecked, defaultChecked = _props$defaultChecked === void 0 ? false : _props$defaultChecked, _props$type = props.type, type4 = _props$type === void 0 ? "checkbox" : _props$type, title = props.title, onChange = props.onChange, inputProps = _objectWithoutProperties(props, _excluded$e);
+  var _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-checkbox" : _props$prefixCls, className = props.className, style2 = props.style, checked = props.checked, disabled = props.disabled, _props$defaultChecked = props.defaultChecked, defaultChecked = _props$defaultChecked === void 0 ? false : _props$defaultChecked, _props$type = props.type, type4 = _props$type === void 0 ? "checkbox" : _props$type, title = props.title, onChange = props.onChange, inputProps = _objectWithoutProperties(props, _excluded$f);
   var inputRef = reactExports.useRef(null);
   var holderRef = reactExports.useRef(null);
   var _useMergedState = useMergedState(defaultChecked, {
@@ -35863,7 +35863,7 @@ const getRadioButtonStyle = (token2) => {
     }
   };
 };
-const prepareComponentToken$6 = (token2) => {
+const prepareComponentToken$7 = (token2) => {
   const {
     wireframe,
     padding,
@@ -35905,7 +35905,7 @@ const prepareComponentToken$6 = (token2) => {
     radioBgColor: wireframe ? colorBgContainer : colorPrimary
   };
 };
-const useStyle$a = genStyleHooks("Radio", (token2) => {
+const useStyle$b = genStyleHooks("Radio", (token2) => {
   const {
     controlOutline,
     controlOutlineWidth
@@ -35917,13 +35917,13 @@ const useStyle$a = genStyleHooks("Radio", (token2) => {
     radioButtonFocusShadow
   });
   return [getGroupRadioStyle(radioToken), getRadioBasicStyle(radioToken), getRadioButtonStyle(radioToken)];
-}, prepareComponentToken$6, {
+}, prepareComponentToken$7, {
   unitless: {
     radioSize: true,
     dotSize: true
   }
 });
-var __rest$r = function(s, e2) {
+var __rest$s = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -35957,12 +35957,12 @@ const InternalRadio = (props, ref) => {
     children,
     style: style2,
     title
-  } = props, restProps = __rest$r(props, ["prefixCls", "className", "rootClassName", "children", "style", "title"]);
+  } = props, restProps = __rest$s(props, ["prefixCls", "className", "rootClassName", "children", "style", "title"]);
   const radioPrefixCls = getPrefixCls("radio", customizePrefixCls);
   const isButtonType = ((groupContext === null || groupContext === void 0 ? void 0 : groupContext.optionType) || radioOptionTypeContext) === "button";
   const prefixCls = isButtonType ? `${radioPrefixCls}-button` : radioPrefixCls;
   const rootCls = useCSSVarCls(radioPrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$a(radioPrefixCls, rootCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$b(radioPrefixCls, rootCls);
   const radioProps = Object.assign({}, restProps);
   const disabled = reactExports.useContext(DisabledContext);
   if (groupContext) {
@@ -36035,7 +36035,7 @@ function getStatus(errors, warnings, meta, defaultValidateStatus, hasFeedback, v
   }
   return status2;
 }
-var __rest$q = function(s, e2) {
+var __rest$r = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -36075,7 +36075,7 @@ function useForm(form) {
     scrollToField: (name, options = {}) => {
       const {
         focus
-      } = options, restOpt = __rest$q(options, ["focus"]);
+      } = options, restOpt = __rest$r(options, ["focus"]);
       const node2 = getFieldDOMNode(name, wrapForm);
       if (node2) {
         e(node2, Object.assign({
@@ -36150,7 +36150,7 @@ const RadioGroup = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
   const prefixCls = getPrefixCls("radio", customizePrefixCls);
   const groupPrefixCls = `${prefixCls}-group`;
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$a(prefixCls, rootCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$b(prefixCls, rootCls);
   let childrenToRender = children;
   if (options && options.length > 0) {
     childrenToRender = options.map((option) => {
@@ -36208,7 +36208,7 @@ const RadioGroup = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
   }, childrenToRender)));
 });
 const Group$1 = /* @__PURE__ */ reactExports.memo(RadioGroup);
-var __rest$p = function(s, e2) {
+var __rest$q = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -36222,7 +36222,7 @@ const RadioButton = (props, ref) => {
   } = reactExports.useContext(ConfigContext);
   const {
     prefixCls: customizePrefixCls
-  } = props, radioProps = __rest$p(props, ["prefixCls"]);
+  } = props, radioProps = __rest$q(props, ["prefixCls"]);
   const prefixCls = getPrefixCls("radio", customizePrefixCls);
   return /* @__PURE__ */ reactExports.createElement(RadioOptionTypeContextProvider, {
     value: "button"
@@ -37223,7 +37223,7 @@ const useSharedStyle = genStyleHooks(["Input", "Shared"], (token2) => {
 }, initComponentToken$1, {
   resetFont: false
 });
-const useStyle$9 = genStyleHooks(["Input", "Component"], (token2) => {
+const useStyle$a = genStyleHooks(["Input", "Component"], (token2) => {
   const inputToken = merge(token2, initInputToken(token2));
   return [
     genGroupStyle(inputToken),
@@ -37297,7 +37297,7 @@ function debounce(delay, callback, options) {
 function getEntity(keyEntities, key) {
   return keyEntities[key];
 }
-var _excluded$d = ["children"];
+var _excluded$e = ["children"];
 function getPosition(level, index2) {
   return "".concat(level, "-").concat(index2);
 }
@@ -37329,7 +37329,7 @@ function convertTreeToData(rootNodes) {
         return null;
       }
       var key = treeNode.key;
-      var _treeNode$props = treeNode.props, children = _treeNode$props.children, rest = _objectWithoutProperties(_treeNode$props, _excluded$d);
+      var _treeNode$props = treeNode.props, children = _treeNode$props.children, rest = _objectWithoutProperties(_treeNode$props, _excluded$e);
       var dataNode = _objectSpread2({
         key
       }, rest);
@@ -37917,11 +37917,11 @@ function getStyle(prefixCls, token2) {
   });
   return [genCheckboxStyle(checkboxToken)];
 }
-const useStyle$8 = genStyleHooks("Checkbox", (token2, {
+const useStyle$9 = genStyleHooks("Checkbox", (token2, {
   prefixCls
 }) => [getStyle(prefixCls, token2)]);
 const GroupContext = /* @__PURE__ */ React.createContext(null);
-var __rest$o = function(s, e2) {
+var __rest$p = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -37942,7 +37942,7 @@ const InternalCheckbox = (props, ref) => {
     onMouseLeave,
     skipGroup = false,
     disabled
-  } = props, restProps = __rest$o(props, ["prefixCls", "className", "rootClassName", "children", "indeterminate", "style", "onMouseEnter", "onMouseLeave", "skipGroup", "disabled"]);
+  } = props, restProps = __rest$p(props, ["prefixCls", "className", "rootClassName", "children", "indeterminate", "style", "onMouseEnter", "onMouseLeave", "skipGroup", "disabled"]);
   const {
     getPrefixCls,
     direction,
@@ -37979,7 +37979,7 @@ const InternalCheckbox = (props, ref) => {
   }, [indeterminate]);
   const prefixCls = getPrefixCls("checkbox", customizePrefixCls);
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$8(prefixCls, rootCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$9(prefixCls, rootCls);
   const checkboxProps = Object.assign({}, restProps);
   if (checkboxGroup && !skipGroup) {
     checkboxProps.onChange = (...args) => {
@@ -38026,7 +38026,7 @@ const InternalCheckbox = (props, ref) => {
   }, children))));
 };
 const Checkbox$1 = /* @__PURE__ */ reactExports.forwardRef(InternalCheckbox);
-var __rest$n = function(s, e2) {
+var __rest$o = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -38044,7 +38044,7 @@ const CheckboxGroup = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     rootClassName,
     style: style2,
     onChange
-  } = props, restProps = __rest$n(props, ["defaultValue", "children", "options", "prefixCls", "className", "rootClassName", "style", "onChange"]);
+  } = props, restProps = __rest$o(props, ["defaultValue", "children", "options", "prefixCls", "className", "rootClassName", "style", "onChange"]);
   const {
     getPrefixCls,
     direction
@@ -38091,7 +38091,7 @@ const CheckboxGroup = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
   const prefixCls = getPrefixCls("checkbox", customizePrefixCls);
   const groupPrefixCls = `${prefixCls}-group`;
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$8(prefixCls, rootCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$9(prefixCls, rootCls);
   const domProps = omit(restProps, ["value", "disabled"]);
   const childrenNode = options.length ? memoizedOptions.map((option) => /* @__PURE__ */ reactExports.createElement(Checkbox$1, {
     prefixCls,
@@ -38131,7 +38131,7 @@ const Checkbox = Checkbox$1;
 Checkbox.Group = CheckboxGroup;
 Checkbox.__ANT_CHECKBOX = true;
 const RowContext = /* @__PURE__ */ reactExports.createContext({});
-var __rest$m = function(s, e2) {
+var __rest$n = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -38169,7 +38169,7 @@ const Col = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     children,
     flex,
     style: style2
-  } = props, others = __rest$m(props, ["prefixCls", "span", "order", "offset", "push", "pull", "className", "children", "flex", "style"]);
+  } = props, others = __rest$n(props, ["prefixCls", "span", "order", "offset", "push", "pull", "className", "children", "flex", "style"]);
   const prefixCls = getPrefixCls("col", customizePrefixCls);
   const [wrapCSSVar, hashId, cssVarCls] = useColStyle(prefixCls);
   const sizeStyle = {};
@@ -38247,7 +38247,7 @@ function useGutter(gutter, screens) {
   });
   return results;
 }
-var __rest$l = function(s, e2) {
+var __rest$m = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -38291,7 +38291,7 @@ const Row = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     children,
     gutter = 0,
     wrap
-  } = props, others = __rest$l(props, ["prefixCls", "justify", "align", "className", "style", "children", "gutter", "wrap"]);
+  } = props, others = __rest$m(props, ["prefixCls", "justify", "align", "className", "style", "children", "gutter", "wrap"]);
   const {
     getPrefixCls,
     direction
@@ -38474,7 +38474,7 @@ var BaseInput = /* @__PURE__ */ React.forwardRef(function(props, ref) {
     hidden
   });
 });
-var _excluded$c = ["show"];
+var _excluded$d = ["show"];
 function useCount(count, showCount) {
   return reactExports.useMemo(function() {
     var mergedConfig = {};
@@ -38482,7 +38482,7 @@ function useCount(count, showCount) {
       mergedConfig.show = _typeof(showCount) === "object" && showCount.formatter ? showCount.formatter : !!showCount;
     }
     mergedConfig = _objectSpread2(_objectSpread2({}, mergedConfig), count);
-    var _ref = mergedConfig, show2 = _ref.show, rest = _objectWithoutProperties(_ref, _excluded$c);
+    var _ref = mergedConfig, show2 = _ref.show, rest = _objectWithoutProperties(_ref, _excluded$d);
     return _objectSpread2(_objectSpread2({}, rest), {}, {
       show: !!show2,
       showFormatter: typeof show2 === "function" ? show2 : void 0,
@@ -38492,9 +38492,9 @@ function useCount(count, showCount) {
     });
   }, [count, showCount]);
 }
-var _excluded$b = ["autoComplete", "onChange", "onFocus", "onBlur", "onPressEnter", "onKeyDown", "onKeyUp", "prefixCls", "disabled", "htmlSize", "className", "maxLength", "suffix", "showCount", "count", "type", "classes", "classNames", "styles", "onCompositionStart", "onCompositionEnd"];
+var _excluded$c = ["autoComplete", "onChange", "onFocus", "onBlur", "onPressEnter", "onKeyDown", "onKeyUp", "prefixCls", "disabled", "htmlSize", "className", "maxLength", "suffix", "showCount", "count", "type", "classes", "classNames", "styles", "onCompositionStart", "onCompositionEnd"];
 var Input$2 = /* @__PURE__ */ reactExports.forwardRef(function(props, ref) {
-  var autoComplete = props.autoComplete, onChange = props.onChange, onFocus = props.onFocus, onBlur = props.onBlur, onPressEnter = props.onPressEnter, onKeyDown2 = props.onKeyDown, onKeyUp = props.onKeyUp, _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-input" : _props$prefixCls, disabled = props.disabled, htmlSize = props.htmlSize, className = props.className, maxLength = props.maxLength, suffix = props.suffix, showCount = props.showCount, count = props.count, _props$type = props.type, type4 = _props$type === void 0 ? "text" : _props$type, classes = props.classes, classNames$1 = props.classNames, styles = props.styles, _onCompositionStart = props.onCompositionStart, onCompositionEnd = props.onCompositionEnd, rest = _objectWithoutProperties(props, _excluded$b);
+  var autoComplete = props.autoComplete, onChange = props.onChange, onFocus = props.onFocus, onBlur = props.onBlur, onPressEnter = props.onPressEnter, onKeyDown2 = props.onKeyDown, onKeyUp = props.onKeyUp, _props$prefixCls = props.prefixCls, prefixCls = _props$prefixCls === void 0 ? "rc-input" : _props$prefixCls, disabled = props.disabled, htmlSize = props.htmlSize, className = props.className, maxLength = props.maxLength, suffix = props.suffix, showCount = props.showCount, count = props.count, _props$type = props.type, type4 = _props$type === void 0 ? "text" : _props$type, classes = props.classes, classNames$1 = props.classNames, styles = props.styles, _onCompositionStart = props.onCompositionStart, onCompositionEnd = props.onCompositionEnd, rest = _objectWithoutProperties(props, _excluded$c);
   var _useState = reactExports.useState(false), _useState2 = _slicedToArray(_useState, 2), focused = _useState2[0], setFocused = _useState2[1];
   var compositionRef = reactExports.useRef(false);
   var keyLockRef = reactExports.useRef(false);
@@ -38716,7 +38716,7 @@ function useRemovePasswordTimeout(inputRef, triggerOnMount) {
 function hasPrefixSuffix(props) {
   return !!(props.prefix || props.suffix || props.allowClear || props.showCount);
 }
-var __rest$k = function(s, e2) {
+var __rest$l = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -38744,7 +38744,7 @@ const Input$1 = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     onChange,
     classNames: classNames$1,
     variant: customVariant
-  } = props, rest = __rest$k(props, ["prefixCls", "bordered", "status", "size", "disabled", "onBlur", "onFocus", "suffix", "allowClear", "addonAfter", "addonBefore", "className", "style", "styles", "rootClassName", "onChange", "classNames", "variant"]);
+  } = props, rest = __rest$l(props, ["prefixCls", "bordered", "status", "size", "disabled", "onBlur", "onFocus", "suffix", "allowClear", "addonAfter", "addonBefore", "className", "style", "styles", "rootClassName", "onChange", "classNames", "variant"]);
   const {
     getPrefixCls,
     direction,
@@ -38759,7 +38759,7 @@ const Input$1 = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
   const inputRef = reactExports.useRef(null);
   const rootCls = useCSSVarCls(prefixCls);
   const [wrapSharedCSSVar, hashId, cssVarCls] = useSharedStyle(prefixCls, rootClassName);
-  const [wrapCSSVar] = useStyle$9(prefixCls, rootCls);
+  const [wrapCSSVar] = useStyle$a(prefixCls, rootCls);
   const {
     compactSize,
     compactItemClassnames
@@ -38875,7 +38875,7 @@ const Item = ({
     className: `${className}-split`
   }, split));
 };
-var __rest$j = function(s, e2) {
+var __rest$k = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -38907,7 +38907,7 @@ const InternalSpace = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     wrap = false,
     classNames: customClassNames,
     styles
-  } = props, otherProps = __rest$j(props, ["size", "align", "className", "rootClassName", "children", "direction", "prefixCls", "split", "style", "wrap", "classNames", "styles"]);
+  } = props, otherProps = __rest$k(props, ["size", "align", "className", "rootClassName", "children", "direction", "prefixCls", "split", "style", "wrap", "classNames", "styles"]);
   const [horizontalSize, verticalSize] = Array.isArray(size) ? size : [size, size];
   const isPresetVerticalSize = isPresetSize(verticalSize);
   const isPresetHorizontalSize = isPresetSize(horizontalSize);
@@ -38918,7 +38918,7 @@ const InternalSpace = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
   });
   const mergedAlign = align === void 0 && direction === "horizontal" ? "center" : align;
   const prefixCls = getPrefixCls("space", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$m(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$n(prefixCls);
   const cls = classNames(prefixCls, contextClassName, hashId, `${prefixCls}-${direction}`, {
     [`${prefixCls}-rtl`]: directionConfig === "rtl",
     [`${prefixCls}-align-${mergedAlign}`]: mergedAlign,
@@ -38967,7 +38967,7 @@ const InternalSpace = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
 });
 const Space = InternalSpace;
 Space.Compact = Compact$1;
-var __rest$i = function(s, e2) {
+var __rest$j = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -39013,7 +39013,7 @@ const DropdownButton = (props) => {
     destroyPopupOnHide,
     dropdownRender,
     popupRender
-  } = props, restProps = __rest$i(props, ["prefixCls", "type", "danger", "disabled", "loading", "onClick", "htmlType", "children", "className", "menu", "arrow", "autoFocus", "overlay", "trigger", "align", "open", "onOpenChange", "placement", "getPopupContainer", "href", "icon", "title", "buttonsRender", "mouseEnterDelay", "mouseLeaveDelay", "overlayClassName", "overlayStyle", "destroyOnHidden", "destroyPopupOnHide", "dropdownRender", "popupRender"]);
+  } = props, restProps = __rest$j(props, ["prefixCls", "type", "danger", "disabled", "loading", "onClick", "htmlType", "children", "className", "menu", "arrow", "autoFocus", "overlay", "trigger", "align", "open", "onOpenChange", "placement", "getPopupContainer", "href", "icon", "title", "buttonsRender", "mouseEnterDelay", "mouseLeaveDelay", "overlayClassName", "overlayStyle", "destroyOnHidden", "destroyPopupOnHide", "dropdownRender", "popupRender"]);
   const prefixCls = getPrefixCls("dropdown", customizePrefixCls);
   const buttonPrefixCls = `${prefixCls}-button`;
   const mergedPopupRender = popupRender || dropdownRender;
@@ -39628,7 +39628,7 @@ const genItemVerticalStyle = (token2) => {
     }
   };
 };
-const prepareComponentToken$5 = (token2) => ({
+const prepareComponentToken$6 = (token2) => ({
   labelRequiredMarkColor: token2.colorError,
   labelColor: token2.colorTextHeading,
   labelFontSize: token2.fontSize,
@@ -39647,12 +39647,12 @@ const prepareToken$1 = (token2, rootPrefixCls) => {
   });
   return formToken;
 };
-const useStyle$7 = genStyleHooks("Form", (token2, {
+const useStyle$8 = genStyleHooks("Form", (token2, {
   rootPrefixCls
 }) => {
   const formToken = prepareToken$1(token2, rootPrefixCls);
   return [genFormStyle(formToken), genFormItemStyle(formToken), genFormValidateMotionStyle(formToken), genHorizontalStyle(formToken, formToken.componentCls), genHorizontalStyle(formToken, formToken.formItemCls), genInlineStyle(formToken), genVerticalStyle(formToken), genItemVerticalStyle(formToken), genCollapseMotion(formToken), zoomIn];
-}, prepareComponentToken$5, {
+}, prepareComponentToken$6, {
   // Let From style before the Grid
   // ref https://github.com/ant-design/ant-design/issues/44386
   order: -1e3
@@ -39679,7 +39679,7 @@ const ErrorList = ({
   } = reactExports.useContext(FormItemPrefixContext);
   const baseClassName = `${prefixCls}-item-explain`;
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$7(prefixCls, rootCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$8(prefixCls, rootCls);
   const collapseMotion = reactExports.useMemo(() => initCollapseMotion(prefixCls), [prefixCls]);
   const debounceErrors = useDebounce(errors);
   const debounceWarnings = useDebounce(warnings);
@@ -39740,7 +39740,7 @@ const ErrorList = ({
     }));
   }));
 };
-var __rest$h = function(s, e2) {
+var __rest$i = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -39780,7 +39780,7 @@ const InternalForm = (props, ref) => {
     style: style2,
     feedbackIcons,
     variant
-  } = props, restFormProps = __rest$h(props, ["prefixCls", "className", "rootClassName", "size", "disabled", "form", "colon", "labelAlign", "labelWrap", "labelCol", "wrapperCol", "hideRequiredMark", "layout", "scrollToFirstError", "requiredMark", "onFinishFailed", "name", "style", "feedbackIcons", "variant"]);
+  } = props, restFormProps = __rest$i(props, ["prefixCls", "className", "rootClassName", "size", "disabled", "form", "colon", "labelAlign", "labelWrap", "labelCol", "wrapperCol", "hideRequiredMark", "layout", "scrollToFirstError", "requiredMark", "onFinishFailed", "name", "style", "feedbackIcons", "variant"]);
   const mergedSize = useSize(size);
   const contextValidateMessages = reactExports.useContext(ValidateMessagesContext);
   const mergedRequiredMark = reactExports.useMemo(() => {
@@ -39798,7 +39798,7 @@ const InternalForm = (props, ref) => {
   const mergedColon = colon !== null && colon !== void 0 ? colon : contextColon;
   const prefixCls = getPrefixCls("form", customizePrefixCls);
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$7(prefixCls, rootCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$8(prefixCls, rootCls);
   const formClassName = classNames(prefixCls, `${prefixCls}-${layout2}`, {
     [`${prefixCls}-hide-required-mark`]: mergedRequiredMark === false,
     // todo: remove in next major version
@@ -39967,7 +39967,7 @@ const FallbackCmp = genSubStyleComponent(["Form", "item-item"], (token2, {
   const formToken = prepareToken$1(token2, rootPrefixCls);
   return [genFallbackStyle(formToken)];
 });
-var __rest$g = function(s, e2) {
+var __rest$h = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -40017,7 +40017,7 @@ const FormItemInput = (props) => {
     const {
       labelCol: labelCol2,
       wrapperCol: wrapperCol2
-    } = formContext, rest = __rest$g(formContext, ["labelCol", "wrapperCol"]);
+    } = formContext, rest = __rest$h(formContext, ["labelCol", "wrapperCol"]);
     return rest;
   }, [formContext]);
   const extraRef = reactExports.useRef(null);
@@ -40084,7 +40084,7 @@ var QuestionCircleOutlined = function QuestionCircleOutlined2(props, ref) {
   }));
 };
 var RefIcon$l = /* @__PURE__ */ reactExports.forwardRef(QuestionCircleOutlined);
-var __rest$f = function(s, e2) {
+var __rest$g = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -40131,7 +40131,7 @@ const FormItemLabel = ({
   if (tooltipProps) {
     const {
       icon = /* @__PURE__ */ reactExports.createElement(RefIcon$l, null)
-    } = tooltipProps, restTooltipProps = __rest$f(tooltipProps, ["icon"]);
+    } = tooltipProps, restTooltipProps = __rest$g(tooltipProps, ["icon"]);
     const tooltipNode = /* @__PURE__ */ reactExports.createElement(Tooltip2, Object.assign({}, restTooltipProps), /* @__PURE__ */ reactExports.cloneElement(icon, {
       className: `${prefixCls}-item-tooltip`,
       title: "",
@@ -40240,7 +40240,7 @@ function StatusProvider({
     value: formItemStatusContext
   }, children);
 }
-var __rest$e = function(s, e2) {
+var __rest$f = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -40268,7 +40268,7 @@ function ItemHolder(props) {
     onSubItemMetaChange,
     layout: layout2,
     name
-  } = props, restProps = __rest$e(props, ["prefixCls", "className", "rootClassName", "style", "help", "errors", "warnings", "validateStatus", "meta", "hasFeedback", "hidden", "children", "fieldId", "required", "isRequired", "onSubItemMetaChange", "layout", "name"]);
+  } = props, restProps = __rest$f(props, ["prefixCls", "className", "rootClassName", "style", "help", "errors", "warnings", "validateStatus", "meta", "hasFeedback", "hidden", "children", "fieldId", "required", "isRequired", "onSubItemMetaChange", "layout", "name"]);
   const itemPrefixCls = `${prefixCls}-item`;
   const {
     requiredMark,
@@ -40440,7 +40440,7 @@ function InternalFormItem(props) {
   const hasName = !(name === void 0 || name === null);
   const prefixCls = getPrefixCls("form", customizePrefixCls);
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$7(prefixCls, rootCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$8(prefixCls, rootCls);
   devUseWarning();
   const listContext = reactExports.useContext(ListContext);
   const fieldKeyPathRef = reactExports.useRef(null);
@@ -40599,7 +40599,7 @@ function InternalFormItem(props) {
 }
 const FormItem = InternalFormItem;
 FormItem.useStatus = useFormItemStatus;
-var __rest$d = function(s, e2) {
+var __rest$e = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -40611,7 +40611,7 @@ const FormList = (_a3) => {
   var {
     prefixCls: customizePrefixCls,
     children
-  } = _a3, props = __rest$d(_a3, ["prefixCls", "children"]);
+  } = _a3, props = __rest$e(_a3, ["prefixCls", "children"]);
   const {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
@@ -40679,7 +40679,7 @@ const Group = (props) => {
   } = props;
   const prefixCls = getPrefixCls("input-group", customizePrefixCls);
   const inputPrefixCls = getPrefixCls("input");
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$9(inputPrefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$a(inputPrefixCls);
   const cls = classNames(prefixCls, cssVarCls, {
     [`${prefixCls}-lg`]: props.size === "large",
     [`${prefixCls}-sm`]: props.size === "small",
@@ -40751,11 +40751,11 @@ const genOTPStyle = (token2) => {
     }
   };
 };
-const useStyle$6 = genStyleHooks(["Input", "OTP"], (token2) => {
+const useStyle$7 = genStyleHooks(["Input", "OTP"], (token2) => {
   const inputToken = merge(token2, initInputToken(token2));
   return [genOTPStyle(inputToken)];
 }, initComponentToken$1);
-var __rest$c = function(s, e2) {
+var __rest$d = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -40771,7 +40771,7 @@ const OTPInput = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     onActiveChange,
     index: index2,
     mask
-  } = props, restProps = __rest$c(props, ["className", "value", "onChange", "onActiveChange", "index", "mask"]);
+  } = props, restProps = __rest$d(props, ["className", "value", "onChange", "onActiveChange", "index", "mask"]);
   const {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
@@ -40835,7 +40835,7 @@ const OTPInput = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     })
   })));
 });
-var __rest$b = function(s, e2) {
+var __rest$c = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -40878,7 +40878,7 @@ const OTP = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     type: type4,
     onInput,
     inputMode
-  } = props, restProps = __rest$b(props, ["prefixCls", "length", "size", "defaultValue", "value", "onChange", "formatter", "separator", "variant", "disabled", "status", "autoFocus", "mask", "type", "onInput", "inputMode"]);
+  } = props, restProps = __rest$c(props, ["prefixCls", "length", "size", "defaultValue", "value", "onChange", "formatter", "separator", "variant", "disabled", "status", "autoFocus", "mask", "type", "onInput", "inputMode"]);
   const {
     getPrefixCls,
     direction
@@ -40889,7 +40889,7 @@ const OTP = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     data: true,
     attr: true
   });
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$6(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$7(prefixCls);
   const mergedSize = useSize((ctx) => customSize !== null && customSize !== void 0 ? customSize : ctx);
   const formContext = reactExports.useContext(FormItemInputContext);
   const mergedStatus = getMergedStatus(formContext.status, customStatus);
@@ -41022,7 +41022,7 @@ var EyeInvisibleOutlined = function EyeInvisibleOutlined2(props, ref) {
   }));
 };
 var RefIcon$j = /* @__PURE__ */ reactExports.forwardRef(EyeInvisibleOutlined);
-var __rest$a = function(s, e2) {
+var __rest$b = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -41088,7 +41088,7 @@ const Password = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     prefixCls: customizePrefixCls,
     inputPrefixCls: customizeInputPrefixCls,
     size
-  } = props, restProps = __rest$a(props, ["className", "prefixCls", "inputPrefixCls", "size"]);
+  } = props, restProps = __rest$b(props, ["className", "prefixCls", "inputPrefixCls", "size"]);
   const {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
@@ -41111,7 +41111,7 @@ const Password = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     ref: composeRef(ref, inputRef)
   }, omittedProps));
 });
-var __rest$9 = function(s, e2) {
+var __rest$a = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -41136,7 +41136,7 @@ const Search = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     onCompositionEnd,
     variant,
     onPressEnter: customOnPressEnter
-  } = props, restProps = __rest$9(props, ["prefixCls", "inputPrefixCls", "className", "size", "suffix", "enterButton", "addonAfter", "loading", "disabled", "onSearch", "onChange", "onCompositionStart", "onCompositionEnd", "variant", "onPressEnter"]);
+  } = props, restProps = __rest$a(props, ["prefixCls", "inputPrefixCls", "className", "size", "suffix", "enterButton", "addonAfter", "loading", "disabled", "onSearch", "onChange", "onCompositionStart", "onCompositionEnd", "variant", "onPressEnter"]);
   const {
     getPrefixCls,
     direction
@@ -41337,14 +41337,14 @@ function calculateAutoSizeStyle(uiTextNode) {
   }
   return style2;
 }
-var _excluded$a = ["prefixCls", "defaultValue", "value", "autoSize", "onResize", "className", "style", "disabled", "onChange", "onInternalAutoSize"];
+var _excluded$b = ["prefixCls", "defaultValue", "value", "autoSize", "onResize", "className", "style", "disabled", "onChange", "onInternalAutoSize"];
 var RESIZE_START = 0;
 var RESIZE_MEASURING = 1;
 var RESIZE_STABLE = 2;
 var ResizableTextArea = /* @__PURE__ */ reactExports.forwardRef(function(props, ref) {
   var _ref = props, prefixCls = _ref.prefixCls, defaultValue = _ref.defaultValue, value = _ref.value, autoSize = _ref.autoSize, onResize2 = _ref.onResize, className = _ref.className, style2 = _ref.style, disabled = _ref.disabled, onChange = _ref.onChange;
   _ref.onInternalAutoSize;
-  var restProps = _objectWithoutProperties(_ref, _excluded$a);
+  var restProps = _objectWithoutProperties(_ref, _excluded$b);
   var _useMergedState = useMergedState(defaultValue, {
     value,
     postState: function postState(val) {
@@ -41435,10 +41435,10 @@ var ResizableTextArea = /* @__PURE__ */ reactExports.forwardRef(function(props, 
     onChange: onInternalChange
   })));
 });
-var _excluded$9 = ["defaultValue", "value", "onFocus", "onBlur", "onChange", "allowClear", "maxLength", "onCompositionStart", "onCompositionEnd", "suffix", "prefixCls", "showCount", "count", "className", "style", "disabled", "hidden", "classNames", "styles", "onResize", "onClear", "onPressEnter", "readOnly", "autoSize", "onKeyDown"];
+var _excluded$a = ["defaultValue", "value", "onFocus", "onBlur", "onChange", "allowClear", "maxLength", "onCompositionStart", "onCompositionEnd", "suffix", "prefixCls", "showCount", "count", "className", "style", "disabled", "hidden", "classNames", "styles", "onResize", "onClear", "onPressEnter", "readOnly", "autoSize", "onKeyDown"];
 var TextArea$1 = /* @__PURE__ */ React.forwardRef(function(_ref, ref) {
   var _countConfig$max;
-  var defaultValue = _ref.defaultValue, customValue = _ref.value, onFocus = _ref.onFocus, onBlur = _ref.onBlur, onChange = _ref.onChange, allowClear = _ref.allowClear, maxLength = _ref.maxLength, onCompositionStart = _ref.onCompositionStart, onCompositionEnd = _ref.onCompositionEnd, suffix = _ref.suffix, _ref$prefixCls = _ref.prefixCls, prefixCls = _ref$prefixCls === void 0 ? "rc-textarea" : _ref$prefixCls, showCount = _ref.showCount, count = _ref.count, className = _ref.className, style2 = _ref.style, disabled = _ref.disabled, hidden = _ref.hidden, classNames$1 = _ref.classNames, styles = _ref.styles, onResize2 = _ref.onResize, onClear = _ref.onClear, onPressEnter = _ref.onPressEnter, readOnly = _ref.readOnly, autoSize = _ref.autoSize, onKeyDown2 = _ref.onKeyDown, rest = _objectWithoutProperties(_ref, _excluded$9);
+  var defaultValue = _ref.defaultValue, customValue = _ref.value, onFocus = _ref.onFocus, onBlur = _ref.onBlur, onChange = _ref.onChange, allowClear = _ref.allowClear, maxLength = _ref.maxLength, onCompositionStart = _ref.onCompositionStart, onCompositionEnd = _ref.onCompositionEnd, suffix = _ref.suffix, _ref$prefixCls = _ref.prefixCls, prefixCls = _ref$prefixCls === void 0 ? "rc-textarea" : _ref$prefixCls, showCount = _ref.showCount, count = _ref.count, className = _ref.className, style2 = _ref.style, disabled = _ref.disabled, hidden = _ref.hidden, classNames$1 = _ref.classNames, styles = _ref.styles, onResize2 = _ref.onResize, onClear = _ref.onClear, onPressEnter = _ref.onPressEnter, readOnly = _ref.readOnly, autoSize = _ref.autoSize, onKeyDown2 = _ref.onKeyDown, rest = _objectWithoutProperties(_ref, _excluded$a);
   var _useMergedState = useMergedState(defaultValue, {
     value: customValue,
     defaultValue
@@ -41695,13 +41695,13 @@ const genTextAreaStyle = (token2) => {
     }
   };
 };
-const useStyle$5 = genStyleHooks(["Input", "TextArea"], (token2) => {
+const useStyle$6 = genStyleHooks(["Input", "TextArea"], (token2) => {
   const inputToken = merge(token2, initInputToken(token2));
   return [genTextAreaStyle(inputToken)];
 }, initComponentToken$1, {
   resetFont: false
 });
-var __rest$8 = function(s, e2) {
+var __rest$9 = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -41727,7 +41727,7 @@ const TextArea = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     showCount,
     onMouseDown,
     onResize: onResize2
-  } = props, rest = __rest$8(props, ["prefixCls", "bordered", "size", "disabled", "status", "allowClear", "classNames", "rootClassName", "className", "style", "styles", "variant", "showCount", "onMouseDown", "onResize"]);
+  } = props, rest = __rest$9(props, ["prefixCls", "bordered", "size", "disabled", "status", "allowClear", "classNames", "rootClassName", "className", "style", "styles", "variant", "showCount", "onMouseDown", "onResize"]);
   const {
     getPrefixCls,
     direction,
@@ -41764,7 +41764,7 @@ const TextArea = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
   const prefixCls = getPrefixCls("input", customizePrefixCls);
   const rootCls = useCSSVarCls(prefixCls);
   const [wrapSharedCSSVar, hashId, cssVarCls] = useSharedStyle(prefixCls, rootClassName);
-  const [wrapCSSVar] = useStyle$5(prefixCls, rootCls);
+  const [wrapCSSVar] = useStyle$6(prefixCls, rootCls);
   const {
     compactSize,
     compactItemClassnames
@@ -41854,7 +41854,7 @@ function useHasSider(siders, children, hasSider) {
   const childNodes = toArray$5(children);
   return childNodes.some((node2) => node2.type === Sider);
 }
-var __rest$7 = function(s, e2) {
+var __rest$8 = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -41882,12 +41882,12 @@ const Basic = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     suffixCls,
     className,
     tagName: TagName
-  } = props, others = __rest$7(props, ["prefixCls", "suffixCls", "className", "tagName"]);
+  } = props, others = __rest$8(props, ["prefixCls", "suffixCls", "className", "tagName"]);
   const {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
   const prefixCls = getPrefixCls("layout", customizePrefixCls);
-  const [wrapSSR, hashId, cssVarCls] = useStyle$f(prefixCls);
+  const [wrapSSR, hashId, cssVarCls] = useStyle$g(prefixCls);
   const prefixWithSuffixCls = suffixCls ? `${prefixCls}-${suffixCls}` : prefixCls;
   return wrapSSR(/* @__PURE__ */ reactExports.createElement(TagName, Object.assign({
     className: classNames(customizePrefixCls || prefixWithSuffixCls, className, hashId, cssVarCls),
@@ -41907,7 +41907,7 @@ const BasicLayout = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
     hasSider,
     tagName: Tag,
     style: style2
-  } = props, others = __rest$7(props, ["prefixCls", "className", "rootClassName", "children", "hasSider", "tagName", "style"]);
+  } = props, others = __rest$8(props, ["prefixCls", "className", "rootClassName", "children", "hasSider", "tagName", "style"]);
   const passedProps = omit(others, ["suffixCls"]);
   const {
     getPrefixCls,
@@ -41916,7 +41916,7 @@ const BasicLayout = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
   } = useComponentConfig("layout");
   const prefixCls = getPrefixCls("layout", customizePrefixCls);
   const mergedHasSider = useHasSider(siders, children, hasSider);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$f(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$g(prefixCls);
   const classString = classNames(prefixCls, {
     [`${prefixCls}-has-sider`]: mergedHasSider,
     [`${prefixCls}-rtl`]: direction === "rtl"
@@ -42957,7 +42957,7 @@ const genPaginationFocusStyle = (token2) => {
     }
   };
 };
-const prepareComponentToken$4 = (token2) => Object.assign({
+const prepareComponentToken$5 = (token2) => Object.assign({
   itemBg: token2.colorBgContainer,
   itemSize: token2.controlHeight,
   itemSizeSM: token2.controlHeightSM,
@@ -42979,10 +42979,10 @@ const prepareToken = (token2) => merge(token2, {
   paginationEllipsisTextIndent: "0.13em"
   // magic for ui experience
 }, initInputToken(token2));
-const useStyle$4 = genStyleHooks("Pagination", (token2) => {
+const useStyle$5 = genStyleHooks("Pagination", (token2) => {
   const paginationToken = prepareToken(token2);
   return [genPaginationStyle$1(paginationToken), genPaginationFocusStyle(paginationToken)];
-}, prepareComponentToken$4);
+}, prepareComponentToken$5);
 const genBorderedStyle$1 = (token2) => {
   const {
     componentCls
@@ -43067,7 +43067,7 @@ const genBorderedStyle$1 = (token2) => {
 const BorderedStyle = genSubStyleComponent(["Pagination", "bordered"], (token2) => {
   const paginationToken = prepareToken(token2);
   return [genBorderedStyle$1(paginationToken)];
-}, prepareComponentToken$4);
+}, prepareComponentToken$5);
 function useShowSizeChanger(showSizeChanger) {
   return reactExports.useMemo(() => {
     if (typeof showSizeChanger === "boolean") {
@@ -43079,7 +43079,7 @@ function useShowSizeChanger(showSizeChanger) {
     return [void 0, void 0];
   }, [showSizeChanger]);
 }
-var __rest$6 = function(s, e2) {
+var __rest$7 = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -43101,7 +43101,7 @@ const Pagination = (props) => {
     showSizeChanger,
     selectComponentClass,
     pageSizeOptions
-  } = props, restProps = __rest$6(props, ["align", "prefixCls", "selectPrefixCls", "className", "rootClassName", "style", "size", "locale", "responsive", "showSizeChanger", "selectComponentClass", "pageSizeOptions"]);
+  } = props, restProps = __rest$7(props, ["align", "prefixCls", "selectPrefixCls", "className", "rootClassName", "style", "size", "locale", "responsive", "showSizeChanger", "selectComponentClass", "pageSizeOptions"]);
   const {
     xs
   } = useBreakpoint(responsive);
@@ -43114,7 +43114,7 @@ const Pagination = (props) => {
     style: contextStyle
   } = useComponentConfig("pagination");
   const prefixCls = getPrefixCls("pagination", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$4(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$5(prefixCls);
   const mergedSize = useSize(customizeSize);
   const isSmall = mergedSize === "small" || !!(xs && !mergedSize && responsive);
   const [contextLocale] = useLocale("Pagination", locale$4);
@@ -43582,7 +43582,7 @@ const genSpinStyle = (token2) => {
     })
   };
 };
-const prepareComponentToken$3 = (token2) => {
+const prepareComponentToken$4 = (token2) => {
   const {
     controlHeightLG,
     controlHeight
@@ -43594,12 +43594,12 @@ const prepareComponentToken$3 = (token2) => {
     dotSizeLG: controlHeight
   };
 };
-const useStyle$3 = genStyleHooks("Spin", (token2) => {
+const useStyle$4 = genStyleHooks("Spin", (token2) => {
   const spinToken = merge(token2, {
     spinDotDefault: token2.colorTextDescription
   });
   return [genSpinStyle(spinToken)];
-}, prepareComponentToken$3);
+}, prepareComponentToken$4);
 const AUTO_INTERVAL = 200;
 const STEP_BUCKETS = [[30, 0.05], [70, 0.03], [96, 0.01]];
 function usePercent(spinning, percent) {
@@ -43628,7 +43628,7 @@ function usePercent(spinning, percent) {
   }, [isAuto, spinning]);
   return isAuto ? mockPercent : percent;
 }
-var __rest$5 = function(s, e2) {
+var __rest$6 = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -43656,7 +43656,7 @@ const Spin = (props) => {
     fullscreen = false,
     indicator,
     percent
-  } = props, restProps = __rest$5(props, ["prefixCls", "spinning", "delay", "className", "rootClassName", "size", "tip", "wrapperClassName", "style", "children", "fullscreen", "indicator", "percent"]);
+  } = props, restProps = __rest$6(props, ["prefixCls", "spinning", "delay", "className", "rootClassName", "size", "tip", "wrapperClassName", "style", "children", "fullscreen", "indicator", "percent"]);
   const {
     getPrefixCls,
     direction,
@@ -43665,7 +43665,7 @@ const Spin = (props) => {
     indicator: contextIndicator
   } = useComponentConfig("spin");
   const prefixCls = getPrefixCls("spin", customizePrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$3(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$4(prefixCls);
   const [spinning, setSpinning] = reactExports.useState(() => customSpinning && !shouldDelay(customSpinning, delay));
   const mergedPercent = usePercent(spinning, percent);
   reactExports.useEffect(() => {
@@ -43938,7 +43938,7 @@ const staticMethods = baseStaticMethods;
 methods.forEach((type4) => {
   staticMethods[type4] = (...args) => typeOpen(type4, args);
 });
-var __rest$4 = function(s, e2) {
+var __rest$5 = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -43956,14 +43956,14 @@ const PurePanel$1 = (props) => {
     title,
     children,
     footer
-  } = props, restProps = __rest$4(props, ["prefixCls", "className", "closeIcon", "closable", "type", "title", "children", "footer"]);
+  } = props, restProps = __rest$5(props, ["prefixCls", "className", "closeIcon", "closable", "type", "title", "children", "footer"]);
   const {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
   const rootPrefixCls = getPrefixCls();
   const prefixCls = customizePrefixCls || getPrefixCls("modal");
   const rootCls = useCSSVarCls(rootPrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle$j(prefixCls, rootCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$k(prefixCls, rootCls);
   const confirmPrefixCls = `${prefixCls}-confirm`;
   let additionalProps = {};
   if (type4) {
@@ -44077,7 +44077,7 @@ const genBaseStyle$1 = (token2) => {
     }
   };
 };
-const prepareComponentToken$2 = (token2) => {
+const prepareComponentToken$3 = (token2) => {
   const {
     zIndexPopupBase
   } = token2;
@@ -44085,10 +44085,10 @@ const prepareComponentToken$2 = (token2) => {
     zIndexPopup: zIndexPopupBase + 60
   };
 };
-const useStyle$2 = genStyleHooks("Popconfirm", (token2) => genBaseStyle$1(token2), prepareComponentToken$2, {
+const useStyle$3 = genStyleHooks("Popconfirm", (token2) => genBaseStyle$1(token2), prepareComponentToken$3, {
   resetStyle: false
 });
-var __rest$3 = function(s, e2) {
+var __rest$4 = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -44154,12 +44154,12 @@ const PurePanel = (props) => {
     placement,
     className,
     style: style2
-  } = props, restProps = __rest$3(props, ["prefixCls", "placement", "className", "style"]);
+  } = props, restProps = __rest$4(props, ["prefixCls", "placement", "className", "style"]);
   const {
     getPrefixCls
   } = reactExports.useContext(ConfigContext);
   const prefixCls = getPrefixCls("popconfirm", customizePrefixCls);
-  const [wrapCSSVar] = useStyle$2(prefixCls);
+  const [wrapCSSVar] = useStyle$3(prefixCls);
   return wrapCSSVar(/* @__PURE__ */ reactExports.createElement(PurePanel$4, {
     placement,
     className: classNames(prefixCls, className),
@@ -44169,7 +44169,7 @@ const PurePanel = (props) => {
     }, restProps))
   }));
 };
-var __rest$2 = function(s, e2) {
+var __rest$3 = function(s, e2) {
   var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
@@ -44192,7 +44192,7 @@ const InternalPopconfirm = /* @__PURE__ */ reactExports.forwardRef((props, ref) 
     overlayStyle,
     styles,
     classNames: popconfirmClassNames
-  } = props, restProps = __rest$2(props, ["prefixCls", "placement", "trigger", "okType", "icon", "children", "overlayClassName", "onOpenChange", "onVisibleChange", "overlayStyle", "styles", "classNames"]);
+  } = props, restProps = __rest$3(props, ["prefixCls", "placement", "trigger", "okType", "icon", "children", "overlayClassName", "onOpenChange", "onVisibleChange", "overlayStyle", "styles", "classNames"]);
   const {
     getPrefixCls,
     className: contextClassName,
@@ -44233,7 +44233,7 @@ const InternalPopconfirm = /* @__PURE__ */ reactExports.forwardRef((props, ref) 
   const prefixCls = getPrefixCls("popconfirm", customizePrefixCls);
   const rootClassNames = classNames(prefixCls, contextClassName, overlayClassName, contextClassNames.root, popconfirmClassNames === null || popconfirmClassNames === void 0 ? void 0 : popconfirmClassNames.root);
   const bodyClassNames = classNames(contextClassNames.body, popconfirmClassNames === null || popconfirmClassNames === void 0 ? void 0 : popconfirmClassNames.body);
-  const [wrapCSSVar] = useStyle$2(prefixCls);
+  const [wrapCSSVar] = useStyle$3(prefixCls);
   return wrapCSSVar(/* @__PURE__ */ reactExports.createElement(Popover, Object.assign({}, omit(restProps, ["title"]), {
     trigger,
     placement,
@@ -44398,6 +44398,434 @@ var UserOutlined = function UserOutlined2(props, ref) {
   }));
 };
 var RefIcon = /* @__PURE__ */ reactExports.forwardRef(UserOutlined);
+var _excluded$9 = ["prefixCls", "className", "checked", "defaultChecked", "disabled", "loadingIcon", "checkedChildren", "unCheckedChildren", "onClick", "onChange", "onKeyDown"];
+var Switch$1 = /* @__PURE__ */ reactExports.forwardRef(function(_ref, ref) {
+  var _classNames;
+  var _ref$prefixCls = _ref.prefixCls, prefixCls = _ref$prefixCls === void 0 ? "rc-switch" : _ref$prefixCls, className = _ref.className, checked = _ref.checked, defaultChecked = _ref.defaultChecked, disabled = _ref.disabled, loadingIcon = _ref.loadingIcon, checkedChildren = _ref.checkedChildren, unCheckedChildren = _ref.unCheckedChildren, onClick = _ref.onClick, onChange = _ref.onChange, onKeyDown2 = _ref.onKeyDown, restProps = _objectWithoutProperties(_ref, _excluded$9);
+  var _useMergedState = useMergedState(false, {
+    value: checked,
+    defaultValue: defaultChecked
+  }), _useMergedState2 = _slicedToArray(_useMergedState, 2), innerChecked = _useMergedState2[0], setInnerChecked = _useMergedState2[1];
+  function triggerChange(newChecked, event) {
+    var mergedChecked = innerChecked;
+    if (!disabled) {
+      mergedChecked = newChecked;
+      setInnerChecked(mergedChecked);
+      onChange === null || onChange === void 0 ? void 0 : onChange(mergedChecked, event);
+    }
+    return mergedChecked;
+  }
+  function onInternalKeyDown(e2) {
+    if (e2.which === KeyCode$2.LEFT) {
+      triggerChange(false, e2);
+    } else if (e2.which === KeyCode$2.RIGHT) {
+      triggerChange(true, e2);
+    }
+    onKeyDown2 === null || onKeyDown2 === void 0 ? void 0 : onKeyDown2(e2);
+  }
+  function onInternalClick(e2) {
+    var ret = triggerChange(!innerChecked, e2);
+    onClick === null || onClick === void 0 ? void 0 : onClick(ret, e2);
+  }
+  var switchClassName = classNames(prefixCls, className, (_classNames = {}, _defineProperty$1(_classNames, "".concat(prefixCls, "-checked"), innerChecked), _defineProperty$1(_classNames, "".concat(prefixCls, "-disabled"), disabled), _classNames));
+  return /* @__PURE__ */ reactExports.createElement("button", _extends({}, restProps, {
+    type: "button",
+    role: "switch",
+    "aria-checked": innerChecked,
+    disabled,
+    className: switchClassName,
+    ref,
+    onKeyDown: onInternalKeyDown,
+    onClick: onInternalClick
+  }), loadingIcon, /* @__PURE__ */ reactExports.createElement("span", {
+    className: "".concat(prefixCls, "-inner")
+  }, /* @__PURE__ */ reactExports.createElement("span", {
+    className: "".concat(prefixCls, "-inner-checked")
+  }, checkedChildren), /* @__PURE__ */ reactExports.createElement("span", {
+    className: "".concat(prefixCls, "-inner-unchecked")
+  }, unCheckedChildren)));
+});
+Switch$1.displayName = "Switch";
+const genSwitchSmallStyle = (token2) => {
+  const {
+    componentCls,
+    trackHeightSM,
+    trackPadding,
+    trackMinWidthSM,
+    innerMinMarginSM,
+    innerMaxMarginSM,
+    handleSizeSM,
+    calc
+  } = token2;
+  const switchInnerCls = `${componentCls}-inner`;
+  const trackPaddingCalc = unit$1(calc(handleSizeSM).add(calc(trackPadding).mul(2)).equal());
+  const innerMaxMarginCalc = unit$1(calc(innerMaxMarginSM).mul(2).equal());
+  return {
+    [componentCls]: {
+      [`&${componentCls}-small`]: {
+        minWidth: trackMinWidthSM,
+        height: trackHeightSM,
+        lineHeight: unit$1(trackHeightSM),
+        [`${componentCls}-inner`]: {
+          paddingInlineStart: innerMaxMarginSM,
+          paddingInlineEnd: innerMinMarginSM,
+          [`${switchInnerCls}-checked, ${switchInnerCls}-unchecked`]: {
+            minHeight: trackHeightSM
+          },
+          [`${switchInnerCls}-checked`]: {
+            marginInlineStart: `calc(-100% + ${trackPaddingCalc} - ${innerMaxMarginCalc})`,
+            marginInlineEnd: `calc(100% - ${trackPaddingCalc} + ${innerMaxMarginCalc})`
+          },
+          [`${switchInnerCls}-unchecked`]: {
+            marginTop: calc(trackHeightSM).mul(-1).equal(),
+            marginInlineStart: 0,
+            marginInlineEnd: 0
+          }
+        },
+        [`${componentCls}-handle`]: {
+          width: handleSizeSM,
+          height: handleSizeSM
+        },
+        [`${componentCls}-loading-icon`]: {
+          top: calc(calc(handleSizeSM).sub(token2.switchLoadingIconSize)).div(2).equal(),
+          fontSize: token2.switchLoadingIconSize
+        },
+        [`&${componentCls}-checked`]: {
+          [`${componentCls}-inner`]: {
+            paddingInlineStart: innerMinMarginSM,
+            paddingInlineEnd: innerMaxMarginSM,
+            [`${switchInnerCls}-checked`]: {
+              marginInlineStart: 0,
+              marginInlineEnd: 0
+            },
+            [`${switchInnerCls}-unchecked`]: {
+              marginInlineStart: `calc(100% - ${trackPaddingCalc} + ${innerMaxMarginCalc})`,
+              marginInlineEnd: `calc(-100% + ${trackPaddingCalc} - ${innerMaxMarginCalc})`
+            }
+          },
+          [`${componentCls}-handle`]: {
+            insetInlineStart: `calc(100% - ${unit$1(calc(handleSizeSM).add(trackPadding).equal())})`
+          }
+        },
+        [`&:not(${componentCls}-disabled):active`]: {
+          [`&:not(${componentCls}-checked) ${switchInnerCls}`]: {
+            [`${switchInnerCls}-unchecked`]: {
+              marginInlineStart: calc(token2.marginXXS).div(2).equal(),
+              marginInlineEnd: calc(token2.marginXXS).mul(-1).div(2).equal()
+            }
+          },
+          [`&${componentCls}-checked ${switchInnerCls}`]: {
+            [`${switchInnerCls}-checked`]: {
+              marginInlineStart: calc(token2.marginXXS).mul(-1).div(2).equal(),
+              marginInlineEnd: calc(token2.marginXXS).div(2).equal()
+            }
+          }
+        }
+      }
+    }
+  };
+};
+const genSwitchLoadingStyle = (token2) => {
+  const {
+    componentCls,
+    handleSize,
+    calc
+  } = token2;
+  return {
+    [componentCls]: {
+      [`${componentCls}-loading-icon${token2.iconCls}`]: {
+        position: "relative",
+        top: calc(calc(handleSize).sub(token2.fontSize)).div(2).equal(),
+        color: token2.switchLoadingIconColor,
+        verticalAlign: "top"
+      },
+      [`&${componentCls}-checked ${componentCls}-loading-icon`]: {
+        color: token2.switchColor
+      }
+    }
+  };
+};
+const genSwitchHandleStyle = (token2) => {
+  const {
+    componentCls,
+    trackPadding,
+    handleBg,
+    handleShadow,
+    handleSize,
+    calc
+  } = token2;
+  const switchHandleCls = `${componentCls}-handle`;
+  return {
+    [componentCls]: {
+      [switchHandleCls]: {
+        position: "absolute",
+        top: trackPadding,
+        insetInlineStart: trackPadding,
+        width: handleSize,
+        height: handleSize,
+        transition: `all ${token2.switchDuration} ease-in-out`,
+        "&::before": {
+          position: "absolute",
+          top: 0,
+          insetInlineEnd: 0,
+          bottom: 0,
+          insetInlineStart: 0,
+          backgroundColor: handleBg,
+          borderRadius: calc(handleSize).div(2).equal(),
+          boxShadow: handleShadow,
+          transition: `all ${token2.switchDuration} ease-in-out`,
+          content: '""'
+        }
+      },
+      [`&${componentCls}-checked ${switchHandleCls}`]: {
+        insetInlineStart: `calc(100% - ${unit$1(calc(handleSize).add(trackPadding).equal())})`
+      },
+      [`&:not(${componentCls}-disabled):active`]: {
+        [`${switchHandleCls}::before`]: {
+          insetInlineEnd: token2.switchHandleActiveInset,
+          insetInlineStart: 0
+        },
+        [`&${componentCls}-checked ${switchHandleCls}::before`]: {
+          insetInlineEnd: 0,
+          insetInlineStart: token2.switchHandleActiveInset
+        }
+      }
+    }
+  };
+};
+const genSwitchInnerStyle = (token2) => {
+  const {
+    componentCls,
+    trackHeight,
+    trackPadding,
+    innerMinMargin,
+    innerMaxMargin,
+    handleSize,
+    calc
+  } = token2;
+  const switchInnerCls = `${componentCls}-inner`;
+  const trackPaddingCalc = unit$1(calc(handleSize).add(calc(trackPadding).mul(2)).equal());
+  const innerMaxMarginCalc = unit$1(calc(innerMaxMargin).mul(2).equal());
+  return {
+    [componentCls]: {
+      [switchInnerCls]: {
+        display: "block",
+        overflow: "hidden",
+        borderRadius: 100,
+        height: "100%",
+        paddingInlineStart: innerMaxMargin,
+        paddingInlineEnd: innerMinMargin,
+        transition: `padding-inline-start ${token2.switchDuration} ease-in-out, padding-inline-end ${token2.switchDuration} ease-in-out`,
+        [`${switchInnerCls}-checked, ${switchInnerCls}-unchecked`]: {
+          display: "block",
+          color: token2.colorTextLightSolid,
+          fontSize: token2.fontSizeSM,
+          transition: `margin-inline-start ${token2.switchDuration} ease-in-out, margin-inline-end ${token2.switchDuration} ease-in-out`,
+          pointerEvents: "none",
+          minHeight: trackHeight
+        },
+        [`${switchInnerCls}-checked`]: {
+          marginInlineStart: `calc(-100% + ${trackPaddingCalc} - ${innerMaxMarginCalc})`,
+          marginInlineEnd: `calc(100% - ${trackPaddingCalc} + ${innerMaxMarginCalc})`
+        },
+        [`${switchInnerCls}-unchecked`]: {
+          marginTop: calc(trackHeight).mul(-1).equal(),
+          marginInlineStart: 0,
+          marginInlineEnd: 0
+        }
+      },
+      [`&${componentCls}-checked ${switchInnerCls}`]: {
+        paddingInlineStart: innerMinMargin,
+        paddingInlineEnd: innerMaxMargin,
+        [`${switchInnerCls}-checked`]: {
+          marginInlineStart: 0,
+          marginInlineEnd: 0
+        },
+        [`${switchInnerCls}-unchecked`]: {
+          marginInlineStart: `calc(100% - ${trackPaddingCalc} + ${innerMaxMarginCalc})`,
+          marginInlineEnd: `calc(-100% + ${trackPaddingCalc} - ${innerMaxMarginCalc})`
+        }
+      },
+      [`&:not(${componentCls}-disabled):active`]: {
+        [`&:not(${componentCls}-checked) ${switchInnerCls}`]: {
+          [`${switchInnerCls}-unchecked`]: {
+            marginInlineStart: calc(trackPadding).mul(2).equal(),
+            marginInlineEnd: calc(trackPadding).mul(-1).mul(2).equal()
+          }
+        },
+        [`&${componentCls}-checked ${switchInnerCls}`]: {
+          [`${switchInnerCls}-checked`]: {
+            marginInlineStart: calc(trackPadding).mul(-1).mul(2).equal(),
+            marginInlineEnd: calc(trackPadding).mul(2).equal()
+          }
+        }
+      }
+    }
+  };
+};
+const genSwitchStyle = (token2) => {
+  const {
+    componentCls,
+    trackHeight,
+    trackMinWidth
+  } = token2;
+  return {
+    [componentCls]: Object.assign(Object.assign(Object.assign(Object.assign({}, resetComponent(token2)), {
+      position: "relative",
+      display: "inline-block",
+      boxSizing: "border-box",
+      minWidth: trackMinWidth,
+      height: trackHeight,
+      lineHeight: unit$1(trackHeight),
+      verticalAlign: "middle",
+      background: token2.colorTextQuaternary,
+      border: "0",
+      borderRadius: 100,
+      cursor: "pointer",
+      transition: `all ${token2.motionDurationMid}`,
+      userSelect: "none",
+      [`&:hover:not(${componentCls}-disabled)`]: {
+        background: token2.colorTextTertiary
+      }
+    }), genFocusStyle(token2)), {
+      [`&${componentCls}-checked`]: {
+        background: token2.switchColor,
+        [`&:hover:not(${componentCls}-disabled)`]: {
+          background: token2.colorPrimaryHover
+        }
+      },
+      [`&${componentCls}-loading, &${componentCls}-disabled`]: {
+        cursor: "not-allowed",
+        opacity: token2.switchDisabledOpacity,
+        "*": {
+          boxShadow: "none",
+          cursor: "not-allowed"
+        }
+      },
+      // rtl style
+      [`&${componentCls}-rtl`]: {
+        direction: "rtl"
+      }
+    })
+  };
+};
+const prepareComponentToken$2 = (token2) => {
+  const {
+    fontSize,
+    lineHeight,
+    controlHeight,
+    colorWhite
+  } = token2;
+  const height = fontSize * lineHeight;
+  const heightSM = controlHeight / 2;
+  const padding = 2;
+  const handleSize = height - padding * 2;
+  const handleSizeSM = heightSM - padding * 2;
+  return {
+    trackHeight: height,
+    trackHeightSM: heightSM,
+    trackMinWidth: handleSize * 2 + padding * 4,
+    trackMinWidthSM: handleSizeSM * 2 + padding * 2,
+    trackPadding: padding,
+    // Fixed value
+    handleBg: colorWhite,
+    handleSize,
+    handleSizeSM,
+    handleShadow: `0 2px 4px 0 ${new FastColor("#00230b").setA(0.2).toRgbString()}`,
+    innerMinMargin: handleSize / 2,
+    innerMaxMargin: handleSize + padding + padding * 2,
+    innerMinMarginSM: handleSizeSM / 2,
+    innerMaxMarginSM: handleSizeSM + padding + padding * 2
+  };
+};
+const useStyle$2 = genStyleHooks("Switch", (token2) => {
+  const switchToken = merge(token2, {
+    switchDuration: token2.motionDurationMid,
+    switchColor: token2.colorPrimary,
+    switchDisabledOpacity: token2.opacityLoading,
+    switchLoadingIconSize: token2.calc(token2.fontSizeIcon).mul(0.75).equal(),
+    switchLoadingIconColor: `rgba(0, 0, 0, ${token2.opacityLoading})`,
+    switchHandleActiveInset: "-30%"
+  });
+  return [
+    genSwitchStyle(switchToken),
+    // inner style
+    genSwitchInnerStyle(switchToken),
+    // handle style
+    genSwitchHandleStyle(switchToken),
+    // loading style
+    genSwitchLoadingStyle(switchToken),
+    // small style
+    genSwitchSmallStyle(switchToken)
+  ];
+}, prepareComponentToken$2);
+var __rest$2 = function(s, e2) {
+  var t2 = {};
+  for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e2.indexOf(p) < 0) t2[p] = s[p];
+  if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+    if (e2.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i])) t2[p[i]] = s[p[i]];
+  }
+  return t2;
+};
+const InternalSwitch = /* @__PURE__ */ reactExports.forwardRef((props, ref) => {
+  const {
+    prefixCls: customizePrefixCls,
+    size: customizeSize,
+    disabled: customDisabled,
+    loading,
+    className,
+    rootClassName,
+    style: style2,
+    checked: checkedProp,
+    value,
+    defaultChecked: defaultCheckedProp,
+    defaultValue,
+    onChange
+  } = props, restProps = __rest$2(props, ["prefixCls", "size", "disabled", "loading", "className", "rootClassName", "style", "checked", "value", "defaultChecked", "defaultValue", "onChange"]);
+  const [checked, setChecked] = useMergedState(false, {
+    value: checkedProp !== null && checkedProp !== void 0 ? checkedProp : value,
+    defaultValue: defaultCheckedProp !== null && defaultCheckedProp !== void 0 ? defaultCheckedProp : defaultValue
+  });
+  const {
+    getPrefixCls,
+    direction,
+    switch: SWITCH
+  } = reactExports.useContext(ConfigContext);
+  const disabled = reactExports.useContext(DisabledContext);
+  const mergedDisabled = (customDisabled !== null && customDisabled !== void 0 ? customDisabled : disabled) || loading;
+  const prefixCls = getPrefixCls("switch", customizePrefixCls);
+  const loadingIcon = /* @__PURE__ */ reactExports.createElement("div", {
+    className: `${prefixCls}-handle`
+  }, loading && /* @__PURE__ */ reactExports.createElement(RefIcon$u, {
+    className: `${prefixCls}-loading-icon`
+  }));
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle$2(prefixCls);
+  const mergedSize = useSize(customizeSize);
+  const classes = classNames(SWITCH === null || SWITCH === void 0 ? void 0 : SWITCH.className, {
+    [`${prefixCls}-small`]: mergedSize === "small",
+    [`${prefixCls}-loading`]: loading,
+    [`${prefixCls}-rtl`]: direction === "rtl"
+  }, className, rootClassName, hashId, cssVarCls);
+  const mergedStyle = Object.assign(Object.assign({}, SWITCH === null || SWITCH === void 0 ? void 0 : SWITCH.style), style2);
+  const changeHandler = (...args) => {
+    setChecked(args[0]);
+    onChange === null || onChange === void 0 ? void 0 : onChange.apply(void 0, args);
+  };
+  return wrapCSSVar(/* @__PURE__ */ reactExports.createElement(Wave, {
+    component: "Switch"
+  }, /* @__PURE__ */ reactExports.createElement(Switch$1, Object.assign({}, restProps, {
+    checked,
+    onChange: changeHandler,
+    prefixCls,
+    className: classes,
+    style: mergedStyle,
+    disabled: mergedDisabled,
+    ref,
+    loadingIcon
+  }))));
+});
+const Switch = InternalSwitch;
+Switch.__ANT_SWITCH = true;
 var EXPAND_COLUMN = {};
 var INTERNAL_HOOKS = "rc-table-internal-hook";
 function createContext(defaultValue) {
@@ -177985,26 +178413,27 @@ export {
   Route as D,
   Navigate as E,
   Form$1 as F,
-  Layout as G,
-  theme as H,
+  Switch as G,
+  Layout as H,
   Input as I,
-  HashRouter as J,
-  createStore as K,
+  theme as J,
+  HashRouter as K,
   Link as L,
   Menu$1 as M,
   NavLink as N,
-  trim as O,
+  createStore as O,
   Popconfirm as P,
-  keys as Q,
+  trim as Q,
   RefIcon as R,
   Select as S,
-  ServiceRegistry as T,
-  setServiceRegistry as U,
-  Breadcrumb as V,
-  RefIcon$5 as W,
-  RefIcon$d as X,
-  RefIcon$1 as Y,
-  RefIcon$c as Z,
+  keys as T,
+  ServiceRegistry as U,
+  setServiceRegistry as V,
+  Breadcrumb as W,
+  RefIcon$5 as X,
+  RefIcon$d as Y,
+  RefIcon$1 as Z,
+  RefIcon$c as _,
   RefIcon$2 as a,
   RefIcon$m as b,
   RefIcon$3 as c,

@@ -2,81 +2,97 @@
  * Created by tsxuehu on 17/1/9.
  */
 
-import axios from "axios";
-import { assertAxiosRes } from "./utils.ts";
+import axios from 'axios';
+import { assertAxiosRes } from './utils.ts';
 
 export async function saveFile(content: any) {
-  const response = await axios.post("/profile/savefile", content);
-  assertAxiosRes(response)
+  const response = await axios.post('/profile/savefile', content);
+  assertAxiosRes(response);
 }
 
-export function disableRule() {
-  return axios.post(`/profile/setRuleState`);
+export async function disableRule() {
+  const response = await axios.post(`/profile/setRuleState`);
+  assertAxiosRes(response);
 }
 
-export function enableRule() {
-  return axios.post(`/profile/setRuleState?rulestate=1`);
+export async function enableRule() {
+  const response = await axios.post(`/profile/setRuleState?rulestate=1`);
+  assertAxiosRes(response);
 }
 
-export function disableResolveHost() {
-  return axios.post(`/profile/setResolveHost`);
+export async function disableResolveHost() {
+  const response = await axios.post(`/profile/setResolveHost`);
+  assertAxiosRes(response);
 }
 
-export function enableResolveHost() {
-  return axios.post(`/profile/setResolveHost?resolve=1`);
+export async function enableResolveHost() {
+  const response = await axios.post(`/profile/setResolveHost?resolve=1`);
+  assertAxiosRes(response);
 }
 
-export function disableHost() {
-  return axios.post(`/profile/setHostState`);
+export async function disableHost() {
+  const response = await axios.post(`/profile/setHostState`);
+  assertAxiosRes(response);
 }
 
-export function enableHost() {
-  return axios.post(`/profile/setHostState?hoststate=1`);
+export async function enableHost() {
+  const response = await axios.post(`/profile/setHostState?hoststate=1`);
+  assertAxiosRes(response);
 }
 
-export function disableFilter() {
-  return axios.post(`/profile/setFilterState`);
+export async function disableFilter() {
+  const response = await axios.post(`/profile/setFilterState`);
+  assertAxiosRes(response);
 }
 
-export function enableFilter() {
-  return axios.post(`/profile/setFilterState?filterstate=1`);
+export async function enableFilter() {
+  const response = await axios.post(`/profile/setFilterState?filterstate=1`);
+  assertAxiosRes(response);
 }
 
 export async function getUserId(): Promise<string> {
-  const result =  await axios.get(`/profile/getUserId`);
-  return result.data.data.userId;
+  const response = await axios.get(`/profile/getUserId`);
+  assertAxiosRes(response);
+  return response.data.data.userId;
 }
 
-export function getUserInfo() {
-  return axios.get(`/profile/getUserInfo`);
+export async function getUserInfo() {
+  const response = await axios.get(`/profile/getUserInfo`);
+  assertAxiosRes(response);
 }
 
-export function setUserId(userId: string) {
-  return axios.get(`/profile/setUserId?userId=${userId}`);
+export async function setUserId(userId: string) {
+  const response = await axios.get(`/profile/setUserId?userId=${userId}`);
+  assertAxiosRes(response);
 }
 
-export function unBind(id: string) {
-  return axios.get(`/profile/device/unbind?deviceId=${id}`);
+export async function unBind(id: string) {
+  const response = await axios.get(`/profile/device/unbind?deviceId=${id}`);
+  assertAxiosRes(response);
 }
 
-export function setDeviceName(deviceId: string, name: string) {
-  return axios.get(`/profile/device/setName?deviceId=${deviceId}&name=${encodeURI(name)}`);
+export async function setDeviceName(deviceId: string, name: string) {
+  const response = await axios.get(`/profile/device/setName?deviceId=${deviceId}&name=${encodeURI(name)}`);
+  assertAxiosRes(response);
 }
 
-export function disableMonitor(deviceId: string) {
-  return axios.get(`/profile/device/disableMonitor?deviceId=${deviceId}`);
+export async function disableMonitor(deviceId: string) {
+  const response = await axios.get(`/profile/device/disableMonitor?deviceId=${deviceId}`);
+  assertAxiosRes(response);
 }
 
-export function deviceUseHost(deviceId: string, hostname: string) {
-  return axios.get(`/profile/device/usehost?deviceId=${deviceId}&hostname=${encodeURI(hostname)}`);
+export async function deviceUseHost(deviceId: string, hostname: string) {
+  const response = await axios.get(`/profile/device/usehost?deviceId=${deviceId}&hostname=${encodeURI(hostname)}`);
+  assertAxiosRes(response);
 }
 
-export function enableMonitor(deviceId: string) {
-  return axios.get(`/profile/device/enableMonitor?deviceId=${deviceId}`);
+export async function enableMonitor(deviceId: string) {
+  const response = await axios.get(`/profile/device/enableMonitor?deviceId=${deviceId}`);
+  assertAxiosRes(response);
 }
 
-export function setExternalProxy(deviceId: string, proxy: any) {
+export async function setExternalProxy(deviceId: string, proxy: any) {
   proxy.deviceId = deviceId;
-  return axios.post("/profile/device/externalProxy", proxy);
+  const response = await axios.post('/profile/device/externalProxy', proxy);
+  assertAxiosRes(response);
 }
-
