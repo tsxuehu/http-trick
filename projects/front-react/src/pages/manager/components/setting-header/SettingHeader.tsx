@@ -1,5 +1,5 @@
 import React from 'react';
-import { Select, Switch } from 'antd';
+import { Button, Select, Switch } from 'antd';
 import { getServiceSync } from '@spring4js/container-browser/lib/esm/global-fn';
 import IProfileService from '../../service-api/IProfileService.ts';
 import EService from '../../config/EService.ts';
@@ -138,6 +138,14 @@ export default class SettingHeader extends React.PureComponent<IProps, IState> {
         </span>
         <span>
           过滤器开关 <Switch checked={enableFilter} onChange={(value, e) => this.setEnableFilter(value)} />
+        </span>
+        <span>
+          <a href="/monitor.html" target="_blank">
+            <Button>监控窗</Button>
+          </a>
+          <a href="/help/index.html" target="_blank">
+            <Button>帮助中心</Button>
+          </a>
         </span>
       </div>
     );

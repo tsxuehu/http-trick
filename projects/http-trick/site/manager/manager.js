@@ -2432,6 +2432,10 @@ class SettingHeader extends React.PureComponent {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
         "过滤器开关 ",
         /* @__PURE__ */ jsxRuntimeExports.jsx(Switch, { checked: enableFilter2, onChange: (value, e) => this.setEnableFilter(value) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "/monitor.html", target: "_blank", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { children: "监控窗" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "/help/index.html", target: "_blank", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { children: "帮助中心" }) })
       ] })
     ] });
   }
