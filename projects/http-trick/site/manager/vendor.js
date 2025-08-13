@@ -18859,36 +18859,36 @@ const getUrlRegex = function() {
   var b = function b2(options) {
     return options && options.includeBoundaries ? "(?:(?<=\\s|^)(?=".concat(word, ")|(?<=").concat(word, ")(?=\\s|$))") : "";
   };
-  var v4 = "(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)){3}";
+  var v42 = "(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)){3}";
   var v6seg = "[a-fA-F\\d]{1,4}";
   var v6List = [
     "(?:".concat(v6seg, ":){7}(?:").concat(v6seg, "|:)"),
     // 1:2:3:4:5:6:7::  1:2:3:4:5:6:7:8
-    "(?:".concat(v6seg, ":){6}(?:").concat(v4, "|:").concat(v6seg, "|:)"),
+    "(?:".concat(v6seg, ":){6}(?:").concat(v42, "|:").concat(v6seg, "|:)"),
     // 1:2:3:4:5:6::    1:2:3:4:5:6::8   1:2:3:4:5:6::8  1:2:3:4:5:6::
-    "(?:".concat(v6seg, ":){5}(?::").concat(v4, "|(?::").concat(v6seg, "){1,2}|:)"),
+    "(?:".concat(v6seg, ":){5}(?::").concat(v42, "|(?::").concat(v6seg, "){1,2}|:)"),
     // 1:2:3:4:5::      1:2:3:4:5::7:8   1:2:3:4:5::8    1:2:3:4:5::
-    "(?:".concat(v6seg, ":){4}(?:(?::").concat(v6seg, "){0,1}:").concat(v4, "|(?::").concat(v6seg, "){1,3}|:)"),
+    "(?:".concat(v6seg, ":){4}(?:(?::").concat(v6seg, "){0,1}:").concat(v42, "|(?::").concat(v6seg, "){1,3}|:)"),
     // 1:2:3:4::        1:2:3:4::6:7:8   1:2:3:4::8      1:2:3:4::
-    "(?:".concat(v6seg, ":){3}(?:(?::").concat(v6seg, "){0,2}:").concat(v4, "|(?::").concat(v6seg, "){1,4}|:)"),
+    "(?:".concat(v6seg, ":){3}(?:(?::").concat(v6seg, "){0,2}:").concat(v42, "|(?::").concat(v6seg, "){1,4}|:)"),
     // 1:2:3::          1:2:3::5:6:7:8   1:2:3::8        1:2:3::
-    "(?:".concat(v6seg, ":){2}(?:(?::").concat(v6seg, "){0,3}:").concat(v4, "|(?::").concat(v6seg, "){1,5}|:)"),
+    "(?:".concat(v6seg, ":){2}(?:(?::").concat(v6seg, "){0,3}:").concat(v42, "|(?::").concat(v6seg, "){1,5}|:)"),
     // 1:2::            1:2::4:5:6:7:8   1:2::8          1:2::
-    "(?:".concat(v6seg, ":){1}(?:(?::").concat(v6seg, "){0,4}:").concat(v4, "|(?::").concat(v6seg, "){1,6}|:)"),
+    "(?:".concat(v6seg, ":){1}(?:(?::").concat(v6seg, "){0,4}:").concat(v42, "|(?::").concat(v6seg, "){1,6}|:)"),
     // 1::              1::3:4:5:6:7:8   1::8            1::
-    "(?::(?:(?::".concat(v6seg, "){0,5}:").concat(v4, "|(?::").concat(v6seg, "){1,7}|:))")
+    "(?::(?:(?::".concat(v6seg, "){0,5}:").concat(v42, "|(?::").concat(v6seg, "){1,7}|:))")
     // ::2:3:4:5:6:7:8  ::2:3:4:5:6:7:8  ::8             ::
   ];
   var v6Eth0 = "(?:%[0-9a-zA-Z]{1,})?";
   var v6 = "(?:".concat(v6List.join("|"), ")").concat(v6Eth0);
-  var v46Exact = new RegExp("(?:^".concat(v4, "$)|(?:^").concat(v6, "$)"));
-  var v4exact = new RegExp("^".concat(v4, "$"));
+  var v46Exact = new RegExp("(?:^".concat(v42, "$)|(?:^").concat(v6, "$)"));
+  var v4exact = new RegExp("^".concat(v42, "$"));
   var v6exact = new RegExp("^".concat(v6, "$"));
   var ip = function ip2(options) {
-    return options && options.exact ? v46Exact : new RegExp("(?:".concat(b(options)).concat(v4).concat(b(options), ")|(?:").concat(b(options)).concat(v6).concat(b(options), ")"), "g");
+    return options && options.exact ? v46Exact : new RegExp("(?:".concat(b(options)).concat(v42).concat(b(options), ")|(?:").concat(b(options)).concat(v6).concat(b(options), ")"), "g");
   };
   ip.v4 = function(options) {
-    return options && options.exact ? v4exact : new RegExp("".concat(b(options)).concat(v4).concat(b(options)), "g");
+    return options && options.exact ? v4exact : new RegExp("".concat(b(options)).concat(v42).concat(b(options)), "g");
   };
   ip.v6 = function(options) {
     return options && options.exact ? v6exact : new RegExp("".concat(b(options)).concat(v6).concat(b(options)), "g");
@@ -141559,19 +141559,19 @@ class MouseTargetFactory {
     const mouseCoordinates = request.pos.toClientCoordinates(getWindow(ctx.viewDomNode));
     const spanNodeClientRect = spanNode.getBoundingClientRect();
     const mouseIsOverSpanNode = spanNodeClientRect.left <= mouseCoordinates.clientX && mouseCoordinates.clientX <= spanNodeClientRect.right;
-    let rng = null;
+    let rng2 = null;
     for (let i = 1; i < points.length; i++) {
       const prev2 = points[i - 1];
       const curr = points[i];
       if (prev2.offset <= request.mouseContentHorizontalOffset && request.mouseContentHorizontalOffset <= curr.offset) {
-        rng = new Range$3(lineNumber, prev2.column, lineNumber, curr.column);
+        rng2 = new Range$3(lineNumber, prev2.column, lineNumber, curr.column);
         const prevDelta = Math.abs(prev2.offset - request.mouseContentHorizontalOffset);
         const nextDelta = Math.abs(curr.offset - request.mouseContentHorizontalOffset);
         pos = prevDelta < nextDelta ? new Position$2(lineNumber, prev2.column) : new Position$2(lineNumber, curr.column);
         break;
       }
     }
-    return request.fulfillContentText(pos, rng, { mightBeForeignElement: !mouseIsOverSpanNode || !!injectedText, injectedText });
+    return request.fulfillContentText(pos, rng2, { mightBeForeignElement: !mouseIsOverSpanNode || !!injectedText, injectedText });
   }
   /**
    * Most probably WebKit browsers and Edge
@@ -150331,12 +150331,12 @@ class RenderedLinesCollection {
     const endLineNumber = this.getEndLineNumber();
     let notifiedSomeone = false;
     for (let i = 0, len = ranges.length; i < len; i++) {
-      const rng = ranges[i];
-      if (rng.toLineNumber < startLineNumber || rng.fromLineNumber > endLineNumber) {
+      const rng2 = ranges[i];
+      if (rng2.toLineNumber < startLineNumber || rng2.fromLineNumber > endLineNumber) {
         continue;
       }
-      const from2 = Math.max(startLineNumber, rng.fromLineNumber);
-      const to = Math.min(endLineNumber, rng.toLineNumber);
+      const from2 = Math.max(startLineNumber, rng2.fromLineNumber);
+      const to = Math.min(endLineNumber, rng2.toLineNumber);
       for (let lineNumber = from2; lineNumber <= to; lineNumber++) {
         const lineIndex = lineNumber - this._rendLineNumberStart;
         this._lines[lineIndex].onTokensChanged();
@@ -174287,6 +174287,39 @@ monaco_editor_core_exports$3.languages.register({
 monaco_editor_core_exports$3.languages.onLanguage("json", () => {
   getMode().then((mode) => mode.setupMode(jsonDefaults));
 });
+const byteToHex = [];
+for (let i = 0; i < 256; ++i) {
+  byteToHex.push((i + 256).toString(16).slice(1));
+}
+function unsafeStringify(arr, offset2 = 0) {
+  return (byteToHex[arr[offset2 + 0]] + byteToHex[arr[offset2 + 1]] + byteToHex[arr[offset2 + 2]] + byteToHex[arr[offset2 + 3]] + "-" + byteToHex[arr[offset2 + 4]] + byteToHex[arr[offset2 + 5]] + "-" + byteToHex[arr[offset2 + 6]] + byteToHex[arr[offset2 + 7]] + "-" + byteToHex[arr[offset2 + 8]] + byteToHex[arr[offset2 + 9]] + "-" + byteToHex[arr[offset2 + 10]] + byteToHex[arr[offset2 + 11]] + byteToHex[arr[offset2 + 12]] + byteToHex[arr[offset2 + 13]] + byteToHex[arr[offset2 + 14]] + byteToHex[arr[offset2 + 15]]).toLowerCase();
+}
+let getRandomValues;
+const rnds8 = new Uint8Array(16);
+function rng() {
+  if (!getRandomValues) {
+    if (typeof crypto === "undefined" || !crypto.getRandomValues) {
+      throw new Error("crypto.getRandomValues() not supported. See https://github.com/uuidjs/uuid#getrandomvalues-not-supported");
+    }
+    getRandomValues = crypto.getRandomValues.bind(crypto);
+  }
+  return getRandomValues(rnds8);
+}
+const randomUUID = typeof crypto !== "undefined" && crypto.randomUUID && crypto.randomUUID.bind(crypto);
+const native = { randomUUID };
+function v4(options, buf, offset2) {
+  if (native.randomUUID && true && !options) {
+    return native.randomUUID();
+  }
+  options = options || {};
+  const rnds = options.random ?? options.rng?.() ?? rng();
+  if (rnds.length < 16) {
+    throw new Error("Random bytes length must be >= 16");
+  }
+  rnds[6] = rnds[6] & 15 | 64;
+  rnds[8] = rnds[8] & 63 | 128;
+  return unsafeStringify(rnds);
+}
 class ServiceRegistry {
   constructor() {
     this.serviceMap = {};
@@ -177946,31 +177979,32 @@ const jsonMode = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProp
   toTextEdit
 }, Symbol.toStringTag, { value: "Module" }));
 export {
-  Route as A,
+  Routes as A,
   Button$2 as B,
   Checkbox as C,
-  Navigate as D,
-  Layout as E,
+  Route as D,
+  Navigate as E,
   Form$1 as F,
-  theme as G,
-  HashRouter as H,
+  Layout as G,
+  theme as H,
   Input as I,
-  createStore as J,
-  trim as K,
+  HashRouter as J,
+  createStore as K,
   Link as L,
   Menu$1 as M,
   NavLink as N,
-  keys as O,
+  trim as O,
   Popconfirm as P,
-  ServiceRegistry as Q,
+  keys as Q,
   RefIcon as R,
   Select as S,
-  setServiceRegistry as T,
-  Breadcrumb as U,
-  RefIcon$5 as V,
-  RefIcon$d as W,
-  RefIcon$1 as X,
-  RefIcon$c as Y,
+  ServiceRegistry as T,
+  setServiceRegistry as U,
+  Breadcrumb as V,
+  RefIcon$5 as W,
+  RefIcon$d as X,
+  RefIcon$1 as Y,
+  RefIcon$c as Z,
   RefIcon$2 as a,
   RefIcon$m as b,
   RefIcon$3 as c,
@@ -177996,6 +178030,6 @@ export {
   Col as w,
   useNavigate as x,
   editor as y,
-  Routes as z
+  v4 as z
 };
 //# sourceMappingURL=vendor.js.map

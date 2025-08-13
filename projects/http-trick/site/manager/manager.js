@@ -1,4 +1,4 @@
-import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as Future, k as clientExports, l as Modal, m as axios, n as copyToClipboard, N as NavLink, o as find, S as Select, p as produce, t as set, v as Row, w as Col, x as useNavigate, y as editor, z as Routes, A as Route, D as Navigate, E as Layout, G as theme, H as HashRouter, J as createStore, K as trim, O as keys, Q as ServiceRegistry, T as setServiceRegistry } from "./vendor.js";
+import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as Future, k as clientExports, l as Modal, m as axios, n as copyToClipboard, N as NavLink, o as find, S as Select, p as produce, t as set, v as Row, w as Col, x as useNavigate, y as editor, z as v4, A as Routes, D as Route, E as Navigate, G as Layout, H as theme, J as HashRouter, K as createStore, O as trim, Q as keys, T as ServiceRegistry, U as setServiceRegistry } from "./vendor.js";
 var EService = /* @__PURE__ */ ((EService2) => {
   EService2["IWorkbenchService"] = "WorkbenchService";
   EService2["IUserService"] = "UserService";
@@ -2019,6 +2019,7 @@ class DataList extends React.PureComponent {
   }
   async requestAddDataFile() {
     const entry = await openDialog(DataCreateForm, {});
+    entry.id = v4();
     await dataFileService.createDataFileEntry(entry);
     staticMethods.success("创建成功!");
   }
@@ -2029,7 +2030,7 @@ class DataList extends React.PureComponent {
       content
     });
     await dataFileService.saveDataFile(dataEntry.id, newContent);
-    staticMethods.success("创建成功!");
+    staticMethods.success("保存成功!");
   }
   async deleteDataFile(dataEntry, index) {
     await dataFileService.removeDataFileEntry(dataEntry);

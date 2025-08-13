@@ -8,6 +8,7 @@ import { ColumnsType } from 'antd/es/table';
 import { openDialog } from '../../forms/utils.ts';
 import DataCreateForm, { IDataCreateFormProps } from '../../forms/data-create-form/DataCreateForm.tsx';
 import DataEditForm, { IDataEditFormProps } from '../../forms/data-edit-form/DataEditForm.tsx';
+import { v4 as uuidV4 } from 'uuid';
 
 interface IProps {}
 
@@ -35,6 +36,7 @@ export default class DataList extends React.PureComponent<IProps, IState> {
 
   async requestAddDataFile() {
     const entry = await openDialog<IDataCreateFormProps, any>(DataCreateForm, {});
+    entry.id = uuidV4();
     await dataFileService.createDataFileEntry(entry);
     message.success('创建成功!');
   }
@@ -46,7 +48,7 @@ export default class DataList extends React.PureComponent<IProps, IState> {
       content,
     });
     await dataFileService.saveDataFile(dataEntry.id, newContent);
-    message.success('创建成功!');
+    message.success('保存成功!');
   }
 
   async deleteDataFile(dataEntry: IDataFileEntry, index: number) {
