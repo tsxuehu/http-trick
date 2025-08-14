@@ -1,6 +1,5 @@
-
 enum EService {
-    IWorkbenchService = 'WorkbenchService',
-
+  IWorkbenchService = 'WorkbenchService',
+  ITrafficService = 'TrafficService',
 }
-export default EService
+export default EService;

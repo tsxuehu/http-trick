@@ -1,50 +1,39 @@
-import axios from "axios";
-import queryString from "query-string";
+import axios from 'axios';
+import queryString from 'query-string';
+import { assertAxiosRes } from './utils.ts';
+
 export async function getResponseBody(id: string) {
-  try{
+  try {
     let result = await axios.get(`/traffic/getResponseBody?id=${id}`);
     return result.data;
-  }catch (e){
+  } catch (e) {
     return '';
   }
-
 }
+
 export async function getRequestBody(id: string) {
-  try{
+  try {
     let result = await axios.get(`/traffic/getRequestBody?id=${id}`);
     return result.data;
-  }catch (e){
+  } catch (e) {
     return '';
   }
-
 }
 
 export async function setStopRecord(stop: boolean) {
-    try{
-        let result = await axios.get(`/traffic/stopRecord?stop=${stop}`);
-        return result.data;
-    }catch (e){
-        return '';
-    }
+  let response = await axios.get(`/traffic/stopRecord?stop=${stop}`);
+  assertAxiosRes(response);
 }
 
 export async function clear() {
-    try{
-        let result = await axios.get('/traffic/clear');
-        return result.data;
-    }catch (e){
-        return '';
-    }
-}
-export async function setFilter(filter: any) {
-    try{
-        let result = await axios.get(`/traffic/setfilter?path=${filter.path}&host=${filter.host}`);
-        return result.data;
-    }catch (e){
-        return '';
-    }
+  let response = await axios.get('/traffic/clear');
+  assertAxiosRes(response);
 }
 
+export async function setFilter(filter: any) {
+  let response = await axios.get(`/traffic/setfilter?path=${filter.path}&host=${filter.host}`);
+  assertAxiosRes(response);
+}
 
 let pairSplitRegExp = /; */;
 let decode = decodeURIComponent;
@@ -62,7 +51,7 @@ export function parseCookie(str: string, options: any) {
     throw new TypeError('argument str must be a string');
   }
 
-  var obj = {}
+  var obj = {};
   var opt = options || {};
   var pairs = str.split(pairSplitRegExp);
   var dec = opt.decode || decode;
@@ -76,7 +65,7 @@ export function parseCookie(str: string, options: any) {
       continue;
     }
 
-    var key = pair.substr(0, eq_idx).trim()
+    var key = pair.substr(0, eq_idx).trim();
     var val = pair.substr(++eq_idx, pair.length).trim();
 
     // quoted values

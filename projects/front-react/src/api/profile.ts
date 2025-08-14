@@ -59,6 +59,7 @@ export async function getUserId(): Promise<string> {
 export async function getUserInfo() {
   const response = await axios.get(`/profile/getUserInfo`);
   assertAxiosRes(response);
+  return response.data.data;
 }
 
 export async function setUserId(userId: string) {

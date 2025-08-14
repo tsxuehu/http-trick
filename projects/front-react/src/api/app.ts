@@ -1,6 +1,8 @@
-
 import axios from 'axios';
+import { assertAxiosRes } from './utils.ts';
 
-export function getAppInfo() {
-  return axios.get('/app/get-info');
+export async function getAppInfo() {
+  const response = await axios.get('/app/get-info');
+  assertAxiosRes(response);
+  return response.data.data;
 }

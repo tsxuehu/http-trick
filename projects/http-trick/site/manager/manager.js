@@ -1,4 +1,5 @@
-import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as Future, k as clientExports, l as Modal, m as axios, n as copyToClipboard, N as NavLink, p as produce, o as Row, t as Col, v as useNavigate, w as find, S as Select, x as set, y as editor, z as v4, A as Routes, D as Route, E as Navigate, G as Switch, H as Layout, J as theme, K as HashRouter, O as createStore, Q as trim, T as keys, U as ServiceRegistry, V as setServiceRegistry } from "./vendor.js";
+import { g as getServiceSync, r as reactExports, u as useLocation, j as jsxRuntimeExports, M as Menu, L as Link, R as RefIcon, a as RefIcon$1, b as RefIcon$2, c as RefIcon$3, d as RefIcon$4, e as React, q as qrcode, s as staticMethods, F as Form, C as Checkbox, I as Input, B as Button, f as Radio, P as Popconfirm, h as ForwardTable, i as Future, k as clientExports, l as Modal, m as copyToClipboard, N as NavLink, p as produce, n as Row, o as Col, t as useNavigate, v as find, S as Select, w as set, x as editor, y as v4, z as Routes, A as Route, D as Navigate, E as Switch, G as Layout, H as theme, J as HashRouter, K as axios, O as trim, Q as keys, T as ServiceRegistry, U as setServiceRegistry } from "./vendor.js";
+import { g as getRemoteFile, a as getUserId, S as StateBase, b as assertAxiosRes, e as enableResolveIp, d as disableResolveIp, c as enableFilter, f as disableFilter, h as enableHost, i as disableHost, j as enableRule, k as disableRule, s as saveFile$2 } from "./StateBase.js";
 var EService = /* @__PURE__ */ ((EService2) => {
   EService2["IWorkbenchService"] = "WorkbenchService";
   EService2["IUserService"] = "UserService";
@@ -640,17 +641,6 @@ const PromptForm = (props) => {
     }
   );
 };
-async function getRemoteFile(url) {
-  const response = await axios.get(`/utils/getRemoteFile?url=${encodeURIComponent(url)}`);
-  assertAxiosRes(response);
-  return response.data.data;
-}
-function assertAxiosRes(response) {
-  const serverData = response.data;
-  if (serverData.code !== 0) {
-    throw new Error(serverData.msg);
-  }
-}
 const hostService$4 = getServiceSync(EService.IHostService);
 const profileService$4 = getServiceSync(EService.IProfileService);
 const appInfoService$2 = getServiceSync(EService.IAppInfoService);
@@ -2459,47 +2449,6 @@ const App = () => {
     ] })
   ] }) });
 };
-async function saveFile$2(content) {
-  const response = await axios.post("/profile/savefile", content);
-  assertAxiosRes(response);
-}
-async function disableRule() {
-  const response = await axios.post(`/profile/setRuleState`);
-  assertAxiosRes(response);
-}
-async function enableRule() {
-  const response = await axios.post(`/profile/setRuleState?rulestate=1`);
-  assertAxiosRes(response);
-}
-async function disableResolveIp() {
-  const response = await axios.post(`/profile/setResolveIp`);
-  assertAxiosRes(response);
-}
-async function enableResolveIp() {
-  const response = await axios.post(`/profile/setResolveIp?resolve=1`);
-  assertAxiosRes(response);
-}
-async function disableHost() {
-  const response = await axios.post(`/profile/setHostState`);
-  assertAxiosRes(response);
-}
-async function enableHost() {
-  const response = await axios.post(`/profile/setHostState?hoststate=1`);
-  assertAxiosRes(response);
-}
-async function disableFilter() {
-  const response = await axios.post(`/profile/setFilterState`);
-  assertAxiosRes(response);
-}
-async function enableFilter() {
-  const response = await axios.post(`/profile/setFilterState?filterstate=1`);
-  assertAxiosRes(response);
-}
-async function getUserId() {
-  const response = await axios.get(`/profile/getUserId`);
-  assertAxiosRes(response);
-  return response.data.data.userId;
-}
 const appInfoService = getServiceSync(EService.IAppInfoService);
 const configureService = getServiceSync(EService.IConfigureService);
 const mockDataService = getServiceSync(EService.IDataFileService);
@@ -2546,22 +2495,6 @@ class WorkbenchService {
     socket.on("datalist", (data) => {
       mockDataService.setDataFileEntryList(data);
     });
-  }
-}
-class StateBase {
-  __store;
-  constructor(initialState) {
-    this.__store = createStore((set2) => initialState);
-  }
-  setState(partial) {
-    this.__store.setState(partial);
-  }
-  getState() {
-    return this.__store.getState();
-  }
-  subscribe(listener) {
-    listener(this.__store.getState());
-    return this.__store.subscribe(listener);
   }
 }
 class AppInfoService extends StateBase {
