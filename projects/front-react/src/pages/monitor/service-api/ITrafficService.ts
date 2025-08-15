@@ -6,12 +6,12 @@ export interface ITraffic {
   requestingClear: boolean;
   bindedDeviceList: any[];
   hostFileList: any[];
-  recordMap: Record<string, any>;
-  originRecordArray: any[];
-  filteredRecordArray: any[];
+  recordMap: Record<string, TrafficRow>;
+  originRecordArray: number[];
+  filteredRecordArray: number[];
   monitorState: IMonitorState;
-  selectRecordId: string;
-  rightClickedRecordId: string;
+  selectRecordId: number;
+  rightClickedRecordId: number;
   rightClickedDeviceId: string;
   currentRequestBody: string;
   currentResponseBody: string;
@@ -86,11 +86,13 @@ export default interface ITrafficService extends IStateBase<ITraffic> {
   setAppInfo(appInfo: IAppInfo): void;
   setTraffic(trafficRecords: TrafficRow[]): void;
   setLocalFilter(filter: IFilter): void;
+  getLocalFilter(): IFilter;
   setMonitorState(monitorState: IMonitorState): void;
+  getMonitorState(): IMonitorState;
   clearLocalMonitorData(): void;
   setBindedDeviceList(bindedDeviceList: any[]): void;
   setHostFileList(hostFileList: any[]): void;
-
+  getRecordMap(): Record<number, TrafficRow>;
   requestSetStopRecord(stop: boolean): Promise<void>;
   requestSetFilter(filter: IFilter): Promise<void>;
   requestClearMonitorData(): Promise<void>;

@@ -1,4 +1,4 @@
-import { K as axios, V as createStore } from "./vendor.js";
+import { K as axios, $ as createStore } from "./vendor.js";
 async function getRemoteFile(url) {
   const response = await axios.get(`/utils/getRemoteFile?url=${encodeURIComponent(url)}`);
   assertAxiosRes(response);

@@ -9,11 +9,13 @@
     "watch": "vite build -m development -w"
   },
   "dependencies": {
+    "@ant-design/icons": "5.x",
     "@spring4js/concurrent": "^1.0.2",
     "@spring4js/container-browser": "^1.0.1",
     "@spring4js/log": "^1.0.1",
     "@types/lodash": "^4.17.20",
     "antd": "^5.26.6",
+    "classnames": "^2.5.1",
     "copy-to-clipboard": "^3.3.3",
     "immer": "^10.1.1",
     "lodash": "^4.17.21",
@@ -23,6 +25,8 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-router": "^7.7.1",
+    "react-virtualized-auto-sizer": "^1.0.26",
+    "react-window": "^1.8.11",
     "uuid": "^11.1.0",
     "zustand": "^5.0.7"
   },
@@ -31,6 +35,7 @@
     "@types/node": "^24.1.0",
     "@types/react": "18.3.1",
     "@types/react-dom": "18.3.1",
+    "@types/react-window": "^1.8.8",
     "@vitejs/plugin-react": "^4.6.0",
     "eslint": "^9.30.1",
     "eslint-plugin-react-hooks": "^5.2.0",

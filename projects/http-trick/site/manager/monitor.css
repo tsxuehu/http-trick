@@ -1,0 +1,149 @@
+* {
+  box-sizing: border-box;
+}
+.monitor-body {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+.monitor-body .traffic-list {
+  flex-grow: 1;
+  height: 100%;
+}
+.monitor-body .traffic-detail {
+  width: 400px;
+  height: 100%;
+}
+.traffic-list .header {
+  line-height: 27px;
+  height: 27px;
+  font-weight: bolder;
+  background-color: #fafafa;
+  border-bottom: 1px solid #eaeefb;
+}
+.traffic-list .header .cell {
+  font-size: 14px;
+}
+.traffic-list .row {
+  width: 100%;
+  cursor: default;
+  font-size: 0;
+}
+.traffic-list .row .cell-index {
+  width: 50px;
+}
+.traffic-list .row .cell-status {
+  width: 60px;
+}
+.traffic-list .row .cell-method {
+  width: 72px;
+}
+.traffic-list .row .cell-protocol {
+  width: 75px;
+}
+.traffic-list .row .cell-host {
+  width: 136px;
+}
+.traffic-list .row .cell-path {
+  width: calc(100% - 763px);
+}
+.traffic-list .row .cell-type {
+  width: 150px;
+}
+.traffic-list .row .cell-device {
+  width: 150px;
+}
+.traffic-list .row .cell-time {
+  width: 70px;
+}
+.traffic-list .cell {
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  white-space: nowrap;
+  display: inline-block;
+}
+.traffic-list .record {
+  line-height: 23px;
+  height: 24px;
+  border-bottom: 1px solid #ddd;
+}
+.traffic-list .record .cell {
+  font-size: 12px;
+}
+.traffic-list .record .cell-host,
+.traffic-list .record .cell-path {
+  text-align: left;
+  padding: 0 2px;
+}
+.traffic-list .record:hover {
+  background-color: #eef1f6;
+}
+.traffic-list .selected {
+  background-color: #eef1f6;
+}
+.traffic-list .right-clicked {
+  border-bottom: 1px solid #0dd000;
+  border-top: 1px solid #0dd000;
+}
+.ctx-menu-container {
+  position: fixed;
+  padding: 0;
+  border: 1px solid #bbb;
+  background-color: whitesmoke;
+  z-index: 99999;
+  box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+}
+.top-bar {
+  padding-left: 20px;
+  display: flex;
+  height: 28px;
+  line-height: 28px;
+  border-bottom: 1px solid #e1e3e6;
+}
+.top-bar .icon-btn {
+  font-size: 20px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+.top-bar .tips {
+  font-size: 12px;
+  color: red;
+  margin-right: 10px;
+}
+.top-bar .filters {
+  line-height: 27px;
+  height: 27px;
+}
+.top-bar .placeholder {
+  flex-grow: 1;
+}
+.top-bar .goto-manager {
+  text-align: right;
+  margin-right: 20px;
+}
+.top-bar .username {
+  text-align: right;
+  padding-right: 20px;
+}
+.top-bar .zanting {
+  color: #F56C6C;
+}
+.top-bar .bofang {
+  color: #67C23A;
+}
+.top-bar .icon-qingchu {
+  color: #F56C6C;
+}
+.top-bar input {
+  width: 150px;
+}
+.top-bar .el-button--text {
+  padding: 0;
+}
+.top-bar .search {
+  margin-left: 5px;
+  font-size: 14px;
+  cursor: pointer;
+}

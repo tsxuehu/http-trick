@@ -1,5 +1,241 @@
-import { G as Layout, r as reactExports, H as theme, j as jsxRuntimeExports, K as axios, g as getServiceSync, p as produce, T as ServiceRegistry, U as setServiceRegistry, k as clientExports } from "./vendor.js";
+import { e as React, j as jsxRuntimeExports, V as cn, k as clientExports, g as getServiceSync, W as AutoSizer, X as FixedSizeList, Y as RefIcon, Z as RefIcon$1, _ as RefIcon$2, I as Input, B as Button, G as Layout, r as reactExports, H as theme, K as axios, p as produce, T as ServiceRegistry, U as setServiceRegistry } from "./vendor.js";
 import { b as assertAxiosRes, l as getUserInfo, S as StateBase } from "./StateBase.js";
+var EService = /* @__PURE__ */ ((EService2) => {
+  EService2["IWorkbenchService"] = "WorkbenchService";
+  EService2["ITrafficService"] = "TrafficService";
+  return EService2;
+})(EService || {});
+class BodyClickListener {
+  _isListening = false;
+  _listener;
+  constructor(fn) {
+    this._listener = fn;
+  }
+  get isListening() {
+    return this._isListening;
+  }
+  start() {
+    window.addEventListener("click", this._onclick, true);
+    window.addEventListener("keyup", this._onescape, true);
+    this._isListening = true;
+  }
+  stop() {
+    window.removeEventListener("click", this._onclick, true);
+    window.removeEventListener("keyup", this._onescape, true);
+    this._isListening = false;
+  }
+  _onclick = (e) => {
+    e.preventDefault();
+    this._listener?.(e);
+  };
+  _onescape = (e) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      this._listener?.(e);
+    }
+  };
+}
+class ContextMenuWrapper extends React.PureComponent {
+  divRef = React.createRef();
+  bodyClickListener;
+  componentDidMount() {
+    this.bodyClickListener = new BodyClickListener((event) => {
+      const outsideClick = !this.divRef.current?.contains(event.target);
+      if (outsideClick) {
+        this.props.close();
+      }
+    });
+    this.bodyClickListener.start();
+  }
+  componentWillUnmount() {
+    this.bodyClickListener?.stop();
+  }
+  render() {
+    const { top, left } = this.props;
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "div",
+      {
+        ref: this.divRef,
+        className: cn("ctx-menu-container"),
+        style: {
+          top: top + "px",
+          left: left + "px"
+        },
+        onClick: (e) => e.stopPropagation(),
+        onContextMenu: (e) => e.stopPropagation(),
+        children: this.props.renderContextMenu(this.props.close)
+      }
+    );
+  }
+}
+function showContextMenu(options) {
+  const { top, left, render } = options;
+  const menuContainerDiv = document.createElement("div");
+  document.body.appendChild(menuContainerDiv);
+  const root = clientExports.createRoot(menuContainerDiv);
+  const destroy = () => {
+    try {
+      root.unmount();
+      document.body.removeChild(menuContainerDiv);
+    } catch (error) {
+    }
+  };
+  root.render(
+    React.createElement(ContextMenuWrapper, {
+      top,
+      left,
+      renderContextMenu: render,
+      close: destroy
+    })
+  );
+}
+const trafficService$2 = getServiceSync(EService.ITrafficService);
+class RecordList extends React.PureComponent {
+  state = {
+    filteredRecordArray: [],
+    rightClickedRecordId: -1,
+    selectRecordId: -1
+  };
+  unTraffic;
+  componentDidMount() {
+    this.unTraffic = trafficService$2.subscribe((state) => {
+      this.setState({
+        filteredRecordArray: state.filteredRecordArray,
+        rightClickedRecordId: state.rightClickedRecordId,
+        selectRecordId: state.selectRecordId
+      });
+    });
+  }
+  componentWillUnmount() {
+    this.unTraffic?.();
+  }
+  onContextMenu(event) {
+    event.preventDefault();
+    showContextMenu({
+      top: 100,
+      left: 100,
+      render: (close) => {
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: "上下文菜单测试" });
+      }
+    });
+  }
+  onClickRow() {
+  }
+  renderRow(index, rowId, style) {
+    const { selectRecordId, rightClickedRecordId } = this.state;
+    const recordMap = trafficService$2.getRecordMap();
+    const { response, requestData, originRequest } = recordMap[rowId];
+    let duration;
+    if (response) {
+      duration = response?.remoteResponseEndTime - response?.remoteRequestBeginTime;
+    }
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        style,
+        onClick: () => this.onClickRow(),
+        className: cn("record row", {
+          selected: selectRecordId === rowId,
+          "right-clicked": rightClickedRecordId === rowId
+        }),
+        onContextMenu: (e) => this.onContextMenu(e),
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-index", children: index + 1 }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-status", children: response?.statusCode }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-method", children: originRequest?.method }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-protocol", children: originRequest?.protocol }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-host", children: originRequest?.hostname }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-path", children: originRequest?.pathname }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-type", children: originRequest?.headers["content-type"] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-device", children: originRequest?.deviceId }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-time", children: duration })
+        ]
+      }
+    );
+  }
+  render() {
+    const { filteredRecordArray } = this.state;
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "traffic-list", onContextMenu: (e) => this.onContextMenu(e), children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "header row", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-index", children: "#" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-status", children: "Status" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-method", children: "Method" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-protocol", children: "Protocol" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-host", children: "Host" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-path", children: "Path" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-type", children: "Type" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-device", children: "Device" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cell cell-time", children: "Time" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(AutoSizer, { disableWidth: true, children: ({ height }) => {
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(
+          FixedSizeList,
+          {
+            height,
+            width: 300,
+            itemCount: filteredRecordArray.length,
+            itemSize: 35,
+            itemData: {
+              dataSource: filteredRecordArray
+            },
+            itemKey: (index, data) => {
+              return data.dataSource[index];
+            },
+            children: ({ index, style, data }) => this.renderRow(index, data.dataSource[index], style)
+          }
+        );
+      } })
+    ] });
+  }
+}
+const trafficService$1 = getServiceSync(EService.ITrafficService);
+class TopBar extends React.PureComponent {
+  state = {
+    monitorState: trafficService$1.getMonitorState(),
+    filter: trafficService$1.getLocalFilter()
+  };
+  unTraffic;
+  componentDidMount() {
+    this.unTraffic = trafficService$1.subscribe((state) => {
+      this.setState({ monitorState: state.monitorState, filter: state.filter });
+    });
+  }
+  componentWillUnmount() {
+    this.unTraffic?.();
+  }
+  clearMonitorData() {
+  }
+  setRecordState(record) {
+  }
+  setHost(host) {
+  }
+  setPath(path) {
+  }
+  render() {
+    const { monitorState, filter } = this.state;
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "top-bar", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `icon-btn ${monitorState.overflow ? "overflow" : ""}`, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon, { onClick: () => this.setRecordState(false) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$1, { onClick: () => this.setRecordState(true) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "icon-btn", children: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$2, { onClick: () => this.clearMonitorData() }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "tips ", style: { visibility: monitorState.overflow ? "initial" : "hidden" }, children: "记录已满，请清除历史记录" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "filters", children: [
+        "Filter:",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Host", value: filter.host, onChange: (e) => this.setHost(e.target.value) }),
+        "/",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "Path", value: filter.path, onChange: (e) => this.setPath(e.target.value) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "placeholder" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "goto-manager", href: "/index.html", target: "_blank", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { children: "管理" }) })
+    ] });
+  }
+}
+class RecordDetail extends React.PureComponent {
+  render() {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "traffic-detail", children: "RecordDetail" });
+  }
+}
 const { Header, Content, Footer, Sider } = Layout;
 const App = () => {
   const [collapsed, setCollapsed] = reactExports.useState(false);
@@ -7,19 +243,11 @@ const App = () => {
     token: { colorBgContainer, borderRadiusLG }
   } = theme.useToken();
   return /* @__PURE__ */ jsxRuntimeExports.jsx(Layout, { style: { height: "100vh" }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Layout, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Header, { style: { padding: 0, background: colorBgContainer } }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Content, { style: { margin: "0 16px" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "div",
-      {
-        style: {
-          padding: 24,
-          minHeight: 360,
-          background: colorBgContainer,
-          borderRadius: borderRadiusLG
-        },
-        children: "Bill is a cat."
-      }
-    ) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Header, { style: { padding: 0, background: colorBgContainer }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(TopBar, {}) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Content, { style: { margin: "0 16px" }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "monitor-body", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(RecordList, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(RecordDetail, {})
+    ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Footer, { style: { textAlign: "center" }, children: [
       "Http Trick ©",
       (/* @__PURE__ */ new Date()).getFullYear(),
@@ -27,11 +255,6 @@ const App = () => {
     ] })
   ] }) });
 };
-var EService = /* @__PURE__ */ ((EService2) => {
-  EService2["IWorkbenchService"] = "WorkbenchService";
-  EService2["ITrafficService"] = "TrafficService";
-  return EService2;
-})(EService || {});
 async function getAppInfo() {
   const response = await axios.get("/app/get-info");
   assertAxiosRes(response);
@@ -129,9 +352,9 @@ class TrafficService extends StateBase {
         // 打到最大记录数显示
       },
       // 交互数据
-      selectRecordId: "",
+      selectRecordId: -1,
       //当前选择的记录
-      rightClickedRecordId: "",
+      rightClickedRecordId: -1,
       // 右击的记录id
       rightClickedDeviceId: "",
       // 右击的设备id
@@ -200,8 +423,14 @@ class TrafficService extends StateBase {
       filteredRecordArray: filtered
     });
   }
+  getLocalFilter() {
+    return this.getState().filter;
+  }
   setMonitorState(monitorState) {
     this.setState({ monitorState });
+  }
+  getMonitorState() {
+    return this.getState().monitorState;
   }
   clearLocalMonitorData() {
     this.setState({
@@ -219,6 +448,9 @@ class TrafficService extends StateBase {
   }
   setHostFileList(hostFileList) {
     this.setState({ hostFileList });
+  }
+  getRecordMap() {
+    return this.getState().recordMap;
   }
   async requestSetStopRecord(stop) {
     await setStopRecord(stop);

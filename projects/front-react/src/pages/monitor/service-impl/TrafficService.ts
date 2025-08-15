@@ -35,8 +35,8 @@ export default class TrafficService extends StateBase<ITraffic> implements ITraf
       },
 
       // 交互数据
-      selectRecordId: '', //当前选择的记录
-      rightClickedRecordId: '', // 右击的记录id
+      selectRecordId: -1, //当前选择的记录
+      rightClickedRecordId: -1, // 右击的记录id
       rightClickedDeviceId: '', // 右击的设备id
       currentRequestBody: '', // 选择记录的请求body
       currentResponseBody: '', // 选择记录的响应body
@@ -120,11 +120,15 @@ export default class TrafficService extends StateBase<ITraffic> implements ITraf
       filteredRecordArray: filtered,
     });
   }
-
+  getLocalFilter(): IFilter {
+    return this.getState().filter;
+  }
   setMonitorState(monitorState: IMonitorState): void {
     this.setState({ monitorState });
   }
-
+  getMonitorState(): IMonitorState {
+    return this.getState().monitorState;
+  }
   clearLocalMonitorData(): void {
     this.setState({
       requestingClear: false,
@@ -144,7 +148,9 @@ export default class TrafficService extends StateBase<ITraffic> implements ITraf
   setHostFileList(hostFileList: any[]): void {
     this.setState({ hostFileList });
   }
-
+  getRecordMap(): Record<number, TrafficRow> {
+    return this.getState().recordMap;
+  }
   async requestSetStopRecord(stop: boolean): Promise<void> {
     await trafficApi.setStopRecord(stop);
   }
