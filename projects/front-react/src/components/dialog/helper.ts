@@ -1,16 +1,22 @@
-import React, { ComponentClass, FunctionComponent } from "react";
-import { createRoot } from "react-dom/client";
-import { Future } from "@spring4js/concurrent";
+import React, { ComponentClass, FunctionComponent } from 'react';
+import { createRoot } from 'react-dom/client';
+import { Future } from '@spring4js/concurrent';
 
-export interface IBaseProps<IOk=any, ICancel = any> {
-  onOk: (data: IOk) => void;
-  onCancel: (data: ICancel) => void;
+interface IRenderParams<OKData, CancelData> {
+  onOk: (data: OKData) => void;
+  onCancel: (data: CancelData) => void;
   onError: (error: Error) => void;
 }
 
-export function openDialog<IProps extends IBaseProps<IResult>, IResult = any>(dialog: FunctionComponent<IProps> | ComponentClass<IProps>, props: Omit<IProps, keyof IBaseProps>): Promise<IResult> {
-  const future = new Future<IResult>();
-  const dialogContainerDiv = document.createElement("div");
+export interface IOpenOptions<OKData, CancelData> {
+  render: (param: IRenderParams<OKData, CancelData>) => React.ReactNode;
+}
+
+export function openDialog<OKData = any, CancelData = any>(
+  options: IOpenOptions<OKData, CancelData>,
+): Promise<OKData | CancelData> {
+  const future = new Future<OKData | CancelData>();
+  const dialogContainerDiv = document.createElement('div');
   document.body.appendChild(dialogContainerDiv);
 
   const root = createRoot(dialogContainerDiv);
@@ -19,28 +25,21 @@ export function openDialog<IProps extends IBaseProps<IResult>, IResult = any>(di
     try {
       root.unmount();
       document.body.removeChild(dialogContainerDiv);
-    } catch (error) {
-    }
+    } catch (error) {}
+  };
+  const onOk = (data: OKData) => {
+    destroy();
+    future.resolve(data);
+  };
+  const onCancel = (data: CancelData) => {
+    destroy();
+    future.resolve(data);
+  };
+  const onError = (error: Error) => {
+    destroy();
+    future.reject(error);
   };
 
-  const dialogProps: IProps = {
-    ...props,
-    onOk: (data: any) => {
-      destroy();
-      future.resolve(data as IResult);
-    },
-    onCancel: (data: any) => {
-      destroy();
-      future.resolve(data as IResult);
-    },
-    onError: (error: Error) => {
-      destroy();
-      future.reject(error);
-    }
-  } as IProps;
-
-  root.render(
-    React.createElement(dialog, dialogProps)
-  );
+  root.render(options.render({ onOk, onCancel, onError }));
   return future.get();
 }

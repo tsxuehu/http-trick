@@ -2,9 +2,10 @@ import React from 'react';
 import './top-bar.less';
 import { Button, Input } from 'antd';
 import { getServiceSync } from '@spring4js/container-browser/lib/esm/global-fn';
-import ITrafficService, { IFilter, IMonitorState } from '../service-api/ITrafficService.ts';
-import EService from '../config/EService.ts';
+import ITrafficService, { IFilter, IMonitorState } from '../../service-api/ITrafficService.ts';
+import EService from '../../config/EService.ts';
 import { CaretRightOutlined, DeleteOutlined, PauseOutlined } from '@ant-design/icons';
+import debounce from 'lodash/debounce';
 
 interface IProps {}
 
@@ -28,25 +29,44 @@ export default class TopBar extends React.PureComponent<IProps, IState> {
       this.setState({ monitorState: state.monitorState, filter: state.filter });
     });
   }
+
   componentWillUnmount() {
     this.unTraffic?.();
   }
 
-  clearMonitorData() {}
+  clearMonitorData() {
+    trafficService.requestClearMonitorData();
+  }
 
-  setRecordState(record: boolean) {}
+  setStopRecord(stop: boolean) {
+    trafficService.requestSetStopRecord(stop);
+  }
 
-  setHost(host: string) {}
+  setHost(host: string) {
+    const { filter } = this.state;
+    const newFilter = { ...filter, host };
+    this.setState({ filter: newFilter });
+    this.syncFilterToService(newFilter);
+  }
 
-  setPath(path: string) {}
+  setPath(path: string) {
+    const { filter } = this.state;
+    const newFilter = { ...filter, path };
+    this.setState({ filter: newFilter });
+    this.syncFilterToService(newFilter);
+  }
+
+  syncFilterToService = debounce((filter: IFilter) => {
+    trafficService.requestSetFilter(filter);
+  });
 
   render() {
     const { monitorState, filter } = this.state;
     return (
       <div className="top-bar">
         <span className={`icon-btn ${monitorState.overflow ? 'overflow' : ''}`}>
-          <CaretRightOutlined onClick={() => this.setRecordState(false)} />
-          <PauseOutlined onClick={() => this.setRecordState(true)} />
+          <CaretRightOutlined onClick={() => this.setStopRecord(false)} />
+          <PauseOutlined onClick={() => this.setStopRecord(true)} />
         </span>
         <span className="icon-btn">
           <DeleteOutlined onClick={() => this.clearMonitorData()} />

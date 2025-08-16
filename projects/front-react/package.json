@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "build-dev": "vite build -m development",
-    "watch": "vite build -m development -w"
+    "build-dev": "cross-env NODE_ENV=development vite build -m development",
+    "watch": "cross-env NODE_ENV=development vite build -m development -w"
   },
   "dependencies": {
     "@ant-design/icons": "5.x",
@@ -37,6 +37,7 @@
     "@types/react-dom": "18.3.1",
     "@types/react-window": "^1.8.8",
     "@vitejs/plugin-react": "^4.6.0",
+    "cross-env": "^10.0.0",
     "eslint": "^9.30.1",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",

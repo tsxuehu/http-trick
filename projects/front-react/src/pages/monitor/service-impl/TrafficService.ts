@@ -135,7 +135,7 @@ export default class TrafficService extends StateBase<ITraffic> implements ITraf
       recordMap: {},
       originRecordArray: [],
       filteredRecordArray: [],
-      selectRecordId: '',
+      selectRecordId: -1,
       currentRequestBody: '',
       currentResponseBody: '',
     });
@@ -166,7 +166,7 @@ export default class TrafficService extends StateBase<ITraffic> implements ITraf
     await trafficApi.clear();
   }
 
-  async selectRecordById(id: string): Promise<void> {
+  async setSelectRecordId(id: number): Promise<void> {
     const { selectRecordId, recordMap } = this.getState();
     if (selectRecordId == id) {
       return;
@@ -177,6 +177,7 @@ export default class TrafficService extends StateBase<ITraffic> implements ITraf
       currentResponseBody: '',
     });
     const currentRow = recordMap[id];
+    // @ts-ignore
     if (/(json)|(x-www-form-urlencoded)/i.test(currentRow.originRequest.headers['content-type'])) {
       // 请求后端 拿数据
       const reqBody = await trafficApi.getRequestBody(id);
@@ -186,6 +187,7 @@ export default class TrafficService extends StateBase<ITraffic> implements ITraf
     }
     // 如果是html json数据 向后端请求拿数据
     try {
+      // @ts-ignore
       if (/(text)|(javascript)|(json)/i.test(currentRow.response.headers['content-type'])) {
         // 请求后端 拿数据
         const resBody = await trafficApi.getResponseBody(id);
@@ -196,5 +198,11 @@ export default class TrafficService extends StateBase<ITraffic> implements ITraf
     } catch (e) {
       console.log('请求body数据失败', currentRow, e);
     }
+  }
+
+  setRightClickedRecordId(id: number): void {
+    this.setState({
+      rightClickedRecordId: id,
+    });
   }
 }

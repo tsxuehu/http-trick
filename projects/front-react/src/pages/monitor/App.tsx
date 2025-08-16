@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import './main.less';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
-import RecordList from './components/RecordList.tsx';
-import TopBar from './components/TopBar.tsx';
-import RecordDetail from './components/RecordDetail.tsx';
+import RecordList from './views/record-list/RecordList.tsx';
+import TopBar from './views/top-bar/TopBar.tsx';
+import RecordDetail from './views/record-detail/RecordDetail.tsx';
 
 const { Header, Content, Footer, Sider } = Layout;
 

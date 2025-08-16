@@ -2,11 +2,12 @@ import React, { MouseEvent } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
 import { getServiceSync } from '@spring4js/container-browser/lib/esm/global-fn';
-import ITrafficService from '../service-api/ITrafficService.ts';
-import EService from '../config/EService.ts';
+import ITrafficService from '../../service-api/ITrafficService.ts';
+import EService from '../../config/EService.ts';
 import cn from 'classnames';
 import './record-list.less';
-import { showContextMenu } from '../../../components/context-menu/helper.ts';
+import { showContextMenu } from '../../../../components/context-menu/helper.ts';
+import { RecordContextMenu } from '../../context-menu/record/RecordContextMenu.tsx';
 
 interface IProps {}
 
@@ -41,18 +42,31 @@ export default class RecordList extends React.PureComponent<IProps, IState> {
     this.unTraffic?.();
   }
 
-  onContextMenu(event: MouseEvent) {
+  onContextMenu(event: MouseEvent, id: number) {
     event.preventDefault();
+    trafficService.setRightClickedRecordId(id);
     showContextMenu({
       top: 100,
       left: 100,
       render: (close) => {
-        return <>上下文菜单测试</>;
+        return (
+          <RecordContextMenu
+            close={close}
+            onClick={(key) => {
+              trafficService.setRightClickedRecordId(-1);
+              if (key === 'saveData') {
+              } else if (key === 'copyUrl') {
+              }
+            }}
+          />
+        );
       },
     });
   }
 
-  onClickRow() {}
+  onClickRow(id: number) {
+    trafficService.setSelectRecordId(id);
+  }
 
   renderRow(index: number, rowId: number, style: any) {
     const { selectRecordId, rightClickedRecordId } = this.state;
@@ -65,12 +79,12 @@ export default class RecordList extends React.PureComponent<IProps, IState> {
     return (
       <div
         style={style}
-        onClick={() => this.onClickRow()}
+        onClick={() => this.onClickRow(rowId)}
         className={cn('record row', {
           selected: selectRecordId === rowId,
           'right-clicked': rightClickedRecordId === rowId,
         })}
-        onContextMenu={(e) => this.onContextMenu(e)}
+        onContextMenu={(e) => this.onContextMenu(e, rowId)}
       >
         <div className="cell cell-index">{index + 1}</div>
         <div className="cell cell-status">{response?.statusCode}</div>
@@ -88,7 +102,7 @@ export default class RecordList extends React.PureComponent<IProps, IState> {
   render() {
     const { filteredRecordArray } = this.state;
     return (
-      <div className="traffic-list" onContextMenu={(e) => this.onContextMenu(e)}>
+      <div className="record-list">
         <div className="header row">
           <div className="cell cell-index">#</div>
           <div className="cell cell-status">Status</div>
@@ -103,7 +117,8 @@ export default class RecordList extends React.PureComponent<IProps, IState> {
         <AutoSizer disableWidth={true}>
           {({ height }) => {
             return (
-              <FixedSizeList
+              // @ts-ignore
+              <FixedSizeList<{ dataSource: number[] }>
                 height={height}
                 width={300}
                 itemCount={filteredRecordArray.length}
@@ -115,9 +130,7 @@ export default class RecordList extends React.PureComponent<IProps, IState> {
                   return data.dataSource[index];
                 }}
               >
-                {({ index, style, data }: { index: number; style: any; data: any }) =>
-                  this.renderRow(index, data.dataSource[index], style)
-                }
+                {({ index, style, data }) => this.renderRow(index, data.dataSource[index], style)}
               </FixedSizeList>
             );
           }}

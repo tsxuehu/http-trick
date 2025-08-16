@@ -2,7 +2,7 @@ import axios from 'axios';
 import queryString from 'query-string';
 import { assertAxiosRes } from './utils.ts';
 
-export async function getResponseBody(id: string) {
+export async function getResponseBody(id: number) {
   try {
     let result = await axios.get(`/traffic/getResponseBody?id=${id}`);
     return result.data;
@@ -11,7 +11,7 @@ export async function getResponseBody(id: string) {
   }
 }
 
-export async function getRequestBody(id: string) {
+export async function getRequestBody(id: number) {
   try {
     let result = await axios.get(`/traffic/getRequestBody?id=${id}`);
     return result.data;

@@ -96,5 +96,6 @@ export default interface ITrafficService extends IStateBase<ITraffic> {
   requestSetStopRecord(stop: boolean): Promise<void>;
   requestSetFilter(filter: IFilter): Promise<void>;
   requestClearMonitorData(): Promise<void>;
-  selectRecordById(id: string): Promise<void>;
+  setSelectRecordId(id: number): Promise<void>;
+  setRightClickedRecordId(id: number): void;
 }
