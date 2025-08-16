@@ -35,7 +35,7 @@ export async function saveDataFile(id: string, content: any) {
   assertAxiosRes(response);
 }
 
-export async function saveDataEntryFromTraffic(reqId: string, name: string, contenttype: string) {
+export async function saveDataEntryFromTraffic(reqId: number, name: string, contenttype: string) {
   const response = await axios.post('/data/savedatafromtraffic', {
     id: uuidv4(),
     name: name,

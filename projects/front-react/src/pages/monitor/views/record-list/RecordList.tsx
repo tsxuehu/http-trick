@@ -8,7 +8,13 @@ import cn from 'classnames';
 import './record-list.less';
 import { showContextMenu } from '../../../../components/context-menu/helper.ts';
 import { RecordContextMenu } from '../../context-menu/record/RecordContextMenu.tsx';
-
+import copyToClipboard from 'copy-to-clipboard';
+import { message } from 'antd';
+import { openDialog } from '../../../manager/forms/utils.ts';
+import PromptForm, { IPromptFormProps } from '../../../manager/forms/prompt/PromptForm.tsx';
+import IDataFileService, { EContentType } from '../../../manager/service-api/IDataFileService.ts';
+import * as dataApi from '../../../../api/data.ts';
+import { saveDataEntryFromTraffic } from '../../../../api/data.ts';
 interface IProps {}
 
 interface IState {
@@ -55,13 +61,42 @@ export default class RecordList extends React.PureComponent<IProps, IState> {
             onClick={(key) => {
               trafficService.setRightClickedRecordId(-1);
               if (key === 'saveData') {
+                this.saveData(id);
               } else if (key === 'copyUrl') {
+                this.copyUrl(id);
               }
             }}
           />
         );
       },
     });
+  }
+
+  copyUrl(id: number) {
+    const recordMap = trafficService.getRecordMap();
+    const record = recordMap[id];
+    let request = record.originRequest!;
+    copyToClipboard(`${request.protocol}//${request.hostname}:${request.port}${request.path}`);
+    message.success('已将url复制到剪切板');
+  }
+
+  async saveData(id: number) {
+    const recordMap = trafficService.getRecordMap();
+    const record = recordMap[id];
+    if (!record.response) {
+      message.warning('服务器还没有响应');
+      return;
+    }
+    const values = await openDialog<IPromptFormProps, any>(PromptForm, {
+      title: '保存为数据文件',
+      fields: [{ label: '数据文件名', key: 'name', value: '', placeholder: '' }],
+    });
+    if (!values) {
+      return;
+    }
+    const contentType = record.response.headers['content-type']?.split(';')[0] || EContentType.html;
+    await dataApi.saveDataEntryFromTraffic(id, values.name, contentType);
+    message.success('保存成功');
   }
 
   onClickRow(id: number) {
