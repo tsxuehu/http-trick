@@ -80,7 +80,7 @@ export default class FilterList extends React.PureComponent<IProps, IState> {
 
   async editRule(rule: IRule, index: number) {
     const nextFilter = await openDialog<IRuleEditFormProps, IRule>(RuleEditForm, {
-      isEditRule: true,
+      isEditRule: false,
       isFilterRule: true,
       rule,
     });
