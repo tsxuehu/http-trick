@@ -975,13 +975,13 @@ koa-mount@^4.2.0:
     debug "^4.0.1"
     koa-compose "^4.1.0"
 
-koa-qs@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.npmmirror.com/koa-qs/-/koa-qs-2.0.0.tgz"
-  integrity sha512-MNQdh7pdsxCuLFSJEYw9/AISCfSFIn/qPc2eDn5u7RSIRykw8V2Bn65p6ujeb19dsjpPu04tiYBeH2oUYip2+w==
+koa-qs@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.npmmirror.com/koa-qs/-/koa-qs-3.0.0.tgz#390b0b5e9be0658b0f863ceb121da9a414b78d78"
+  integrity sha512-05IB5KirwMs3heWW26iTz46HuMAtrlrRMus/aNH1BRDocLyF/099EtCB0MIfQpRuT0TISvaTsWwSy2gctIWiGA==
   dependencies:
-    merge-descriptors "~0.0.2"
-    qs "~2.3.3"
+    merge-descriptors "^1.0.1"
+    qs "^6.9.4"
 
 koa-send@^5.0.0:
   version "5.0.1"
@@ -1066,10 +1066,10 @@ media-typer@^1.1.0:
   resolved "https://registry.npmmirror.com/media-typer/-/media-typer-1.1.0.tgz"
   integrity sha512-aisnrDP4GNe06UcKFnV5bfMNPBUw4jsLGaWwWfnH3v02GnBuXX2MCVn5RbrWo0j3pczUilYblq7fQ7Nw2t5XKw==
 
-merge-descriptors@~0.0.2:
-  version "0.0.2"
-  resolved "https://registry.npmmirror.com/merge-descriptors/-/merge-descriptors-0.0.2.tgz"
-  integrity sha512-dYBT4Ep+t/qnPeJcnMymmhTdd4g8/hn48ciaDqLAkfRf8abzLPS6Rb6EBdz5CZCL8tzZuI5ps9MhGQGxk+EuKg==
+merge-descriptors@^1.0.1:
+  version "1.0.3"
+  resolved "https://registry.npmmirror.com/merge-descriptors/-/merge-descriptors-1.0.3.tgz#d80319a65f3c7935351e5cfdac8f9318504dbed5"
+  integrity sha512-gaNvAS7TZ897/rVaZ0nMtAyxNyi/pdbjbAwUpFQpN70GqnVfOiXpeUUMKRBmzXaSQ8DdTX4/0ms62r2K+hE6mQ==
 
 merge2@^1.3.0:
   version "1.4.1"
@@ -1223,17 +1223,12 @@ proxy-from-env@^1.1.0:
   resolved "https://registry.npmmirror.com/proxy-from-env/-/proxy-from-env-1.1.0.tgz"
   integrity sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==
 
-qs@^6.4.0:
+qs@^6.4.0, qs@^6.9.4:
   version "6.14.0"
   resolved "https://registry.npmmirror.com/qs/-/qs-6.14.0.tgz"
   integrity sha512-YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w==
   dependencies:
     side-channel "^1.1.0"
-
-qs@~2.3.3:
-  version "2.3.3"
-  resolved "https://registry.npmmirror.com/qs/-/qs-2.3.3.tgz"
-  integrity sha512-f5M0HQqZWkzU8GELTY8LyMrGkr3bPjKoFtTkwUEqJQbcljbeK8M7mliP9Ia2xoOI6oMerp+QPS7oYJtpGmWe/A==
 
 query-string@^4.3.4:
   version "4.3.4"
