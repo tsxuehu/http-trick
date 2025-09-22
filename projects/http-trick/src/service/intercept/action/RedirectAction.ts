@@ -87,6 +87,7 @@ export default class RedirectAction extends BaseAction {
 
     actualRequestData.protocol = redirectUrlObj.protocol;
     actualRequestData.port = redirectUrlObj.port;
+    actualRequestData.method = originRequestData.method;
 
     await this.hostResolveService.resolveIpAndSetInfoToContext(redirectUrlObj.hostname, context);
 

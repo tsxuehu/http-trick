@@ -46,6 +46,7 @@ export default class BypassAction extends BaseAction {
     const { last } = extraInfo;
     actualRequestData.protocol = originRequestData.protocol;
     actualRequestData.port = originRequestData.port;
+    actualRequestData.method = originRequestData.method;
 
     await this.hostResolveService.resolveIpAndSetInfoToContext(originRequestData.hostname, context);
 
